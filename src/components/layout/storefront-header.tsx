@@ -67,7 +67,9 @@ export function StorefrontHeader() {
                   className="hidden sm:inline-flex"
                   asChild
                 >
-                  <Link to="/account">{t("nav.account")}</Link>
+                  <Link to="/account" search={{ tab: "dashboard" }}>
+                    {t("nav.account")}
+                  </Link>
                 </Button>
                 {isDealer && (
                   <Button

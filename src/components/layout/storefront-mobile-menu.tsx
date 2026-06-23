@@ -55,6 +55,7 @@ export function StorefrontMobileMenu() {
               <>
                 <Link
                   to="/account"
+                  search={{ tab: "dashboard" }}
                   className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted"
                   onClick={() => setOpen(false)}
                 >

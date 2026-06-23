@@ -61,7 +61,11 @@ export function AccountDashboard({
   isDealer,
 }: AccountDashboardProps) {
   const { t } = useT();
-  const initials = (profile.fullName?.[0] ?? profile.email?.[0] ?? "U").toUpperCase();
+  const initials = (
+    profile.fullName?.[0] ??
+    profile.email?.[0] ??
+    "U"
+  ).toUpperCase();
 
   const tierPct =
     tierProgress?.nextTierName && tierProgress.amountToNext != null
@@ -124,7 +128,9 @@ export function AccountDashboard({
             <h2 className="text-lg font-semibold">
               {profile.fullName ?? "สมาชิก"}
             </h2>
-            <p className="mt-1 text-sm text-muted-foreground">{profile.email}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {profile.email}
+            </p>
             <div className="mt-3 flex flex-wrap justify-center gap-2">
               <Badge variant="secondary">
                 {customerTypeLabel(profile.customerType)}
@@ -146,12 +152,7 @@ export function AccountDashboard({
                 <span className="truncate">{profile.email}</span>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="mt-4"
-              asChild
-            >
+            <Button variant="ghost" size="sm" className="mt-4" asChild>
               <Link to="/account" search={{ tab: "settings" }}>
                 <Pencil className="mr-1 size-3.5" />
                 แก้ไขโปรไฟล์
@@ -342,15 +343,12 @@ export function AccountDashboard({
       </Card>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <StatCard label="คำสั่งซื้อทั้งหมด" value={`${profile.orderCount} รายการ`} />
         <StatCard
-          label="ยอดซื้อสะสม"
-          value={formatPrice(profile.totalSpent)}
+          label="คำสั่งซื้อทั้งหมด"
+          value={`${profile.orderCount} รายการ`}
         />
-        <StatCard
-          label="สถานะบัญชี"
-          value={profile.accountStatus}
-        />
+        <StatCard label="ยอดซื้อสะสม" value={formatPrice(profile.totalSpent)} />
+        <StatCard label="สถานะบัญชี" value={profile.accountStatus ?? "-"} />
       </div>
     </div>
   );
