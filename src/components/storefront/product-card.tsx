@@ -69,7 +69,7 @@ export function ProductCard({
           >
             <Label
               htmlFor={`compare-${product.id}`}
-              className="flex cursor-pointer items-center gap-1 rounded-md border border-border/60 bg-white/95 px-2 py-1 text-[10px] font-medium shadow-sm backdrop-blur-sm"
+              className="flex cursor-pointer items-center rounded-md border border-border/60 bg-white/95 p-1 shadow-sm backdrop-blur-sm"
             >
               <Checkbox
                 id={`compare-${product.id}`}
@@ -78,7 +78,6 @@ export function ProductCard({
                 onCheckedChange={() => toggle(product)}
                 aria-label="เปรียบเทียบ"
               />
-              <span className="select-none">เทียบ</span>
             </Label>
           </div>
         )}

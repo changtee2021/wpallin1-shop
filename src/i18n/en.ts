@@ -31,6 +31,7 @@ export const en: Translations = {
   "auth.noAccount": "Don't have an account?",
   "auth.hasAccount": "Already have an account?",
   "account.profile": "Profile",
+  "account.dashboard": "Dashboard",
   "account.orders": "Orders",
   "account.trackOrder": "Track order",
   "account.wallet": "Wallet",

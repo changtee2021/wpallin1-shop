@@ -72,9 +72,9 @@ function linksForZone(
     return [
       {
         to: "/account",
-        label: "ที่อยู่ / ใบกำกับ",
+        label: "ตั้งค่า",
         icon: Settings,
-        search: { tab: "addresses" },
+        search: { tab: "settings" },
       },
       { to: "/account/notifications", label: "แจ้งเตือน", icon: Bell },
       { to: "/account/quotations", label: "ใบเสนอราคา", icon: FileText },

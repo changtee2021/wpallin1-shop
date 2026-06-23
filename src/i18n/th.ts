@@ -29,6 +29,7 @@ export const th: Translations = {
   "auth.noAccount": "ยังไม่มีบัญชี?",
   "auth.hasAccount": "มีบัญชีแล้ว?",
   "account.profile": "โปรไฟล์",
+  "account.dashboard": "แดชบอร์ด",
   "account.orders": "คำสั่งซื้อ",
   "account.trackOrder": "ติดตามสถานะ",
   "account.wallet": "กระเป๋าเงิน",

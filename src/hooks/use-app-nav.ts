@@ -42,11 +42,11 @@ export function useAppNavItems(cartCount = 0): AppNavItem[] {
   if (zone === "account") {
     return [
       {
-        id: "profile",
+        id: "dashboard",
         to: "/account",
-        label: "โปรไฟล์",
-        icon: User,
-        search: { tab: "profile" },
+        label: "แดชบอร์ด",
+        icon: LayoutDashboard,
+        search: { tab: "dashboard" },
       },
       {
         id: "orders",
@@ -55,11 +55,11 @@ export function useAppNavItems(cartCount = 0): AppNavItem[] {
         icon: Package,
       },
       {
-        id: "wallet",
+        id: "settings",
         to: "/account",
-        label: "กระเป๋า",
-        icon: Wallet,
-        search: { tab: "wallet" },
+        label: "ตั้งค่า",
+        icon: User,
+        search: { tab: "settings" },
       },
       {
         id: "track",

@@ -1,43 +1,26 @@
 import {
   Bell,
-  CreditCard,
-  FileText,
+  Heart,
   Home,
-  MapPin,
+  LayoutDashboard,
   Package,
-  Receipt,
   Search,
   Settings,
   SlidersHorizontal,
   Store,
-  User,
-  Wallet,
   Share2,
-  Heart,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { useT } from "@/i18n";
-import { fetchCreditAccount } from "@/lib/api.functions";
-import { showCreditPanel } from "@/lib/member-tier";
-import { authServerFnOptions } from "@/lib/server-fn-auth";
 
 export function AccountSidebar() {
   const { t } = useT();
-  const { user, session } = useAuth();
-  const [hasCreditAccount, setHasCreditAccount] = useState(false);
+  const { user } = useAuth();
   const initials = (user?.email?.[0] ?? "U").toUpperCase();
-
-  useEffect(() => {
-    if (!session) return;
-    void fetchCreditAccount(authServerFnOptions(session))
-      .then((acct) => setHasCreditAccount(Boolean(acct)))
-      .catch(() => setHasCreditAccount(false));
-  }, [session]);
 
   return (
     <div className="space-y-4">
@@ -59,55 +42,23 @@ export function AccountSidebar() {
         items={[
           {
             to: "/account",
-            label: t("account.profile"),
-            icon: User,
-            key: "profile",
+            search: { tab: "dashboard" },
+            label: t("account.dashboard"),
+            icon: LayoutDashboard,
+            key: "dashboard",
           },
-          {
-            to: "/account",
-            search: { tab: "wallet" },
-            label: t("account.wallet"),
-            icon: Wallet,
-            key: "wallet",
-          },
-          {
-            to: "/account",
-            search: { tab: "addresses" },
-            label: t("account.addresses"),
-            icon: MapPin,
-            key: "addresses",
-          },
-          {
-            to: "/account",
-            search: { tab: "tax" },
-            label: t("account.taxInvoice"),
-            icon: Receipt,
-            key: "tax",
-          },
-          {
-            to: "/account",
-            search: { tab: "documents" },
-            label: t("account.documents"),
-            icon: FileText,
-            key: "documents",
-          },
-          ...(showCreditPanel(hasCreditAccount)
-            ? [
-                {
-                  to: "/account",
-                  search: { tab: "credit" },
-                  label: t("account.credit"),
-                  icon: CreditCard,
-                  key: "credit",
-                },
-              ]
-            : []),
           {
             to: "/account",
             search: { tab: "settings" },
             label: t("account.settings"),
             icon: Settings,
             key: "settings",
+          },
+          {
+            to: "/account/orders",
+            label: t("account.orders"),
+            icon: Package,
+            key: "orders",
           },
           {
             to: "/account/wishlist",
@@ -120,12 +71,6 @@ export function AccountSidebar() {
             label: "Affiliate",
             icon: Share2,
             key: "affiliate",
-          },
-          {
-            to: "/account/orders",
-            label: t("account.orders"),
-            icon: Package,
-            key: "orders",
           },
           {
             to: "/account/notifications",

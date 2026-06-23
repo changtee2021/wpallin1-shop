@@ -29,6 +29,7 @@ export type TranslationKey =
   | "auth.noAccount"
   | "auth.hasAccount"
   | "account.profile"
+  | "account.dashboard"
   | "account.orders"
   | "account.trackOrder"
   | "account.wallet"
