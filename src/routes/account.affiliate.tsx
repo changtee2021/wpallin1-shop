@@ -110,7 +110,9 @@ function AccountAffiliatePage() {
             <p className="text-muted-foreground">
               สมัครโปรแกรม Affiliate เพื่อรับลิงก์ชวนและติดตามค่าคอม
             </p>
-            <Button onClick={() => void handleRegister()}>สมัคร Affiliate</Button>
+            <Button onClick={() => void handleRegister()}>
+              สมัคร Affiliate
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -139,13 +141,17 @@ function AccountAffiliatePage() {
         <Card>
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground">ค่าคอมรวม</p>
-            <p className="text-2xl font-bold">{formatPrice(acc.totalCommission)}</p>
+            <p className="text-2xl font-bold">
+              {formatPrice(acc.totalCommission)}
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground">ถอนได้</p>
-            <p className="text-2xl font-bold">{formatPrice(acc.payoutBalance)}</p>
+            <p className="text-2xl font-bold">
+              {formatPrice(acc.payoutBalance)}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -169,7 +175,10 @@ function AccountAffiliatePage() {
           <div className="grid gap-3 sm:grid-cols-3">
             <div>
               <Label>Slug</Label>
-              <Input value={linkSlug} onChange={(e) => setLinkSlug(e.target.value)} />
+              <Input
+                value={linkSlug}
+                onChange={(e) => setLinkSlug(e.target.value)}
+              />
             </div>
             <div className="sm:col-span-2">
               <Label>ชื่อ (ไม่บังคับ)</Label>
@@ -192,7 +201,9 @@ function AccountAffiliatePage() {
                   <span>
                     {link.label ?? link.slug} · {link.clickCount} คลิก
                   </span>
-                  <span className="text-muted-foreground">{link.targetUrl}</span>
+                  <span className="text-muted-foreground">
+                    {link.targetUrl}
+                  </span>
                 </div>
               ))}
             </div>

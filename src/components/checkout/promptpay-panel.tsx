@@ -1,7 +1,4 @@
-import {
-  buildPromptPayPayload,
-  promptPayQrImageUrl,
-} from "@/lib/promptpay";
+import { buildPromptPayPayload, promptPayQrImageUrl } from "@/lib/promptpay";
 import { formatPrice } from "@/lib/format";
 
 export function PromptPayPanel({
@@ -17,9 +14,7 @@ export function PromptPayPanel({
   try {
     payload = buildPromptPayPayload(promptPayId, amount);
   } catch {
-    return (
-      <p className="text-sm text-destructive">PromptPay ID ไม่ถูกต้อง</p>
-    );
+    return <p className="text-sm text-destructive">PromptPay ID ไม่ถูกต้อง</p>;
   }
 
   const qrUrl = promptPayQrImageUrl(payload);
@@ -32,7 +27,9 @@ export function PromptPayPanel({
         alt="PromptPay QR"
         className="mx-auto size-48 rounded-md border"
       />
-      <p className="mt-2 text-lg font-bold text-accent">{formatPrice(amount)}</p>
+      <p className="mt-2 text-lg font-bold text-accent">
+        {formatPrice(amount)}
+      </p>
       <p className="text-xs text-muted-foreground">ID: {promptPayId}</p>
     </div>
   );

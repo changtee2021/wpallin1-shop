@@ -45,8 +45,11 @@ import { Route as AccountQuotationsRouteImport } from './routes/account.quotatio
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
 import { Route as AccountNotificationsRouteImport } from './routes/account.notifications'
 import { Route as AccountAffiliateRouteImport } from './routes/account.affiliate'
+import { Route as StoreTermsRouteImport } from './routes/_store.terms'
 import { Route as StoreShopRouteImport } from './routes/_store.shop'
+import { Route as StorePrivacyRouteImport } from './routes/_store.privacy'
 import { Route as StoreErrorRouteImport } from './routes/_store.error'
+import { Route as StoreCookiesRouteImport } from './routes/_store.cookies'
 import { Route as StoreContactRouteImport } from './routes/_store.contact'
 import { Route as StoreConfiguratorRouteImport } from './routes/_store.configurator'
 import { Route as StoreCheckoutRouteImport } from './routes/_store.checkout'
@@ -243,14 +246,29 @@ const AccountAffiliateRoute = AccountAffiliateRouteImport.update({
   path: '/affiliate',
   getParentRoute: () => AccountRoute,
 } as any)
+const StoreTermsRoute = StoreTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => StoreRoute,
+} as any)
 const StoreShopRoute = StoreShopRouteImport.update({
   id: '/shop',
   path: '/shop',
   getParentRoute: () => StoreRoute,
 } as any)
+const StorePrivacyRoute = StorePrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => StoreRoute,
+} as any)
 const StoreErrorRoute = StoreErrorRouteImport.update({
   id: '/error',
   path: '/error',
+  getParentRoute: () => StoreRoute,
+} as any)
+const StoreCookiesRoute = StoreCookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
   getParentRoute: () => StoreRoute,
 } as any)
 const StoreContactRoute = StoreContactRouteImport.update({
@@ -349,8 +367,11 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof StoreCheckoutRoute
   '/configurator': typeof StoreConfiguratorRoute
   '/contact': typeof StoreContactRoute
+  '/cookies': typeof StoreCookiesRoute
   '/error': typeof StoreErrorRoute
+  '/privacy': typeof StorePrivacyRoute
   '/shop': typeof StoreShopRoute
+  '/terms': typeof StoreTermsRoute
   '/account/affiliate': typeof AccountAffiliateRoute
   '/account/notifications': typeof AccountNotificationsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
@@ -400,8 +421,11 @@ export interface FileRoutesByTo {
   '/checkout': typeof StoreCheckoutRoute
   '/configurator': typeof StoreConfiguratorRoute
   '/contact': typeof StoreContactRoute
+  '/cookies': typeof StoreCookiesRoute
   '/error': typeof StoreErrorRoute
+  '/privacy': typeof StorePrivacyRoute
   '/shop': typeof StoreShopRoute
+  '/terms': typeof StoreTermsRoute
   '/account/affiliate': typeof AccountAffiliateRoute
   '/account/notifications': typeof AccountNotificationsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
@@ -457,8 +481,11 @@ export interface FileRoutesById {
   '/_store/checkout': typeof StoreCheckoutRoute
   '/_store/configurator': typeof StoreConfiguratorRoute
   '/_store/contact': typeof StoreContactRoute
+  '/_store/cookies': typeof StoreCookiesRoute
   '/_store/error': typeof StoreErrorRoute
+  '/_store/privacy': typeof StorePrivacyRoute
   '/_store/shop': typeof StoreShopRoute
+  '/_store/terms': typeof StoreTermsRoute
   '/account/affiliate': typeof AccountAffiliateRoute
   '/account/notifications': typeof AccountNotificationsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
@@ -515,8 +542,11 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/configurator'
     | '/contact'
+    | '/cookies'
     | '/error'
+    | '/privacy'
     | '/shop'
+    | '/terms'
     | '/account/affiliate'
     | '/account/notifications'
     | '/account/orders'
@@ -566,8 +596,11 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/configurator'
     | '/contact'
+    | '/cookies'
     | '/error'
+    | '/privacy'
     | '/shop'
+    | '/terms'
     | '/account/affiliate'
     | '/account/notifications'
     | '/account/orders'
@@ -622,8 +655,11 @@ export interface FileRouteTypes {
     | '/_store/checkout'
     | '/_store/configurator'
     | '/_store/contact'
+    | '/_store/cookies'
     | '/_store/error'
+    | '/_store/privacy'
     | '/_store/shop'
+    | '/_store/terms'
     | '/account/affiliate'
     | '/account/notifications'
     | '/account/orders'
@@ -935,6 +971,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAffiliateRouteImport
       parentRoute: typeof AccountRoute
     }
+    '/_store/terms': {
+      id: '/_store/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof StoreTermsRouteImport
+      parentRoute: typeof StoreRoute
+    }
     '/_store/shop': {
       id: '/_store/shop'
       path: '/shop'
@@ -942,11 +985,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoreShopRouteImport
       parentRoute: typeof StoreRoute
     }
+    '/_store/privacy': {
+      id: '/_store/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof StorePrivacyRouteImport
+      parentRoute: typeof StoreRoute
+    }
     '/_store/error': {
       id: '/_store/error'
       path: '/error'
       fullPath: '/error'
       preLoaderRoute: typeof StoreErrorRouteImport
+      parentRoute: typeof StoreRoute
+    }
+    '/_store/cookies': {
+      id: '/_store/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof StoreCookiesRouteImport
       parentRoute: typeof StoreRoute
     }
     '/_store/contact': {
@@ -1070,8 +1127,11 @@ interface StoreRouteChildren {
   StoreCheckoutRoute: typeof StoreCheckoutRoute
   StoreConfiguratorRoute: typeof StoreConfiguratorRoute
   StoreContactRoute: typeof StoreContactRoute
+  StoreCookiesRoute: typeof StoreCookiesRoute
   StoreErrorRoute: typeof StoreErrorRoute
+  StorePrivacyRoute: typeof StorePrivacyRoute
   StoreShopRoute: typeof StoreShopRoute
+  StoreTermsRoute: typeof StoreTermsRoute
   StoreIndexRoute: typeof StoreIndexRoute
   StoreDealerRegisterRoute: typeof StoreDealerRegisterRoute
   StoreProductsSlugRoute: typeof StoreProductsSlugRoute
@@ -1083,8 +1143,11 @@ const StoreRouteChildren: StoreRouteChildren = {
   StoreCheckoutRoute: StoreCheckoutRoute,
   StoreConfiguratorRoute: StoreConfiguratorRoute,
   StoreContactRoute: StoreContactRoute,
+  StoreCookiesRoute: StoreCookiesRoute,
   StoreErrorRoute: StoreErrorRoute,
+  StorePrivacyRoute: StorePrivacyRoute,
   StoreShopRoute: StoreShopRoute,
+  StoreTermsRoute: StoreTermsRoute,
   StoreIndexRoute: StoreIndexRoute,
   StoreDealerRegisterRoute: StoreDealerRegisterRoute,
   StoreProductsSlugRoute: StoreProductsSlugRoute,

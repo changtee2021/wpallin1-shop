@@ -22,7 +22,9 @@ export async function listProductReviews(
 ): Promise<ProductReviewDto[]> {
   const { data, error } = await supabase
     .from("product_reviews")
-    .select("id, user_id, rating, title, body, is_verified_purchase, created_at")
+    .select(
+      "id, user_id, rating, title, body, is_verified_purchase, created_at",
+    )
     .eq("product_id", productId)
     .eq("is_published", true)
     .order("created_at", { ascending: false })
@@ -69,7 +71,10 @@ export async function getProductReviewSummary(
   if (rows.length === 0) return { average: 0, count: 0 };
 
   const sum = rows.reduce((acc, row) => acc + Number(row.rating), 0);
-  return { average: Math.round((sum / rows.length) * 10) / 10, count: rows.length };
+  return {
+    average: Math.round((sum / rows.length) * 10) / 10,
+    count: rows.length,
+  };
 }
 
 export async function submitProductReview(

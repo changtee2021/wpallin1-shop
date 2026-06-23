@@ -52,4 +52,12 @@ export const th: Translations = {
     "เลือกประเภทสินค้าเพื่อเริ่มต้น — ระบบคำนวณราคาและแสดงตัวอย่างจะเปิดใช้ใน Phase 3",
   "footer.newsletter": "รับข่าวสารและโปรโมชัน",
   "footer.rights": "สงวนลิขสิทธิ์",
+  "footer.terms": "เงื่อนไขการใช้บริการ",
+  "footer.privacy": "นโยบายความเป็นส่วนตัว",
+  "footer.cookies": "นโยบายคุกกี้",
+  "cookie.banner.title": "เราใช้คุกกี้และ Local Storage",
+  "cookie.banner.body":
+    "เพื่อให้บริการเข้าสู่ระบบ ตะกร้า และการตั้งค่าภาษา คุณสามารถเลือกยอมรับคุกกี้การตลาดได้",
+  "cookie.banner.essentialOnly": "เฉพาะที่จำเป็น",
+  "cookie.banner.acceptAll": "ยอมรับทั้งหมด",
 };

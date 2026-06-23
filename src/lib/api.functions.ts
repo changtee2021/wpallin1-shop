@@ -2,10 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import {
-  optionalSupabaseAuth,
-  requireAdmin,
-} from "@/lib/server-auth";
+import { optionalSupabaseAuth, requireAdmin } from "@/lib/server-auth";
 import {
   addToCartSchema,
   adminProductSchema,
@@ -517,9 +514,7 @@ export const submitContactForm = createServerFn({ method: "POST" })
         message: z.string().min(1),
         errorCode: z.string().optional(),
         sourceUrl: z.string().optional(),
-        category: z
-          .enum(["contact", "error", "404", "403", "500"])
-          .optional(),
+        category: z.enum(["contact", "error", "404", "403", "500"]).optional(),
       })
       .parse(input),
   )

@@ -59,6 +59,7 @@ function mapProduct(
     stock: Number(row.stock_qty),
     moq: row.min_order_qty,
     leadTimeDays: null,
+    createdAt: row.created_at,
   };
 }
 

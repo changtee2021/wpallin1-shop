@@ -1,5 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { logUploadFailure, validateUploadFile } from "@/lib/upload-validation";
+import { enforceRateLimit, RateLimitError } from "@/lib/rate-limit";
+
 export const Route = createFileRoute("/api/v1/wallet-topup-slip")({
   server: {
     handlers: {
@@ -35,6 +38,20 @@ export const Route = createFileRoute("/api/v1/wallet-topup-slip")({
           return Response.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        const userId = claims.claims.sub as string;
+
+        try {
+          await enforceRateLimit("wallet-topup-slip", userId, {
+            requests: 5,
+            window: "1 m",
+          });
+        } catch (err) {
+          if (err instanceof RateLimitError) {
+            return Response.json({ error: err.message }, { status: 429 });
+          }
+          throw err;
+        }
+
         const form = await request.formData();
         const file = form.get("file");
         const requestId = form.get("requestId");
@@ -43,17 +60,20 @@ export const Route = createFileRoute("/api/v1/wallet-topup-slip")({
           return Response.json({ error: "Invalid form data" }, { status: 400 });
         }
 
-        try {
-          await uploadTopupSlip(
-            supabase,
-            claims.claims.sub as string,
-            requestId,
-            file,
+        const uploadError = validateUploadFile(file);
+        if (uploadError) {
+          return Response.json(
+            { error: uploadError.message },
+            { status: uploadError.status },
           );
+        }
+
+        try {
+          await uploadTopupSlip(supabase, userId, requestId, file);
           return Response.json({ ok: true });
         } catch (err) {
-          const message = err instanceof Error ? err.message : "Upload failed";
-          return Response.json({ error: message }, { status: 400 });
+          logUploadFailure("wallet-topup-slip", err);
+          return Response.json({ error: "Upload failed" }, { status: 400 });
         }
       },
     },

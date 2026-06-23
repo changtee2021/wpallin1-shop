@@ -1,5 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { logUploadFailure, validateUploadFile } from "@/lib/upload-validation";
+import { enforceRateLimit, RateLimitError } from "@/lib/rate-limit";
+
 export const Route = createFileRoute("/api/v1/payment-slip")({
   server: {
     handlers: {
@@ -36,6 +39,20 @@ export const Route = createFileRoute("/api/v1/payment-slip")({
           return Response.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        const userId = claims.claims.sub as string;
+
+        try {
+          await enforceRateLimit("payment-slip", userId, {
+            requests: 5,
+            window: "1 m",
+          });
+        } catch (err) {
+          if (err instanceof RateLimitError) {
+            return Response.json({ error: err.message }, { status: 429 });
+          }
+          throw err;
+        }
+
         const form = await request.formData();
         const file = form.get("file");
         const paymentId = form.get("paymentId");
@@ -49,18 +66,26 @@ export const Route = createFileRoute("/api/v1/payment-slip")({
           return Response.json({ error: "Invalid form data" }, { status: 400 });
         }
 
+        const uploadError = validateUploadFile(file);
+        if (uploadError) {
+          return Response.json(
+            { error: uploadError.message },
+            { status: uploadError.status },
+          );
+        }
+
         try {
           const fileUrl = await uploadPaymentSlip(
             supabase,
-            claims.claims.sub as string,
+            userId,
             paymentId,
             orderId,
             file,
           );
           return Response.json({ ok: true, fileUrl });
         } catch (err) {
-          const message = err instanceof Error ? err.message : "Upload failed";
-          return Response.json({ error: message }, { status: 400 });
+          logUploadFailure("payment-slip", err);
+          return Response.json({ error: "Upload failed" }, { status: 400 });
         }
       },
     },

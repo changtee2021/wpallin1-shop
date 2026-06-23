@@ -50,6 +50,13 @@ export type TranslationKey =
   | "configurator.title"
   | "configurator.empty"
   | "footer.newsletter"
-  | "footer.rights";
+  | "footer.rights"
+  | "footer.terms"
+  | "footer.privacy"
+  | "footer.cookies"
+  | "cookie.banner.title"
+  | "cookie.banner.body"
+  | "cookie.banner.essentialOnly"
+  | "cookie.banner.acceptAll";
 
 export type Translations = Record<TranslationKey, string>;

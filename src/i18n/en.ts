@@ -48,4 +48,12 @@ export const en: Translations = {
     "Select a product type to begin — pricing and preview arrive in Phase 3",
   "footer.newsletter": "Get updates and promotions",
   "footer.rights": "All rights reserved",
+  "footer.terms": "Terms of Service",
+  "footer.privacy": "Privacy Policy",
+  "footer.cookies": "Cookie Policy",
+  "cookie.banner.title": "We use cookies and local storage",
+  "cookie.banner.body":
+    "For login, cart, and language settings. You may accept optional marketing cookies.",
+  "cookie.banner.essentialOnly": "Essential only",
+  "cookie.banner.acceptAll": "Accept all",
 };

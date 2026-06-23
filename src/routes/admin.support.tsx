@@ -276,7 +276,9 @@ function AdminSupportPage() {
                         {item.sourceUrl}
                       </p>
                     ) : null}
-                    <p className="whitespace-pre-wrap text-sm">{item.message}</p>
+                    <p className="whitespace-pre-wrap text-sm">
+                      {item.message}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {formatDate(item.createdAt)} · ref {item.id.slice(0, 8)}
                     </p>
@@ -323,11 +325,7 @@ function AdminSupportPage() {
                   value={nextStatus}
                   onValueChange={(value) =>
                     setNextStatus(
-                      value as
-                        | "open"
-                        | "in_progress"
-                        | "resolved"
-                        | "closed",
+                      value as "open" | "in_progress" | "resolved" | "closed",
                     )
                   }
                 >

@@ -41,9 +41,9 @@ export const updateProductStockFn = createServerFn({ method: "POST" })
 export const fetchAdminReports = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ periodDays: z.number().int().min(1).max(365).optional() }).parse(
-      input ?? {},
-    ),
+    z
+      .object({ periodDays: z.number().int().min(1).max(365).optional() })
+      .parse(input ?? {}),
   )
   .handler(async ({ data, context }) => {
     await requireAdmin(context.userId);

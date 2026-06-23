@@ -1,33 +1,69 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { fetchPublicProducts } from "@/lib/api.functions";
+import { getPublicUrl } from "@/lib/public-url";
+import { getAdminClient } from "@/lib/server-fns/_shared";
+import { listPublicProducts } from "@/services/catalog.service";
+
+type SitemapEntry = {
+  path: string;
+  lastmod?: string;
+};
+
+function formatLastmod(iso?: string | null): string | undefined {
+  if (!iso) return undefined;
+  const date = iso.slice(0, 10);
+  return date.length === 10 ? date : undefined;
+}
+
+function renderUrl(base: string, entry: SitemapEntry): string {
+  const loc = `${base}${entry.path}`;
+  const lastmod = entry.lastmod
+    ? `\n    <lastmod>${entry.lastmod}</lastmod>`
+    : "";
+  return `  <url><loc>${loc}</loc>${lastmod}\n    <changefreq>weekly</changefreq>\n  </url>`;
+}
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const base =
-          process.env.VITE_APP_PUBLIC_URL ?? "https://wpallin1-shop.vercel.app";
-        const products = await fetchPublicProducts({
-          data: { page: 1, pageSize: 500 },
-        });
+        const base = getPublicUrl().replace(/\/$/, "");
+        const supabase = await getAdminClient();
+        const productEntries: SitemapEntry[] = [];
+        let page = 1;
+        let totalPages = 1;
 
-        const urls = [
-          "",
-          "/shop",
-          "/configurator",
-          "/about",
-          "/contact",
-          ...products.data.map((p) => `/products/${p.slug}`),
+        while (page <= totalPages) {
+          const batch = await listPublicProducts(supabase, {
+            page,
+            pageSize: 100,
+          });
+          productEntries.push(
+            ...batch.data.map((product) => ({
+              path: `/products/${product.slug}`,
+              lastmod: formatLastmod(product.createdAt),
+            })),
+          );
+          totalPages = batch.meta.totalPages;
+          page += 1;
+        }
+
+        const staticEntries: SitemapEntry[] = [
+          { path: "" },
+          { path: "/shop" },
+          { path: "/configurator" },
+          { path: "/about" },
+          { path: "/contact" },
+          { path: "/terms" },
+          { path: "/privacy" },
+          { path: "/cookies" },
         ];
+
+        const urls = [...staticEntries, ...productEntries];
 
         const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls
-  .map(
-    (path) => `  <url><loc>${base}${path}</loc><changefreq>weekly</changefreq></url>`,
-  )
-  .join("\n")}
+${urls.map((entry) => renderUrl(base, entry)).join("\n")}
 </urlset>`;
 
         return new Response(body, {

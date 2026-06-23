@@ -39,7 +39,9 @@ export function RecentlyViewedSection() {
             <p className="mt-2 line-clamp-2 text-xs font-medium group-hover:text-primary">
               {item.name}
             </p>
-            <p className="text-xs text-accent">{formatPrice(item.retailPrice)}</p>
+            <p className="text-xs text-accent">
+              {formatPrice(item.retailPrice)}
+            </p>
           </Link>
         ))}
       </div>

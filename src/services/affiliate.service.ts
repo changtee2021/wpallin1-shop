@@ -209,7 +209,12 @@ export async function createAffiliateLink(
 export async function requestAffiliatePayout(
   supabase: SupabaseClient,
   userId: string,
-  input: { amount: number; bank: string; accountNo: string; accountName: string },
+  input: {
+    amount: number;
+    bank: string;
+    accountNo: string;
+    accountName: string;
+  },
 ): Promise<void> {
   const { data: account } = await supabase
     .from("affiliate_accounts")

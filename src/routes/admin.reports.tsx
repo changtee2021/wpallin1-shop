@@ -39,7 +39,9 @@ function AdminReportsPage() {
         <Card>
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground">รายได้</p>
-            <p className="text-2xl font-bold">{formatPrice(reports.totalRevenue)}</p>
+            <p className="text-2xl font-bold">
+              {formatPrice(reports.totalRevenue)}
+            </p>
           </CardContent>
         </Card>
         <Card>

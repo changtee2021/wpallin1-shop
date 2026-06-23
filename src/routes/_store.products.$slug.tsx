@@ -13,35 +13,49 @@ import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
 import { fetchProductBySlug } from "@/lib/api.functions";
 import { formatPrice } from "@/lib/format";
+import { absoluteUrl, getDefaultOgImageUrl } from "@/lib/public-url";
+import { buildProductJsonLd } from "@/lib/seo-structured-data";
 import { trackRecentlyViewed } from "@/lib/recently-viewed";
+import { getAdminClient } from "@/lib/server-fns/_shared";
+import { getProductReviewSummary } from "@/services/review.service";
 import { useT } from "@/i18n";
 
 export const Route = createFileRoute("/_store/products/$slug")({
-  head: ({ loaderData }) => ({
-    meta: loaderData?.product
-      ? [
-          { title: `${loaderData.product.name} | WP ALL` },
-          {
-            name: "description",
-            content:
-              loaderData.product.description?.slice(0, 160) ??
-              loaderData.product.name,
-          },
-          { property: "og:title", content: loaderData.product.name },
-          {
-            property: "og:description",
-            content: loaderData.product.description ?? loaderData.product.name,
-          },
-          ...(loaderData.product.imageUrl
-            ? [{ property: "og:image", content: loaderData.product.imageUrl }]
-            : []),
-        ]
-      : [],
-  }),
+  head: ({ loaderData }) => {
+    if (!loaderData?.product) return {};
+
+    const { product, reviewSummary } = loaderData;
+    const canonical = absoluteUrl(`/products/${product.slug}`);
+    const ogImage = product.imageUrl ?? getDefaultOgImageUrl();
+    const description = product.description?.slice(0, 160) ?? product.name;
+
+    return {
+      meta: [
+        { title: `${product.name} | WP ALL` },
+        { name: "description", content: description },
+        { property: "og:type", content: "product" },
+        { property: "og:title", content: product.name },
+        { property: "og:description", content: description },
+        { property: "og:url", content: canonical },
+        { property: "og:image", content: ogImage },
+      ],
+      links: [{ rel: "canonical", href: canonical }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(buildProductJsonLd(product, reviewSummary)),
+        },
+      ],
+    };
+  },
   loader: async ({ params }) => {
     const product = await fetchProductBySlug({ data: { slug: params.slug } });
     if (!product) throw new Error("Product not found");
-    return { product };
+
+    const supabase = await getAdminClient();
+    const reviewSummary = await getProductReviewSummary(supabase, product.id);
+
+    return { product, reviewSummary };
   },
   component: ProductDetailPage,
 });

@@ -16,11 +16,7 @@ import {
 import { formatDate } from "@/lib/format";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 
-export function ProductReviews({
-  productId,
-}: {
-  productId: string;
-}) {
+export function ProductReviews({ productId }: { productId: string }) {
   const { session } = useAuth();
   const [reviews, setReviews] = useState<
     Awaited<ReturnType<typeof fetchProductReviews>>["reviews"]
@@ -100,7 +96,10 @@ export function ProductReviews({
             </div>
             <div>
               <Label>ความคิดเห็น</Label>
-              <Textarea value={body} onChange={(e) => setBody(e.target.value)} />
+              <Textarea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+              />
             </div>
             <Button disabled={submitting} onClick={() => void handleSubmit()}>
               ส่งรีวิว

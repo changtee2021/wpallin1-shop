@@ -183,7 +183,10 @@ function AdminCouponsPage() {
                   type="number"
                   value={couponForm.discountValue}
                   onChange={(e) =>
-                    setCouponForm({ ...couponForm, discountValue: e.target.value })
+                    setCouponForm({
+                      ...couponForm,
+                      discountValue: e.target.value,
+                    })
                   }
                 />
               </div>
@@ -265,7 +268,9 @@ function AdminCouponsPage() {
                   }
                 />
               </div>
-              <Button onClick={() => void savePromotion()}>เพิ่มโปรโมชัน</Button>
+              <Button onClick={() => void savePromotion()}>
+                เพิ่มโปรโมชัน
+              </Button>
             </CardContent>
           </Card>
           <div className="space-y-2">
@@ -289,7 +294,8 @@ function AdminCouponsPage() {
           <Card>
             <CardContent className="space-y-3 p-4">
               <p className="text-sm text-muted-foreground">
-                เบอร์โทร 10 หลัก หรือเลขนิติบุคคล 13 หลัก — ใช้สร้าง QR หลังสั่งซื้อ
+                เบอร์โทร 10 หลัก หรือเลขนิติบุคคล 13 หลัก — ใช้สร้าง QR
+                หลังสั่งซื้อ
               </p>
               <div>
                 <Label>PromptPay ID</Label>

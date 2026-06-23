@@ -37,6 +37,15 @@ export function StorefrontFooter() {
             <Link to="/contact" className="hover:text-foreground">
               {t("nav.contact")}
             </Link>
+            <Link to="/terms" className="hover:text-foreground">
+              {t("footer.terms")}
+            </Link>
+            <Link to="/privacy" className="hover:text-foreground">
+              {t("footer.privacy")}
+            </Link>
+            <Link to="/cookies" className="hover:text-foreground">
+              {t("footer.cookies")}
+            </Link>
             <Link to="/dealer/register" className="hover:text-foreground">
               สมัครตัวแทนจำหน่าย
             </Link>

@@ -9,11 +9,13 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { ErrorPageShell } from "@/components/errors/error-page-shell";
+import { CookieConsent } from "@/components/cookie-consent";
 import { Toaster } from "@/components/ui/sonner";
 import { LocaleSync } from "@/components/locale-sync";
 import { AuthProvider } from "@/hooks/use-auth";
 import { I18nProvider } from "@/i18n";
 import appCss from "@/styles.css?url";
+import { getDefaultOgImageUrl, getPublicUrl } from "@/lib/public-url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -54,10 +56,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { property: "og:site_name", content: "WP ALL" },
         {
           property: "og:url",
-          content:
-            process.env.VITE_APP_PUBLIC_URL ??
-            "https://wpallin1-shop.vercel.app",
+          content: getPublicUrl(),
         },
+        { property: "og:image", content: getDefaultOgImageUrl() },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: getDefaultOgImageUrl() },
       ],
       links: [
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -105,6 +108,7 @@ function RootComponent() {
           <LocaleSync />
           <Outlet />
           <Toaster position="top-center" richColors />
+          <CookieConsent />
         </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>

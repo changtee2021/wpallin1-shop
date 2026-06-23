@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { enforceRateLimit, RateLimitError } from "@/lib/rate-limit";
 import { requireAdmin, requireStaff } from "@/lib/server-auth";
 import { cartCtxSchema, getAdminClient } from "@/lib/server-fns/_shared";
 import { resolveCartForContext } from "@/services/cart.service";
@@ -21,6 +22,18 @@ export const requestQuotationFromCart = createServerFn({ method: "POST" })
     cartCtxSchema.extend({ note: z.string().optional() }).parse(input),
   )
   .handler(async ({ data, context }) => {
+    try {
+      await enforceRateLimit("quote-request", context.userId, {
+        requests: 3,
+        window: "1 m",
+      });
+    } catch (err) {
+      if (err instanceof RateLimitError) {
+        throw new Error("Too many quote requests. Please try again later.");
+      }
+      throw err;
+    }
+
     const supabase = await getAdminClient();
     const cart = await resolveCartForContext(supabase, {
       userId: context.userId,

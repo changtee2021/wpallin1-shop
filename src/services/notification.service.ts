@@ -145,6 +145,13 @@ export async function notifyUserEvent(
     body: copy.body,
     payload: { event, href: copy.href, ...meta },
   });
+
+  try {
+    const { sendNotificationEmail } = await import("@/services/email.service");
+    await sendNotificationEmail(supabase, userId, event, copy, meta);
+  } catch (err) {
+    console.error("[email] notifyUserEvent failed", err);
+  }
 }
 
 export async function notifyStaff(

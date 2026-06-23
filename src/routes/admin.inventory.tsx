@@ -53,10 +53,7 @@ function AdminInventoryPage() {
 
   return (
     <div>
-      <PageHeader
-        title="สต็อกสินค้า"
-        description="สินค้าที่สต็อกต่ำ (≤10)"
-      />
+      <PageHeader title="สต็อกสินค้า" description="สินค้าที่สต็อกต่ำ (≤10)" />
       {items.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center text-muted-foreground">

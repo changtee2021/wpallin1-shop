@@ -17,6 +17,7 @@ export type ProductPublicDto = {
   stock: number;
   moq: number;
   leadTimeDays: number | null;
+  createdAt?: string | null;
 };
 
 export type ProductListQuery = {
