@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchWishlist } from "@/lib/api.functions";
-import { authServerFnOptions } from "@/lib/server-fn-auth";
+import { authServerFnOptions, useAuthServerFnOptions } from "@/lib/server-fn-auth";
 import type { ProductPublicDto } from "@/types/api/products";
 
 export const Route = createFileRoute("/account/wishlist")({
@@ -17,17 +17,27 @@ export const Route = createFileRoute("/account/wishlist")({
 
 function AccountWishlistPage() {
   const { session } = useAuth();
+  const authOpts = useAuthServerFnOptions(session);
   const [products, setProducts] = useState<ProductPublicDto[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    void fetchWishlist(authServerFnOptions(session))
-      .then(setProducts)
+    let cancelled = false;
+    setLoading(true);
+    void fetchWishlist(authOpts)
+      .then((data) => {
+        if (!cancelled) setProducts(data);
+      })
       .catch((err) =>
         toast.error(err instanceof Error ? err.message : "โหลดไม่สำเร็จ"),
       )
-      .finally(() => setLoading(false));
-  }, [session]);
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authOpts]);
 
   return (
     <div>

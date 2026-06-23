@@ -13,7 +13,8 @@ import {
   markNotificationReadFn,
 } from "@/lib/api.functions";
 import { formatDate } from "@/lib/format";
-import { authServerFnOptions } from "@/lib/server-fn-auth";
+import { useAuthServerFnOptions } from "@/lib/server-fn-auth";
+import { useT } from "@/i18n";
 import type { NotificationDto } from "@/services/notification.service";
 
 export const Route = createFileRoute("/account/notifications")({
@@ -21,13 +22,26 @@ export const Route = createFileRoute("/account/notifications")({
 });
 
 function AccountNotificationsPage() {
+  const { t } = useT();
   const { session } = useAuth();
+  const authOpts = useAuthServerFnOptions(session);
   const [items, setItems] = useState<NotificationDto[]>([]);
-  const authOpts = authServerFnOptions(session);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    void fetchNotifications(authOpts).then(setItems);
-  }, [session]);
+    let cancelled = false;
+    setLoading(true);
+    void fetchNotifications(authOpts)
+      .then((data) => {
+        if (!cancelled) setItems(data);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authOpts]);
 
   async function markRead(id: string) {
     await markNotificationReadFn({ data: { id }, ...authOpts });
@@ -55,7 +69,9 @@ function AccountNotificationsPage() {
         </Button>
       </div>
       <div className="space-y-2">
-        {items.length === 0 ? (
+        {loading ? (
+          <p className="text-muted-foreground">{t("common.loading")}</p>
+        ) : items.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center text-muted-foreground">
               ไม่มีแจ้งเตือน

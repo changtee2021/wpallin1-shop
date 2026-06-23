@@ -38,7 +38,7 @@ import {
   updateAccountProfileFn,
 } from "@/lib/api.functions";
 import { formatDate, formatPrice } from "@/lib/format";
-import { authServerFnOptions } from "@/lib/server-fn-auth";
+import { authServerFnOptions, useAuthServerFnOptions } from "@/lib/server-fn-auth";
 import { tierLabel } from "@/lib/member-tier";
 import { useT, useLocaleControl } from "@/i18n";
 import type {
@@ -98,6 +98,7 @@ function AccountProfilePage() {
 
   const [profile, setProfile] = useState<AccountProfileDto | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tabLoading, setTabLoading] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
 
   const [fullName, setFullName] = useState("");
@@ -128,7 +129,7 @@ function AccountProfilePage() {
   const [editingTaxId, setEditingTaxId] = useState<string | null>(null);
   const [savingTax, setSavingTax] = useState(false);
 
-  const authOpts = authServerFnOptions(session);
+  const authOpts = useAuthServerFnOptions(session);
 
   const loadProfile = useCallback(async () => {
     const data = await fetchAccountProfile(authOpts);
@@ -161,18 +162,55 @@ function AccountProfilePage() {
   }, [authOpts]);
 
   useEffect(() => {
+    let cancelled = false;
+
     void (async () => {
       setLoading(true);
       try {
         await loadProfile();
-        await Promise.all([loadWallet(), loadAddresses(), loadTaxProfiles()]);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "โหลดข้อมูลไม่สำเร็จ");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     })();
-  }, [loadProfile, loadWallet, loadAddresses, loadTaxProfiles]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [loadProfile]);
+
+  useEffect(() => {
+    if (!profile) return;
+
+    if (tab === "profile" || tab === "settings") {
+      setTabLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    void (async () => {
+      setTabLoading(true);
+      try {
+        if (tab === "wallet") {
+          await loadWallet();
+        } else if (tab === "addresses") {
+          await loadAddresses();
+        } else if (tab === "tax") {
+          await loadTaxProfiles();
+        }
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "โหลดข้อมูลไม่สำเร็จ");
+      } finally {
+        if (!cancelled) setTabLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tab, profile, loadWallet, loadAddresses, loadTaxProfiles]);
 
   async function saveProfileData(successMessage: string) {
     setSavingProfile(true);
@@ -380,7 +418,7 @@ function AccountProfilePage() {
         }
         className="space-y-6"
       >
-        <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
+        <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 lg:hidden">
           <TabsTrigger value="profile">ข้อมูลส่วนตัว</TabsTrigger>
           <TabsTrigger value="wallet">{t("account.wallet")}</TabsTrigger>
           <TabsTrigger value="addresses">{t("account.addresses")}</TabsTrigger>
@@ -452,6 +490,10 @@ function AccountProfilePage() {
         </TabsContent>
 
         <TabsContent value="wallet" className="space-y-4">
+          {tabLoading ? (
+            <TabLoading />
+          ) : (
+            <>
           {tierProgress ? (
             <Card>
               <CardHeader>
@@ -630,9 +672,15 @@ function AccountProfilePage() {
               )}
             </CardContent>
           </Card>
+            </>
+          )}
         </TabsContent>
 
         <TabsContent value="addresses" className="space-y-4">
+          {tabLoading ? (
+            <TabLoading />
+          ) : (
+            <>
           <Card>
             <CardHeader>
               <CardTitle className="text-base">
@@ -816,9 +864,15 @@ function AccountProfilePage() {
               ))
             )}
           </div>
+            </>
+          )}
         </TabsContent>
 
         <TabsContent value="tax" className="space-y-4">
+          {tabLoading ? (
+            <TabLoading />
+          ) : (
+            <>
           <Card>
             <CardHeader>
               <CardTitle className="text-base">
@@ -982,6 +1036,8 @@ function AccountProfilePage() {
               ))
             )}
           </div>
+            </>
+          )}
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-4">
@@ -1027,6 +1083,14 @@ function AccountProfilePage() {
           </Card>
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function TabLoading() {
+  return (
+    <div className="flex min-h-[24vh] items-center justify-center">
+      <Loader2 className="size-6 animate-spin text-muted-foreground" />
     </div>
   );
 }

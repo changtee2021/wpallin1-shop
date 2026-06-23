@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchMyOrders } from "@/lib/api.functions";
-import { authServerFnOptions } from "@/lib/server-fn-auth";
+import { useAuthServerFnOptions } from "@/lib/server-fn-auth";
 import { formatDate, formatPrice } from "@/lib/format";
 import { useT } from "@/i18n";
 import type { OrderSummaryDto } from "@/types/api/orders";
@@ -28,14 +28,24 @@ const statusLabels: Record<string, string> = {
 function AccountOrdersPage() {
   const { t } = useT();
   const { session } = useAuth();
+  const authOpts = useAuthServerFnOptions(session);
   const [orders, setOrders] = useState<OrderSummaryDto[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    void fetchMyOrders(authServerFnOptions(session))
-      .then(setOrders)
-      .finally(() => setLoading(false));
-  }, [session]);
+    let cancelled = false;
+    setLoading(true);
+    void fetchMyOrders(authOpts)
+      .then((data) => {
+        if (!cancelled) setOrders(data);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authOpts]);
 
   return (
     <div>

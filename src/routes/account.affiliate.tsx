@@ -16,7 +16,7 @@ import {
   requestAffiliatePayoutFn,
 } from "@/lib/api.functions";
 import { formatDate, formatPrice } from "@/lib/format";
-import { authServerFnOptions } from "@/lib/server-fn-auth";
+import { useAuthServerFnOptions } from "@/lib/server-fn-auth";
 import type { AffiliateDashboardDto } from "@/services/affiliate.service";
 
 export const Route = createFileRoute("/account/affiliate")({
@@ -25,6 +25,7 @@ export const Route = createFileRoute("/account/affiliate")({
 
 function AccountAffiliatePage() {
   const { session } = useAuth();
+  const authOpts = useAuthServerFnOptions(session);
   const [data, setData] = useState<AffiliateDashboardDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [linkSlug, setLinkSlug] = useState("");
@@ -35,18 +36,28 @@ function AccountAffiliatePage() {
   const [accountName, setAccountName] = useState("");
 
   async function reload() {
-    const dash = await fetchAffiliateDashboard(authServerFnOptions(session));
+    const dash = await fetchAffiliateDashboard(authOpts);
     setData(dash);
   }
 
   useEffect(() => {
-    void reload().finally(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session]);
+    let cancelled = false;
+    setLoading(true);
+    void reload()
+      .catch((err) =>
+        toast.error(err instanceof Error ? err.message : "โหลดไม่สำเร็จ"),
+      )
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authOpts]);
 
   async function handleRegister() {
     try {
-      await registerAffiliate(authServerFnOptions(session));
+      await registerAffiliate(authOpts);
       toast.success("สมัคร Affiliate แล้ว");
       await reload();
     } catch (err) {
@@ -67,7 +78,7 @@ function AccountAffiliatePage() {
           targetUrl: `${base}/shop`,
           label: linkLabel || undefined,
         },
-        ...authServerFnOptions(session),
+        ...authOpts,
       });
       toast.success("สร้างลิงก์แล้ว");
       setLinkSlug("");
@@ -84,7 +95,7 @@ function AccountAffiliatePage() {
     try {
       await requestAffiliatePayoutFn({
         data: { amount, bank, accountNo, accountName },
-        ...authServerFnOptions(session),
+        ...authOpts,
       });
       toast.success("ส่งคำขอถอนแล้ว");
       setPayoutAmount("");

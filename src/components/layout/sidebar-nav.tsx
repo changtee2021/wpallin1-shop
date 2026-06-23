@@ -31,6 +31,7 @@ export function SidebarNav({
             key={item.key ?? `${item.to}-${item.label}`}
             to={item.to}
             search={item.search}
+            preload={false}
             className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             activeProps={{ className: "bg-muted text-foreground" }}
             activeOptions={{ exact: false, includeSearch: true }}
