@@ -8,7 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchWishlist } from "@/lib/api.functions";
-import { authServerFnOptions, useAuthServerFnOptions } from "@/lib/server-fn-auth";
+import {
+  authServerFnOptions,
+  useAuthServerFnOptions,
+} from "@/lib/server-fn-auth";
 import type { ProductPublicDto } from "@/types/api/products";
 
 export const Route = createFileRoute("/account/wishlist")({

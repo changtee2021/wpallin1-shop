@@ -3,13 +3,17 @@ import { useEffect, useState } from "react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import { fetchMyOrders } from "@/lib/api.functions";
+import { useCart } from "@/hooks/use-cart";
+import { fetchMyOrders, reorderFromOrder } from "@/lib/api.functions";
+import { getOrCreateCartSessionId } from "@/lib/cart-session";
 import { useAuthServerFnOptions } from "@/lib/server-fn-auth";
 import { formatDate, formatPrice } from "@/lib/format";
 import { useT } from "@/i18n";
 import type { OrderSummaryDto } from "@/types/api/orders";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/account/orders")({
   component: AccountOrdersPage,
@@ -28,9 +32,27 @@ const statusLabels: Record<string, string> = {
 function AccountOrdersPage() {
   const { t } = useT();
   const { session } = useAuth();
+  const { refresh } = useCart();
   const authOpts = useAuthServerFnOptions(session);
   const [orders, setOrders] = useState<OrderSummaryDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reordering, setReordering] = useState<string | null>(null);
+
+  async function handleReorder(orderId: string) {
+    setReordering(orderId);
+    try {
+      await reorderFromOrder({
+        data: { orderId, sessionId: getOrCreateCartSessionId() },
+        ...authOpts,
+      });
+      await refresh();
+      toast.success("เพิ่มรายการลงตะกร้าแล้ว");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "ไม่สำเร็จ");
+    } finally {
+      setReordering(null);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -87,6 +109,14 @@ function AccountOrdersPage() {
                 <p className="font-bold text-accent">
                   {formatPrice(order.grandTotal)}
                 </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={reordering === order.id}
+                  onClick={() => void handleReorder(order.id)}
+                >
+                  {reordering === order.id ? "กำลังเพิ่ม..." : "สั่งซ้ำ"}
+                </Button>
               </CardContent>
             </Card>
           ))}

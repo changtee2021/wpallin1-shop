@@ -1,5 +1,5 @@
 import { Heart } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,13 @@ import { cn } from "@/lib/utils";
 export function WishlistButton({
   productId,
   className,
+  variant = "outline",
+  iconClassName,
 }: {
   productId: string;
   className?: string;
+  variant?: "outline" | "ghost";
+  iconClassName?: string;
 }) {
   const { session } = useAuth();
   const [wishlisted, setWishlisted] = useState(false);
@@ -29,7 +33,10 @@ export function WishlistButton({
       .catch(() => undefined);
   }, [productId, session]);
 
-  async function handleToggle() {
+  async function handleToggle(e: MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (!session) {
       toast.error("กรุณาเข้าสู่ระบบ");
       return;
@@ -52,15 +59,19 @@ export function WishlistButton({
   return (
     <Button
       type="button"
-      variant="outline"
+      variant={variant}
       size="icon"
-      className={cn(className)}
+      className={cn("size-8 shrink-0", className)}
       disabled={loading}
-      onClick={() => void handleToggle()}
+      onClick={(e) => void handleToggle(e)}
       aria-label="รายการโปรด"
     >
       <Heart
-        className={cn("size-5", wishlisted && "fill-red-500 text-red-500")}
+        className={cn(
+          "size-4",
+          iconClassName,
+          wishlisted && "fill-red-500 text-red-500",
+        )}
       />
     </Button>
   );

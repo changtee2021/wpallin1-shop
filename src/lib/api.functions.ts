@@ -920,3 +920,33 @@ export {
   updateProductStockFn,
   fetchAdminReports,
 } from "@/lib/server-fns/inventory-reports";
+
+export {
+  fetchCreditEnabled,
+  fetchCreditSummary,
+  fetchCreditAccount,
+  validateCreditCheckoutFn,
+  fetchAdminCreditAccounts,
+  fetchAdminPendingCreditOrders,
+  fetchAdminCreditInvoices,
+  adminUpsertCreditAccount,
+  adminApproveCreditOrder,
+  adminRejectCreditOrder,
+  adminRecordCreditPayment,
+} from "@/lib/server-fns/credit";
+
+export {
+  fetchCustomerDocuments,
+  fetchAdminCustomerDocuments,
+  saveCustomerDocumentFn,
+  adminReviewCustomerDocument,
+} from "@/lib/server-fns/documents";
+
+export {
+  quickOrderBySku,
+  reorderFromOrder,
+  fetchPriceList,
+  lookupProductBySku,
+} from "@/lib/server-fns/wholesale";
+
+export { fetchAdminMemberProfile } from "@/lib/server-fns/member-admin";

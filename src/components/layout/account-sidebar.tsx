@@ -1,8 +1,11 @@
 import {
   Bell,
+  CreditCard,
+  FileText,
   Home,
   MapPin,
   Package,
+  Receipt,
   Search,
   Settings,
   SlidersHorizontal,
@@ -12,17 +15,29 @@ import {
   Share2,
   Heart,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { useT } from "@/i18n";
+import { fetchCreditAccount } from "@/lib/api.functions";
+import { showCreditPanel } from "@/lib/member-tier";
+import { authServerFnOptions } from "@/lib/server-fn-auth";
 
 export function AccountSidebar() {
   const { t } = useT();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
+  const [hasCreditAccount, setHasCreditAccount] = useState(false);
   const initials = (user?.email?.[0] ?? "U").toUpperCase();
+
+  useEffect(() => {
+    if (!session) return;
+    void fetchCreditAccount(authServerFnOptions(session))
+      .then((acct) => setHasCreditAccount(Boolean(acct)))
+      .catch(() => setHasCreditAccount(false));
+  }, [session]);
 
   return (
     <div className="space-y-4">
@@ -62,6 +77,31 @@ export function AccountSidebar() {
             icon: MapPin,
             key: "addresses",
           },
+          {
+            to: "/account",
+            search: { tab: "tax" },
+            label: t("account.taxInvoice"),
+            icon: Receipt,
+            key: "tax",
+          },
+          {
+            to: "/account",
+            search: { tab: "documents" },
+            label: t("account.documents"),
+            icon: FileText,
+            key: "documents",
+          },
+          ...(showCreditPanel(hasCreditAccount)
+            ? [
+                {
+                  to: "/account",
+                  search: { tab: "credit" },
+                  label: t("account.credit"),
+                  icon: CreditCard,
+                  key: "credit",
+                },
+              ]
+            : []),
           {
             to: "/account",
             search: { tab: "settings" },

@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { PageHeader } from "@/components/layout/page-header";
+import { CreditPanel } from "@/components/account/credit-panel";
+import { DocumentsPanel } from "@/components/account/documents-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,10 +38,18 @@ import {
   saveAccountAddress,
   saveTaxInvoiceProfileFn,
   updateAccountProfileFn,
+  fetchCreditAccount,
 } from "@/lib/api.functions";
 import { formatDate, formatPrice } from "@/lib/format";
-import { authServerFnOptions, useAuthServerFnOptions } from "@/lib/server-fn-auth";
-import { tierLabel } from "@/lib/member-tier";
+import {
+  authServerFnOptions,
+  useAuthServerFnOptions,
+} from "@/lib/server-fn-auth";
+import {
+  tierLabel,
+  customerTypeLabel,
+  showCreditPanel,
+} from "@/lib/member-tier";
 import { useT, useLocaleControl } from "@/i18n";
 import type {
   AccountProfileDto,
@@ -57,6 +67,8 @@ const accountTabSchema = z.enum([
   "wallet",
   "addresses",
   "tax",
+  "documents",
+  "credit",
   "settings",
 ]);
 
@@ -104,6 +116,13 @@ function AccountProfilePage() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [locale, setLocale] = useState<"th" | "en">("th");
+  const [customerType, setCustomerType] = useState<"individual" | "juristic">(
+    "individual",
+  );
+  const [nationalId, setNationalId] = useState("");
+  const [companyTaxId, setCompanyTaxId] = useState("");
+  const [companyBranch, setCompanyBranch] = useState("");
+  const [hasCreditAccount, setHasCreditAccount] = useState(false);
 
   const [walletBalance, setWalletBalance] = useState(0);
   const [walletPending, setWalletPending] = useState(0);
@@ -137,6 +156,16 @@ function AccountProfilePage() {
     setFullName(data.fullName ?? "");
     setPhone(data.phone ?? "");
     setLocale(data.locale === "en" ? "en" : "th");
+    setCustomerType(data.customerType);
+    setNationalId(data.nationalId ?? "");
+    setCompanyTaxId(data.companyTaxId ?? "");
+    setCompanyBranch(data.companyBranch ?? "");
+    try {
+      const credit = await fetchCreditAccount(authOpts);
+      setHasCreditAccount(Boolean(credit && credit.status === "active"));
+    } catch {
+      setHasCreditAccount(false);
+    }
   }, [authOpts]);
 
   const loadWallet = useCallback(async () => {
@@ -188,6 +217,11 @@ function AccountProfilePage() {
       return;
     }
 
+    if (tab === "documents" || tab === "credit") {
+      setTabLoading(false);
+      return;
+    }
+
     let cancelled = false;
 
     void (async () => {
@@ -216,7 +250,15 @@ function AccountProfilePage() {
     setSavingProfile(true);
     try {
       await updateAccountProfileFn({
-        data: { fullName, phone, locale },
+        data: {
+          fullName,
+          phone,
+          locale,
+          customerType,
+          nationalId,
+          companyTaxId,
+          companyBranch,
+        },
         ...authOpts,
       });
       applyLocale(locale);
@@ -393,6 +435,15 @@ function AccountProfilePage() {
         description="จัดการข้อมูลส่วนตัว กระเป๋าเงิน ที่อยู่ และการตั้งค่า"
       />
 
+      {!profile.profileCompleted && (
+        <Card className="mb-4 border-amber-200 bg-amber-50">
+          <CardContent className="p-4 text-sm text-amber-900">
+            กรุณากรอกข้อมูลให้ครบ (ประเภทผู้ซื้อและเลขประจำตัว/เลขภาษี)
+            เพื่อใช้งานใบกำกับภาษีและขอวงเงินเครดิต
+          </CardContent>
+        </Card>
+      )}
+
       {(isAdmin || isDealer) && (
         <div className="mb-6 flex flex-wrap gap-2">
           {isAdmin && (
@@ -423,6 +474,10 @@ function AccountProfilePage() {
           <TabsTrigger value="wallet">{t("account.wallet")}</TabsTrigger>
           <TabsTrigger value="addresses">{t("account.addresses")}</TabsTrigger>
           <TabsTrigger value="tax">{t("account.taxInvoice")}</TabsTrigger>
+          <TabsTrigger value="documents">เอกสาร</TabsTrigger>
+          {showCreditPanel(hasCreditAccount) && (
+            <TabsTrigger value="credit">เครดิต</TabsTrigger>
+          )}
           <TabsTrigger value="settings">{t("account.settings")}</TabsTrigger>
         </TabsList>
 
@@ -446,6 +501,54 @@ function AccountProfilePage() {
                     required
                   />
                 </div>
+                <div className="grid gap-2">
+                  <Label>ประเภทผู้ซื้อ</Label>
+                  <Select
+                    value={customerType}
+                    onValueChange={(v) =>
+                      setCustomerType(v as "individual" | "juristic")
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="individual">บุคคลธรรมดา</SelectItem>
+                      <SelectItem value="juristic">นิติบุคคล</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {customerType === "individual" ? (
+                  <div className="grid gap-2">
+                    <Label htmlFor="nationalId">เลขบัตรประชาชน</Label>
+                    <Input
+                      id="nationalId"
+                      value={nationalId}
+                      onChange={(e) => setNationalId(e.target.value)}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid gap-2">
+                      <Label htmlFor="companyTaxId">เลขผู้เสียภาษี</Label>
+                      <Input
+                        id="companyTaxId"
+                        value={companyTaxId}
+                        onChange={(e) => setCompanyTaxId(e.target.value)}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="companyBranch">
+                        สาขา (00000 = สำนักงานใหญ่)
+                      </Label>
+                      <Input
+                        id="companyBranch"
+                        value={companyBranch}
+                        onChange={(e) => setCompanyBranch(e.target.value)}
+                      />
+                    </div>
+                  </>
+                )}
                 <div className="grid gap-2">
                   <Label htmlFor="phone">เบอร์โทร</Label>
                   <Input
@@ -494,184 +597,190 @@ function AccountProfilePage() {
             <TabLoading />
           ) : (
             <>
-          {tierProgress ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">ระดับสมาชิก</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge>{tierProgress.currentTierName}</Badge>
-                  {tierProgress.discountPct > 0 ? (
-                    <span className="text-muted-foreground">
-                      ส่วนลด {tierProgress.discountPct}%
-                    </span>
-                  ) : null}
-                </div>
-                <p>
-                  ยอดซื้อสะสม {formatPrice(tierProgress.totalSpent)}
-                  {tierProgress.nextTierName ? (
-                    <>
-                      {" "}
-                      · อีก {formatPrice(
-                        tierProgress.amountToNext ?? 0,
-                      )} ถึง {tierProgress.nextTierName}
-                    </>
-                  ) : (
-                    " · ระดับสูงสุดแล้ว"
-                  )}
-                </p>
-              </CardContent>
-            </Card>
-          ) : null}
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-sm text-muted-foreground">ยอดใช้ได้</p>
-                <p className="text-3xl font-bold text-accent">
-                  {formatPrice(walletBalance)}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-sm text-muted-foreground">รอดำเนินการ</p>
-                <p className="text-2xl font-semibold">
-                  {formatPrice(walletPending)}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">เติมเงินกระเป๋า</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form
-                onSubmit={handleSubmitTopup}
-                className="grid gap-4 sm:max-w-md"
-              >
-                <div className="grid gap-2">
-                  <Label htmlFor="topup-amount">จำนวนเงิน (บาท)</Label>
-                  <Input
-                    id="topup-amount"
-                    type="number"
-                    min={100}
-                    step={1}
-                    value={topupAmount}
-                    onChange={(e) => setTopupAmount(e.target.value)}
-                    placeholder="ขั้นต่ำ 100"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="topup-slip">สลิปโอนเงิน</Label>
-                  <Input
-                    id="topup-slip"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      setTopupSlipFile(e.target.files?.[0] ?? null)
-                    }
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    โอนเข้าบัญชีร้านตามหน้า checkout แล้วแนบสลิป
-                  </p>
-                </div>
-                <Button type="submit" disabled={submittingTopup}>
-                  {submittingTopup ? "กำลังส่ง..." : "ส่งคำขอเติมเงิน"}
-                </Button>
-                {activeTopupId ? (
-                  <p className="text-xs text-muted-foreground">
-                    คำขอล่าสุด: {activeTopupId.slice(0, 8)}…
-                  </p>
-                ) : null}
-              </form>
-            </CardContent>
-          </Card>
-
-          {topupRequests.some((r) => r.status === "pending") ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">คำขอเติมเงิน</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {topupRequests.map((req) => (
-                  <div
-                    key={req.id}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 text-sm"
-                  >
-                    <div>
-                      <p className="font-medium">{formatPrice(req.amount)}</p>
-                      <p className="text-muted-foreground">
-                        {formatDate(req.createdAt)}
-                      </p>
-                      <Badge variant="outline">{req.status}</Badge>
+              {tierProgress ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">ระดับสมาชิก</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2 text-sm">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge>{tierProgress.currentTierName}</Badge>
+                      {tierProgress.discountPct > 0 ? (
+                        <span className="text-muted-foreground">
+                          ส่วนลด {tierProgress.discountPct}%
+                        </span>
+                      ) : null}
                     </div>
-                    {req.status === "pending" && !req.slipFileUrl ? (
+                    <p>
+                      ยอดซื้อสะสม {formatPrice(tierProgress.totalSpent)}
+                      {tierProgress.nextTierName ? (
+                        <>
+                          {" "}
+                          · อีก {formatPrice(
+                            tierProgress.amountToNext ?? 0,
+                          )}{" "}
+                          ถึง {tierProgress.nextTierName}
+                        </>
+                      ) : (
+                        " · ระดับสูงสุดแล้ว"
+                      )}
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : null}
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Card>
+                  <CardContent className="p-6">
+                    <p className="text-sm text-muted-foreground">ยอดใช้ได้</p>
+                    <p className="text-3xl font-bold text-accent">
+                      {formatPrice(walletBalance)}
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-6">
+                    <p className="text-sm text-muted-foreground">รอดำเนินการ</p>
+                    <p className="text-2xl font-semibold">
+                      {formatPrice(walletPending)}
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">เติมเงินกระเป๋า</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form
+                    onSubmit={handleSubmitTopup}
+                    className="grid gap-4 sm:max-w-md"
+                  >
+                    <div className="grid gap-2">
+                      <Label htmlFor="topup-amount">จำนวนเงิน (บาท)</Label>
                       <Input
+                        id="topup-amount"
+                        type="number"
+                        min={100}
+                        step={1}
+                        value={topupAmount}
+                        onChange={(e) => setTopupAmount(e.target.value)}
+                        placeholder="ขั้นต่ำ 100"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="topup-slip">สลิปโอนเงิน</Label>
+                      <Input
+                        id="topup-slip"
                         type="file"
                         accept="image/*"
-                        className="max-w-xs"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) void handleUploadTopupSlip(req.id, file);
-                        }}
-                      />
-                    ) : req.slipSignedUrl ? (
-                      <a
-                        href={req.slipSignedUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-primary underline"
-                      >
-                        ดูสลิป
-                      </a>
-                    ) : null}
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          ) : null}
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">ประวัติธุรกรรม</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {walletTxs.length === 0 ? (
-                <p className="text-sm text-muted-foreground">ยังไม่มีธุรกรรม</p>
-              ) : (
-                walletTxs.map((tx) => (
-                  <div
-                    key={tx.id}
-                    className="flex items-center justify-between rounded-lg border p-3 text-sm"
-                  >
-                    <div>
-                      <p>{tx.description ?? tx.type}</p>
-                      <p className="text-muted-foreground">
-                        {formatDate(tx.createdAt)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <Badge variant="outline">{tx.status}</Badge>
-                      <p
-                        className={
-                          tx.direction === "debit"
-                            ? "text-destructive"
-                            : "text-green-600"
+                        onChange={(e) =>
+                          setTopupSlipFile(e.target.files?.[0] ?? null)
                         }
-                      >
-                        {tx.direction === "debit" ? "-" : "+"}
-                        {formatPrice(tx.amount)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        โอนเข้าบัญชีร้านตามหน้า checkout แล้วแนบสลิป
                       </p>
                     </div>
-                  </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
+                    <Button type="submit" disabled={submittingTopup}>
+                      {submittingTopup ? "กำลังส่ง..." : "ส่งคำขอเติมเงิน"}
+                    </Button>
+                    {activeTopupId ? (
+                      <p className="text-xs text-muted-foreground">
+                        คำขอล่าสุด: {activeTopupId.slice(0, 8)}…
+                      </p>
+                    ) : null}
+                  </form>
+                </CardContent>
+              </Card>
+
+              {topupRequests.some((r) => r.status === "pending") ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">คำขอเติมเงิน</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {topupRequests.map((req) => (
+                      <div
+                        key={req.id}
+                        className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 text-sm"
+                      >
+                        <div>
+                          <p className="font-medium">
+                            {formatPrice(req.amount)}
+                          </p>
+                          <p className="text-muted-foreground">
+                            {formatDate(req.createdAt)}
+                          </p>
+                          <Badge variant="outline">{req.status}</Badge>
+                        </div>
+                        {req.status === "pending" && !req.slipFileUrl ? (
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            className="max-w-xs"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file)
+                                void handleUploadTopupSlip(req.id, file);
+                            }}
+                          />
+                        ) : req.slipSignedUrl ? (
+                          <a
+                            href={req.slipSignedUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-primary underline"
+                          >
+                            ดูสลิป
+                          </a>
+                        ) : null}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              ) : null}
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">ประวัติธุรกรรม</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {walletTxs.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      ยังไม่มีธุรกรรม
+                    </p>
+                  ) : (
+                    walletTxs.map((tx) => (
+                      <div
+                        key={tx.id}
+                        className="flex items-center justify-between rounded-lg border p-3 text-sm"
+                      >
+                        <div>
+                          <p>{tx.description ?? tx.type}</p>
+                          <p className="text-muted-foreground">
+                            {formatDate(tx.createdAt)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant="outline">{tx.status}</Badge>
+                          <p
+                            className={
+                              tx.direction === "debit"
+                                ? "text-destructive"
+                                : "text-green-600"
+                            }
+                          >
+                            {tx.direction === "debit" ? "-" : "+"}
+                            {formatPrice(tx.amount)}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </CardContent>
+              </Card>
             </>
           )}
         </TabsContent>
@@ -681,189 +790,200 @@ function AccountProfilePage() {
             <TabLoading />
           ) : (
             <>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">
-                {editingAddressId ? "แก้ไขที่อยู่" : "เพิ่มที่อยู่จัดส่ง"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSaveAddress} className="grid gap-4">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="grid gap-2">
-                    <Label>ชื่อที่อยู่ (เช่น บ้าน, ออฟฟิศ)</Label>
-                    <Input
-                      value={addressForm.label}
-                      onChange={(e) =>
-                        setAddressForm((f) => ({
-                          ...f,
-                          label: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>ชื่อผู้รับ</Label>
-                    <Input
-                      value={addressForm.recipientName}
-                      onChange={(e) =>
-                        setAddressForm((f) => ({
-                          ...f,
-                          recipientName: e.target.value,
-                        }))
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>เบอร์โทร</Label>
-                    <Input
-                      value={addressForm.phone}
-                      onChange={(e) =>
-                        setAddressForm((f) => ({ ...f, phone: e.target.value }))
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="grid gap-2 sm:col-span-2">
-                    <Label>ที่อยู่</Label>
-                    <Input
-                      value={addressForm.line1}
-                      onChange={(e) =>
-                        setAddressForm((f) => ({ ...f, line1: e.target.value }))
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>แขวง/ตำบล</Label>
-                    <Input
-                      value={addressForm.district}
-                      onChange={(e) =>
-                        setAddressForm((f) => ({
-                          ...f,
-                          district: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>จังหวัด</Label>
-                    <Input
-                      value={addressForm.province}
-                      onChange={(e) =>
-                        setAddressForm((f) => ({
-                          ...f,
-                          province: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>รหัสไปรษณีย์</Label>
-                    <Input
-                      value={addressForm.postalCode}
-                      onChange={(e) =>
-                        setAddressForm((f) => ({
-                          ...f,
-                          postalCode: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 sm:col-span-2">
-                    <Switch
-                      checked={addressForm.isDefault}
-                      onCheckedChange={(checked) =>
-                        setAddressForm((f) => ({ ...f, isDefault: checked }))
-                      }
-                    />
-                    <Label>ตั้งเป็นที่อยู่หลัก</Label>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button type="submit" disabled={savingAddress}>
-                    {savingAddress && (
-                      <Loader2 className="mr-2 size-4 animate-spin" />
-                    )}
-                    บันทึกที่อยู่
-                  </Button>
-                  {editingAddressId && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setEditingAddressId(null);
-                        setAddressForm(emptyAddress);
-                      }}
-                    >
-                      ยกเลิก
-                    </Button>
-                  )}
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-
-          <div className="space-y-2">
-            {addresses.length === 0 ? (
-              <p className="text-sm text-muted-foreground">ยังไม่มีที่อยู่</p>
-            ) : (
-              addresses.map((addr) => (
-                <Card key={addr.id}>
-                  <CardContent className="flex flex-wrap items-start justify-between gap-3 p-4">
-                    <div className="text-sm">
-                      <div className="mb-1 flex flex-wrap items-center gap-2">
-                        <p className="font-medium">
-                          {addr.label ?? "ที่อยู่จัดส่ง"}
-                        </p>
-                        {addr.isDefault && (
-                          <Badge variant="secondary">หลัก</Badge>
-                        )}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    {editingAddressId ? "แก้ไขที่อยู่" : "เพิ่มที่อยู่จัดส่ง"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSaveAddress} className="grid gap-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="grid gap-2">
+                        <Label>ชื่อที่อยู่ (เช่น บ้าน, ออฟฟิศ)</Label>
+                        <Input
+                          value={addressForm.label}
+                          onChange={(e) =>
+                            setAddressForm((f) => ({
+                              ...f,
+                              label: e.target.value,
+                            }))
+                          }
+                        />
                       </div>
-                      <p>{addr.recipientName}</p>
-                      <p className="text-muted-foreground">{addr.phone}</p>
-                      <p>
-                        {addr.line1}
-                        {addr.district ? ` ${addr.district}` : ""}
-                        {addr.province ? ` ${addr.province}` : ""}
-                        {addr.postalCode ? ` ${addr.postalCode}` : ""}
-                      </p>
+                      <div className="grid gap-2">
+                        <Label>ชื่อผู้รับ</Label>
+                        <Input
+                          value={addressForm.recipientName}
+                          onChange={(e) =>
+                            setAddressForm((f) => ({
+                              ...f,
+                              recipientName: e.target.value,
+                            }))
+                          }
+                          required
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>เบอร์โทร</Label>
+                        <Input
+                          value={addressForm.phone}
+                          onChange={(e) =>
+                            setAddressForm((f) => ({
+                              ...f,
+                              phone: e.target.value,
+                            }))
+                          }
+                          required
+                        />
+                      </div>
+                      <div className="grid gap-2 sm:col-span-2">
+                        <Label>ที่อยู่</Label>
+                        <Input
+                          value={addressForm.line1}
+                          onChange={(e) =>
+                            setAddressForm((f) => ({
+                              ...f,
+                              line1: e.target.value,
+                            }))
+                          }
+                          required
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>แขวง/ตำบล</Label>
+                        <Input
+                          value={addressForm.district}
+                          onChange={(e) =>
+                            setAddressForm((f) => ({
+                              ...f,
+                              district: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>จังหวัด</Label>
+                        <Input
+                          value={addressForm.province}
+                          onChange={(e) =>
+                            setAddressForm((f) => ({
+                              ...f,
+                              province: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>รหัสไปรษณีย์</Label>
+                        <Input
+                          value={addressForm.postalCode}
+                          onChange={(e) =>
+                            setAddressForm((f) => ({
+                              ...f,
+                              postalCode: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center gap-2 sm:col-span-2">
+                        <Switch
+                          checked={addressForm.isDefault}
+                          onCheckedChange={(checked) =>
+                            setAddressForm((f) => ({
+                              ...f,
+                              isDefault: checked,
+                            }))
+                          }
+                        />
+                        <Label>ตั้งเป็นที่อยู่หลัก</Label>
+                      </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setEditingAddressId(addr.id);
-                          setAddressForm({
-                            label: addr.label ?? "",
-                            recipientName: addr.recipientName ?? "",
-                            phone: addr.phone ?? "",
-                            line1: addr.line1,
-                            line2: addr.line2 ?? "",
-                            district: addr.district ?? "",
-                            province: addr.province ?? "",
-                            postalCode: addr.postalCode ?? "",
-                            isDefault: addr.isDefault,
-                          });
-                        }}
-                      >
-                        แก้ไข
+                      <Button type="submit" disabled={savingAddress}>
+                        {savingAddress && (
+                          <Loader2 className="mr-2 size-4 animate-spin" />
+                        )}
+                        บันทึกที่อยู่
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => void handleDeleteAddress(addr.id)}
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
+                      {editingAddressId && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            setEditingAddressId(null);
+                            setAddressForm(emptyAddress);
+                          }}
+                        >
+                          ยกเลิก
+                        </Button>
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
+                  </form>
+                </CardContent>
+              </Card>
+
+              <div className="space-y-2">
+                {addresses.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    ยังไม่มีที่อยู่
+                  </p>
+                ) : (
+                  addresses.map((addr) => (
+                    <Card key={addr.id}>
+                      <CardContent className="flex flex-wrap items-start justify-between gap-3 p-4">
+                        <div className="text-sm">
+                          <div className="mb-1 flex flex-wrap items-center gap-2">
+                            <p className="font-medium">
+                              {addr.label ?? "ที่อยู่จัดส่ง"}
+                            </p>
+                            {addr.isDefault && (
+                              <Badge variant="secondary">หลัก</Badge>
+                            )}
+                          </div>
+                          <p>{addr.recipientName}</p>
+                          <p className="text-muted-foreground">{addr.phone}</p>
+                          <p>
+                            {addr.line1}
+                            {addr.district ? ` ${addr.district}` : ""}
+                            {addr.province ? ` ${addr.province}` : ""}
+                            {addr.postalCode ? ` ${addr.postalCode}` : ""}
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setEditingAddressId(addr.id);
+                              setAddressForm({
+                                label: addr.label ?? "",
+                                recipientName: addr.recipientName ?? "",
+                                phone: addr.phone ?? "",
+                                line1: addr.line1,
+                                line2: addr.line2 ?? "",
+                                district: addr.district ?? "",
+                                province: addr.province ?? "",
+                                postalCode: addr.postalCode ?? "",
+                                isDefault: addr.isDefault,
+                              });
+                            }}
+                          >
+                            แก้ไข
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => void handleDeleteAddress(addr.id)}
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
             </>
           )}
         </TabsContent>
@@ -873,172 +993,185 @@ function AccountProfilePage() {
             <TabLoading />
           ) : (
             <>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">
-                {editingTaxId
-                  ? "แก้ไขข้อมูลใบกำกับภาษี"
-                  : "เพิ่มข้อมูลใบกำกับภาษี"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSaveTax} className="grid gap-4">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="grid gap-2 sm:col-span-2">
-                    <Label>ชื่อบริษัท / นิติบุคคล</Label>
-                    <Input
-                      value={taxForm.companyName}
-                      onChange={(e) =>
-                        setTaxForm((f) => ({
-                          ...f,
-                          companyName: e.target.value,
-                        }))
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>เลขประจำตัวผู้เสียภาษี</Label>
-                    <Input
-                      value={taxForm.taxId}
-                      onChange={(e) =>
-                        setTaxForm((f) => ({ ...f, taxId: e.target.value }))
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>รหัสสาขา</Label>
-                    <Input
-                      value={taxForm.branchCode}
-                      onChange={(e) =>
-                        setTaxForm((f) => ({
-                          ...f,
-                          branchCode: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="grid gap-2 sm:col-span-2">
-                    <Label>ที่อยู่ในใบกำกับ</Label>
-                    <Textarea
-                      value={taxForm.address}
-                      onChange={(e) =>
-                        setTaxForm((f) => ({ ...f, address: e.target.value }))
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>อีเมล</Label>
-                    <Input
-                      type="email"
-                      value={taxForm.email}
-                      onChange={(e) =>
-                        setTaxForm((f) => ({ ...f, email: e.target.value }))
-                      }
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>เบอร์โทร</Label>
-                    <Input
-                      value={taxForm.phone}
-                      onChange={(e) =>
-                        setTaxForm((f) => ({ ...f, phone: e.target.value }))
-                      }
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 sm:col-span-2">
-                    <Switch
-                      checked={taxForm.isDefault}
-                      onCheckedChange={(checked) =>
-                        setTaxForm((f) => ({ ...f, isDefault: checked }))
-                      }
-                    />
-                    <Label>ตั้งเป็นข้อมูลหลัก</Label>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button type="submit" disabled={savingTax}>
-                    {savingTax && (
-                      <Loader2 className="mr-2 size-4 animate-spin" />
-                    )}
-                    บันทึก
-                  </Button>
-                  {editingTaxId && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setEditingTaxId(null);
-                        setTaxForm(emptyTax);
-                      }}
-                    >
-                      ยกเลิก
-                    </Button>
-                  )}
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-
-          <div className="space-y-2">
-            {taxProfiles.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                ยังไม่มีข้อมูลใบกำกับภาษี
-              </p>
-            ) : (
-              taxProfiles.map((tax) => (
-                <Card key={tax.id}>
-                  <CardContent className="flex flex-wrap items-start justify-between gap-3 p-4">
-                    <div className="text-sm">
-                      <div className="mb-1 flex flex-wrap items-center gap-2">
-                        <p className="font-medium">{tax.companyName}</p>
-                        {tax.isDefault && (
-                          <Badge variant="secondary">หลัก</Badge>
-                        )}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    {editingTaxId
+                      ? "แก้ไขข้อมูลใบกำกับภาษี"
+                      : "เพิ่มข้อมูลใบกำกับภาษี"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSaveTax} className="grid gap-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="grid gap-2 sm:col-span-2">
+                        <Label>ชื่อบริษัท / นิติบุคคล</Label>
+                        <Input
+                          value={taxForm.companyName}
+                          onChange={(e) =>
+                            setTaxForm((f) => ({
+                              ...f,
+                              companyName: e.target.value,
+                            }))
+                          }
+                          required
+                        />
                       </div>
-                      <p className="text-muted-foreground">
-                        เลขภาษี {tax.taxId}
-                        {tax.branchCode ? ` สาขา ${tax.branchCode}` : ""}
-                      </p>
-                      <p>{tax.address}</p>
+                      <div className="grid gap-2">
+                        <Label>เลขประจำตัวผู้เสียภาษี</Label>
+                        <Input
+                          value={taxForm.taxId}
+                          onChange={(e) =>
+                            setTaxForm((f) => ({ ...f, taxId: e.target.value }))
+                          }
+                          required
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>รหัสสาขา</Label>
+                        <Input
+                          value={taxForm.branchCode}
+                          onChange={(e) =>
+                            setTaxForm((f) => ({
+                              ...f,
+                              branchCode: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="grid gap-2 sm:col-span-2">
+                        <Label>ที่อยู่ในใบกำกับ</Label>
+                        <Textarea
+                          value={taxForm.address}
+                          onChange={(e) =>
+                            setTaxForm((f) => ({
+                              ...f,
+                              address: e.target.value,
+                            }))
+                          }
+                          required
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>อีเมล</Label>
+                        <Input
+                          type="email"
+                          value={taxForm.email}
+                          onChange={(e) =>
+                            setTaxForm((f) => ({ ...f, email: e.target.value }))
+                          }
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>เบอร์โทร</Label>
+                        <Input
+                          value={taxForm.phone}
+                          onChange={(e) =>
+                            setTaxForm((f) => ({ ...f, phone: e.target.value }))
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center gap-2 sm:col-span-2">
+                        <Switch
+                          checked={taxForm.isDefault}
+                          onCheckedChange={(checked) =>
+                            setTaxForm((f) => ({ ...f, isDefault: checked }))
+                          }
+                        />
+                        <Label>ตั้งเป็นข้อมูลหลัก</Label>
+                      </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setEditingTaxId(tax.id);
-                          setTaxForm({
-                            companyName: tax.companyName,
-                            taxId: tax.taxId,
-                            branchCode: tax.branchCode ?? "",
-                            address: tax.address,
-                            email: tax.email ?? "",
-                            phone: tax.phone ?? "",
-                            isDefault: tax.isDefault,
-                          });
-                        }}
-                      >
-                        แก้ไข
+                      <Button type="submit" disabled={savingTax}>
+                        {savingTax && (
+                          <Loader2 className="mr-2 size-4 animate-spin" />
+                        )}
+                        บันทึก
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => void handleDeleteTax(tax.id)}
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
+                      {editingTaxId && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            setEditingTaxId(null);
+                            setTaxForm(emptyTax);
+                          }}
+                        >
+                          ยกเลิก
+                        </Button>
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
+                  </form>
+                </CardContent>
+              </Card>
+
+              <div className="space-y-2">
+                {taxProfiles.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    ยังไม่มีข้อมูลใบกำกับภาษี
+                  </p>
+                ) : (
+                  taxProfiles.map((tax) => (
+                    <Card key={tax.id}>
+                      <CardContent className="flex flex-wrap items-start justify-between gap-3 p-4">
+                        <div className="text-sm">
+                          <div className="mb-1 flex flex-wrap items-center gap-2">
+                            <p className="font-medium">{tax.companyName}</p>
+                            {tax.isDefault && (
+                              <Badge variant="secondary">หลัก</Badge>
+                            )}
+                          </div>
+                          <p className="text-muted-foreground">
+                            เลขภาษี {tax.taxId}
+                            {tax.branchCode ? ` สาขา ${tax.branchCode}` : ""}
+                          </p>
+                          <p>{tax.address}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setEditingTaxId(tax.id);
+                              setTaxForm({
+                                companyName: tax.companyName,
+                                taxId: tax.taxId,
+                                branchCode: tax.branchCode ?? "",
+                                address: tax.address,
+                                email: tax.email ?? "",
+                                phone: tax.phone ?? "",
+                                isDefault: tax.isDefault,
+                              });
+                            }}
+                          >
+                            แก้ไข
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => void handleDeleteTax(tax.id)}
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
             </>
           )}
         </TabsContent>
+
+        <TabsContent value="documents" className="space-y-4">
+          <DocumentsPanel customerType={customerType} />
+        </TabsContent>
+
+        {showCreditPanel(hasCreditAccount) && (
+          <TabsContent value="credit" className="space-y-4">
+            <CreditPanel />
+          </TabsContent>
+        )}
 
         <TabsContent value="settings" className="space-y-4">
           <Card>

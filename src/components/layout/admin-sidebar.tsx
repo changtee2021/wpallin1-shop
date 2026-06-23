@@ -12,6 +12,7 @@ import {
   Tag,
   BarChart3,
   Boxes,
+  CreditCard,
 } from "lucide-react";
 
 import { SidebarNav } from "@/components/layout/sidebar-nav";
@@ -29,6 +30,7 @@ export function AdminSidebar() {
         { to: "/admin/sales-order", label: "สั่งซื้อแทน", icon: Users },
         { to: "/admin/quotations", label: "ใบเสนอราคา", icon: FileText },
         { to: "/admin/wallet", label: "กระเป๋าเงิน", icon: Wallet },
+        { to: "/admin/credit", label: "เครดิต", icon: CreditCard },
         { to: "/admin/members", label: "สมาชิก", icon: UserCircle },
         { to: "/admin/tiers", label: "ระดับ/Tier", icon: Award },
         { to: "/admin/dealers", label: "ตัวแทน", icon: Users },

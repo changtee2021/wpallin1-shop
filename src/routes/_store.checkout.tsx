@@ -21,6 +21,7 @@ import {
   checkoutOrder,
   fetchAccountAddresses,
   fetchAccountProfile,
+  fetchCreditAccount,
   fetchOrderDetail,
   fetchPromptPayId,
   fetchWalletSummary,
@@ -51,9 +52,11 @@ function CheckoutPage() {
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<
-    "bank_transfer" | "wallet"
+    "bank_transfer" | "wallet" | "credit"
   >("bank_transfer");
   const [walletBalance, setWalletBalance] = useState(0);
+  const [creditAvailable, setCreditAvailable] = useState(0);
+  const [hasCredit, setHasCredit] = useState(false);
   const [savedAddresses, setSavedAddresses] = useState<AddressDto[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("manual");
   const [form, setForm] = useState({
@@ -84,6 +87,12 @@ function CheckoutPage() {
     void fetchWalletSummary(opts).then((w) =>
       setWalletBalance(w.availableBalance),
     );
+    void fetchCreditAccount(opts).then((acct) => {
+      if (acct && acct.status === "active") {
+        setHasCredit(true);
+        setCreditAvailable(acct.availableCredit);
+      }
+    });
     void Promise.all([
       fetchAccountAddresses(opts),
       fetchAccountProfile(opts),
@@ -140,6 +149,15 @@ function CheckoutPage() {
         ...authServerFnOptions(session),
       });
       await refresh();
+      if (paymentMethod === "credit") {
+        toast.success("ส่งคำขอชำระเครดิตแล้ว รอแอดมินอนุมัติ");
+        void navigate({
+          to: "/account/orders/$orderId",
+          params: { orderId: result.orderId },
+        });
+        return;
+      }
+
       if (paymentMethod === "wallet") {
         void navigate({
           to: "/account/orders/$orderId",
@@ -284,7 +302,7 @@ function CheckoutPage() {
             <Select
               value={paymentMethod}
               onValueChange={(v) =>
-                setPaymentMethod(v as "bank_transfer" | "wallet")
+                setPaymentMethod(v as "bank_transfer" | "wallet" | "credit")
               }
             >
               <SelectTrigger>
@@ -295,8 +313,18 @@ function CheckoutPage() {
                 <SelectItem value="wallet">
                   กระเป๋าเงิน (ยอด {formatPrice(walletBalance)})
                 </SelectItem>
+                {hasCredit && (
+                  <SelectItem value="credit">
+                    เครดิต/วางบิล (คงเหลือ {formatPrice(creditAvailable)})
+                  </SelectItem>
+                )}
               </SelectContent>
             </Select>
+            {paymentMethod === "credit" && (
+              <p className="text-xs text-muted-foreground">
+                ออเดอร์จะรอแอดมินอนุมัติก่อนดำเนินการ
+              </p>
+            )}
             <div className="flex justify-between text-lg font-bold">
               <span>ยอดชำระ</span>
               <span className="text-accent">

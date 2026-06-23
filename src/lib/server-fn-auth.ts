@@ -11,8 +11,5 @@ export function authServerFnOptions(session: Session | null) {
 }
 
 export function useAuthServerFnOptions(session: Session | null) {
-  return useMemo(
-    () => authServerFnOptions(session),
-    [session?.access_token],
-  );
+  return useMemo(() => authServerFnOptions(session), [session?.access_token]);
 }

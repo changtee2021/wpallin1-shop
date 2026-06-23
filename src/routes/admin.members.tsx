@@ -114,6 +114,14 @@ function AdminMembersPage() {
                   </Select>
                   <Button size="sm" variant="outline" asChild>
                     <Link
+                      to="/admin/members/$userId"
+                      params={{ userId: m.userId }}
+                    >
+                      ดูรายละเอียด
+                    </Link>
+                  </Button>
+                  <Button size="sm" variant="outline" asChild>
+                    <Link
                       to="/admin/sales-order"
                       search={{ customerId: m.userId }}
                     >

@@ -115,6 +115,20 @@ export async function placeOrder(
     }
   }
 
+  if (paymentMethod === "credit") {
+    const { validateCreditCheckout } =
+      await import("@/services/credit.service");
+    await validateCreditCheckout(supabase, userId, totals.grandTotal);
+  }
+
+  const orderMetadata: Record<string, unknown> = {};
+  if (paymentMethod === "credit") {
+    orderMetadata.credit_status = "requested";
+  }
+
+  const isWalletPaid = paymentMethod === "wallet";
+  const isCreditPending = paymentMethod === "credit";
+
   const { data: order, error: orderErr } = await supabase
     .from("orders")
     .insert({
@@ -129,8 +143,13 @@ export async function placeOrder(
       tax_amount: totals.taxAmount,
       grand_total: totals.grandTotal,
       note: input.note?.trim() || null,
-      status: paymentMethod === "wallet" ? "paid" : "pending_payment",
-      payment_status: paymentMethod === "wallet" ? "paid" : "unpaid",
+      metadata: orderMetadata,
+      status: isWalletPaid
+        ? "paid"
+        : isCreditPending
+          ? "pending_payment"
+          : "pending_payment",
+      payment_status: isWalletPaid ? "paid" : "unpaid",
     })
     .select("id, order_number, grand_total")
     .single();
@@ -148,15 +167,15 @@ export async function placeOrder(
       user_id: userId,
       order_id: order.id,
       method: paymentMethod,
-      status: paymentMethod === "wallet" ? "paid" : "awaiting_verification",
+      status: isWalletPaid ? "paid" : "awaiting_verification",
       amount: totals.grandTotal,
-      paid_at: paymentMethod === "wallet" ? new Date().toISOString() : null,
+      paid_at: isWalletPaid ? new Date().toISOString() : null,
     })
     .select("id")
     .single();
   if (payErr) throw new Error(payErr.message);
 
-  if (paymentMethod === "wallet") {
+  if (isWalletPaid) {
     await debitWalletForOrder(supabase, userId, order.id, totals.grandTotal);
     await recordPaidOrderStats(supabase, userId, totals.grandTotal);
     const { createProductionJob } =

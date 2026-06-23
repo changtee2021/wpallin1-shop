@@ -34,6 +34,8 @@ export const th: Translations = {
   "account.wallet": "กระเป๋าเงิน",
   "account.addresses": "ที่อยู่จัดส่ง",
   "account.taxInvoice": "ใบกำกับภาษี",
+  "account.documents": "เอกสาร",
+  "account.credit": "เครดิต",
   "account.settings": "ตั้งค่า",
   "dealer.dashboard": "แดชบอร์ดตัวแทน",
   "dealer.catalog": "แคตตาล็อกราคาส่ง",

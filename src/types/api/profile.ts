@@ -22,6 +22,11 @@ export type AccountProfileDto = {
   locale: string;
   memberTier: string | null;
   accountStatus: string | null;
+  customerType: "individual" | "juristic";
+  nationalId: string | null;
+  companyTaxId: string | null;
+  companyBranch: string | null;
+  profileCompleted: boolean;
   orderCount: number;
   totalSpent: number;
   roles: string[];
@@ -56,6 +61,10 @@ export type UpdateAccountProfileInput = {
   fullName: string;
   phone?: string;
   locale?: "th" | "en";
+  customerType?: "individual" | "juristic";
+  nationalId?: string;
+  companyTaxId?: string;
+  companyBranch?: string;
 };
 
 export type AppRole =

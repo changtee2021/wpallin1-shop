@@ -36,6 +36,8 @@ export const en: Translations = {
   "account.wallet": "Wallet",
   "account.addresses": "Shipping addresses",
   "account.taxInvoice": "Tax invoice",
+  "account.documents": "Documents",
+  "account.credit": "Credit",
   "account.settings": "Settings",
   "common.loading": "Loading...",
   "common.comingSoon": "Coming soon",

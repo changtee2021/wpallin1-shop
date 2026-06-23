@@ -3,7 +3,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { validateCartQty } from "@/domain/cart";
 import { calcCartSubtotal, calcLineTotal } from "@/domain/pricing";
 import { getProductById } from "@/services/catalog.service";
-import { resolveProductUnitPrice } from "@/services/tier.service";
+import {
+  getProductPricingRow,
+  resolveProductUnitPrice,
+} from "@/services/pricing-resolver";
 import type { CartDto, CartItemDto } from "@/types/api/cart";
 
 type CartContext = {
@@ -128,6 +131,7 @@ async function refreshCartTierPrices(
       supabase,
       userId,
       row.product_id,
+      Number(row.qty),
     );
     const lineTotal = calcLineTotal(Number(row.qty), unitPrice);
     await supabase
@@ -167,7 +171,9 @@ export async function addToCart(
   const product = await getProductById(supabase, productId);
   if (!product) throw new Error("ไม่พบสินค้า");
 
-  const err = validateCartQty(qty, product.moq, product.stock);
+  const pricing = await getProductPricingRow(supabase, productId);
+  const orderStep = pricing?.orderStep ?? 1;
+  const err = validateCartQty(qty, product.moq, product.stock, orderStep);
   if (err) throw new Error(err);
 
   const cart = await resolveCart(supabase, ctx);
@@ -175,6 +181,7 @@ export async function addToCart(
     supabase,
     ctx.userId,
     productId,
+    qty,
   );
 
   const { data: existing } = await supabase
@@ -186,7 +193,12 @@ export async function addToCart(
 
   if (existing) {
     const newQty = Number(existing.qty) + qty;
-    const qtyErr = validateCartQty(newQty, product.moq, product.stock);
+    const qtyErr = validateCartQty(
+      newQty,
+      product.moq,
+      product.stock,
+      orderStep,
+    );
     if (qtyErr) throw new Error(qtyErr);
     const lineTotal = calcLineTotal(newQty, unitPrice);
     const { error } = await supabase
@@ -236,8 +248,14 @@ export async function updateCartItemQty(
 
   if (item.product_id) {
     const product = await getProductById(supabase, item.product_id);
+    const pricing = await getProductPricingRow(supabase, item.product_id);
     if (product) {
-      const err = validateCartQty(qty, product.moq, product.stock);
+      const err = validateCartQty(
+        qty,
+        product.moq,
+        product.stock,
+        pricing?.orderStep ?? 1,
+      );
       if (err) throw new Error(err);
     }
   }

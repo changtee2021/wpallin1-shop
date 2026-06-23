@@ -102,7 +102,7 @@ export type CheckoutInput = {
   province?: string;
   postalCode?: string;
   note?: string;
-  paymentMethod?: "bank_transfer" | "wallet";
+  paymentMethod?: "bank_transfer" | "wallet" | "credit";
   affiliateCode?: string;
 };
 

@@ -41,7 +41,7 @@ export async function getAccountProfile(
     supabase
       .from("profiles")
       .select(
-        "email, full_name, phone, locale, member_tier, account_status, order_count, total_spent",
+        "email, full_name, phone, locale, member_tier, account_status, order_count, total_spent, customer_type, national_id, company_tax_id, company_branch, profile_completed",
       )
       .eq("id", userId)
       .maybeSingle(),
@@ -56,6 +56,12 @@ export async function getAccountProfile(
     locale: profile?.locale ?? "th",
     memberTier: profile?.member_tier ?? null,
     accountStatus: profile?.account_status ?? null,
+    customerType:
+      (profile?.customer_type as "individual" | "juristic") ?? "individual",
+    nationalId: profile?.national_id ?? null,
+    companyTaxId: profile?.company_tax_id ?? null,
+    companyBranch: profile?.company_branch ?? null,
+    profileCompleted: profile?.profile_completed ?? false,
     orderCount: profile?.order_count ?? 0,
     totalSpent: Number(profile?.total_spent ?? 0),
     roles: (roles ?? []).map((r) => r.role as string),
@@ -67,12 +73,29 @@ export async function updateAccountProfile(
   userId: string,
   input: UpdateAccountProfileInput,
 ): Promise<void> {
+  const customerType = input.customerType ?? "individual";
+  const profileCompleted =
+    input.fullName.trim().length > 0 &&
+    (customerType === "individual"
+      ? Boolean(input.nationalId?.trim())
+      : Boolean(input.companyTaxId?.trim()));
+
   const { error } = await supabase.from("profiles").upsert(
     {
       id: userId,
       full_name: input.fullName.trim(),
       phone: input.phone?.trim() || null,
       locale: input.locale ?? "th",
+      customer_type: customerType,
+      national_id:
+        customerType === "individual" ? input.nationalId?.trim() || null : null,
+      company_tax_id:
+        customerType === "juristic" ? input.companyTaxId?.trim() || null : null,
+      company_branch:
+        customerType === "juristic"
+          ? input.companyBranch?.trim() || null
+          : null,
+      profile_completed: profileCompleted,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "id" },
@@ -287,6 +310,14 @@ export async function saveTaxInvoiceProfile(
     .single();
   if (error) throw new Error(error.message);
   return mapTaxInvoice(data);
+}
+
+export async function getAdminMemberProfile(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<AccountProfileDto | null> {
+  const { data: authUser } = await supabase.auth.admin.getUserById(userId);
+  return getAccountProfile(supabase, userId, authUser?.user?.email ?? null);
 }
 
 export async function deleteTaxInvoiceProfile(

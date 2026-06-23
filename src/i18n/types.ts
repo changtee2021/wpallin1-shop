@@ -34,6 +34,8 @@ export type TranslationKey =
   | "account.wallet"
   | "account.addresses"
   | "account.taxInvoice"
+  | "account.documents"
+  | "account.credit"
   | "account.settings"
   | "dealer.dashboard"
   | "dealer.catalog"

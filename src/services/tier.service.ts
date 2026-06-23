@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { getProductById } from "@/services/catalog.service";
 import { calcCartSubtotal } from "@/domain/pricing";
+import { resolveProductUnitPrice as resolveFromPricing } from "@/services/pricing-resolver";
 
 export type MemberTierDto = {
   id: string;
@@ -174,50 +174,9 @@ export async function resolveProductUnitPrice(
   supabase: SupabaseClient,
   userId: string | null | undefined,
   productId: string,
+  qty = 1,
 ): Promise<number> {
-  const product = await getProductById(supabase, productId);
-  if (!product) throw new Error("ไม่พบสินค้า");
-
-  if (!userId) return product.retailPrice;
-
-  const [{ data: profile }, dealer] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("member_tier")
-      .eq("id", userId)
-      .maybeSingle(),
-    isDealerUser(supabase, userId),
-  ]);
-
-  const tier = profile?.member_tier ?? "retail";
-
-  if (dealer || tier !== "retail") {
-    const { data: tierPrice } = await supabase
-      .from("product_tier_prices")
-      .select("price")
-      .eq("product_id", productId)
-      .eq("tier", tier)
-      .maybeSingle();
-
-    if (tierPrice) return Number(tierPrice.price);
-    if (dealer && product.dealerPrice > 0) return product.dealerPrice;
-  }
-
-  const { data: tierRow } = await supabase
-    .from("member_tiers")
-    .select("discount_pct")
-    .eq("tier", tier)
-    .eq("is_active", true)
-    .maybeSingle();
-
-  const discountPct = Number(tierRow?.discount_pct ?? 0);
-  if (discountPct > 0) {
-    return (
-      Math.round(product.retailPrice * (1 - discountPct / 100) * 100) / 100
-    );
-  }
-
-  return product.retailPrice;
+  return resolveFromPricing(supabase, userId, productId, qty);
 }
 
 export async function syncTierProductPrices(

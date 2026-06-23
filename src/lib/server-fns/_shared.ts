@@ -33,7 +33,7 @@ export const checkoutSchema = z.object({
   province: z.string().optional(),
   postalCode: z.string().optional(),
   note: z.string().optional(),
-  paymentMethod: z.enum(["bank_transfer", "wallet"]).optional(),
+  paymentMethod: z.enum(["bank_transfer", "wallet", "credit"]).optional(),
   affiliateCode: z.string().optional(),
 });
 

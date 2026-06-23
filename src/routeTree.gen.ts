@@ -37,6 +37,7 @@ import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminMembersRouteImport } from './routes/admin.members'
 import { Route as AdminInventoryRouteImport } from './routes/admin.inventory'
 import { Route as AdminDealersRouteImport } from './routes/admin.dealers'
+import { Route as AdminCreditRouteImport } from './routes/admin.credit'
 import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AccountWishlistRouteImport } from './routes/account.wishlist'
@@ -47,22 +48,26 @@ import { Route as AccountNotificationsRouteImport } from './routes/account.notif
 import { Route as AccountAffiliateRouteImport } from './routes/account.affiliate'
 import { Route as StoreTermsRouteImport } from './routes/_store.terms'
 import { Route as StoreShopRouteImport } from './routes/_store.shop'
+import { Route as StoreQuickOrderRouteImport } from './routes/_store.quick-order'
 import { Route as StorePrivacyRouteImport } from './routes/_store.privacy'
 import { Route as StoreErrorRouteImport } from './routes/_store.error'
 import { Route as StoreCookiesRouteImport } from './routes/_store.cookies'
 import { Route as StoreContactRouteImport } from './routes/_store.contact'
 import { Route as StoreConfiguratorRouteImport } from './routes/_store.configurator'
+import { Route as StoreCompareRouteImport } from './routes/_store.compare'
 import { Route as StoreCheckoutRouteImport } from './routes/_store.checkout'
 import { Route as StoreCartRouteImport } from './routes/_store.cart'
 import { Route as StoreAboutRouteImport } from './routes/_store.about'
 import { Route as ApiV1WalletTopupSlipRouteImport } from './routes/api/v1/wallet-topup-slip'
 import { Route as ApiV1ProductsRouteImport } from './routes/api/v1/products'
 import { Route as ApiV1PaymentSlipRouteImport } from './routes/api/v1/payment-slip'
+import { Route as ApiV1CustomerDocumentRouteImport } from './routes/api/v1/customer-document'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as AdminQuotationsQuotationIdRouteImport } from './routes/admin.quotations.$quotationId'
 import { Route as AdminProductsNewRouteImport } from './routes/admin.products.new'
 import { Route as AdminProductsIdRouteImport } from './routes/admin.products.$id'
 import { Route as AdminOrdersOrderIdRouteImport } from './routes/admin.orders.$orderId'
+import { Route as AdminMembersUserIdRouteImport } from './routes/admin.members.$userId'
 import { Route as AccountOrdersOrderIdRouteImport } from './routes/account.orders.$orderId'
 import { Route as StoreProductsSlugRouteImport } from './routes/_store.products.$slug'
 import { Route as StoreDealerRegisterRouteImport } from './routes/_store.dealer.register'
@@ -206,6 +211,11 @@ const AdminDealersRoute = AdminDealersRouteImport.update({
   path: '/dealers',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCreditRoute = AdminCreditRouteImport.update({
+  id: '/credit',
+  path: '/credit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCouponsRoute = AdminCouponsRouteImport.update({
   id: '/coupons',
   path: '/coupons',
@@ -256,6 +266,11 @@ const StoreShopRoute = StoreShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => StoreRoute,
 } as any)
+const StoreQuickOrderRoute = StoreQuickOrderRouteImport.update({
+  id: '/quick-order',
+  path: '/quick-order',
+  getParentRoute: () => StoreRoute,
+} as any)
 const StorePrivacyRoute = StorePrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -279,6 +294,11 @@ const StoreContactRoute = StoreContactRouteImport.update({
 const StoreConfiguratorRoute = StoreConfiguratorRouteImport.update({
   id: '/configurator',
   path: '/configurator',
+  getParentRoute: () => StoreRoute,
+} as any)
+const StoreCompareRoute = StoreCompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
   getParentRoute: () => StoreRoute,
 } as any)
 const StoreCheckoutRoute = StoreCheckoutRouteImport.update({
@@ -311,6 +331,11 @@ const ApiV1PaymentSlipRoute = ApiV1PaymentSlipRouteImport.update({
   path: '/api/v1/payment-slip',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1CustomerDocumentRoute = ApiV1CustomerDocumentRouteImport.update({
+  id: '/api/v1/customer-document',
+  path: '/api/v1/customer-document',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   id: '/api/public/health',
   path: '/api/public/health',
@@ -336,6 +361,11 @@ const AdminOrdersOrderIdRoute = AdminOrdersOrderIdRouteImport.update({
   id: '/$orderId',
   path: '/$orderId',
   getParentRoute: () => AdminOrdersRoute,
+} as any)
+const AdminMembersUserIdRoute = AdminMembersUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => AdminMembersRoute,
 } as any)
 const AccountOrdersOrderIdRoute = AccountOrdersOrderIdRouteImport.update({
   id: '/$orderId',
@@ -365,11 +395,13 @@ export interface FileRoutesByFullPath {
   '/about': typeof StoreAboutRoute
   '/cart': typeof StoreCartRoute
   '/checkout': typeof StoreCheckoutRoute
+  '/compare': typeof StoreCompareRoute
   '/configurator': typeof StoreConfiguratorRoute
   '/contact': typeof StoreContactRoute
   '/cookies': typeof StoreCookiesRoute
   '/error': typeof StoreErrorRoute
   '/privacy': typeof StorePrivacyRoute
+  '/quick-order': typeof StoreQuickOrderRoute
   '/shop': typeof StoreShopRoute
   '/terms': typeof StoreTermsRoute
   '/account/affiliate': typeof AccountAffiliateRoute
@@ -380,9 +412,10 @@ export interface FileRoutesByFullPath {
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/coupons': typeof AdminCouponsRoute
+  '/admin/credit': typeof AdminCreditRoute
   '/admin/dealers': typeof AdminDealersRoute
   '/admin/inventory': typeof AdminInventoryRoute
-  '/admin/members': typeof AdminMembersRoute
+  '/admin/members': typeof AdminMembersRouteWithChildren
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/products': typeof AdminProductsRouteWithChildren
   '/admin/quotations': typeof AdminQuotationsRouteWithChildren
@@ -402,11 +435,13 @@ export interface FileRoutesByFullPath {
   '/dealer/register': typeof StoreDealerRegisterRoute
   '/products/$slug': typeof StoreProductsSlugRoute
   '/account/orders/$orderId': typeof AccountOrdersOrderIdRoute
+  '/admin/members/$userId': typeof AdminMembersUserIdRoute
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/quotations/$quotationId': typeof AdminQuotationsQuotationIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/v1/customer-document': typeof ApiV1CustomerDocumentRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
@@ -419,11 +454,13 @@ export interface FileRoutesByTo {
   '/about': typeof StoreAboutRoute
   '/cart': typeof StoreCartRoute
   '/checkout': typeof StoreCheckoutRoute
+  '/compare': typeof StoreCompareRoute
   '/configurator': typeof StoreConfiguratorRoute
   '/contact': typeof StoreContactRoute
   '/cookies': typeof StoreCookiesRoute
   '/error': typeof StoreErrorRoute
   '/privacy': typeof StorePrivacyRoute
+  '/quick-order': typeof StoreQuickOrderRoute
   '/shop': typeof StoreShopRoute
   '/terms': typeof StoreTermsRoute
   '/account/affiliate': typeof AccountAffiliateRoute
@@ -434,9 +471,10 @@ export interface FileRoutesByTo {
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/coupons': typeof AdminCouponsRoute
+  '/admin/credit': typeof AdminCreditRoute
   '/admin/dealers': typeof AdminDealersRoute
   '/admin/inventory': typeof AdminInventoryRoute
-  '/admin/members': typeof AdminMembersRoute
+  '/admin/members': typeof AdminMembersRouteWithChildren
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/products': typeof AdminProductsRouteWithChildren
   '/admin/quotations': typeof AdminQuotationsRouteWithChildren
@@ -457,11 +495,13 @@ export interface FileRoutesByTo {
   '/dealer/register': typeof StoreDealerRegisterRoute
   '/products/$slug': typeof StoreProductsSlugRoute
   '/account/orders/$orderId': typeof AccountOrdersOrderIdRoute
+  '/admin/members/$userId': typeof AdminMembersUserIdRoute
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/quotations/$quotationId': typeof AdminQuotationsQuotationIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/v1/customer-document': typeof ApiV1CustomerDocumentRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
@@ -479,11 +519,13 @@ export interface FileRoutesById {
   '/_store/about': typeof StoreAboutRoute
   '/_store/cart': typeof StoreCartRoute
   '/_store/checkout': typeof StoreCheckoutRoute
+  '/_store/compare': typeof StoreCompareRoute
   '/_store/configurator': typeof StoreConfiguratorRoute
   '/_store/contact': typeof StoreContactRoute
   '/_store/cookies': typeof StoreCookiesRoute
   '/_store/error': typeof StoreErrorRoute
   '/_store/privacy': typeof StorePrivacyRoute
+  '/_store/quick-order': typeof StoreQuickOrderRoute
   '/_store/shop': typeof StoreShopRoute
   '/_store/terms': typeof StoreTermsRoute
   '/account/affiliate': typeof AccountAffiliateRoute
@@ -494,9 +536,10 @@ export interface FileRoutesById {
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/coupons': typeof AdminCouponsRoute
+  '/admin/credit': typeof AdminCreditRoute
   '/admin/dealers': typeof AdminDealersRoute
   '/admin/inventory': typeof AdminInventoryRoute
-  '/admin/members': typeof AdminMembersRoute
+  '/admin/members': typeof AdminMembersRouteWithChildren
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/products': typeof AdminProductsRouteWithChildren
   '/admin/quotations': typeof AdminQuotationsRouteWithChildren
@@ -517,11 +560,13 @@ export interface FileRoutesById {
   '/_store/dealer/register': typeof StoreDealerRegisterRoute
   '/_store/products/$slug': typeof StoreProductsSlugRoute
   '/account/orders/$orderId': typeof AccountOrdersOrderIdRoute
+  '/admin/members/$userId': typeof AdminMembersUserIdRoute
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/quotations/$quotationId': typeof AdminQuotationsQuotationIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/v1/customer-document': typeof ApiV1CustomerDocumentRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
@@ -540,11 +585,13 @@ export interface FileRouteTypes {
     | '/about'
     | '/cart'
     | '/checkout'
+    | '/compare'
     | '/configurator'
     | '/contact'
     | '/cookies'
     | '/error'
     | '/privacy'
+    | '/quick-order'
     | '/shop'
     | '/terms'
     | '/account/affiliate'
@@ -555,6 +602,7 @@ export interface FileRouteTypes {
     | '/account/wishlist'
     | '/admin/categories'
     | '/admin/coupons'
+    | '/admin/credit'
     | '/admin/dealers'
     | '/admin/inventory'
     | '/admin/members'
@@ -577,11 +625,13 @@ export interface FileRouteTypes {
     | '/dealer/register'
     | '/products/$slug'
     | '/account/orders/$orderId'
+    | '/admin/members/$userId'
     | '/admin/orders/$orderId'
     | '/admin/products/$id'
     | '/admin/products/new'
     | '/admin/quotations/$quotationId'
     | '/api/public/health'
+    | '/api/v1/customer-document'
     | '/api/v1/payment-slip'
     | '/api/v1/products'
     | '/api/v1/wallet-topup-slip'
@@ -594,11 +644,13 @@ export interface FileRouteTypes {
     | '/about'
     | '/cart'
     | '/checkout'
+    | '/compare'
     | '/configurator'
     | '/contact'
     | '/cookies'
     | '/error'
     | '/privacy'
+    | '/quick-order'
     | '/shop'
     | '/terms'
     | '/account/affiliate'
@@ -609,6 +661,7 @@ export interface FileRouteTypes {
     | '/account/wishlist'
     | '/admin/categories'
     | '/admin/coupons'
+    | '/admin/credit'
     | '/admin/dealers'
     | '/admin/inventory'
     | '/admin/members'
@@ -632,11 +685,13 @@ export interface FileRouteTypes {
     | '/dealer/register'
     | '/products/$slug'
     | '/account/orders/$orderId'
+    | '/admin/members/$userId'
     | '/admin/orders/$orderId'
     | '/admin/products/$id'
     | '/admin/products/new'
     | '/admin/quotations/$quotationId'
     | '/api/public/health'
+    | '/api/v1/customer-document'
     | '/api/v1/payment-slip'
     | '/api/v1/products'
     | '/api/v1/wallet-topup-slip'
@@ -653,11 +708,13 @@ export interface FileRouteTypes {
     | '/_store/about'
     | '/_store/cart'
     | '/_store/checkout'
+    | '/_store/compare'
     | '/_store/configurator'
     | '/_store/contact'
     | '/_store/cookies'
     | '/_store/error'
     | '/_store/privacy'
+    | '/_store/quick-order'
     | '/_store/shop'
     | '/_store/terms'
     | '/account/affiliate'
@@ -668,6 +725,7 @@ export interface FileRouteTypes {
     | '/account/wishlist'
     | '/admin/categories'
     | '/admin/coupons'
+    | '/admin/credit'
     | '/admin/dealers'
     | '/admin/inventory'
     | '/admin/members'
@@ -691,11 +749,13 @@ export interface FileRouteTypes {
     | '/_store/dealer/register'
     | '/_store/products/$slug'
     | '/account/orders/$orderId'
+    | '/admin/members/$userId'
     | '/admin/orders/$orderId'
     | '/admin/products/$id'
     | '/admin/products/new'
     | '/admin/quotations/$quotationId'
     | '/api/public/health'
+    | '/api/v1/customer-document'
     | '/api/v1/payment-slip'
     | '/api/v1/products'
     | '/api/v1/wallet-topup-slip'
@@ -712,6 +772,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
+  ApiV1CustomerDocumentRoute: typeof ApiV1CustomerDocumentRoute
   ApiV1PaymentSlipRoute: typeof ApiV1PaymentSlipRoute
   ApiV1ProductsRoute: typeof ApiV1ProductsRoute
   ApiV1WalletTopupSlipRoute: typeof ApiV1WalletTopupSlipRoute
@@ -915,6 +976,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDealersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/credit': {
+      id: '/admin/credit'
+      path: '/credit'
+      fullPath: '/admin/credit'
+      preLoaderRoute: typeof AdminCreditRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/coupons': {
       id: '/admin/coupons'
       path: '/coupons'
@@ -985,6 +1053,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoreShopRouteImport
       parentRoute: typeof StoreRoute
     }
+    '/_store/quick-order': {
+      id: '/_store/quick-order'
+      path: '/quick-order'
+      fullPath: '/quick-order'
+      preLoaderRoute: typeof StoreQuickOrderRouteImport
+      parentRoute: typeof StoreRoute
+    }
     '/_store/privacy': {
       id: '/_store/privacy'
       path: '/privacy'
@@ -1018,6 +1093,13 @@ declare module '@tanstack/react-router' {
       path: '/configurator'
       fullPath: '/configurator'
       preLoaderRoute: typeof StoreConfiguratorRouteImport
+      parentRoute: typeof StoreRoute
+    }
+    '/_store/compare': {
+      id: '/_store/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof StoreCompareRouteImport
       parentRoute: typeof StoreRoute
     }
     '/_store/checkout': {
@@ -1062,6 +1144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1PaymentSlipRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/customer-document': {
+      id: '/api/v1/customer-document'
+      path: '/api/v1/customer-document'
+      fullPath: '/api/v1/customer-document'
+      preLoaderRoute: typeof ApiV1CustomerDocumentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/health': {
       id: '/api/public/health'
       path: '/api/public/health'
@@ -1097,6 +1186,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOrdersOrderIdRouteImport
       parentRoute: typeof AdminOrdersRoute
     }
+    '/admin/members/$userId': {
+      id: '/admin/members/$userId'
+      path: '/$userId'
+      fullPath: '/admin/members/$userId'
+      preLoaderRoute: typeof AdminMembersUserIdRouteImport
+      parentRoute: typeof AdminMembersRoute
+    }
     '/account/orders/$orderId': {
       id: '/account/orders/$orderId'
       path: '/$orderId'
@@ -1125,11 +1221,13 @@ interface StoreRouteChildren {
   StoreAboutRoute: typeof StoreAboutRoute
   StoreCartRoute: typeof StoreCartRoute
   StoreCheckoutRoute: typeof StoreCheckoutRoute
+  StoreCompareRoute: typeof StoreCompareRoute
   StoreConfiguratorRoute: typeof StoreConfiguratorRoute
   StoreContactRoute: typeof StoreContactRoute
   StoreCookiesRoute: typeof StoreCookiesRoute
   StoreErrorRoute: typeof StoreErrorRoute
   StorePrivacyRoute: typeof StorePrivacyRoute
+  StoreQuickOrderRoute: typeof StoreQuickOrderRoute
   StoreShopRoute: typeof StoreShopRoute
   StoreTermsRoute: typeof StoreTermsRoute
   StoreIndexRoute: typeof StoreIndexRoute
@@ -1141,11 +1239,13 @@ const StoreRouteChildren: StoreRouteChildren = {
   StoreAboutRoute: StoreAboutRoute,
   StoreCartRoute: StoreCartRoute,
   StoreCheckoutRoute: StoreCheckoutRoute,
+  StoreCompareRoute: StoreCompareRoute,
   StoreConfiguratorRoute: StoreConfiguratorRoute,
   StoreContactRoute: StoreContactRoute,
   StoreCookiesRoute: StoreCookiesRoute,
   StoreErrorRoute: StoreErrorRoute,
   StorePrivacyRoute: StorePrivacyRoute,
+  StoreQuickOrderRoute: StoreQuickOrderRoute,
   StoreShopRoute: StoreShopRoute,
   StoreTermsRoute: StoreTermsRoute,
   StoreIndexRoute: StoreIndexRoute,
@@ -1190,6 +1290,18 @@ const AccountRouteChildren: AccountRouteChildren = {
 const AccountRouteWithChildren =
   AccountRoute._addFileChildren(AccountRouteChildren)
 
+interface AdminMembersRouteChildren {
+  AdminMembersUserIdRoute: typeof AdminMembersUserIdRoute
+}
+
+const AdminMembersRouteChildren: AdminMembersRouteChildren = {
+  AdminMembersUserIdRoute: AdminMembersUserIdRoute,
+}
+
+const AdminMembersRouteWithChildren = AdminMembersRoute._addFileChildren(
+  AdminMembersRouteChildren,
+)
+
 interface AdminOrdersRouteChildren {
   AdminOrdersOrderIdRoute: typeof AdminOrdersOrderIdRoute
 }
@@ -1231,9 +1343,10 @@ const AdminQuotationsRouteWithChildren = AdminQuotationsRoute._addFileChildren(
 interface AdminRouteChildren {
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminCouponsRoute: typeof AdminCouponsRoute
+  AdminCreditRoute: typeof AdminCreditRoute
   AdminDealersRoute: typeof AdminDealersRoute
   AdminInventoryRoute: typeof AdminInventoryRoute
-  AdminMembersRoute: typeof AdminMembersRoute
+  AdminMembersRoute: typeof AdminMembersRouteWithChildren
   AdminOrdersRoute: typeof AdminOrdersRouteWithChildren
   AdminProductsRoute: typeof AdminProductsRouteWithChildren
   AdminQuotationsRoute: typeof AdminQuotationsRouteWithChildren
@@ -1249,9 +1362,10 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminCouponsRoute: AdminCouponsRoute,
+  AdminCreditRoute: AdminCreditRoute,
   AdminDealersRoute: AdminDealersRoute,
   AdminInventoryRoute: AdminInventoryRoute,
-  AdminMembersRoute: AdminMembersRoute,
+  AdminMembersRoute: AdminMembersRouteWithChildren,
   AdminOrdersRoute: AdminOrdersRouteWithChildren,
   AdminProductsRoute: AdminProductsRouteWithChildren,
   AdminQuotationsRoute: AdminQuotationsRouteWithChildren,
@@ -1294,6 +1408,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
+  ApiV1CustomerDocumentRoute: ApiV1CustomerDocumentRoute,
   ApiV1PaymentSlipRoute: ApiV1PaymentSlipRoute,
   ApiV1ProductsRoute: ApiV1ProductsRoute,
   ApiV1WalletTopupSlipRoute: ApiV1WalletTopupSlipRoute,
