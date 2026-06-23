@@ -9,7 +9,7 @@ export async function listWishlistProducts(
   const { data, error } = await supabase
     .from("wishlist_items")
     .select(
-      "created_at, products:product_id(id, slug, name, description, sku, product_type, retail_price, compare_at_price, image_url, is_featured, is_active, stock_qty, min_order_qty, category_id, created_at)",
+      "created_at, products:product_id(id, slug, name, description, sku, product_type, retail_price, compare_at_price, image_url, is_featured, is_active, stock_qty, min_order_qty, unit, weight_kg, attributes, category_id, created_at)",
     )
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
@@ -37,6 +37,12 @@ export async function listWishlistProducts(
         stock: Number(p.stock_qty),
         moq: Number(p.min_order_qty),
         leadTimeDays: null,
+        unit: p.unit ? String(p.unit) : null,
+        weightKg: p.weight_kg != null ? Number(p.weight_kg) : null,
+        attributes:
+          p.attributes && typeof p.attributes === "object"
+            ? (p.attributes as Record<string, unknown>)
+            : null,
       } satisfies ProductPublicDto;
     })
     .filter(Boolean) as ProductPublicDto[];

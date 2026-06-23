@@ -19,6 +19,10 @@ type ProductRow = {
   is_active: boolean;
   stock_qty: number;
   min_order_qty: number;
+  unit: string | null;
+  weight_kg: number | null;
+  attributes: Record<string, unknown> | null;
+  metadata: Record<string, unknown> | null;
   category_id: string | null;
   created_at: string;
 };
@@ -42,6 +46,13 @@ function mapProduct(
   categories: Map<string, { slug: string; name: string }>,
 ): ProductPublicDto {
   const cat = row.category_id ? categories.get(row.category_id) : null;
+  const leadTimeRaw = row.metadata?.["lead_time_days"];
+  const leadTimeDays =
+    typeof leadTimeRaw === "number"
+      ? leadTimeRaw
+      : typeof leadTimeRaw === "string" && leadTimeRaw.trim() !== ""
+        ? Number(leadTimeRaw)
+        : null;
   return {
     id: row.id,
     slug: row.slug,
@@ -58,7 +69,16 @@ function mapProduct(
     isActive: row.is_active,
     stock: Number(row.stock_qty),
     moq: row.min_order_qty,
-    leadTimeDays: null,
+    leadTimeDays:
+      leadTimeDays != null && Number.isFinite(leadTimeDays)
+        ? leadTimeDays
+        : null,
+    unit: row.unit ?? null,
+    weightKg: row.weight_kg != null ? Number(row.weight_kg) : null,
+    attributes:
+      row.attributes && typeof row.attributes === "object"
+        ? row.attributes
+        : null,
     createdAt: row.created_at,
   };
 }

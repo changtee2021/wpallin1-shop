@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
+import { ProductImage } from "@/components/storefront/product-image";
 import { ProductShareButton } from "@/components/storefront/product-share-button";
 import { WishlistButton } from "@/components/storefront/wishlist-button";
 import { Badge } from "@/components/ui/badge";
@@ -39,18 +40,11 @@ export function ProductCard({
           params={{ slug: product.slug }}
           className="block size-full"
         >
-          {product.imageUrl ? (
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="size-full object-cover transition-transform group-hover:scale-105"
-              loading="lazy"
-            />
-          ) : (
-            <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
-              ไม่มีรูป
-            </div>
-          )}
+          <ProductImage
+            src={product.imageUrl}
+            alt={product.name}
+            imgClassName="transition-transform group-hover:scale-105"
+          />
         </Link>
 
         {product.isFeatured && (

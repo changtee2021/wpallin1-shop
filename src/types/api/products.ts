@@ -17,6 +17,9 @@ export type ProductPublicDto = {
   stock: number;
   moq: number;
   leadTimeDays: number | null;
+  unit: string | null;
+  weightKg: number | null;
+  attributes: Record<string, unknown> | null;
   createdAt?: string | null;
 };
 

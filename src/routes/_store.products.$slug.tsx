@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { ProductImage } from "@/components/storefront/product-image";
 import { ProductReviews } from "@/components/storefront/product-reviews";
 import { RecentlyViewedSection } from "@/components/storefront/recently-viewed-section";
 import { WishlistButton } from "@/components/storefront/wishlist-button";
@@ -19,6 +20,38 @@ import { trackRecentlyViewed } from "@/lib/recently-viewed";
 import { getAdminClient } from "@/lib/server-fns/_shared";
 import { getProductReviewSummary } from "@/services/review.service";
 import { useT } from "@/i18n";
+
+const ATTRIBUTE_LABELS: Record<string, string> = {
+  color: "สี",
+  material: "วัสดุ",
+  opacity: "ความทึบแสง",
+  style: "สไตล์",
+  size: "ขนาด",
+  width: "ความกว้าง",
+  height: "ความสูง",
+  length: "ความยาว",
+  pattern: "ลวดลาย",
+  finish: "พื้นผิว",
+  warranty: "การรับประกัน",
+  origin: "แหล่งผลิต",
+  brand: "แบรนด์",
+  fabric: "เนื้อผ้า",
+  moq: "ขั้นต่ำ",
+  pack: "แพ็ก",
+};
+
+function formatAttrLabel(key: string): string {
+  if (ATTRIBUTE_LABELS[key]) return ATTRIBUTE_LABELS[key];
+  return key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatAttrValue(value: unknown): string {
+  if (value == null) return "-";
+  if (typeof value === "boolean") return value ? "ใช่" : "ไม่";
+  if (Array.isArray(value)) return value.map((v) => String(v)).join(", ");
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+}
 
 export const Route = createFileRoute("/_store/products/$slug")({
   head: ({ loaderData }) => {
@@ -87,17 +120,17 @@ function ProductDetailPage() {
     product.compareAtPrice != null &&
     product.compareAtPrice > product.retailPrice;
 
+  const attributeEntries = product.attributes
+    ? Object.entries(product.attributes).filter(
+        ([, value]) => value != null && value !== "",
+      )
+    : [];
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div className="grid gap-10 lg:grid-cols-2">
         <div className="aspect-square overflow-hidden rounded-2xl bg-muted/30">
-          {product.imageUrl ? (
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="size-full object-cover"
-            />
-          ) : null}
+          <ProductImage src={product.imageUrl} alt={product.name} />
         </div>
         <div>
           {product.categoryName && (
@@ -134,10 +167,50 @@ function ProductDetailPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">ขั้นต่ำ</span>
-                <span>{product.moq} ชิ้น</span>
+                <span>
+                  {product.moq} {product.unit ?? "ชิ้น"}
+                </span>
               </div>
+              {product.unit && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">หน่วย</span>
+                  <span>{product.unit}</span>
+                </div>
+              )}
+              {product.weightKg != null && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">น้ำหนัก</span>
+                  <span>{product.weightKg} กก.</span>
+                </div>
+              )}
+              {product.leadTimeDays != null && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">ระยะเวลาผลิต</span>
+                  <span>{product.leadTimeDays} วัน</span>
+                </div>
+              )}
             </CardContent>
           </Card>
+
+          {attributeEntries.length > 0 && (
+            <Card className="mt-4">
+              <CardContent className="p-4">
+                <h2 className="mb-3 text-sm font-semibold">รายละเอียดสินค้า</h2>
+                <div className="grid gap-2 text-sm">
+                  {attributeEntries.map(([key, value]) => (
+                    <div key={key} className="flex justify-between gap-4">
+                      <span className="text-muted-foreground">
+                        {formatAttrLabel(key)}
+                      </span>
+                      <span className="text-right">
+                        {formatAttrValue(value)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Input
               type="number"
