@@ -12,13 +12,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
-import { fetchProductBySlug } from "@/lib/api.functions";
+import {
+  fetchProductBySlug,
+  fetchProductReviewSummary,
+} from "@/lib/api.functions";
 import { formatPrice } from "@/lib/format";
 import { absoluteUrl, getDefaultOgImageUrl } from "@/lib/public-url";
 import { buildProductJsonLd } from "@/lib/seo-structured-data";
 import { trackRecentlyViewed } from "@/lib/recently-viewed";
-import { getAdminClient } from "@/lib/server-fns/_shared";
-import { getProductReviewSummary } from "@/services/review.service";
 import { useT } from "@/i18n";
 
 const ATTRIBUTE_LABELS: Record<string, string> = {
@@ -85,8 +86,9 @@ export const Route = createFileRoute("/_store/products/$slug")({
     const product = await fetchProductBySlug({ data: { slug: params.slug } });
     if (!product) throw new Error("Product not found");
 
-    const supabase = await getAdminClient();
-    const reviewSummary = await getProductReviewSummary(supabase, product.id);
+    const reviewSummary = await fetchProductReviewSummary({
+      data: { productId: product.id },
+    }).catch(() => ({ average: 0, count: 0 }));
 
     return { product, reviewSummary };
   },

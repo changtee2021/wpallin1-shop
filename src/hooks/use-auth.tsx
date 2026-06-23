@@ -157,3 +157,12 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 }
+
+/**
+ * Like {@link useAuth} but returns null instead of throwing when no
+ * AuthProvider is present (e.g. inside a root error boundary that renders
+ * outside the provider tree). Use only where auth is optional.
+ */
+export function useOptionalAuth(): AuthState | null {
+  return useContext(AuthContext);
+}

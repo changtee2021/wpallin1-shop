@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useAuth } from "@/hooks/use-auth";
+import { useOptionalAuth } from "@/hooks/use-auth";
 import type { FeedbackCategory } from "@/lib/error-feedback";
 import { submitContactForm } from "@/lib/api.functions";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
@@ -29,7 +29,9 @@ export function ErrorFeedbackForm({
   compact = false,
   onSubmitted,
 }: ErrorFeedbackFormProps) {
-  const { session, user } = useAuth();
+  const auth = useOptionalAuth();
+  const session = auth?.session ?? null;
+  const user = auth?.user ?? null;
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: (user?.user_metadata?.full_name as string) ?? "",

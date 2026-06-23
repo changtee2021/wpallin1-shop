@@ -19,6 +19,7 @@ import {
   listPublicProducts,
   getProductBySlug,
 } from "@/services/catalog.service";
+import { getProductReviewSummary } from "@/services/review.service";
 import {
   getCart,
   addToCart,
@@ -122,6 +123,15 @@ export const fetchProductBySlug = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const supabase = await getAdminClient();
     return getProductBySlug(supabase, data.slug);
+  });
+
+export const fetchProductReviewSummary = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z.object({ productId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const supabase = await getAdminClient();
+    return getProductReviewSummary(supabase, data.productId);
   });
 
 export const fetchSessionProfile = createServerFn({ method: "GET" })
