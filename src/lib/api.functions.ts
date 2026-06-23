@@ -895,3 +895,33 @@ export {
   updateAdminSupportTicket,
   fetchAdminGuestFeedback,
 } from "@/lib/server-fns/support";
+
+export {
+  fetchAffiliateDashboard,
+  registerAffiliate,
+  createAffiliateLinkFn,
+  requestAffiliatePayoutFn,
+} from "@/lib/server-fns/affiliate";
+
+export {
+  fetchAdminCoupons,
+  saveAdminCouponFn,
+  fetchAdminPromotions,
+  saveAdminPromotionFn,
+  fetchPromptPayId,
+  updatePromptPayIdFn,
+} from "@/lib/server-fns/promotions";
+
+export {
+  fetchProductReviews,
+  submitProductReviewFn,
+  fetchWishlist,
+  fetchWishlistIds,
+  toggleWishlistFn,
+} from "@/lib/server-fns/reviews-wishlist";
+
+export {
+  fetchLowStockProducts,
+  updateProductStockFn,
+  fetchAdminReports,
+} from "@/lib/server-fns/inventory-reports";

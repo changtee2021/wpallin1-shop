@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DealerRouteImport } from './routes/dealer'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -28,16 +30,21 @@ import { Route as AdminTiersRouteImport } from './routes/admin.tiers'
 import { Route as AdminSupportRouteImport } from './routes/admin.support'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSalesOrderRouteImport } from './routes/admin.sales-order'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminQuotationsRouteImport } from './routes/admin.quotations'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminMembersRouteImport } from './routes/admin.members'
+import { Route as AdminInventoryRouteImport } from './routes/admin.inventory'
 import { Route as AdminDealersRouteImport } from './routes/admin.dealers'
+import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AccountWishlistRouteImport } from './routes/account.wishlist'
 import { Route as AccountTrackRouteImport } from './routes/account.track'
 import { Route as AccountQuotationsRouteImport } from './routes/account.quotations'
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
 import { Route as AccountNotificationsRouteImport } from './routes/account.notifications'
+import { Route as AccountAffiliateRouteImport } from './routes/account.affiliate'
 import { Route as StoreShopRouteImport } from './routes/_store.shop'
 import { Route as StoreErrorRouteImport } from './routes/_store.error'
 import { Route as StoreContactRouteImport } from './routes/_store.contact'
@@ -49,6 +56,7 @@ import { Route as ApiV1WalletTopupSlipRouteImport } from './routes/api/v1/wallet
 import { Route as ApiV1ProductsRouteImport } from './routes/api/v1/products'
 import { Route as ApiV1PaymentSlipRouteImport } from './routes/api/v1/payment-slip'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
+import { Route as AdminQuotationsQuotationIdRouteImport } from './routes/admin.quotations.$quotationId'
 import { Route as AdminProductsNewRouteImport } from './routes/admin.products.new'
 import { Route as AdminProductsIdRouteImport } from './routes/admin.products.$id'
 import { Route as AdminOrdersOrderIdRouteImport } from './routes/admin.orders.$orderId'
@@ -56,9 +64,19 @@ import { Route as AccountOrdersOrderIdRouteImport } from './routes/account.order
 import { Route as StoreProductsSlugRouteImport } from './routes/_store.products.$slug'
 import { Route as StoreDealerRegisterRouteImport } from './routes/_store.dealer.register'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -150,6 +168,11 @@ const AdminSalesOrderRoute = AdminSalesOrderRouteImport.update({
   path: '/sales-order',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminQuotationsRoute = AdminQuotationsRouteImport.update({
   id: '/quotations',
   path: '/quotations',
@@ -170,15 +193,30 @@ const AdminMembersRoute = AdminMembersRouteImport.update({
   path: '/members',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminInventoryRoute = AdminInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDealersRoute = AdminDealersRouteImport.update({
   id: '/dealers',
   path: '/dealers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCouponsRoute = AdminCouponsRouteImport.update({
+  id: '/coupons',
+  path: '/coupons',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
   getParentRoute: () => AdminRoute,
+} as any)
+const AccountWishlistRoute = AccountWishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => AccountRoute,
 } as any)
 const AccountTrackRoute = AccountTrackRouteImport.update({
   id: '/track',
@@ -198,6 +236,11 @@ const AccountOrdersRoute = AccountOrdersRouteImport.update({
 const AccountNotificationsRoute = AccountNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountAffiliateRoute = AccountAffiliateRouteImport.update({
+  id: '/affiliate',
+  path: '/affiliate',
   getParentRoute: () => AccountRoute,
 } as any)
 const StoreShopRoute = StoreShopRouteImport.update({
@@ -255,6 +298,12 @@ const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   path: '/api/public/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminQuotationsQuotationIdRoute =
+  AdminQuotationsQuotationIdRouteImport.update({
+    id: '/$quotationId',
+    path: '/$quotationId',
+    getParentRoute: () => AdminQuotationsRoute,
+  } as any)
 const AdminProductsNewRoute = AdminProductsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -292,7 +341,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/dealer': typeof DealerRouteWithChildren
   '/login': typeof LoginRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/signup': typeof SignupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/about': typeof StoreAboutRoute
   '/cart': typeof StoreCartRoute
   '/checkout': typeof StoreCheckoutRoute
@@ -300,16 +351,21 @@ export interface FileRoutesByFullPath {
   '/contact': typeof StoreContactRoute
   '/error': typeof StoreErrorRoute
   '/shop': typeof StoreShopRoute
+  '/account/affiliate': typeof AccountAffiliateRoute
   '/account/notifications': typeof AccountNotificationsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/quotations': typeof AccountQuotationsRoute
   '/account/track': typeof AccountTrackRoute
+  '/account/wishlist': typeof AccountWishlistRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/coupons': typeof AdminCouponsRoute
   '/admin/dealers': typeof AdminDealersRoute
+  '/admin/inventory': typeof AdminInventoryRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/products': typeof AdminProductsRouteWithChildren
-  '/admin/quotations': typeof AdminQuotationsRoute
+  '/admin/quotations': typeof AdminQuotationsRouteWithChildren
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/sales-order': typeof AdminSalesOrderRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/support': typeof AdminSupportRoute
@@ -328,6 +384,7 @@ export interface FileRoutesByFullPath {
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/quotations/$quotationId': typeof AdminQuotationsQuotationIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
@@ -335,7 +392,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/signup': typeof SignupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/about': typeof StoreAboutRoute
   '/cart': typeof StoreCartRoute
   '/checkout': typeof StoreCheckoutRoute
@@ -343,16 +402,21 @@ export interface FileRoutesByTo {
   '/contact': typeof StoreContactRoute
   '/error': typeof StoreErrorRoute
   '/shop': typeof StoreShopRoute
+  '/account/affiliate': typeof AccountAffiliateRoute
   '/account/notifications': typeof AccountNotificationsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/quotations': typeof AccountQuotationsRoute
   '/account/track': typeof AccountTrackRoute
+  '/account/wishlist': typeof AccountWishlistRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/coupons': typeof AdminCouponsRoute
   '/admin/dealers': typeof AdminDealersRoute
+  '/admin/inventory': typeof AdminInventoryRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/products': typeof AdminProductsRouteWithChildren
-  '/admin/quotations': typeof AdminQuotationsRoute
+  '/admin/quotations': typeof AdminQuotationsRouteWithChildren
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/sales-order': typeof AdminSalesOrderRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/support': typeof AdminSupportRoute
@@ -372,6 +436,7 @@ export interface FileRoutesByTo {
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/quotations/$quotationId': typeof AdminQuotationsQuotationIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
@@ -384,7 +449,9 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/dealer': typeof DealerRouteWithChildren
   '/login': typeof LoginRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/signup': typeof SignupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_store/about': typeof StoreAboutRoute
   '/_store/cart': typeof StoreCartRoute
   '/_store/checkout': typeof StoreCheckoutRoute
@@ -392,16 +459,21 @@ export interface FileRoutesById {
   '/_store/contact': typeof StoreContactRoute
   '/_store/error': typeof StoreErrorRoute
   '/_store/shop': typeof StoreShopRoute
+  '/account/affiliate': typeof AccountAffiliateRoute
   '/account/notifications': typeof AccountNotificationsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/quotations': typeof AccountQuotationsRoute
   '/account/track': typeof AccountTrackRoute
+  '/account/wishlist': typeof AccountWishlistRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/coupons': typeof AdminCouponsRoute
   '/admin/dealers': typeof AdminDealersRoute
+  '/admin/inventory': typeof AdminInventoryRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/products': typeof AdminProductsRouteWithChildren
-  '/admin/quotations': typeof AdminQuotationsRoute
+  '/admin/quotations': typeof AdminQuotationsRouteWithChildren
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/sales-order': typeof AdminSalesOrderRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/support': typeof AdminSupportRoute
@@ -421,6 +493,7 @@ export interface FileRoutesById {
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/quotations/$quotationId': typeof AdminQuotationsQuotationIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
@@ -434,7 +507,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dealer'
     | '/login'
+    | '/robots.txt'
     | '/signup'
+    | '/sitemap.xml'
     | '/about'
     | '/cart'
     | '/checkout'
@@ -442,16 +517,21 @@ export interface FileRouteTypes {
     | '/contact'
     | '/error'
     | '/shop'
+    | '/account/affiliate'
     | '/account/notifications'
     | '/account/orders'
     | '/account/quotations'
     | '/account/track'
+    | '/account/wishlist'
     | '/admin/categories'
+    | '/admin/coupons'
     | '/admin/dealers'
+    | '/admin/inventory'
     | '/admin/members'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/quotations'
+    | '/admin/reports'
     | '/admin/sales-order'
     | '/admin/settings'
     | '/admin/support'
@@ -470,6 +550,7 @@ export interface FileRouteTypes {
     | '/admin/orders/$orderId'
     | '/admin/products/$id'
     | '/admin/products/new'
+    | '/admin/quotations/$quotationId'
     | '/api/public/health'
     | '/api/v1/payment-slip'
     | '/api/v1/products'
@@ -477,7 +558,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/robots.txt'
     | '/signup'
+    | '/sitemap.xml'
     | '/about'
     | '/cart'
     | '/checkout'
@@ -485,16 +568,21 @@ export interface FileRouteTypes {
     | '/contact'
     | '/error'
     | '/shop'
+    | '/account/affiliate'
     | '/account/notifications'
     | '/account/orders'
     | '/account/quotations'
     | '/account/track'
+    | '/account/wishlist'
     | '/admin/categories'
+    | '/admin/coupons'
     | '/admin/dealers'
+    | '/admin/inventory'
     | '/admin/members'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/quotations'
+    | '/admin/reports'
     | '/admin/sales-order'
     | '/admin/settings'
     | '/admin/support'
@@ -514,6 +602,7 @@ export interface FileRouteTypes {
     | '/admin/orders/$orderId'
     | '/admin/products/$id'
     | '/admin/products/new'
+    | '/admin/quotations/$quotationId'
     | '/api/public/health'
     | '/api/v1/payment-slip'
     | '/api/v1/products'
@@ -525,7 +614,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dealer'
     | '/login'
+    | '/robots.txt'
     | '/signup'
+    | '/sitemap.xml'
     | '/_store/about'
     | '/_store/cart'
     | '/_store/checkout'
@@ -533,16 +624,21 @@ export interface FileRouteTypes {
     | '/_store/contact'
     | '/_store/error'
     | '/_store/shop'
+    | '/account/affiliate'
     | '/account/notifications'
     | '/account/orders'
     | '/account/quotations'
     | '/account/track'
+    | '/account/wishlist'
     | '/admin/categories'
+    | '/admin/coupons'
     | '/admin/dealers'
+    | '/admin/inventory'
     | '/admin/members'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/quotations'
+    | '/admin/reports'
     | '/admin/sales-order'
     | '/admin/settings'
     | '/admin/support'
@@ -562,6 +658,7 @@ export interface FileRouteTypes {
     | '/admin/orders/$orderId'
     | '/admin/products/$id'
     | '/admin/products/new'
+    | '/admin/quotations/$quotationId'
     | '/api/public/health'
     | '/api/v1/payment-slip'
     | '/api/v1/products'
@@ -574,7 +671,9 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   DealerRoute: typeof DealerRouteWithChildren
   LoginRoute: typeof LoginRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SignupRoute: typeof SignupRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiV1PaymentSlipRoute: typeof ApiV1PaymentSlipRoute
@@ -584,11 +683,25 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -717,6 +830,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSalesOrderRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/quotations': {
       id: '/admin/quotations'
       path: '/quotations'
@@ -745,11 +865,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMembersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/inventory': {
+      id: '/admin/inventory'
+      path: '/inventory'
+      fullPath: '/admin/inventory'
+      preLoaderRoute: typeof AdminInventoryRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/dealers': {
       id: '/admin/dealers'
       path: '/dealers'
       fullPath: '/admin/dealers'
       preLoaderRoute: typeof AdminDealersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/coupons': {
+      id: '/admin/coupons'
+      path: '/coupons'
+      fullPath: '/admin/coupons'
+      preLoaderRoute: typeof AdminCouponsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/categories': {
@@ -758,6 +892,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/categories'
       preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/account/wishlist': {
+      id: '/account/wishlist'
+      path: '/wishlist'
+      fullPath: '/account/wishlist'
+      preLoaderRoute: typeof AccountWishlistRouteImport
+      parentRoute: typeof AccountRoute
     }
     '/account/track': {
       id: '/account/track'
@@ -785,6 +926,13 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/account/notifications'
       preLoaderRoute: typeof AccountNotificationsRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/account/affiliate': {
+      id: '/account/affiliate'
+      path: '/affiliate'
+      fullPath: '/account/affiliate'
+      preLoaderRoute: typeof AccountAffiliateRouteImport
       parentRoute: typeof AccountRoute
     }
     '/_store/shop': {
@@ -863,6 +1011,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/health'
       preLoaderRoute: typeof ApiPublicHealthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/quotations/$quotationId': {
+      id: '/admin/quotations/$quotationId'
+      path: '/$quotationId'
+      fullPath: '/admin/quotations/$quotationId'
+      preLoaderRoute: typeof AdminQuotationsQuotationIdRouteImport
+      parentRoute: typeof AdminQuotationsRoute
     }
     '/admin/products/new': {
       id: '/admin/products/new'
@@ -950,18 +1105,22 @@ const AccountOrdersRouteWithChildren = AccountOrdersRoute._addFileChildren(
 )
 
 interface AccountRouteChildren {
+  AccountAffiliateRoute: typeof AccountAffiliateRoute
   AccountNotificationsRoute: typeof AccountNotificationsRoute
   AccountOrdersRoute: typeof AccountOrdersRouteWithChildren
   AccountQuotationsRoute: typeof AccountQuotationsRoute
   AccountTrackRoute: typeof AccountTrackRoute
+  AccountWishlistRoute: typeof AccountWishlistRoute
   AccountIndexRoute: typeof AccountIndexRoute
 }
 
 const AccountRouteChildren: AccountRouteChildren = {
+  AccountAffiliateRoute: AccountAffiliateRoute,
   AccountNotificationsRoute: AccountNotificationsRoute,
   AccountOrdersRoute: AccountOrdersRouteWithChildren,
   AccountQuotationsRoute: AccountQuotationsRoute,
   AccountTrackRoute: AccountTrackRoute,
+  AccountWishlistRoute: AccountWishlistRoute,
   AccountIndexRoute: AccountIndexRoute,
 }
 
@@ -994,13 +1153,28 @@ const AdminProductsRouteWithChildren = AdminProductsRoute._addFileChildren(
   AdminProductsRouteChildren,
 )
 
+interface AdminQuotationsRouteChildren {
+  AdminQuotationsQuotationIdRoute: typeof AdminQuotationsQuotationIdRoute
+}
+
+const AdminQuotationsRouteChildren: AdminQuotationsRouteChildren = {
+  AdminQuotationsQuotationIdRoute: AdminQuotationsQuotationIdRoute,
+}
+
+const AdminQuotationsRouteWithChildren = AdminQuotationsRoute._addFileChildren(
+  AdminQuotationsRouteChildren,
+)
+
 interface AdminRouteChildren {
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminCouponsRoute: typeof AdminCouponsRoute
   AdminDealersRoute: typeof AdminDealersRoute
+  AdminInventoryRoute: typeof AdminInventoryRoute
   AdminMembersRoute: typeof AdminMembersRoute
   AdminOrdersRoute: typeof AdminOrdersRouteWithChildren
   AdminProductsRoute: typeof AdminProductsRouteWithChildren
-  AdminQuotationsRoute: typeof AdminQuotationsRoute
+  AdminQuotationsRoute: typeof AdminQuotationsRouteWithChildren
+  AdminReportsRoute: typeof AdminReportsRoute
   AdminSalesOrderRoute: typeof AdminSalesOrderRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminSupportRoute: typeof AdminSupportRoute
@@ -1011,11 +1185,14 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminCouponsRoute: AdminCouponsRoute,
   AdminDealersRoute: AdminDealersRoute,
+  AdminInventoryRoute: AdminInventoryRoute,
   AdminMembersRoute: AdminMembersRoute,
   AdminOrdersRoute: AdminOrdersRouteWithChildren,
   AdminProductsRoute: AdminProductsRouteWithChildren,
-  AdminQuotationsRoute: AdminQuotationsRoute,
+  AdminQuotationsRoute: AdminQuotationsRouteWithChildren,
+  AdminReportsRoute: AdminReportsRoute,
   AdminSalesOrderRoute: AdminSalesOrderRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminSupportRoute: AdminSupportRoute,
@@ -1049,7 +1226,9 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   DealerRoute: DealerRouteWithChildren,
   LoginRoute: LoginRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SignupRoute: SignupRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiV1PaymentSlipRoute: ApiV1PaymentSlipRoute,

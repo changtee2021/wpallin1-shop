@@ -328,6 +328,21 @@ export async function updateOrderStatus(
   status: OrderStatus,
   note?: string,
 ): Promise<void> {
+  const { data: order } = await supabase
+    .from("orders")
+    .select("user_id, order_number")
+    .eq("id", orderId)
+    .single();
+
   await supabase.from("orders").update({ status }).eq("id", orderId);
   await appendStatusHistory(supabase, orderId, status, note);
+
+  if (order?.user_id) {
+    const { notifyUserEvent } = await import("@/services/notification.service");
+    await notifyUserEvent(supabase, order.user_id, "order_status", {
+      orderId,
+      orderNumber: order.order_number,
+      status,
+    });
+  }
 }

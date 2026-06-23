@@ -50,6 +50,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content:
             "ร้านค้าผ้าม่านและมู่ลี่ ขายปลีกและขายส่ง สั่งทำพิเศษ ใบเสนอราคา และติดตามออเดอร์",
         },
+        { property: "og:type", content: "website" },
+        { property: "og:site_name", content: "WP ALL" },
+        {
+          property: "og:url",
+          content:
+            process.env.VITE_APP_PUBLIC_URL ??
+            "https://wpallin1-shop.vercel.app",
+        },
       ],
       links: [
         { rel: "preconnect", href: "https://fonts.googleapis.com" },

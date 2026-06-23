@@ -4,6 +4,13 @@ import { z } from "zod";
 import { ProductFeed } from "@/components/storefront/product-feed";
 import { SearchBar } from "@/components/storefront/search-bar";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useMemberProductPrices } from "@/hooks/use-member-product-prices";
 import { fetchCategories, fetchPublicProducts } from "@/lib/api.functions";
 import { useT } from "@/i18n";
@@ -12,6 +19,8 @@ const shopSearchSchema = z.object({
   search: z.string().optional(),
   category: z.string().optional(),
   page: z.number().optional(),
+  sortBy: z.enum(["created_at", "name", "retail_price"]).optional(),
+  sortDir: z.enum(["asc", "desc"]).optional(),
 });
 
 export const Route = createFileRoute("/_store/shop")({
@@ -26,8 +35,8 @@ export const Route = createFileRoute("/_store/shop")({
           pageSize: 24,
           search: deps.search,
           category: deps.category,
-          sortBy: "created_at",
-          sortDir: "desc",
+          sortBy: deps.sortBy ?? "created_at",
+          sortDir: deps.sortDir ?? "desc",
         },
       }),
       fetchCategories(),
@@ -91,11 +100,33 @@ function ShopPage() {
         </aside>
 
         <div>
-          <div className="mb-4 flex items-center justify-between text-sm text-muted-foreground">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
             <span>
               แสดง {products.data.length} จาก {products.meta.total} รายการ
             </span>
-            {search.search && <span>ค้นหา: &quot;{search.search}&quot;</span>}
+            <div className="flex items-center gap-2">
+              {search.search && <span>ค้นหา: &quot;{search.search}&quot;</span>}
+              <Select
+                value={`${search.sortBy ?? "created_at"}:${search.sortDir ?? "desc"}`}
+                onValueChange={(value) => {
+                  const [sortBy, sortDir] = value.split(":") as [
+                    "created_at" | "name" | "retail_price",
+                    "asc" | "desc",
+                  ];
+                  navigate({ search: { ...search, sortBy, sortDir, page: 1 } });
+                }}
+              >
+                <SelectTrigger className="h-8 w-44">
+                  <SelectValue placeholder="เรียงลำดับ" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="created_at:desc">ใหม่ล่าสุด</SelectItem>
+                  <SelectItem value="retail_price:asc">ราคาต่ำ-สูง</SelectItem>
+                  <SelectItem value="retail_price:desc">ราคาสูง-ต่ำ</SelectItem>
+                  <SelectItem value="name:asc">ชื่อ A-Z</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <ProductFeed
             products={products.data}

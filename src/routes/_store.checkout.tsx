@@ -22,8 +22,10 @@ import {
   fetchAccountAddresses,
   fetchAccountProfile,
   fetchOrderDetail,
+  fetchPromptPayId,
   fetchWalletSummary,
 } from "@/lib/api.functions";
+import { PromptPayPanel } from "@/components/checkout/promptpay-panel";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { getAffiliateRef } from "@/lib/affiliate-cookie";
 import { formatPrice } from "@/lib/format";
@@ -335,13 +337,20 @@ function OrderSuccess({
   setUploading: (v: boolean) => void;
 }) {
   const [bankAccounts, setBankAccounts] = useState<BankAccountDto[]>([]);
+  const [promptPayId, setPromptPayId] = useState<string | null>(null);
+  const [orderTotal, setOrderTotal] = useState(0);
 
   useEffect(() => {
-    void fetchOrderDetail({
-      data: { orderId },
-      ...authServerFnOptions(session),
-    }).then((detail) => {
+    void Promise.all([
+      fetchOrderDetail({
+        data: { orderId },
+        ...authServerFnOptions(session),
+      }),
+      fetchPromptPayId(),
+    ]).then(([detail, pp]) => {
       if (detail?.bankAccounts) setBankAccounts(detail.bankAccounts);
+      if (detail?.grandTotal) setOrderTotal(detail.grandTotal);
+      setPromptPayId(pp.promptPayId);
     });
   }, [orderId, session]);
   async function handleSlipUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -393,6 +402,9 @@ function OrderSuccess({
               ))
             )}
           </div>
+          {promptPayId && orderTotal > 0 ? (
+            <PromptPayPanel promptPayId={promptPayId} amount={orderTotal} />
+          ) : null}
           <div>
             <Label htmlFor="slip">อัปโหลดสลิปโอนเงิน</Label>
             <Input

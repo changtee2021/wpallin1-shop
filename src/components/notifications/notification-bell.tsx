@@ -18,6 +18,7 @@ import {
 } from "@/lib/api.functions";
 import { formatDate } from "@/lib/format";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
+import { useNotificationsRealtime } from "@/hooks/use-notifications-realtime";
 import type { NotificationDto } from "@/services/notification.service";
 
 export function NotificationBell() {
@@ -42,6 +43,8 @@ export function NotificationBell() {
     const interval = setInterval(() => void load(), 60_000);
     return () => clearInterval(interval);
   }, [load]);
+
+  useNotificationsRealtime(user?.id, load);
 
   async function handleMarkRead(id: string) {
     await markNotificationReadFn({ data: { id }, ...authOpts });

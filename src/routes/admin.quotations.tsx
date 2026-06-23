@@ -87,6 +87,14 @@ function AdminQuotationsPage() {
                 </div>
                 <Badge>{q.status}</Badge>
                 <div className="flex flex-wrap gap-2">
+                  <Button size="sm" variant="secondary" asChild>
+                    <Link
+                      to="/admin/quotations/$quotationId"
+                      params={{ quotationId: q.id }}
+                    >
+                      รายละเอียด
+                    </Link>
+                  </Button>
                   {q.status === "draft" ? (
                     <Button size="sm" onClick={() => void handleSend(q.id)}>
                       ส่งให้ลูกค้า

@@ -1,13 +1,18 @@
 import { Link } from "@tanstack/react-router";
 import {
+  BarChart3,
   Bell,
+  Boxes,
   FileText,
+  Heart,
   LayoutDashboard,
   LogOut,
   Settings,
+  Share2,
   Shield,
   SlidersHorizontal,
   Store,
+  Tag,
   Wallet,
 } from "lucide-react";
 
@@ -47,9 +52,14 @@ function linksForZone(
         icon: Bell,
       });
       links.push({
-        to: "/account/quotations",
-        label: "ใบเสนอราคา",
-        icon: FileText,
+        to: "/account/affiliate",
+        label: "Affiliate",
+        icon: Share2,
+      });
+      links.push({
+        to: "/account/wishlist",
+        label: "รายการโปรด",
+        icon: Heart,
       });
     }
     if (isDealer)
@@ -88,8 +98,10 @@ function linksForZone(
     { to: "/admin/members", label: "สมาชิก", icon: Store },
     { to: "/admin/tiers", label: "Tier", icon: LayoutDashboard },
     { to: "/admin/dealers", label: "ตัวแทน", icon: Store },
-    { to: "/admin/quotations", label: "ใบเสนอราคา", icon: FileText },
-    { to: "/admin/settings", label: "ตั้งค่า", icon: Settings },
+    { to: "/admin/coupons", label: "คูปอง", icon: Tag },
+    { to: "/admin/inventory", label: "สต็อก", icon: Boxes },
+    { to: "/admin/reports", label: "รายงาน", icon: BarChart3 },
+    { to: "/admin/support", label: "Support", icon: Bell },
     { to: "/shop", label: "ร้านค้า", icon: Store },
   ];
 }

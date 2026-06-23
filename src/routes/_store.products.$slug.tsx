@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { ProductReviews } from "@/components/storefront/product-reviews";
+import { RecentlyViewedSection } from "@/components/storefront/recently-viewed-section";
+import { WishlistButton } from "@/components/storefront/wishlist-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,9 +13,31 @@ import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
 import { fetchProductBySlug } from "@/lib/api.functions";
 import { formatPrice } from "@/lib/format";
+import { trackRecentlyViewed } from "@/lib/recently-viewed";
 import { useT } from "@/i18n";
 
 export const Route = createFileRoute("/_store/products/$slug")({
+  head: ({ loaderData }) => ({
+    meta: loaderData?.product
+      ? [
+          { title: `${loaderData.product.name} | WP ALL` },
+          {
+            name: "description",
+            content:
+              loaderData.product.description?.slice(0, 160) ??
+              loaderData.product.name,
+          },
+          { property: "og:title", content: loaderData.product.name },
+          {
+            property: "og:description",
+            content: loaderData.product.description ?? loaderData.product.name,
+          },
+          ...(loaderData.product.imageUrl
+            ? [{ property: "og:image", content: loaderData.product.imageUrl }]
+            : []),
+        ]
+      : [],
+  }),
   loader: async ({ params }) => {
     const product = await fetchProductBySlug({ data: { slug: params.slug } });
     if (!product) throw new Error("Product not found");
@@ -27,6 +52,10 @@ function ProductDetailPage() {
   const { t } = useT();
   const [qty, setQty] = useState(product.moq);
   const [adding, setAdding] = useState(false);
+
+  useEffect(() => {
+    trackRecentlyViewed(product);
+  }, [product]);
 
   async function handleAddToCart() {
     setAdding(true);
@@ -113,9 +142,14 @@ function ProductDetailPage() {
             <Button variant="outline" asChild>
               <Link to="/cart">ดูตะกร้า</Link>
             </Button>
+            <WishlistButton productId={product.id} />
           </div>
         </div>
       </div>
+      <div className="mt-12">
+        <ProductReviews productId={product.id} />
+      </div>
+      <RecentlyViewedSection />
     </div>
   );
 }

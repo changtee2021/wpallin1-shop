@@ -9,6 +9,9 @@ import {
   Wallet,
   Award,
   UserCircle,
+  Tag,
+  BarChart3,
+  Boxes,
 } from "lucide-react";
 
 import { SidebarNav } from "@/components/layout/sidebar-nav";
@@ -30,6 +33,9 @@ export function AdminSidebar() {
         { to: "/admin/tiers", label: "ระดับ/Tier", icon: Award },
         { to: "/admin/dealers", label: "ตัวแทน", icon: Users },
         { to: "/admin/support", label: "ติดต่อ/Feedback", icon: LifeBuoy },
+        { to: "/admin/coupons", label: "คูปอง/โปร", icon: Tag },
+        { to: "/admin/inventory", label: "สต็อก", icon: Boxes },
+        { to: "/admin/reports", label: "รายงาน", icon: BarChart3 },
         { to: "/admin/products", label: t("admin.products"), icon: Package },
         { to: "/admin/categories", label: "หมวดหมู่", icon: Package },
         { to: "/admin/settings", label: t("admin.settings"), icon: Settings },

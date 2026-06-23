@@ -9,6 +9,8 @@ import {
   Store,
   User,
   Wallet,
+  Share2,
+  Heart,
 } from "lucide-react";
 
 import { SidebarNav } from "@/components/layout/sidebar-nav";
@@ -66,6 +68,18 @@ export function AccountSidebar() {
             label: t("account.settings"),
             icon: Settings,
             key: "settings",
+          },
+          {
+            to: "/account/wishlist",
+            label: "รายการโปรด",
+            icon: Heart,
+            key: "wishlist",
+          },
+          {
+            to: "/account/affiliate",
+            label: "Affiliate",
+            icon: Share2,
+            key: "affiliate",
           },
           {
             to: "/account/orders",
