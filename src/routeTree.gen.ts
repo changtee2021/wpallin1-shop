@@ -25,6 +25,7 @@ import { Route as DealerCatalogRouteImport } from './routes/dealer.catalog'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminWalletRouteImport } from './routes/admin.wallet'
 import { Route as AdminTiersRouteImport } from './routes/admin.tiers'
+import { Route as AdminSupportRouteImport } from './routes/admin.support'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSalesOrderRouteImport } from './routes/admin.sales-order'
 import { Route as AdminQuotationsRouteImport } from './routes/admin.quotations'
@@ -132,6 +133,11 @@ const AdminWalletRoute = AdminWalletRouteImport.update({
 const AdminTiersRoute = AdminTiersRouteImport.update({
   id: '/tiers',
   path: '/tiers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSupportRoute = AdminSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
@@ -306,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/admin/quotations': typeof AdminQuotationsRoute
   '/admin/sales-order': typeof AdminSalesOrderRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/tiers': typeof AdminTiersRoute
   '/admin/wallet': typeof AdminWalletRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -348,6 +355,7 @@ export interface FileRoutesByTo {
   '/admin/quotations': typeof AdminQuotationsRoute
   '/admin/sales-order': typeof AdminSalesOrderRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/tiers': typeof AdminTiersRoute
   '/admin/wallet': typeof AdminWalletRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -396,6 +404,7 @@ export interface FileRoutesById {
   '/admin/quotations': typeof AdminQuotationsRoute
   '/admin/sales-order': typeof AdminSalesOrderRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/tiers': typeof AdminTiersRoute
   '/admin/wallet': typeof AdminWalletRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -445,6 +454,7 @@ export interface FileRouteTypes {
     | '/admin/quotations'
     | '/admin/sales-order'
     | '/admin/settings'
+    | '/admin/support'
     | '/admin/tiers'
     | '/admin/wallet'
     | '/auth/callback'
@@ -487,6 +497,7 @@ export interface FileRouteTypes {
     | '/admin/quotations'
     | '/admin/sales-order'
     | '/admin/settings'
+    | '/admin/support'
     | '/admin/tiers'
     | '/admin/wallet'
     | '/auth/callback'
@@ -534,6 +545,7 @@ export interface FileRouteTypes {
     | '/admin/quotations'
     | '/admin/sales-order'
     | '/admin/settings'
+    | '/admin/support'
     | '/admin/tiers'
     | '/admin/wallet'
     | '/auth/callback'
@@ -682,6 +694,13 @@ declare module '@tanstack/react-router' {
       path: '/tiers'
       fullPath: '/admin/tiers'
       preLoaderRoute: typeof AdminTiersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/support': {
+      id: '/admin/support'
+      path: '/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof AdminSupportRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/settings': {
@@ -984,6 +1003,7 @@ interface AdminRouteChildren {
   AdminQuotationsRoute: typeof AdminQuotationsRoute
   AdminSalesOrderRoute: typeof AdminSalesOrderRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSupportRoute: typeof AdminSupportRoute
   AdminTiersRoute: typeof AdminTiersRoute
   AdminWalletRoute: typeof AdminWalletRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -998,6 +1018,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminQuotationsRoute: AdminQuotationsRoute,
   AdminSalesOrderRoute: AdminSalesOrderRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminSupportRoute: AdminSupportRoute,
   AdminTiersRoute: AdminTiersRoute,
   AdminWalletRoute: AdminWalletRoute,
   AdminIndexRoute: AdminIndexRoute,

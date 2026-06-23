@@ -888,3 +888,10 @@ export {
 } from "@/lib/server-fns/categories";
 
 export { fetchMemberProductPrices } from "@/lib/server-fns/pricing";
+
+export {
+  fetchAdminSupportTickets,
+  fetchAdminSupportTicketDetail,
+  updateAdminSupportTicket,
+  fetchAdminGuestFeedback,
+} from "@/lib/server-fns/support";
