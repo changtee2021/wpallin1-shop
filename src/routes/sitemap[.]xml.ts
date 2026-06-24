@@ -39,7 +39,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/cookies" },
         ];
 
-        let productEntries: SitemapEntry[] = [];
+        const productEntries: SitemapEntry[] = [];
         try {
           const supabase = await getAdminClient();
           let page = 1;

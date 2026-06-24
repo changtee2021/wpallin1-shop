@@ -1,30 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import {
-  Bell,
-  CreditCard,
-  Heart,
-  Mail,
-  MapPin,
-  Package,
-  Pencil,
-  Phone,
-  Receipt,
-  Search,
-  Shield,
-  Wallet,
-} from "lucide-react";
+import { useMemo, useState } from "react";
+import { CreditCard, Heart, Package, Receipt } from "lucide-react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { useT } from "@/i18n";
-import { customerTypeLabel, tierLabel } from "@/lib/member-tier";
 import { formatDate, formatPrice } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import type { CreditAccountDto } from "@/services/credit.service";
-import type { TierProgressDto } from "@/services/tier.service";
-import type { OrderSummaryDto } from "@/types/api/orders";
+import type { OrderStatus, OrderSummaryDto } from "@/types/api/orders";
 import type { AccountProfileDto } from "@/types/api/profile";
 
 const statusLabels: Record<string, string> = {
@@ -37,49 +22,80 @@ const statusLabels: Record<string, string> = {
   cancelled: "ยกเลิก",
 };
 
+type OrderTab =
+  | "all"
+  | "pay"
+  | "processing"
+  | "shipping"
+  | "completed"
+  | "cancelled";
+
+const orderTabs: {
+  id: OrderTab;
+  label: string;
+  statuses: OrderStatus[] | null;
+}[] = [
+  { id: "all", label: "ทั้งหมด", statuses: null },
+  {
+    id: "pay",
+    label: "รอชำระ",
+    statuses: ["pending_payment", "awaiting_payment_verification"],
+  },
+  {
+    id: "processing",
+    label: "กำลังเตรียม",
+    statuses: ["paid", "confirmed"],
+  },
+  { id: "shipping", label: "กำลังจัดส่ง", statuses: ["shipped"] },
+  { id: "completed", label: "สำเร็จ", statuses: ["completed"] },
+  { id: "cancelled", label: "ยกเลิก", statuses: ["cancelled"] },
+];
+
 type AccountDashboardProps = {
   profile: AccountProfileDto;
-  walletBalance: number;
-  walletPending: number;
-  tierProgress: TierProgressDto | null;
   creditAccount: CreditAccountDto | null;
   recentOrders: OrderSummaryDto[];
   loading: boolean;
-  isAdmin: boolean;
-  isDealer: boolean;
 };
 
 export function AccountDashboard({
   profile,
-  walletBalance,
-  walletPending,
-  tierProgress,
   creditAccount,
   recentOrders,
   loading,
-  isAdmin,
-  isDealer,
 }: AccountDashboardProps) {
   const { t } = useT();
-  const initials = (
-    profile.fullName?.[0] ??
-    profile.email?.[0] ??
-    "U"
-  ).toUpperCase();
+  const [orderTab, setOrderTab] = useState<OrderTab>("all");
 
-  const tierPct =
-    tierProgress?.nextTierName && tierProgress.amountToNext != null
-      ? Math.min(
-          100,
-          Math.round(
-            (tierProgress.totalSpent /
-              (tierProgress.totalSpent + tierProgress.amountToNext)) *
-              100,
-          ),
-        )
-      : tierProgress
-        ? 100
-        : 0;
+  const tabCounts = useMemo(() => {
+    const counts: Record<OrderTab, number> = {
+      all: recentOrders.length,
+      pay: 0,
+      processing: 0,
+      shipping: 0,
+      completed: 0,
+      cancelled: 0,
+    };
+    for (const order of recentOrders) {
+      for (const tab of orderTabs) {
+        if (tab.id === "all") continue;
+        if (tab.statuses?.includes(order.status)) {
+          counts[tab.id]++;
+        }
+      }
+    }
+    return counts;
+  }, [recentOrders]);
+
+  const filteredOrders = useMemo(() => {
+    const active = orderTabs.find((tab) => tab.id === orderTab);
+    if (!active?.statuses) return recentOrders;
+    return recentOrders.filter((order) =>
+      active.statuses!.includes(order.status),
+    );
+  }, [recentOrders, orderTab]);
+
+  const displayOrders = filteredOrders.slice(0, 5);
 
   return (
     <div className="space-y-6">
@@ -91,7 +107,10 @@ export function AccountDashboard({
               เพื่อใช้งานใบกำกับภาษีและขอวงเงินเครดิต
             </p>
             <Button size="sm" variant="outline" asChild>
-              <Link to="/account" search={{ tab: "settings" }}>
+              <Link
+                to="/account"
+                search={{ tab: "settings", section: "personal" }}
+              >
                 กรอกข้อมูล
               </Link>
             </Button>
@@ -99,246 +118,146 @@ export function AccountDashboard({
         </Card>
       )}
 
-      {(isAdmin || isDealer) && (
-        <div className="flex flex-wrap gap-2">
-          {isAdmin && (
-            <Button asChild>
-              <Link to="/admin">
-                <Shield className="mr-2 size-4" />
-                {t("nav.admin")}
-              </Link>
-            </Button>
-          )}
-          {isDealer && (
-            <Button asChild variant="outline">
-              <Link to="/dealer">{t("nav.dealer")}</Link>
-            </Button>
-          )}
+      <section>
+        <div className="grid grid-cols-3 gap-x-4 gap-y-6">
+          <ShortcutLink
+            to="/account/wishlist"
+            icon={Heart}
+            label="รายการโปรด"
+          />
+          <ShortcutLink
+            to="/account/tax-invoices"
+            icon={Receipt}
+            label={t("account.taxInvoice")}
+          />
+          <ShortcutLink
+            to="/account/orders"
+            icon={Package}
+            label={t("account.orders")}
+          />
         </div>
-      )}
+      </section>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="overflow-hidden border-border/60 shadow-sm lg:col-span-1">
-          <CardContent className="flex flex-col items-center p-6 text-center">
-            <Avatar className="mb-4 size-20 rounded-2xl">
-              <AvatarFallback className="rounded-2xl text-2xl">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <h2 className="text-lg font-semibold">
-              {profile.fullName ?? "สมาชิก"}
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {profile.email}
-            </p>
-            <div className="mt-3 flex flex-wrap justify-center gap-2">
-              <Badge variant="secondary">
-                {customerTypeLabel(profile.customerType)}
-              </Badge>
-              <Badge>{tierLabel(profile.memberTier)}</Badge>
-            </div>
-            <Badge className="mt-4 bg-accent px-4 py-1.5 text-sm text-white hover:bg-accent">
-              Balance: {formatPrice(walletBalance)}
-            </Badge>
-            <div className="mt-4 w-full space-y-2 text-left text-sm">
-              {profile.phone && (
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Phone className="size-4 shrink-0" />
-                  <span>{profile.phone}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="size-4 shrink-0" />
-                <span className="truncate">{profile.email}</span>
-              </div>
-            </div>
-            <Button variant="ghost" size="sm" className="mt-4" asChild>
-              <Link to="/account" search={{ tab: "settings" }}>
-                <Pencil className="mr-1 size-3.5" />
-                แก้ไขโปรไฟล์
+      {creditAccount && (
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <CreditCard className="size-4 text-accent" />
+              {t("account.credit")}
+            </CardTitle>
+            <Button variant="link" size="sm" className="h-auto p-0" asChild>
+              <Link
+                to="/account"
+                search={{ tab: "settings", section: "personal" }}
+              >
+                รายละเอียด
               </Link>
             </Button>
+          </CardHeader>
+          <CardContent className="grid gap-4 text-sm sm:grid-cols-3">
+            <div>
+              <p className="text-muted-foreground">วงเงิน</p>
+              <p className="font-medium">
+                {formatPrice(creditAccount.creditLimit)}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">คงค้าง</p>
+              <p>{formatPrice(creditAccount.outstandingBalance)}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">ใช้ได้</p>
+              <p className="font-semibold text-accent">
+                {formatPrice(creditAccount.availableCredit)}
+              </p>
+            </div>
           </CardContent>
         </Card>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:col-span-2">
-          <Card className="border-border/60 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Wallet className="size-4 text-accent" />
-                {t("account.wallet")}
-              </CardTitle>
-              <Button variant="link" size="sm" className="h-auto p-0" asChild>
-                <Link to="/account" search={{ tab: "settings" }}>
-                  จัดการ
-                </Link>
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {loading ? (
-                <p className="text-sm text-muted-foreground">กำลังโหลด...</p>
-              ) : (
-                <>
-                  <div>
-                    <p className="text-sm text-muted-foreground">ยอดใช้ได้</p>
-                    <p className="text-2xl font-bold text-accent">
-                      {formatPrice(walletBalance)}
-                    </p>
-                  </div>
-                  {walletPending > 0 && (
-                    <p className="text-sm text-muted-foreground">
-                      รอดำเนินการ {formatPrice(walletPending)}
-                    </p>
-                  )}
-                  {tierProgress && (
-                    <div className="space-y-1.5 pt-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <span>{tierProgress.currentTierName}</span>
-                        {tierProgress.nextTierName ? (
-                          <span className="text-muted-foreground">
-                            → {tierProgress.nextTierName}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground">
-                            ระดับสูงสุด
-                          </span>
-                        )}
-                      </div>
-                      <Progress value={tierPct} className="h-1.5" />
-                      <p className="text-xs text-muted-foreground">
-                        ยอดซื้อสะสม {formatPrice(tierProgress.totalSpent)}
-                      </p>
-                    </div>
-                  )}
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          {creditAccount && (
-            <Card className="border-border/60 shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <CreditCard className="size-4 text-accent" />
-                  {t("account.credit")}
-                </CardTitle>
-                <Button variant="link" size="sm" className="h-auto p-0" asChild>
-                  <Link to="/account" search={{ tab: "settings" }}>
-                    รายละเอียด
-                  </Link>
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">วงเงิน</span>
-                  <span className="font-medium">
-                    {formatPrice(creditAccount.creditLimit)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">คงค้าง</span>
-                  <span>{formatPrice(creditAccount.outstandingBalance)}</span>
-                </div>
-                <div className="flex justify-between border-t pt-2">
-                  <span className="font-medium">ใช้ได้</span>
-                  <span className="font-semibold text-accent">
-                    {formatPrice(creditAccount.availableCredit)}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          <Card
-            className={`border-border/60 shadow-sm ${creditAccount ? "sm:col-span-2" : ""}`}
-          >
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Package className="size-4 text-accent" />
-                คำสั่งซื้อล่าสุด
-              </CardTitle>
-              <Button variant="link" size="sm" className="h-auto p-0" asChild>
-                <Link to="/account/orders">ดูทั้งหมด</Link>
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <p className="text-sm text-muted-foreground">กำลังโหลด...</p>
-              ) : recentOrders.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  ยังไม่มีคำสั่งซื้อ
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {recentOrders.map((order) => (
-                    <Link
-                      key={order.id}
-                      to="/account/orders/$orderId"
-                      params={{ orderId: order.id }}
-                      className="flex items-center justify-between rounded-lg border p-3 text-sm transition-colors hover:bg-muted/50"
-                    >
-                      <div>
-                        <p className="font-medium">{order.orderNumber}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatDate(order.createdAt)}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <Badge variant="outline" className="mb-1">
-                          {statusLabels[order.status] ?? order.status}
-                        </Badge>
-                        <p className="font-medium">
-                          {formatPrice(order.grandTotal)}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      )}
 
       <Card className="border-border/60 shadow-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">ทางลัด</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between gap-2 pb-0">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Package className="size-4 text-accent" />
+            คำสั่งซื้อล่าสุด
+          </CardTitle>
+          <Button
+            variant="link"
+            size="sm"
+            className="h-auto shrink-0 p-0"
+            asChild
+          >
+            <Link to="/account/orders">ดูทั้งหมด</Link>
+          </Button>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <ShortcutLink
-              to="/account/wishlist"
-              icon={Heart}
-              label="รายการโปรด"
-            />
-            <ShortcutLink
-              to="/account/notifications"
-              icon={Bell}
-              label="แจ้งเตือน"
-            />
-            <ShortcutLink
-              to="/account/track"
-              icon={Search}
-              label={t("account.trackOrder")}
-            />
-            <ShortcutLink
-              to="/account"
-              search={{ tab: "settings" }}
-              icon={Receipt}
-              label={t("account.taxInvoice")}
-            />
-            <ShortcutLink
-              to="/account/orders"
-              icon={Package}
-              label={t("account.orders")}
-            />
-            <ShortcutLink
-              to="/account"
-              search={{ tab: "settings" }}
-              icon={MapPin}
-              label={t("account.addresses")}
-            />
+        <CardContent className="space-y-4 pt-4">
+          <div className="-mx-1 overflow-x-auto pb-1">
+            <div className="flex min-w-max gap-1 border-b px-1">
+              {orderTabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setOrderTab(tab.id)}
+                  className={cn(
+                    "relative shrink-0 px-3 py-2.5 text-sm font-medium transition-colors",
+                    orderTab === tab.id
+                      ? "text-accent after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-accent"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {tab.label}
+                  {tabCounts[tab.id] > 0 && (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      ({tabCounts[tab.id]})
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {loading ? (
+            <p className="text-sm text-muted-foreground">กำลังโหลด...</p>
+          ) : displayOrders.length === 0 ? (
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              {orderTab === "all"
+                ? "ยังไม่มีคำสั่งซื้อ"
+                : "ไม่มีคำสั่งซื้อในสถานะนี้"}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {displayOrders.map((order) => (
+                <Link
+                  key={order.id}
+                  to="/account/orders/$orderId"
+                  params={{ orderId: order.id }}
+                  className="flex items-center justify-between rounded-lg border p-3 text-sm transition-colors hover:bg-muted/50"
+                >
+                  <div className="min-w-0">
+                    <p className="font-medium">{order.orderNumber}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDate(order.createdAt)}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <Badge variant="outline" className="mb-1">
+                      {statusLabels[order.status] ?? order.status}
+                    </Badge>
+                    <p className="font-medium">
+                      {formatPrice(order.grandTotal)}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+              {filteredOrders.length > 5 && (
+                <Button variant="outline" size="sm" className="w-full" asChild>
+                  <Link to="/account/orders">
+                    ดูอีก {filteredOrders.length - 5} รายการ
+                  </Link>
+                </Button>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -357,11 +276,13 @@ export function AccountDashboard({
 function ShortcutLink({
   to,
   search,
+  hash,
   icon: Icon,
   label,
 }: {
   to: string;
   search?: { tab: string };
+  hash?: string;
   icon: typeof Heart;
   label: string;
 }) {
@@ -369,9 +290,10 @@ function ShortcutLink({
     <Link
       to={to}
       search={search}
-      className="flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-muted/20 p-4 text-center text-sm transition-colors hover:border-accent/40 hover:bg-accent/5"
+      hash={hash}
+      className="flex flex-col items-center gap-2 text-center text-sm text-foreground transition-colors hover:text-accent"
     >
-      <Icon className="size-5 text-accent" />
+      <Icon className="size-6 text-accent" />
       <span>{label}</span>
     </Link>
   );

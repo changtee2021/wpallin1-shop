@@ -21,7 +21,11 @@ import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { useNotificationsRealtime } from "@/hooks/use-notifications-realtime";
 import type { NotificationDto } from "@/services/notification.service";
 
-export function NotificationBell() {
+export function NotificationBell({
+  triggerClassName,
+}: {
+  triggerClassName?: string;
+}) {
   const { session, user } = useAuth();
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(0);
@@ -61,7 +65,11 @@ export function NotificationBell() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative rounded-full">
+        <Button
+          variant="ghost"
+          size="icon"
+          className={`relative rounded-full ${triggerClassName ?? ""}`}
+        >
           <Bell className="size-5" />
           {unread > 0 ? (
             <Badge className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-accent p-0 text-[9px] text-white">

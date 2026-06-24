@@ -37,7 +37,6 @@ import {
   rejectPaymentSlip,
   updateOrderStatus,
 } from "@/services/admin-order.service";
-import { trackOrderByNumberAndEmail } from "@/services/track-order.service";
 import {
   getSettings,
   updateSettings,
@@ -54,6 +53,7 @@ import {
   getSessionProfile,
   getAccountProfile,
   updateAccountProfile,
+  submitBankAccountRequest,
   listAddresses,
   saveAddress,
   deleteAddress,
@@ -163,11 +163,32 @@ export const updateAccountProfileFn = createServerFn({ method: "POST" })
         fullName: z.string().min(1),
         phone: z.string().optional(),
         locale: z.enum(["th", "en"]).optional(),
+        customerType: z.enum(["individual", "juristic"]).optional(),
+        nationalId: z.string().optional(),
+        companyTaxId: z.string().optional(),
+        companyBranch: z.string().optional(),
       })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
     await updateAccountProfile(context.supabase, context.userId, data);
+    return { ok: true };
+  });
+
+export const submitBankAccountFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        bankName: z.string().min(1),
+        accountNumber: z.string().min(1),
+        accountName: z.string().min(1),
+        branch: z.string().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await submitBankAccountRequest(context.supabase, context.userId, data);
     return { ok: true };
   });
 
@@ -458,20 +479,6 @@ export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
       data.note,
     );
     return { ok: true };
-  });
-
-export const trackOrder = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
-    z
-      .object({
-        orderNumber: z.string().min(1),
-        email: z.string().email(),
-      })
-      .parse(input),
-  )
-  .handler(async ({ data }) => {
-    const supabase = await getAdminClient();
-    return trackOrderByNumberAndEmail(supabase, data.orderNumber, data.email);
   });
 
 export const fetchAdminDashboard = createServerFn({ method: "GET" })
@@ -973,3 +980,10 @@ export {
   saveAdminMarketingCatalog,
   deleteAdminMarketingCatalog,
 } from "@/lib/server-fns/marketing-catalogs";
+
+export {
+  fetchUserTaxInvoiceOverview,
+  fetchOrderTaxInvoice,
+  fetchTaxInvoiceDownloadUrl,
+  fetchAdminOrderTaxInvoice,
+} from "@/lib/server-fns/tax-invoices";

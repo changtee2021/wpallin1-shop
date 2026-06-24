@@ -5,7 +5,10 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { AccountDashboard } from "@/components/account/account-dashboard";
-import { AccountSettingsSections } from "@/components/account/account-settings-sections";
+import {
+  AccountSettingsSections,
+  type SettingsSectionId,
+} from "@/components/account/account-settings-sections";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -46,10 +49,19 @@ import type { CreditAccountDto } from "@/services/credit.service";
 import type { OrderSummaryDto } from "@/types/api/orders";
 
 const accountTabSchema = z.enum(["dashboard", "settings"]);
+const settingsSectionSchema = z.enum([
+  "personal",
+  "finance",
+  "address-tax",
+  "system",
+]);
 
 export const Route = createFileRoute("/account/")({
   validateSearch: (search) => ({
     tab: accountTabSchema.catch("dashboard").parse(search.tab ?? "dashboard"),
+    section: settingsSectionSchema
+      .catch("personal")
+      .parse(search.section ?? "personal"),
   }),
   component: AccountPage,
 });
@@ -79,8 +91,8 @@ const emptyTax = {
 function AccountPage() {
   const { t } = useT();
   const { setLocale: applyLocale } = useLocaleControl();
-  const { session, signOut, isAdmin, isDealer } = useAuth();
-  const { tab } = Route.useSearch();
+  const { session, signOut } = useAuth();
+  const { tab, section } = Route.useSearch();
 
   const [profile, setProfile] = useState<AccountProfileDto | null>(null);
   const [loading, setLoading] = useState(true);
@@ -163,16 +175,11 @@ function AccountPage() {
   }, [authOpts]);
 
   const loadDashboard = useCallback(async () => {
-    const [summary, progress, orders, creditSummary] = await Promise.all([
-      fetchWalletSummary(authOpts),
-      fetchTierProgress(authOpts),
+    const [orders, creditSummary] = await Promise.all([
       fetchMyOrders(authOpts),
       fetchCreditSummary(authOpts).catch(() => null),
     ]);
-    setWalletBalance(summary.availableBalance);
-    setWalletPending(summary.pendingBalance);
-    setTierProgress(progress);
-    setRecentOrders(orders.slice(0, 3));
+    setRecentOrders(orders);
     setCreditAccount(creditSummary?.account ?? null);
   }, [authOpts]);
 
@@ -224,7 +231,14 @@ function AccountPage() {
     if (tab === "settings") {
       let cancelled = false;
       setSettingsLoading(true);
-      void Promise.all([loadWallet(), loadAddresses(), loadTaxProfiles()])
+      const loaders: Promise<unknown>[] = [];
+      if (section === "finance") {
+        loaders.push(loadWallet());
+      }
+      if (section === "address-tax") {
+        loaders.push(loadAddresses(), loadTaxProfiles());
+      }
+      void Promise.all(loaders)
         .catch((err) =>
           toast.error(err instanceof Error ? err.message : "โหลดไม่สำเร็จ"),
         )
@@ -237,6 +251,7 @@ function AccountPage() {
     }
   }, [
     tab,
+    section,
     profile,
     loadDashboard,
     loadWallet,
@@ -426,11 +441,20 @@ function AccountPage() {
     );
   }
 
+  const settingsSectionTitles: Record<SettingsSectionId, string> = {
+    personal: "ข้อมูลส่วนตัว",
+    finance: "การเงิน",
+    "address-tax": "ที่อยู่และภาษี",
+    system: "ระบบ",
+  };
+
   return (
     <div>
       <PageHeader
         title={
-          tab === "settings" ? t("account.settings") : t("account.dashboard")
+          tab === "settings"
+            ? settingsSectionTitles[section]
+            : t("account.dashboard")
         }
         description={
           tab === "settings"
@@ -439,43 +463,22 @@ function AccountPage() {
         }
       />
 
-      <div className="mb-6 flex gap-2 lg:hidden">
-        <Button
-          variant={tab === "dashboard" ? "default" : "outline"}
-          size="sm"
-          asChild
-        >
-          <Link to="/account" search={{ tab: "dashboard" }}>
-            {t("account.dashboard")}
-          </Link>
-        </Button>
-        <Button
-          variant={tab === "settings" ? "default" : "outline"}
-          size="sm"
-          asChild
-        >
-          <Link to="/account" search={{ tab: "settings" }}>
-            {t("account.settings")}
-          </Link>
-        </Button>
-      </div>
-
       {tab === "dashboard" ? (
         <AccountDashboard
           profile={profile}
-          walletBalance={walletBalance}
-          walletPending={walletPending}
-          tierProgress={tierProgress}
           creditAccount={creditAccount}
           recentOrders={recentOrders}
           loading={dashboardLoading}
-          isAdmin={isAdmin}
-          isDealer={isDealer}
         />
       ) : (
         <AccountSettingsSections
-          loading={settingsLoading}
+          section={section}
+          loading={
+            settingsLoading &&
+            (section === "finance" || section === "address-tax")
+          }
           profile={profile}
+          onProfileRefresh={() => void loadProfile()}
           hasCreditAccount={hasCreditAccount}
           customerType={customerType}
           setCustomerType={setCustomerType}

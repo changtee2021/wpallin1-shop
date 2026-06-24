@@ -9,7 +9,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
-import { fetchOrderDetail } from "@/lib/api.functions";
+import {
+  fetchOrderDetail,
+  fetchOrderTaxInvoice,
+  fetchTaxInvoiceDownloadUrl,
+} from "@/lib/api.functions";
+import { isOrderEligibleForTaxInvoice } from "@/services/tax-invoice.service";
+import type { OrderTaxInvoiceDto } from "@/services/tax-invoice.service";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { formatDate, formatPrice } from "@/lib/format";
 import { useT } from "@/i18n";
@@ -34,15 +40,21 @@ function AccountOrderDetailPage() {
   const { session } = useAuth();
   const { orderId } = Route.useParams();
   const [order, setOrder] = useState<OrderDetailDto | null>(null);
+  const [taxInvoice, setTaxInvoice] = useState<OrderTaxInvoiceDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
 
   useEffect(() => {
-    void fetchOrderDetail({
-      data: { orderId },
-      ...authServerFnOptions(session),
-    })
-      .then(setOrder)
+    const authOpts = authServerFnOptions(session);
+    void Promise.all([
+      fetchOrderDetail({ data: { orderId }, ...authOpts }),
+      fetchOrderTaxInvoice({ data: { orderId }, ...authOpts }),
+    ])
+      .then(([orderData, invoiceData]) => {
+        setOrder(orderData);
+        setTaxInvoice(invoiceData);
+      })
       .finally(() => setLoading(false));
   }, [orderId, session]);
 
@@ -75,6 +87,22 @@ function AccountOrderDetailPage() {
     }
   }
 
+  async function handleDownloadInvoice() {
+    if (!taxInvoice) return;
+    setDownloadingInvoice(true);
+    try {
+      const { url } = await fetchTaxInvoiceDownloadUrl({
+        data: { invoiceId: taxInvoice.id },
+        ...authServerFnOptions(session),
+      });
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "ดาวน์โหลดไม่สำเร็จ");
+    } finally {
+      setDownloadingInvoice(false);
+    }
+  }
+
   if (loading) {
     return <p className="text-muted-foreground">{t("common.loading")}</p>;
   }
@@ -96,6 +124,10 @@ function AccountOrderDetailPage() {
     order.paymentId &&
     (order.status === "pending_payment" ||
       order.status === "awaiting_payment_verification");
+  const showTaxInvoiceSection = isOrderEligibleForTaxInvoice(
+    order.paymentStatus,
+    order.status,
+  );
 
   return (
     <div>
@@ -155,6 +187,46 @@ function AccountOrderDetailPage() {
                 disabled={uploading}
                 onChange={(e) => void handleSlipUpload(e)}
               />
+            </CardContent>
+          </Card>
+        )}
+
+        {showTaxInvoiceSection && (
+          <Card>
+            <CardContent className="space-y-3 p-4">
+              <h2 className="font-semibold">{t("account.taxInvoice")}</h2>
+              {taxInvoice ? (
+                <>
+                  <p className="text-sm">
+                    เลขที่ {taxInvoice.invoiceNumber} ·{" "}
+                    {formatDate(taxInvoice.invoiceDate)}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      disabled={downloadingInvoice}
+                      onClick={() => void handleDownloadInvoice()}
+                    >
+                      {downloadingInvoice ? "กำลังเปิด..." : "ดาวน์โหลด PDF"}
+                    </Button>
+                    <Button size="sm" variant="outline" asChild>
+                      <Link to="/account/tax-invoices">ดูทั้งหมด</Link>
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  รอทีมบัญชีออกใบกำกับ —{" "}
+                  <Link
+                    to="/account"
+                    search={{ tab: "settings", section: "address-tax" }}
+                    hash="section-tax-invoice"
+                    className="text-primary underline"
+                  >
+                    ตรวจสอบข้อมูลออกใบกำกับ
+                  </Link>
+                </p>
+              )}
             </CardContent>
           </Card>
         )}

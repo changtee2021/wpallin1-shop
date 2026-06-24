@@ -62,9 +62,6 @@ function linksForZone(
         icon: Heart,
       });
     }
-    if (isDealer)
-      links.push({ to: "/dealer", label: "พอร์ทัลตัวแทน", icon: Store });
-    if (isAdmin) links.push({ to: "/admin", label: "แอดมิน", icon: Shield });
     return links;
   }
 
@@ -74,7 +71,12 @@ function linksForZone(
         to: "/account",
         label: "ตั้งค่า",
         icon: Settings,
-        search: { tab: "settings" },
+        search: { tab: "settings", section: "personal" },
+      },
+      {
+        to: "/account/tax-invoices",
+        label: "ใบกำกับภาษี",
+        icon: FileText,
       },
       { to: "/account/notifications", label: "แจ้งเตือน", icon: Bell },
       { to: "/account/quotations", label: "ใบเสนอราคา", icon: FileText },

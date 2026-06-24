@@ -88,7 +88,12 @@ export function ProductOptionsEditor({ groups, onChange }: Props) {
             สี ขนาด วัสดุ ฯลฯ — ลูกค้าเลือกก่อนใส่ตะกร้า
           </p>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={addEmptyGroup}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={addEmptyGroup}
+        >
           <Plus className="mr-1 size-4" />
           เพิ่มกลุ่มตัวเลือก
         </Button>
@@ -111,7 +116,8 @@ export function ProductOptionsEditor({ groups, onChange }: Props) {
 
       {!groups.length && (
         <p className="text-sm text-muted-foreground">
-          ยังไม่มีตัวเลือก — กด &quot;เพิ่มกลุ่มตัวเลือก&quot; หรือเลือก preset ด้านบน
+          ยังไม่มีตัวเลือก — กด &quot;เพิ่มกลุ่มตัวเลือก&quot; หรือเลือก preset
+          ด้านบน
         </p>
       )}
 

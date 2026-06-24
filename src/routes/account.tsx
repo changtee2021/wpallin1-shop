@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
+import { AccountProfileSummary } from "@/components/account/account-profile-summary";
 import { AccountSidebar } from "@/components/layout/account-sidebar";
 import { AppBottomNav } from "@/components/layout/app-bottom-nav";
 import { StorefrontFooter } from "@/components/layout/storefront-footer";
@@ -25,6 +26,9 @@ function AccountLayout() {
             <AccountSidebar />
           </div>
           <div className="min-w-0">
+            <div className="mb-6 lg:hidden">
+              <AccountProfileSummary showNav={false} />
+            </div>
             <Outlet />
           </div>
         </div>

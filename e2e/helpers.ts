@@ -39,16 +39,18 @@ function shouldIgnoreConsoleError(text: string): boolean {
 
 export async function assertHealthyPage(page: Page, pathLabel: string) {
   await expect(page.getByText("Something went wrong!")).toHaveCount(0);
-  await expect(page.getByText("useAuth must be used within AuthProvider")).toHaveCount(
-    0,
-  );
+  await expect(
+    page.getByText("useAuth must be used within AuthProvider"),
+  ).toHaveCount(0);
 
   const title = await page.title();
   expect(title.length, `${pathLabel}: empty document title`).toBeGreaterThan(0);
 }
 
 export async function dismissCookieBanner(page: Page) {
-  const accept = page.getByRole("button", { name: /ยอมรับทั้งหมด|accept all/i });
+  const accept = page.getByRole("button", {
+    name: /ยอมรับทั้งหมด|accept all/i,
+  });
   if (await accept.isVisible({ timeout: 2000 }).catch(() => false)) {
     await accept.click();
   }
@@ -64,10 +66,9 @@ export async function visitAndCheck(
     waitUntil: options?.waitUntil ?? "domcontentloaded",
   });
   expect(response, `${url}: no response`).toBeTruthy();
-  expect(
-    response!.status(),
-    `${url}: HTTP ${response!.status()}`,
-  ).toBeLessThan(400);
+  expect(response!.status(), `${url}: HTTP ${response!.status()}`).toBeLessThan(
+    400,
+  );
 
   await page.waitForTimeout(1500);
   await dismissCookieBanner(page);

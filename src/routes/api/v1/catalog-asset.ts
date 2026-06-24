@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { logUploadFailure } from "@/lib/upload-validation";
 import { enforceRateLimit, RateLimitError } from "@/lib/rate-limit";
 
-const CATALOG_MAX_BYTES = 25 * 1024 * 1024;
+const CATALOG_MAX_BYTES = 150 * 1024 * 1024;
 const CATALOG_ALLOWED_TYPES = new Set([
   "image/jpeg",
   "image/png",
@@ -13,7 +13,7 @@ const CATALOG_ALLOWED_TYPES = new Set([
 
 function validateCatalogFile(file: File) {
   if (file.size > CATALOG_MAX_BYTES) {
-    return { status: 413, message: "File exceeds 25MB limit" };
+    return { status: 413, message: "File exceeds 150MB limit" };
   }
   if (!CATALOG_ALLOWED_TYPES.has(file.type)) {
     return { status: 415, message: "Unsupported file type" };

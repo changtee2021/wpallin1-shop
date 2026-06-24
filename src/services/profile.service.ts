@@ -3,10 +3,54 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   AccountProfileDto,
   AddressDto,
+  BankAccountRequestDto,
   SessionProfileDto,
+  SubmitBankAccountInput,
   TaxInvoiceProfileDto,
   UpdateAccountProfileInput,
 } from "@/types/api/profile";
+
+const AVATAR_BUCKET = "wpall-retail-customer-docs";
+
+function parseBankAccount(metadata: unknown): BankAccountRequestDto | null {
+  if (!metadata || typeof metadata !== "object") return null;
+  const raw = (metadata as { bankAccount?: unknown }).bankAccount;
+  if (!raw || typeof raw !== "object") return null;
+  const row = raw as Record<string, unknown>;
+  if (
+    typeof row.bankName !== "string" ||
+    typeof row.accountNumber !== "string" ||
+    typeof row.accountName !== "string"
+  ) {
+    return null;
+  }
+  const status =
+    row.status === "approved" ||
+    row.status === "rejected" ||
+    row.status === "pending"
+      ? row.status
+      : "pending";
+  return {
+    bankName: row.bankName,
+    accountNumber: row.accountNumber,
+    accountName: row.accountName,
+    branch: typeof row.branch === "string" ? row.branch : null,
+    status,
+    submittedAt: typeof row.submittedAt === "string" ? row.submittedAt : null,
+  };
+}
+
+async function resolveAvatarSignedUrl(
+  supabase: SupabaseClient,
+  avatarPath: string | null | undefined,
+): Promise<string | null> {
+  if (!avatarPath) return null;
+  if (avatarPath.startsWith("http")) return avatarPath;
+  const { data } = await supabase.storage
+    .from(AVATAR_BUCKET)
+    .createSignedUrl(avatarPath, 60 * 60 * 24);
+  return data?.signedUrl ?? null;
+}
 
 export async function getSessionProfile(
   supabase: SupabaseClient,
@@ -41,18 +85,21 @@ export async function getAccountProfile(
     supabase
       .from("profiles")
       .select(
-        "email, full_name, phone, locale, member_tier, account_status, order_count, total_spent, customer_type, national_id, company_tax_id, company_branch, profile_completed",
+        "email, full_name, phone, avatar_url, locale, member_tier, account_status, order_count, total_spent, customer_type, national_id, company_tax_id, company_branch, profile_completed, metadata",
       )
       .eq("id", userId)
       .maybeSingle(),
     supabase.from("user_roles").select("role").eq("user_id", userId),
   ]);
 
+  const avatarUrl = await resolveAvatarSignedUrl(supabase, profile?.avatar_url);
+
   return {
     userId,
     email: profile?.email ?? email,
     fullName: profile?.full_name ?? null,
     phone: profile?.phone ?? null,
+    avatarUrl,
     locale: profile?.locale ?? "th",
     memberTier: profile?.member_tier ?? null,
     accountStatus: profile?.account_status ?? null,
@@ -64,8 +111,60 @@ export async function getAccountProfile(
     profileCompleted: profile?.profile_completed ?? false,
     orderCount: profile?.order_count ?? 0,
     totalSpent: Number(profile?.total_spent ?? 0),
+    bankAccount: parseBankAccount(profile?.metadata),
     roles: (roles ?? []).map((r) => r.role as string),
   };
+}
+
+export async function updateProfileAvatarPath(
+  supabase: SupabaseClient,
+  userId: string,
+  storagePath: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      avatar_url: storagePath,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", userId);
+  if (error) throw new Error(error.message);
+}
+
+export async function submitBankAccountRequest(
+  supabase: SupabaseClient,
+  userId: string,
+  input: SubmitBankAccountInput,
+): Promise<void> {
+  const { data: profile, error: readErr } = await supabase
+    .from("profiles")
+    .select("metadata")
+    .eq("id", userId)
+    .maybeSingle();
+  if (readErr) throw new Error(readErr.message);
+
+  const metadata =
+    profile?.metadata && typeof profile.metadata === "object"
+      ? { ...(profile.metadata as Record<string, unknown>) }
+      : {};
+
+  metadata.bankAccount = {
+    bankName: input.bankName.trim(),
+    accountNumber: input.accountNumber.trim(),
+    accountName: input.accountName.trim(),
+    branch: input.branch?.trim() || null,
+    status: "pending",
+    submittedAt: new Date().toISOString(),
+  };
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      metadata,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", userId);
+  if (error) throw new Error(error.message);
 }
 
 export async function updateAccountProfile(

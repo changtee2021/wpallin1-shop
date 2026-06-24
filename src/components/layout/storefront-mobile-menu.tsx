@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Menu } from "lucide-react";
 import { useState } from "react";
 
+import { AccountMenuButton } from "@/components/account/account-menu-button";
 import {
   Sheet,
   SheetContent,
@@ -21,9 +22,13 @@ const storeLinks = [
   { to: "/contact", key: "nav.contact" as const },
 ];
 
-export function StorefrontMobileMenu() {
+export function StorefrontMobileMenu({
+  triggerClassName,
+}: {
+  triggerClassName?: string;
+}) {
   const { t } = useT();
-  const { user, isAdmin, isDealer } = useAuth();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
   return (
@@ -31,7 +36,7 @@ export function StorefrontMobileMenu() {
       <Button
         variant="ghost"
         size="icon"
-        className="rounded-full lg:hidden"
+        className={`rounded-full lg:hidden ${triggerClassName ?? ""}`}
         onClick={() => setOpen(true)}
         aria-label="Menu"
       >
@@ -54,34 +59,11 @@ export function StorefrontMobileMenu() {
               </Link>
             ))}
             {user ? (
-              <>
-                <Link
-                  to="/account"
-                  search={{ tab: "dashboard" }}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted"
-                  onClick={() => setOpen(false)}
-                >
-                  {t("nav.account")}
-                </Link>
-                {isDealer ? (
-                  <Link
-                    to="/dealer"
-                    className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted"
-                    onClick={() => setOpen(false)}
-                  >
-                    {t("nav.dealer")}
-                  </Link>
-                ) : null}
-                {isAdmin ? (
-                  <Link
-                    to="/admin"
-                    className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted"
-                    onClick={() => setOpen(false)}
-                  >
-                    {t("nav.admin")}
-                  </Link>
-                ) : null}
-              </>
+              <AccountMenuButton
+                variant="menu"
+                className="mt-2"
+                onNavigate={() => setOpen(false)}
+              />
             ) : (
               <>
                 <Link

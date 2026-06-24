@@ -6,6 +6,8 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -19,9 +21,14 @@ import {
   adminUpdateOrderStatus,
   adminVerifySlip,
   fetchAdminOrderDetail,
+  fetchAdminOrderTaxInvoice,
 } from "@/lib/api.functions";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { formatDate, formatPrice } from "@/lib/format";
+import {
+  isOrderEligibleForTaxInvoice,
+  type OrderTaxInvoiceDto,
+} from "@/services/tax-invoice.service";
 import type { AdminOrderDetailDto, OrderStatus } from "@/types/api/orders";
 
 export const Route = createFileRoute("/admin/orders/$orderId")({
@@ -32,15 +39,27 @@ function AdminOrderDetailPage() {
   const { session } = useAuth();
   const { orderId } = Route.useParams();
   const [order, setOrder] = useState<AdminOrderDetailDto | null>(null);
+  const [taxInvoice, setTaxInvoice] = useState<OrderTaxInvoiceDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [acting, setActing] = useState(false);
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [invoiceDate, setInvoiceDate] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
+  const [invoiceFile, setInvoiceFile] = useState<File | null>(null);
+  const [uploadingInvoice, setUploadingInvoice] = useState(false);
 
   async function reload() {
-    const data = await fetchAdminOrderDetail({
-      data: { orderId },
-      ...authServerFnOptions(session),
-    });
+    const authOpts = authServerFnOptions(session);
+    const [data, invoice] = await Promise.all([
+      fetchAdminOrderDetail({ data: { orderId }, ...authOpts }),
+      fetchAdminOrderTaxInvoice({ data: { orderId }, ...authOpts }),
+    ]);
     setOrder(data);
+    setTaxInvoice(invoice);
+    if (invoice && !invoiceNumber) {
+      setInvoiceNumber(invoice.invoiceNumber);
+    }
   }
 
   useEffect(() => {
@@ -105,6 +124,35 @@ function AdminOrderDetailPage() {
     }
   }
 
+  async function handleUploadTaxInvoice() {
+    if (!session?.access_token || !invoiceFile || !invoiceNumber.trim()) {
+      toast.error("กรอกเลขที่ใบกำกับและเลือกไฟล์ PDF");
+      return;
+    }
+    setUploadingInvoice(true);
+    try {
+      const form = new FormData();
+      form.append("orderId", orderId);
+      form.append("invoiceNumber", invoiceNumber.trim());
+      form.append("invoiceDate", invoiceDate);
+      form.append("file", invoiceFile);
+      const res = await fetch("/api/v1/admin-tax-invoice", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.access_token}` },
+        body: form,
+      });
+      const json = (await res.json()) as { error?: string };
+      if (!res.ok) throw new Error(json.error ?? "อัปโหลดไม่สำเร็จ");
+      toast.success("อัปโหลดใบกำกับภาษีแล้ว");
+      setInvoiceFile(null);
+      await reload();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "ไม่สำเร็จ");
+    } finally {
+      setUploadingInvoice(false);
+    }
+  }
+
   if (loading) return <p className="text-muted-foreground">กำลังโหลด...</p>;
   if (!order) {
     return (
@@ -113,6 +161,11 @@ function AdminOrderDetailPage() {
       </Card>
     );
   }
+
+  const canIssueTaxInvoice = isOrderEligibleForTaxInvoice(
+    order.paymentStatus,
+    order.status,
+  );
 
   return (
     <div>
@@ -187,6 +240,69 @@ function AdminOrderDetailPage() {
               )}
           </CardContent>
         </Card>
+
+        {canIssueTaxInvoice && (
+          <Card className="lg:col-span-2">
+            <CardContent className="space-y-4 p-4">
+              <h2 className="font-semibold">ใบกำกับภาษี</h2>
+              {taxInvoice ? (
+                <div className="rounded-lg border bg-muted/30 p-3 text-sm">
+                  <p>
+                    เลขที่ {taxInvoice.invoiceNumber} ·{" "}
+                    {formatDate(taxInvoice.invoiceDate)}
+                  </p>
+                  <p className="text-muted-foreground">
+                    อัปโหลดแล้ว {formatDate(taxInvoice.issuedAt)}
+                    {taxInvoice.fileName ? ` · ${taxInvoice.fileName}` : ""}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  ยังไม่มีใบกำกับสำหรับออเดอร์นี้
+                </p>
+              )}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="invoiceNumber">เลขที่ใบกำกับ</Label>
+                  <Input
+                    id="invoiceNumber"
+                    value={invoiceNumber}
+                    onChange={(e) => setInvoiceNumber(e.target.value)}
+                    placeholder="INV-2026-0001"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="invoiceDate">วันที่ใบกำกับ</Label>
+                  <Input
+                    id="invoiceDate"
+                    type="date"
+                    value={invoiceDate}
+                    onChange={(e) => setInvoiceDate(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="invoiceFile">ไฟล์ PDF</Label>
+                <Input
+                  id="invoiceFile"
+                  type="file"
+                  accept="application/pdf,.pdf"
+                  onChange={(e) => setInvoiceFile(e.target.files?.[0] ?? null)}
+                />
+              </div>
+              <Button
+                disabled={uploadingInvoice}
+                onClick={() => void handleUploadTaxInvoice()}
+              >
+                {uploadingInvoice
+                  ? "กำลังอัปโหลด..."
+                  : taxInvoice
+                    ? "อัปเดตใบกำกับ"
+                    : "ออกใบกำกับ"}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="lg:col-span-2">
           <CardContent className="space-y-4 p-4">

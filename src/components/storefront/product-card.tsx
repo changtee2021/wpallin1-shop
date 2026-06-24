@@ -63,7 +63,7 @@ export function ProductCard({
           >
             <Label
               htmlFor={`compare-${product.id}`}
-              className="flex cursor-pointer items-center rounded-md border border-border/60 bg-white/95 p-1 shadow-sm backdrop-blur-sm"
+              className="flex cursor-pointer items-center"
             >
               <Checkbox
                 id={`compare-${product.id}`}

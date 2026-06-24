@@ -1,0 +1,109 @@
+# Migrations — wpall_retail (wpallin1-shop)
+
+Canonical SQL lives in **`wp-group-erp/supabase/migrations/`** — not in this app repo.
+
+Supabase project: `erpzxusskbtdxvqadwxv`  
+Schema: `wpall_retail`
+
+---
+
+## Apply migrations
+
+```powershell
+cd "C:\Users\Admin\WP GROUP\wp-group-erp"
+# First time: supabase link --project-ref erpzxusskbtdxvqadwxv
+supabase db push
+```
+
+Verify schema:
+
+```sql
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'wpall_retail'
+ORDER BY table_name;
+```
+
+ERP-wide runbook: `wp-group-erp/docs/MIGRATION-RUNBOOK.md`
+
+---
+
+## wpall_retail migration list
+
+Apply in timestamp order. All paths relative to `wp-group-erp/supabase/migrations/`.
+
+| Migration | Summary |
+|-----------|---------|
+| `20260623100000_wpall_retail_bootstrap.sql` | Schema, enums, core tables (profiles, products, orders, cart, wallet, quotations, coupons, affiliates, notifications, site_settings) |
+| `20260623110000_wpall_retail_rls.sql` | Row Level Security policies + helper functions (`is_admin`, `has_role`) |
+| `20260623120000_wpall_retail_phase2_seed_storage.sql` | Storage buckets `wpall-retail-products`, `wpall-retail-payment-slips`; demo catalog seed; brand settings |
+| `20260623130000_wpall_retail_phase3_configurator_seed.sql` | Curtain configurator seed data |
+| `20260623140000_wpall_retail_wallet_topup_tiers.sql` | `wallet_topup_requests`, tier helpers |
+| `20260623150000_wpall_retail_reviews_wishlist.sql` | `product_reviews`, `wishlist_items`, PromptPay setting seed |
+| `20260623200000_wpall_retail_b2b_credit_docs.sql` | B2B credit accounts, KYC documents, contract pricing |
+| `20260624100000_wpall_retail_mock_products.sql` | QA mock products |
+| `20260625100000_wpall_retail_mock_product_images.sql` | Mock product images |
+| `20260626100000_wpall_retail_mock_product_options.sql` | Mock selectable options (color, size, material) |
+
+---
+
+## Pending — marketing PDF catalogs
+
+**Required for commit `70611e4` (marketing catalogs feature).**
+
+| Migration | Status | Summary |
+|-----------|--------|---------|
+| `20260627100000_wpall_retail_marketing_catalogs.sql` | **Not yet in wp-group-erp** | Tables + storage for PDF catalogs |
+
+Expected objects (from app code):
+
+| Object | Purpose |
+|--------|---------|
+| `marketing_catalog_categories` | Group catalogs (e.g. ม่าน, มู่ลี่) |
+| `marketing_catalogs` | Title, brand, cover, PDF URL, tags, visibility |
+| `marketing_catalog_products` | Link catalogs ↔ products |
+| Storage bucket `wpall-retail-catalogs` | Public PDF/cover uploads (admin write) |
+
+Until this migration is applied:
+
+- `/catalogs` and `/admin/catalogs` will fail on DB queries
+- Upload API `POST /api/v1/catalog-asset` will fail on storage
+
+**Action:** Add migration to `wp-group-erp`, then `supabase db push`.
+
+Feature doc: `docs/marketing-catalogs.md`
+
+---
+
+## Storage buckets (wpall_retail)
+
+| Bucket | Public | Purpose |
+|--------|--------|---------|
+| `wpall-retail-products` | Yes | Product images |
+| `wpall-retail-payment-slips` | No | Payment / top-up slips |
+| `wpall-retail-catalogs` | Yes (pending migration) | Marketing PDF + covers |
+
+---
+
+## Adding a new migration
+
+1. Create `wp-group-erp/supabase/migrations/YYYYMMDDHHMMSS_wpall_retail_<name>.sql`
+2. Start with `SET search_path TO wpall_retail, public;`
+3. Enable RLS on new tables; add policies consistent with `20260623110000_wpall_retail_rls.sql`
+4. `supabase db push` against ERP project
+5. Update this file and `CHANGELOG.md`
+
+---
+
+## Rollback policy
+
+Shared ERP — **do not** run destructive resets on production.  
+Revert app code via Vercel; fix forward with a new migration if schema change was wrong.
+
+---
+
+## Related
+
+- `docs/DEPLOY.md` — deploy after migrations
+- `docs/GO-LIVE-CHECKLIST.md` — migration gate before prod
+- `docs/SUPABASE-SECURITY-NOTES.md` — RLS advisor findings

@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { ShoppingCart } from "lucide-react";
 
+import { AccountMenuButton } from "@/components/account/account-menu-button";
 import { NotificationBell } from "@/components/notifications/notification-bell";
-import { StorefrontMobileMenu } from "@/components/layout/storefront-mobile-menu";
 import { SearchBar } from "@/components/storefront/search-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,24 +18,24 @@ const navLinks = [
   { to: "/about" as const, key: "nav.about" as const },
 ];
 
+const headerIconClass = "text-white hover:bg-white/10 hover:text-white";
+
 export function StorefrontHeader() {
   const { t } = useT();
-  const { user, isAdmin, isDealer } = useAuth();
+  const { user } = useAuth();
   const { cart } = useCart();
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-white shadow-sm">
+    <header className="sticky top-0 z-40 bg-gradient-to-r from-primary to-[#126B68] text-white shadow-md">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex h-14 items-center gap-2 sm:h-16 sm:gap-3 md:gap-6">
           <Link to="/" className="flex shrink-0 items-center">
             <img
-              src="/brand/logo-color.png"
+              src="/brand/logo-mono-dark.png"
               alt="WP ALL"
-              className="h-8 w-auto object-contain sm:h-10"
+              className="h-8 w-auto object-contain mix-blend-screen sm:h-10"
             />
           </Link>
-
-          <StorefrontMobileMenu />
 
           <div className="min-w-0 flex-1 lg:hidden">
             <SearchBar compact />
@@ -46,11 +46,13 @@ export function StorefrontHeader() {
           </div>
 
           <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
-            {user ? <NotificationBell /> : null}
+            {user ? (
+              <NotificationBell triggerClassName={headerIconClass} />
+            ) : null}
             <Button
               variant="ghost"
               size="icon"
-              className="relative rounded-full hidden md:inline-flex"
+              className={`relative hidden rounded-full md:inline-flex ${headerIconClass}`}
               asChild
             >
               <Link to="/cart" aria-label={t("nav.cart")}>
@@ -63,44 +65,13 @@ export function StorefrontHeader() {
               </Link>
             </Button>
             {user ? (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="hidden sm:inline-flex"
-                  asChild
-                >
-                  <Link to="/account" search={{ tab: "dashboard" }}>
-                    {t("nav.account")}
-                  </Link>
-                </Button>
-                {isDealer && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="hidden lg:inline-flex"
-                    asChild
-                  >
-                    <Link to="/dealer">{t("nav.dealer")}</Link>
-                  </Button>
-                )}
-                {isAdmin && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="hidden lg:inline-flex"
-                    asChild
-                  >
-                    <Link to="/admin">{t("nav.admin")}</Link>
-                  </Button>
-                )}
-              </>
+              <AccountMenuButton />
             ) : (
               <>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="hidden sm:inline-flex"
+                  className={`hidden sm:inline-flex ${headerIconClass}`}
                   asChild
                 >
                   <Link to="/login">{t("nav.login")}</Link>
@@ -117,13 +88,13 @@ export function StorefrontHeader() {
           </div>
         </div>
 
-        <nav className="hidden border-t py-2 lg:flex lg:items-center lg:gap-6">
+        <nav className="hidden border-t border-white/15 py-2 lg:flex lg:items-center lg:gap-6">
           {navLinks.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-              activeProps={{ className: "text-primary font-semibold" }}
+              className="text-sm font-medium text-white/80 transition-colors hover:text-white"
+              activeProps={{ className: "text-white font-semibold" }}
               activeOptions={item.exact ? { exact: true } : undefined}
             >
               {t(item.key)}

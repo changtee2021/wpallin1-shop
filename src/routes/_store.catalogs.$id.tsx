@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Download, ExternalLink } from "lucide-react";
 
+import { CatalogFlipbook } from "@/components/storefront/catalog-flipbook";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { fetchPublicMarketingCatalog } from "@/lib/api.functions";
@@ -29,18 +30,6 @@ function CatalogViewerPage() {
           </Link>
         </Button>
         <div className="flex flex-wrap gap-2">
-          {catalog.pdfUrl ? (
-            <Button variant="outline" asChild>
-              <a
-                href={catalog.pdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Download className="size-4" />
-                ดาวน์โหลด PDF
-              </a>
-            </Button>
-          ) : null}
           {catalog.externalLink ? (
             <Button variant="outline" asChild>
               <a
@@ -50,6 +39,18 @@ function CatalogViewerPage() {
               >
                 <ExternalLink className="size-4" />
                 เปิดลิงก์ภายนอก
+              </a>
+            </Button>
+          ) : null}
+          {catalog.pdfUrl ? (
+            <Button variant="outline" asChild>
+              <a
+                href={catalog.pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Download className="size-4" />
+                ดาวน์โหลด PDF
               </a>
             </Button>
           ) : null}
@@ -71,13 +72,7 @@ function CatalogViewerPage() {
       </Card>
 
       {catalog.pdfUrl ? (
-        <div className="overflow-hidden rounded-xl border bg-muted/20 shadow-sm">
-          <iframe
-            title={catalog.title}
-            src={catalog.pdfUrl}
-            className="h-[75vh] w-full bg-white"
-          />
-        </div>
+        <CatalogFlipbook pdfUrl={catalog.pdfUrl} title={catalog.title} />
       ) : (
         <div className="rounded-xl border border-dashed p-12 text-center text-muted-foreground">
           ยังไม่มีไฟล์ PDF สำหรับแคตตาล็อกนี้

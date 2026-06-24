@@ -114,7 +114,9 @@ export function validateSelectedOptions(
   return null;
 }
 
-export function optionsSnapshotKey(snapshot: { options?: SelectedProductOptions }) {
+export function optionsSnapshotKey(snapshot: {
+  options?: SelectedProductOptions;
+}) {
   const options = snapshot.options ?? {};
   return JSON.stringify(
     Object.keys(options)

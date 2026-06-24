@@ -37,3 +37,9 @@ Staff creates order with `orders.user_id = customer`, audit in `metadata.placed_
 ## Mobile shell
 
 `use-app-nav.ts` + `AppBottomNav` + `AppMoreSheet` provide zone-aware bottom navigation on all layouts.
+
+## Related docs
+
+- `docs/DEPLOY.md`, `docs/ENV.md`, `docs/MIGRATIONS.md` — deploy & database
+- `docs/ADMIN-GUIDE.md`, `docs/marketing-catalogs.md` — operations
+- `docs/design.md`, `docs/GO-LIVE-CHECKLIST.md`, `CHANGELOG.md`

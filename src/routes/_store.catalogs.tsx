@@ -3,9 +3,11 @@ import { BookOpen } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 
+import { CatalogCategoryHero } from "@/components/storefront/catalog-category-hero";
 import { MarketingCatalogGrid } from "@/components/storefront/marketing-catalog-grid";
 import { Button } from "@/components/ui/button";
 import { fetchPublicMarketingCatalogs } from "@/lib/api.functions";
+import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_store/catalogs")({
@@ -24,6 +26,7 @@ export const Route = createFileRoute("/_store/catalogs")({
 });
 
 function CatalogsPage() {
+  const { t } = useT();
   const { catalogs, categories } = Route.useLoaderData();
   const [activeCategory, setActiveCategory] = useState<string | "all">("all");
 
@@ -31,6 +34,15 @@ function CatalogsPage() {
     if (activeCategory === "all") return catalogs;
     return catalogs.filter((item) => item.categoryId === activeCategory);
   }, [activeCategory, catalogs]);
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const catalog of catalogs) {
+      if (!catalog.categoryId) continue;
+      counts[catalog.categoryId] = (counts[catalog.categoryId] ?? 0) + 1;
+    }
+    return counts;
+  }, [catalogs]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
@@ -40,20 +52,32 @@ function CatalogsPage() {
             <BookOpen className="size-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold sm:text-3xl">แคตตาล็อก</h1>
+            <h1 className="text-2xl font-bold sm:text-3xl">
+              {t("catalogs.title")}
+            </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              ดูแคตตาล็อกสินค้าและไฟล์ PDF ออนไลน์
+              {t("catalogs.subtitle")}
             </p>
           </div>
         </div>
       </div>
+
+      {activeCategory === "all" && categories.length > 0 ? (
+        <CatalogCategoryHero
+          categories={categories}
+          counts={categoryCounts}
+          activeCategory={activeCategory}
+          onSelect={setActiveCategory}
+          title={t("catalogs.categories.title")}
+        />
+      ) : null}
 
       <div className="mb-6 flex flex-wrap gap-2">
         <CategoryPill
           active={activeCategory === "all"}
           onClick={() => setActiveCategory("all")}
         >
-          ทั้งหมด ({catalogs.length})
+          {t("catalogs.all")} ({catalogs.length})
         </CategoryPill>
         {categories.map((category) => {
           const count = catalogs.filter(

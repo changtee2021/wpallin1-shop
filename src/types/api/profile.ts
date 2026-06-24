@@ -14,11 +14,23 @@ export type SessionProfileDto = {
   accountStatus: string | null;
 };
 
+export type BankAccountRequestStatus = "pending" | "approved" | "rejected";
+
+export type BankAccountRequestDto = {
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+  branch: string | null;
+  status: BankAccountRequestStatus;
+  submittedAt: string | null;
+};
+
 export type AccountProfileDto = {
   userId: string;
   email: string | null;
   fullName: string | null;
   phone: string | null;
+  avatarUrl: string | null;
   locale: string;
   memberTier: string | null;
   accountStatus: string | null;
@@ -29,6 +41,7 @@ export type AccountProfileDto = {
   profileCompleted: boolean;
   orderCount: number;
   totalSpent: number;
+  bankAccount: BankAccountRequestDto | null;
   roles: string[];
 };
 
@@ -65,6 +78,13 @@ export type UpdateAccountProfileInput = {
   nationalId?: string;
   companyTaxId?: string;
   companyBranch?: string;
+};
+
+export type SubmitBankAccountInput = {
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+  branch?: string;
 };
 
 export type AppRole =

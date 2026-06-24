@@ -42,7 +42,7 @@ import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminCatalogsRouteImport } from './routes/admin.catalogs'
 import { Route as AccountWishlistRouteImport } from './routes/account.wishlist'
-import { Route as AccountTrackRouteImport } from './routes/account.track'
+import { Route as AccountTaxInvoicesRouteImport } from './routes/account.tax-invoices'
 import { Route as AccountQuotationsRouteImport } from './routes/account.quotations'
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
 import { Route as AccountNotificationsRouteImport } from './routes/account.notifications'
@@ -61,10 +61,12 @@ import { Route as StoreCatalogsRouteImport } from './routes/_store.catalogs'
 import { Route as StoreCartRouteImport } from './routes/_store.cart'
 import { Route as StoreAboutRouteImport } from './routes/_store.about'
 import { Route as ApiV1WalletTopupSlipRouteImport } from './routes/api/v1/wallet-topup-slip'
+import { Route as ApiV1ProfileAvatarRouteImport } from './routes/api/v1/profile-avatar'
 import { Route as ApiV1ProductsRouteImport } from './routes/api/v1/products'
 import { Route as ApiV1PaymentSlipRouteImport } from './routes/api/v1/payment-slip'
 import { Route as ApiV1CustomerDocumentRouteImport } from './routes/api/v1/customer-document'
 import { Route as ApiV1CatalogAssetRouteImport } from './routes/api/v1/catalog-asset'
+import { Route as ApiV1AdminTaxInvoiceRouteImport } from './routes/api/v1/admin-tax-invoice'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as AdminQuotationsQuotationIdRouteImport } from './routes/admin.quotations.$quotationId'
 import { Route as AdminProductsNewRouteImport } from './routes/admin.products.new'
@@ -240,9 +242,9 @@ const AccountWishlistRoute = AccountWishlistRouteImport.update({
   path: '/wishlist',
   getParentRoute: () => AccountRoute,
 } as any)
-const AccountTrackRoute = AccountTrackRouteImport.update({
-  id: '/track',
-  path: '/track',
+const AccountTaxInvoicesRoute = AccountTaxInvoicesRouteImport.update({
+  id: '/tax-invoices',
+  path: '/tax-invoices',
   getParentRoute: () => AccountRoute,
 } as any)
 const AccountQuotationsRoute = AccountQuotationsRouteImport.update({
@@ -335,6 +337,11 @@ const ApiV1WalletTopupSlipRoute = ApiV1WalletTopupSlipRouteImport.update({
   path: '/api/v1/wallet-topup-slip',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1ProfileAvatarRoute = ApiV1ProfileAvatarRouteImport.update({
+  id: '/api/v1/profile-avatar',
+  path: '/api/v1/profile-avatar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1ProductsRoute = ApiV1ProductsRouteImport.update({
   id: '/api/v1/products',
   path: '/api/v1/products',
@@ -353,6 +360,11 @@ const ApiV1CustomerDocumentRoute = ApiV1CustomerDocumentRouteImport.update({
 const ApiV1CatalogAssetRoute = ApiV1CatalogAssetRouteImport.update({
   id: '/api/v1/catalog-asset',
   path: '/api/v1/catalog-asset',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1AdminTaxInvoiceRoute = ApiV1AdminTaxInvoiceRouteImport.update({
+  id: '/api/v1/admin-tax-invoice',
+  path: '/api/v1/admin-tax-invoice',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
@@ -433,7 +445,7 @@ export interface FileRoutesByFullPath {
   '/account/notifications': typeof AccountNotificationsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/quotations': typeof AccountQuotationsRoute
-  '/account/track': typeof AccountTrackRoute
+  '/account/tax-invoices': typeof AccountTaxInvoicesRoute
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/catalogs': typeof AdminCatalogsRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -468,10 +480,12 @@ export interface FileRoutesByFullPath {
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/quotations/$quotationId': typeof AdminQuotationsQuotationIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/v1/admin-tax-invoice': typeof ApiV1AdminTaxInvoiceRoute
   '/api/v1/catalog-asset': typeof ApiV1CatalogAssetRoute
   '/api/v1/customer-document': typeof ApiV1CustomerDocumentRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
+  '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
 }
 export interface FileRoutesByTo {
@@ -496,7 +510,7 @@ export interface FileRoutesByTo {
   '/account/notifications': typeof AccountNotificationsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/quotations': typeof AccountQuotationsRoute
-  '/account/track': typeof AccountTrackRoute
+  '/account/tax-invoices': typeof AccountTaxInvoicesRoute
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/catalogs': typeof AdminCatalogsRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -532,10 +546,12 @@ export interface FileRoutesByTo {
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/quotations/$quotationId': typeof AdminQuotationsQuotationIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/v1/admin-tax-invoice': typeof ApiV1AdminTaxInvoiceRoute
   '/api/v1/catalog-asset': typeof ApiV1CatalogAssetRoute
   '/api/v1/customer-document': typeof ApiV1CustomerDocumentRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
+  '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
 }
 export interface FileRoutesById {
@@ -565,7 +581,7 @@ export interface FileRoutesById {
   '/account/notifications': typeof AccountNotificationsRoute
   '/account/orders': typeof AccountOrdersRouteWithChildren
   '/account/quotations': typeof AccountQuotationsRoute
-  '/account/track': typeof AccountTrackRoute
+  '/account/tax-invoices': typeof AccountTaxInvoicesRoute
   '/account/wishlist': typeof AccountWishlistRoute
   '/admin/catalogs': typeof AdminCatalogsRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -601,10 +617,12 @@ export interface FileRoutesById {
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/quotations/$quotationId': typeof AdminQuotationsQuotationIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/v1/admin-tax-invoice': typeof ApiV1AdminTaxInvoiceRoute
   '/api/v1/catalog-asset': typeof ApiV1CatalogAssetRoute
   '/api/v1/customer-document': typeof ApiV1CustomerDocumentRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
+  '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
 }
 export interface FileRouteTypes {
@@ -635,7 +653,7 @@ export interface FileRouteTypes {
     | '/account/notifications'
     | '/account/orders'
     | '/account/quotations'
-    | '/account/track'
+    | '/account/tax-invoices'
     | '/account/wishlist'
     | '/admin/catalogs'
     | '/admin/categories'
@@ -670,10 +688,12 @@ export interface FileRouteTypes {
     | '/admin/products/new'
     | '/admin/quotations/$quotationId'
     | '/api/public/health'
+    | '/api/v1/admin-tax-invoice'
     | '/api/v1/catalog-asset'
     | '/api/v1/customer-document'
     | '/api/v1/payment-slip'
     | '/api/v1/products'
+    | '/api/v1/profile-avatar'
     | '/api/v1/wallet-topup-slip'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -698,7 +718,7 @@ export interface FileRouteTypes {
     | '/account/notifications'
     | '/account/orders'
     | '/account/quotations'
-    | '/account/track'
+    | '/account/tax-invoices'
     | '/account/wishlist'
     | '/admin/catalogs'
     | '/admin/categories'
@@ -734,10 +754,12 @@ export interface FileRouteTypes {
     | '/admin/products/new'
     | '/admin/quotations/$quotationId'
     | '/api/public/health'
+    | '/api/v1/admin-tax-invoice'
     | '/api/v1/catalog-asset'
     | '/api/v1/customer-document'
     | '/api/v1/payment-slip'
     | '/api/v1/products'
+    | '/api/v1/profile-avatar'
     | '/api/v1/wallet-topup-slip'
   id:
     | '__root__'
@@ -766,7 +788,7 @@ export interface FileRouteTypes {
     | '/account/notifications'
     | '/account/orders'
     | '/account/quotations'
-    | '/account/track'
+    | '/account/tax-invoices'
     | '/account/wishlist'
     | '/admin/catalogs'
     | '/admin/categories'
@@ -802,10 +824,12 @@ export interface FileRouteTypes {
     | '/admin/products/new'
     | '/admin/quotations/$quotationId'
     | '/api/public/health'
+    | '/api/v1/admin-tax-invoice'
     | '/api/v1/catalog-asset'
     | '/api/v1/customer-document'
     | '/api/v1/payment-slip'
     | '/api/v1/products'
+    | '/api/v1/profile-avatar'
     | '/api/v1/wallet-topup-slip'
   fileRoutesById: FileRoutesById
 }
@@ -820,10 +844,12 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
+  ApiV1AdminTaxInvoiceRoute: typeof ApiV1AdminTaxInvoiceRoute
   ApiV1CatalogAssetRoute: typeof ApiV1CatalogAssetRoute
   ApiV1CustomerDocumentRoute: typeof ApiV1CustomerDocumentRoute
   ApiV1PaymentSlipRoute: typeof ApiV1PaymentSlipRoute
   ApiV1ProductsRoute: typeof ApiV1ProductsRoute
+  ApiV1ProfileAvatarRoute: typeof ApiV1ProfileAvatarRoute
   ApiV1WalletTopupSlipRoute: typeof ApiV1WalletTopupSlipRoute
 }
 
@@ -1060,11 +1086,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountWishlistRouteImport
       parentRoute: typeof AccountRoute
     }
-    '/account/track': {
-      id: '/account/track'
-      path: '/track'
-      fullPath: '/account/track'
-      preLoaderRoute: typeof AccountTrackRouteImport
+    '/account/tax-invoices': {
+      id: '/account/tax-invoices'
+      path: '/tax-invoices'
+      fullPath: '/account/tax-invoices'
+      preLoaderRoute: typeof AccountTaxInvoicesRouteImport
       parentRoute: typeof AccountRoute
     }
     '/account/quotations': {
@@ -1193,6 +1219,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1WalletTopupSlipRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/profile-avatar': {
+      id: '/api/v1/profile-avatar'
+      path: '/api/v1/profile-avatar'
+      fullPath: '/api/v1/profile-avatar'
+      preLoaderRoute: typeof ApiV1ProfileAvatarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/products': {
       id: '/api/v1/products'
       path: '/api/v1/products'
@@ -1219,6 +1252,13 @@ declare module '@tanstack/react-router' {
       path: '/api/v1/catalog-asset'
       fullPath: '/api/v1/catalog-asset'
       preLoaderRoute: typeof ApiV1CatalogAssetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/admin-tax-invoice': {
+      id: '/api/v1/admin-tax-invoice'
+      path: '/api/v1/admin-tax-invoice'
+      fullPath: '/api/v1/admin-tax-invoice'
+      preLoaderRoute: typeof ApiV1AdminTaxInvoiceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/health': {
@@ -1363,7 +1403,7 @@ interface AccountRouteChildren {
   AccountNotificationsRoute: typeof AccountNotificationsRoute
   AccountOrdersRoute: typeof AccountOrdersRouteWithChildren
   AccountQuotationsRoute: typeof AccountQuotationsRoute
-  AccountTrackRoute: typeof AccountTrackRoute
+  AccountTaxInvoicesRoute: typeof AccountTaxInvoicesRoute
   AccountWishlistRoute: typeof AccountWishlistRoute
   AccountIndexRoute: typeof AccountIndexRoute
 }
@@ -1373,7 +1413,7 @@ const AccountRouteChildren: AccountRouteChildren = {
   AccountNotificationsRoute: AccountNotificationsRoute,
   AccountOrdersRoute: AccountOrdersRouteWithChildren,
   AccountQuotationsRoute: AccountQuotationsRoute,
-  AccountTrackRoute: AccountTrackRoute,
+  AccountTaxInvoicesRoute: AccountTaxInvoicesRoute,
   AccountWishlistRoute: AccountWishlistRoute,
   AccountIndexRoute: AccountIndexRoute,
 }
@@ -1501,10 +1541,12 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
+  ApiV1AdminTaxInvoiceRoute: ApiV1AdminTaxInvoiceRoute,
   ApiV1CatalogAssetRoute: ApiV1CatalogAssetRoute,
   ApiV1CustomerDocumentRoute: ApiV1CustomerDocumentRoute,
   ApiV1PaymentSlipRoute: ApiV1PaymentSlipRoute,
   ApiV1ProductsRoute: ApiV1ProductsRoute,
+  ApiV1ProfileAvatarRoute: ApiV1ProfileAvatarRoute,
   ApiV1WalletTopupSlipRoute: ApiV1WalletTopupSlipRoute,
 }
 export const routeTree = rootRouteImport

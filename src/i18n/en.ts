@@ -4,7 +4,7 @@ import { th } from "./th";
 /** English stub — keys mirror Thai; replace with proper copy in Phase 2+ */
 export const en: Translations = {
   ...th,
-  "app.tagline": "Quality curtains and blinds — retail and wholesale",
+  "app.tagline": "WP all in one – Home Decoration",
   "nav.home": "Home",
   "nav.shop": "Shop",
   "nav.catalogs": "Catalogs",
@@ -34,7 +34,6 @@ export const en: Translations = {
   "account.profile": "Profile",
   "account.dashboard": "Dashboard",
   "account.orders": "Orders",
-  "account.trackOrder": "Track order",
   "account.wallet": "Wallet",
   "account.addresses": "Shipping addresses",
   "account.taxInvoice": "Tax invoice",
@@ -60,4 +59,65 @@ export const en: Translations = {
     "For login, cart, and language settings. You may accept optional marketing cookies.",
   "cookie.banner.essentialOnly": "Essential only",
   "cookie.banner.acceptAll": "Accept all",
+  "home.hero.title":
+    "Complete curtain solutions for homes, projects, and commercial spaces",
+  "home.hero.subtitle":
+    "WP ALL is a global manufacturer and distributor of curtains, blinds, and motorized systems for indoor and outdoor spaces.",
+  "home.hero.body":
+    "Driven by professional standards and specialized expertise, we deliver efficient, tailor-made solutions for both private clients and commercial projects.",
+  "home.hero.ctaShop": "Shop featured products",
+  "home.hero.ctaContact": "Contact us",
+  "home.capabilities.title": "Why WP ALL",
+  "home.capabilities.global.title": "Global manufacturing",
+  "home.capabilities.global.desc":
+    "Manufacturer and distributor of curtains, blinds, and motorized systems worldwide",
+  "home.capabilities.tailor.title": "Tailor-made solutions",
+  "home.capabilities.tailor.desc":
+    "Custom designs built around your space and requirements",
+  "home.capabilities.motorized.title": "Motorized systems",
+  "home.capabilities.motorized.desc":
+    "Automated control for indoor and outdoor curtain systems",
+  "home.capabilities.projects.title": "Project support",
+  "home.capabilities.projects.desc":
+    "End-to-end service for homes, hotels, offices, and commercial projects",
+  "home.featured.title": "Featured products from WP ALL",
+  "home.featured.seeAll": "See all products",
+  "home.categories.title": "Shop by category",
+  "home.solutions.title": "Solutions for every space",
+  "home.solutions.indoor.title": "Indoor curtains",
+  "home.solutions.indoor.desc":
+    "Curtains and blinds for bedrooms, living rooms, and interiors",
+  "home.solutions.outdoor.title": "Outdoor blinds",
+  "home.solutions.outdoor.desc": "Sun shading and outdoor curtain systems",
+  "home.solutions.motorized.title": "Motorized curtains",
+  "home.solutions.motorized.desc": "Automated open/close with smart control",
+  "home.solutions.commercial.title": "Commercial projects",
+  "home.solutions.commercial.desc":
+    "Hotels, offices, and large-scale commercial work",
+  "home.process.title": "Our service process",
+  "home.process.consult": "Consult",
+  "home.process.measure": "Measure",
+  "home.process.produce": "Produce",
+  "home.process.install": "Install",
+  "home.process.support": "After-sales support",
+  "home.cta.title": "Start your curtain project with WP ALL",
+  "home.cta.body":
+    "Our expert team helps you choose products, plan systems, and quote for your space",
+  "home.cta.primary": "Request a quote",
+  "home.cta.secondary": "Custom curtains",
+  "home.catalogs.title": "Product catalogs",
+  "home.catalogs.body":
+    "Browse flipbook catalogs online — roller blinds, curtains, and more",
+  "home.catalogs.cta": "View all catalogs",
+  "catalogs.title": "Catalogs",
+  "catalogs.subtitle": "Browse product catalogs as an interactive flipbook",
+  "catalogs.all": "All",
+  "catalogs.categories.title": "Browse by category",
+  "catalogs.viewer.loading": "Loading catalog…",
+  "catalogs.viewer.pageOf": "Page {current} / {total}",
+  "catalogs.viewer.prev": "Previous",
+  "catalogs.viewer.next": "Next",
+  "catalogs.viewer.fullscreen": "Fullscreen",
+  "catalogs.viewer.exitFullscreen": "Exit fullscreen",
+  "catalogs.viewer.download": "Download PDF",
 };

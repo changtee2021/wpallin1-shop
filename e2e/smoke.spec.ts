@@ -32,7 +32,9 @@ const AUTH_ROUTES = [
 ] as const;
 
 test.describe("wpallin1-shop smoke", () => {
-  test("guest storefront pages load without runtime errors", async ({ page }) => {
+  test("guest storefront pages load without runtime errors", async ({
+    page,
+  }) => {
     const issues: PageIssue[] = [];
 
     for (const route of GUEST_ROUTES) {
@@ -58,7 +60,9 @@ test.describe("wpallin1-shop smoke", () => {
     await visitAndCheck(page, "/shop", issues);
     await visitAndCheck(page, "/products/mock-zebra-blackout", issues);
 
-    const addButton = page.getByRole("button", { name: /ตะกร้า|cart/i }).first();
+    const addButton = page
+      .getByRole("button", { name: /ตะกร้า|cart/i })
+      .first();
     if (await addButton.isVisible()) {
       await addButton.click();
       await page.waitForTimeout(1500);

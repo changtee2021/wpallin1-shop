@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BookOpen, Pencil, Plus, Trash2, Upload } from "lucide-react";
+import { BookOpen, ExternalLink, Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/page-header";
+import { CatalogAssetUpload } from "@/components/admin/catalog-asset-upload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -86,10 +87,9 @@ function AdminCatalogsPage() {
     Array<{ id: string; name: string; sku: string | null }>
   >([]);
   const [categoryName, setCategoryName] = useState("");
+  const [listCategory, setListCategory] = useState<string | "all">("all");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<CatalogFormState>(emptyForm());
-  const [uploadingCover, setUploadingCover] = useState(false);
-  const [uploadingPdf, setUploadingPdf] = useState(false);
 
   async function reload() {
     const [cats, items, productRows] = await Promise.all([
@@ -114,10 +114,14 @@ function AdminCatalogsPage() {
 
   const sortedCatalogs = useMemo(
     () =>
-      [...catalogs].sort(
-        (a, b) => a.sortOrder - b.sortOrder || a.title.localeCompare(b.title),
-      ),
-    [catalogs],
+      [...catalogs]
+        .filter((item) =>
+          listCategory === "all" ? true : item.categoryId === listCategory,
+        )
+        .sort(
+          (a, b) => a.sortOrder - b.sortOrder || a.title.localeCompare(b.title),
+        ),
+    [catalogs, listCategory],
   );
 
   async function handleSaveCategory(e: React.FormEvent) {
@@ -157,56 +161,6 @@ function AdminCatalogsPage() {
       productIds: catalog.productIds,
     });
     setOpen(true);
-  }
-
-  async function uploadAsset(
-    file: File,
-    kind: "cover" | "pdf",
-  ): Promise<string | null> {
-    if (!session?.access_token) {
-      toast.error("กรุณาเข้าสู่ระบบ");
-      return null;
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("kind", kind);
-
-    const res = await fetch("/api/v1/catalog-asset", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${session.access_token}` },
-      body: formData,
-    });
-
-    const json = (await res.json()) as { fileUrl?: string; error?: string };
-    if (!res.ok) {
-      throw new Error(json.error ?? "อัปโหลดไม่สำเร็จ");
-    }
-
-    return json.fileUrl ?? null;
-  }
-
-  async function handleUpload(kind: "cover" | "pdf", file: File | undefined) {
-    if (!file) return;
-    try {
-      if (kind === "cover") setUploadingCover(true);
-      else setUploadingPdf(true);
-
-      const url = await uploadAsset(file, kind);
-      if (!url) return;
-
-      setForm((current) => ({
-        ...current,
-        coverImageUrl: kind === "cover" ? url : current.coverImageUrl,
-        pdfUrl: kind === "pdf" ? url : current.pdfUrl,
-      }));
-      toast.success("อัปโหลดไฟล์แล้ว");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "อัปโหลดไม่สำเร็จ");
-    } finally {
-      setUploadingCover(false);
-      setUploadingPdf(false);
-    }
   }
 
   async function handleSaveCatalog(e: React.FormEvent) {
@@ -325,6 +279,35 @@ function AdminCatalogsPage() {
         </CardContent>
       </Card>
 
+      <div className="mb-4 flex flex-wrap gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant={listCategory === "all" ? "default" : "outline"}
+          className="rounded-full"
+          onClick={() => setListCategory("all")}
+        >
+          ทั้งหมด ({catalogs.length})
+        </Button>
+        {categories.map((category) => {
+          const count = catalogs.filter(
+            (item) => item.categoryId === category.id,
+          ).length;
+          return (
+            <Button
+              key={category.id}
+              type="button"
+              size="sm"
+              variant={listCategory === category.id ? "default" : "outline"}
+              className="rounded-full"
+              onClick={() => setListCategory(category.id)}
+            >
+              {category.name} ({count})
+            </Button>
+          );
+        })}
+      </div>
+
       <div className="space-y-3">
         {sortedCatalogs.map((catalog) => (
           <Card key={catalog.id}>
@@ -357,6 +340,18 @@ function AdminCatalogsPage() {
                 </div>
               </div>
               <div className="flex gap-2">
+                {catalog.isPublic && catalog.isActive ? (
+                  <Button variant="outline" size="sm" asChild>
+                    <a
+                      href={`/catalogs/${catalog.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="size-4" />
+                      ดูออนไลน์
+                    </a>
+                  </Button>
+                ) : null}
                 <Button
                   variant="outline"
                   size="sm"
@@ -477,66 +472,17 @@ function AdminCatalogsPage() {
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>รูปปก</Label>
-                <Input
-                  value={form.coverImageUrl}
-                  onChange={(e) =>
-                    setForm((current) => ({
-                      ...current,
-                      coverImageUrl: e.target.value,
-                    }))
-                  }
-                  placeholder="URL หรืออัปโหลด"
-                />
-                <label className="inline-flex">
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    className="hidden"
-                    onChange={(e) =>
-                      void handleUpload("cover", e.target.files?.[0])
-                    }
-                  />
-                  <Button type="button" variant="outline" size="sm" asChild>
-                    <span>
-                      <Upload className="size-4" />
-                      {uploadingCover ? "กำลังอัปโหลด..." : "อัปโหลดรูป"}
-                    </span>
-                  </Button>
-                </label>
-              </div>
-              <div className="space-y-2">
-                <Label>ไฟล์ PDF</Label>
-                <Input
-                  value={form.pdfUrl}
-                  onChange={(e) =>
-                    setForm((current) => ({
-                      ...current,
-                      pdfUrl: e.target.value,
-                    }))
-                  }
-                  placeholder="URL หรืออัปโหลด"
-                />
-                <label className="inline-flex">
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    className="hidden"
-                    onChange={(e) =>
-                      void handleUpload("pdf", e.target.files?.[0])
-                    }
-                  />
-                  <Button type="button" variant="outline" size="sm" asChild>
-                    <span>
-                      <Upload className="size-4" />
-                      {uploadingPdf ? "กำลังอัปโหลด..." : "อัปโหลด PDF"}
-                    </span>
-                  </Button>
-                </label>
-              </div>
-            </div>
+            <CatalogAssetUpload
+              accessToken={session?.access_token}
+              coverImageUrl={form.coverImageUrl}
+              pdfUrl={form.pdfUrl}
+              onCoverChange={(url) =>
+                setForm((current) => ({ ...current, coverImageUrl: url }))
+              }
+              onPdfChange={(url) =>
+                setForm((current) => ({ ...current, pdfUrl: url }))
+              }
+            />
 
             <div className="space-y-2">
               <Label>ลิงก์ภายนอก (ถ้ามี)</Label>

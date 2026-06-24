@@ -26,6 +26,45 @@ export type CustomerDocumentDto = {
 const INDIVIDUAL_REQUIRED: KycDocType[] = ["id_card"];
 const JURISTIC_REQUIRED: KycDocType[] = ["company_certificate", "vat_pp20"];
 
+const INDIVIDUAL_KYC_DOCS: KycDocType[] = [
+  "id_card",
+  "house_registration",
+  "tax_id_card",
+];
+
+const JURISTIC_KYC_DOCS: KycDocType[] = [
+  "company_certificate",
+  "vat_pp20",
+  "tax_id_card",
+];
+
+export type KycDocRequirement = {
+  docType: KycDocType;
+  required: boolean;
+};
+
+export function kycDocsForCustomerType(
+  customerType: "individual" | "juristic",
+): KycDocRequirement[] {
+  const required = new Set(requiredDocsForCustomerType(customerType));
+  const types =
+    customerType === "juristic" ? JURISTIC_KYC_DOCS : INDIVIDUAL_KYC_DOCS;
+  return types.map((docType) => ({
+    docType,
+    required: required.has(docType),
+  }));
+}
+
+export function kycCatalogForDisplay(): {
+  individual: KycDocRequirement[];
+  juristic: KycDocRequirement[];
+} {
+  return {
+    individual: kycDocsForCustomerType("individual"),
+    juristic: kycDocsForCustomerType("juristic"),
+  };
+}
+
 export function requiredDocsForCustomerType(
   customerType: "individual" | "juristic",
 ): KycDocType[] {

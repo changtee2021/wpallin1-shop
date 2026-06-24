@@ -5,7 +5,6 @@ import {
   LayoutDashboard,
   MoreHorizontal,
   Package,
-  Search,
   ShoppingBag,
   ShoppingCart,
   Store,
@@ -59,13 +58,7 @@ export function useAppNavItems(cartCount = 0): AppNavItem[] {
         to: "/account",
         label: "ตั้งค่า",
         icon: User,
-        search: { tab: "settings" },
-      },
-      {
-        id: "track",
-        to: "/account/track",
-        label: "ติดตาม",
-        icon: Search,
+        search: { tab: "settings", section: "personal" },
       },
       {
         id: "more",
