@@ -62,16 +62,18 @@ Reload Cursor, then use Agent mode with `@chrome-devtools`.
 
 Settings → enable **Browser** / `cursor-ide-browser` if available in your Cursor version.
 
-## CI (optional)
+## CI (GitHub Actions)
 
-```yaml
-- run: npx playwright install chromium --with-deps
-- run: npm run test:smoke
-  env:
-    SMOKE_BASE_URL: https://wpallin1-shop.vercel.app
-    SMOKE_TEST_EMAIL: ${{ secrets.SMOKE_TEST_EMAIL }}
-    SMOKE_TEST_PASSWORD: ${{ secrets.SMOKE_TEST_PASSWORD }}
-```
+Workflow: `.github/workflows/e2e-smoke.yml` (runs on push/PR to `main`).
+
+Add repository secrets:
+
+| Secret | Purpose |
+|--------|---------|
+| `SMOKE_TEST_EMAIL` | Admin/super_admin login for authenticated smoke |
+| `SMOKE_TEST_PASSWORD` | Password (never commit to repo) |
+
+Guest tests run without secrets; admin/checkout routes skip if secrets are missing.
 
 ## Admin users in ERP
 

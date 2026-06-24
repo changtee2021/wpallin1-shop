@@ -28,26 +28,6 @@ export const Route = createFileRoute("/sitemap.xml")({
     handlers: {
       GET: async () => {
         const base = getPublicUrl().replace(/\/$/, "");
-        const supabase = await getAdminClient();
-        const productEntries: SitemapEntry[] = [];
-        let page = 1;
-        let totalPages = 1;
-
-        while (page <= totalPages) {
-          const batch = await listPublicProducts(supabase, {
-            page,
-            pageSize: 100,
-          });
-          productEntries.push(
-            ...batch.data.map((product) => ({
-              path: `/products/${product.slug}`,
-              lastmod: formatLastmod(product.createdAt),
-            })),
-          );
-          totalPages = batch.meta.totalPages;
-          page += 1;
-        }
-
         const staticEntries: SitemapEntry[] = [
           { path: "" },
           { path: "/shop" },
@@ -58,6 +38,30 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/privacy" },
           { path: "/cookies" },
         ];
+
+        let productEntries: SitemapEntry[] = [];
+        try {
+          const supabase = await getAdminClient();
+          let page = 1;
+          let totalPages = 1;
+
+          while (page <= totalPages) {
+            const batch = await listPublicProducts(supabase, {
+              page,
+              pageSize: 100,
+            });
+            productEntries.push(
+              ...batch.data.map((product) => ({
+                path: `/products/${product.slug}`,
+                lastmod: formatLastmod(product.createdAt),
+              })),
+            );
+            totalPages = Math.max(1, batch.meta.totalPages || 1);
+            page += 1;
+          }
+        } catch (err) {
+          console.error("[sitemap] product fetch failed:", err);
+        }
 
         const urls = [...staticEntries, ...productEntries];
 

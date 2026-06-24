@@ -15,6 +15,8 @@ const GUEST_ROUTES = [
   "/products/mock-roller-blackout-white",
   "/cart",
   "/compare",
+  "/configurator",
+  "/quick-order",
   "/contact",
   "/about",
 ] as const;
@@ -23,6 +25,7 @@ const AUTH_ROUTES = [
   "/account?tab=dashboard",
   "/account/orders",
   "/account/wishlist",
+  "/checkout",
   "/admin",
   "/admin/products",
   "/admin/orders",
