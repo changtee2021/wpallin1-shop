@@ -79,6 +79,7 @@ export const Route = createFileRoute("/api/v1/catalog-asset")({
         const form = await request.formData();
         const file = form.get("file");
         const kind = form.get("kind");
+        const catalogId = form.get("catalogId");
 
         if (!(file instanceof File) || (kind !== "cover" && kind !== "pdf")) {
           return Response.json({ error: "Invalid form data" }, { status: 400 });
@@ -92,14 +93,31 @@ export const Route = createFileRoute("/api/v1/catalog-asset")({
           );
         }
 
-        const ext = file.name.split(".").pop() ?? "bin";
-        const path = `${kind}/${crypto.randomUUID()}.${ext}`;
+        let path: string;
+        if (
+          kind === "pdf" &&
+          typeof catalogId === "string" &&
+          catalogId.length > 0
+        ) {
+          const uuidRe =
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+          if (!uuidRe.test(catalogId)) {
+            return Response.json(
+              { error: "Invalid catalogId" },
+              { status: 400 },
+            );
+          }
+          path = `pdf/${catalogId}.pdf`;
+        } else {
+          const ext = file.name.split(".").pop() ?? "bin";
+          path = `${kind}/${crypto.randomUUID()}.${ext}`;
+        }
 
         try {
           const { error: uploadErr } = await supabase.storage
             .from("wpall-retail-catalogs")
             .upload(path, file, {
-              upsert: false,
+              upsert: kind === "pdf" && Boolean(catalogId),
               contentType: file.type || undefined,
             });
 
@@ -115,6 +133,7 @@ export const Route = createFileRoute("/api/v1/catalog-asset")({
             fileName: file.name,
             mimeType: file.type,
             fileSize: file.size,
+            storagePath: path,
           });
         } catch (err) {
           logUploadFailure("catalog-asset", err);

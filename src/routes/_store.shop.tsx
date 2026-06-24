@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
+import { CategoryRail } from "@/components/storefront/category-rail";
 import { ProductFeed } from "@/components/storefront/product-feed";
-import { SearchBar } from "@/components/storefront/search-bar";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -13,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { useMemberProductPrices } from "@/hooks/use-member-product-prices";
 import { fetchCategories, fetchPublicProducts } from "@/lib/api.functions";
-import { useT } from "@/i18n";
 
 const shopSearchSchema = z.object({
   search: z.string().optional(),
@@ -47,7 +45,6 @@ export const Route = createFileRoute("/_store/shop")({
 });
 
 function ShopPage() {
-  const { t } = useT();
   const search = Route.useSearch();
   const { products, categories } = Route.useLoaderData();
   const navigate = Route.useNavigate();
@@ -55,51 +52,17 @@ function ShopPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-      <div className="mb-6 lg:hidden">
-        <SearchBar defaultValue={search.search ?? ""} />
-      </div>
+      {categories.length > 0 ? (
+        <div className="mb-6">
+          <CategoryRail
+            categories={categories}
+            activeSlug={search.category}
+            showAll
+          />
+        </div>
+      ) : null}
 
-      <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
-        <aside className="hidden space-y-4 rounded-xl border bg-white p-4 lg:block">
-          <p className="text-sm font-semibold text-primary">
-            {t("shop.filters")}
-          </p>
-          <div className="space-y-2">
-            <button
-              type="button"
-              className="block w-full text-left text-sm hover:text-primary"
-              onClick={() =>
-                navigate({
-                  search: { ...search, category: undefined, page: 1 },
-                })
-              }
-            >
-              ทั้งหมด
-            </button>
-            {categories.map((cat) => (
-              <label
-                key={cat.id}
-                className="flex cursor-pointer items-center gap-2 text-sm"
-              >
-                <Checkbox
-                  checked={search.category === cat.slug}
-                  onCheckedChange={(checked) =>
-                    navigate({
-                      search: {
-                        ...search,
-                        category: checked ? cat.slug : undefined,
-                        page: 1,
-                      },
-                    })
-                  }
-                />
-                <span>{cat.name}</span>
-              </label>
-            ))}
-          </div>
-        </aside>
-
-        <div>
+      <div>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
             <span>
               แสดง {products.data.length} จาก {products.meta.total} รายการ
@@ -165,7 +128,6 @@ function ShopPage() {
             </div>
           )}
         </div>
-      </div>
     </div>
   );
 }

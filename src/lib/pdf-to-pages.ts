@@ -4,23 +4,38 @@ let workerConfigured = false;
 
 function ensureWorker() {
   if (workerConfigured || typeof window === "undefined") return;
-  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    "pdfjs-dist/build/pdf.worker.min.mjs",
-    import.meta.url,
-  ).toString();
+  pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
   workerConfigured = true;
 }
+
+export type PdfSearchHit = {
+  pageNumber: number;
+  snippet: string;
+};
 
 export type PdfDocumentHandle = {
   numPages: number;
   renderPage: (pageNumber: number, scale?: number) => Promise<string>;
+  extractPageText: (pageNumber: number) => Promise<string>;
+  searchText: (
+    query: string,
+    onProgress?: (page: number, total: number) => void,
+  ) => Promise<PdfSearchHit[]>;
   destroy: () => void;
 };
 
 const pageCache = new Map<string, Map<number, string>>();
+const textCache = new Map<string, Map<number, string>>();
 
 function cacheKey(pdfUrl: string) {
   return pdfUrl;
+}
+
+function snippetAround(text: string, index: number, radius = 48): string {
+  const start = Math.max(0, index - radius);
+  const end = Math.min(text.length, index + radius);
+  const chunk = text.slice(start, end).replace(/\s+/g, " ").trim();
+  return start > 0 ? `…${chunk}` : chunk;
 }
 
 export async function openPdfDocument(
@@ -38,6 +53,12 @@ export async function openPdfDocument(
     const key = cacheKey(pdfUrl);
     if (!pageCache.has(key)) pageCache.set(key, new Map());
     return pageCache.get(key)!;
+  };
+
+  const getTextCache = () => {
+    const key = cacheKey(pdfUrl);
+    if (!textCache.has(key)) textCache.set(key, new Map());
+    return textCache.get(key)!;
   };
 
   return {
@@ -62,9 +83,45 @@ export async function openPdfDocument(
       page.cleanup();
       return dataUrl;
     },
+    async extractPageText(pageNumber: number) {
+      const cache = getTextCache();
+      const cached = cache.get(pageNumber);
+      if (cached !== undefined) return cached;
+
+      const page = await pdf.getPage(pageNumber);
+      const content = await page.getTextContent();
+      page.cleanup();
+      const text = content.items
+        .map((item) => ("str" in item ? item.str : ""))
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim();
+      cache.set(pageNumber, text);
+      return text;
+    },
+    async searchText(query, onProgress) {
+      const q = query.trim().toLowerCase();
+      if (!q) return [];
+
+      const hits: PdfSearchHit[] = [];
+      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+        onProgress?.(pageNumber, pdf.numPages);
+        const text = await this.extractPageText(pageNumber);
+        const lower = text.toLowerCase();
+        const index = lower.indexOf(q);
+        if (index >= 0) {
+          hits.push({
+            pageNumber,
+            snippet: snippetAround(text, index),
+          });
+        }
+      }
+      return hits;
+    },
     destroy() {
       pageCache.delete(cacheKey(pdfUrl));
-      void pdf.destroy();
+      textCache.delete(cacheKey(pdfUrl));
+      void loadingTask.destroy().catch(() => undefined);
     },
   };
 }

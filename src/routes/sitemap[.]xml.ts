@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getPublicUrl } from "@/lib/public-url";
 import { getAdminClient } from "@/lib/server-fns/_shared";
 import { listPublicProducts } from "@/services/catalog.service";
+import { listPublicMarketingCatalogs } from "@/services/marketing-catalog.service";
 
 type SitemapEntry = {
   path: string;
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const staticEntries: SitemapEntry[] = [
           { path: "" },
           { path: "/shop" },
+          { path: "/catalogs" },
           { path: "/configurator" },
           { path: "/about" },
           { path: "/contact" },
@@ -63,7 +65,23 @@ export const Route = createFileRoute("/sitemap.xml")({
           console.error("[sitemap] product fetch failed:", err);
         }
 
-        const urls = [...staticEntries, ...productEntries];
+        const catalogEntries: SitemapEntry[] = [];
+        try {
+          const supabase = await getAdminClient();
+          const catalogs = await listPublicMarketingCatalogs(supabase);
+          catalogEntries.push(
+            ...catalogs
+              .filter((catalog) => catalog.visibility === "public")
+              .map((catalog) => ({
+                path: `/catalogs/${catalog.slug}`,
+                lastmod: formatLastmod(catalog.updatedAt),
+              })),
+          );
+        } catch (err) {
+          console.error("[sitemap] catalog fetch failed:", err);
+        }
+
+        const urls = [...staticEntries, ...productEntries, ...catalogEntries];
 
         const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

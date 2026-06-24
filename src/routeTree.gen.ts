@@ -41,6 +41,7 @@ import { Route as AdminCreditRouteImport } from './routes/admin.credit'
 import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminCatalogsRouteImport } from './routes/admin.catalogs'
+import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AccountWishlistRouteImport } from './routes/account.wishlist'
 import { Route as AccountTaxInvoicesRouteImport } from './routes/account.tax-invoices'
 import { Route as AccountQuotationsRouteImport } from './routes/account.quotations'
@@ -60,10 +61,12 @@ import { Route as StoreCheckoutRouteImport } from './routes/_store.checkout'
 import { Route as StoreCatalogsRouteImport } from './routes/_store.catalogs'
 import { Route as StoreCartRouteImport } from './routes/_store.cart'
 import { Route as StoreAboutRouteImport } from './routes/_store.about'
+import { Route as StoreCatalogsIndexRouteImport } from './routes/_store.catalogs.index'
 import { Route as ApiV1WalletTopupSlipRouteImport } from './routes/api/v1/wallet-topup-slip'
 import { Route as ApiV1ProfileAvatarRouteImport } from './routes/api/v1/profile-avatar'
 import { Route as ApiV1ProductsRouteImport } from './routes/api/v1/products'
 import { Route as ApiV1PaymentSlipRouteImport } from './routes/api/v1/payment-slip'
+import { Route as ApiV1HeroBannerRouteImport } from './routes/api/v1/hero-banner'
 import { Route as ApiV1CustomerDocumentRouteImport } from './routes/api/v1/customer-document'
 import { Route as ApiV1CatalogAssetRouteImport } from './routes/api/v1/catalog-asset'
 import { Route as ApiV1AdminTaxInvoiceRouteImport } from './routes/api/v1/admin-tax-invoice'
@@ -237,6 +240,11 @@ const AdminCatalogsRoute = AdminCatalogsRouteImport.update({
   path: '/catalogs',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminBannersRoute = AdminBannersRouteImport.update({
+  id: '/banners',
+  path: '/banners',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AccountWishlistRoute = AccountWishlistRouteImport.update({
   id: '/wishlist',
   path: '/wishlist',
@@ -332,6 +340,11 @@ const StoreAboutRoute = StoreAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => StoreRoute,
 } as any)
+const StoreCatalogsIndexRoute = StoreCatalogsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StoreCatalogsRoute,
+} as any)
 const ApiV1WalletTopupSlipRoute = ApiV1WalletTopupSlipRouteImport.update({
   id: '/api/v1/wallet-topup-slip',
   path: '/api/v1/wallet-topup-slip',
@@ -350,6 +363,11 @@ const ApiV1ProductsRoute = ApiV1ProductsRouteImport.update({
 const ApiV1PaymentSlipRoute = ApiV1PaymentSlipRouteImport.update({
   id: '/api/v1/payment-slip',
   path: '/api/v1/payment-slip',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1HeroBannerRoute = ApiV1HeroBannerRouteImport.update({
+  id: '/api/v1/hero-banner',
+  path: '/api/v1/hero-banner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiV1CustomerDocumentRoute = ApiV1CustomerDocumentRouteImport.update({
@@ -447,6 +465,7 @@ export interface FileRoutesByFullPath {
   '/account/quotations': typeof AccountQuotationsRoute
   '/account/tax-invoices': typeof AccountTaxInvoicesRoute
   '/account/wishlist': typeof AccountWishlistRoute
+  '/admin/banners': typeof AdminBannersRoute
   '/admin/catalogs': typeof AdminCatalogsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/coupons': typeof AdminCouponsRoute
@@ -483,10 +502,12 @@ export interface FileRoutesByFullPath {
   '/api/v1/admin-tax-invoice': typeof ApiV1AdminTaxInvoiceRoute
   '/api/v1/catalog-asset': typeof ApiV1CatalogAssetRoute
   '/api/v1/customer-document': typeof ApiV1CustomerDocumentRoute
+  '/api/v1/hero-banner': typeof ApiV1HeroBannerRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
   '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
+  '/catalogs/': typeof StoreCatalogsIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -495,7 +516,6 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/about': typeof StoreAboutRoute
   '/cart': typeof StoreCartRoute
-  '/catalogs': typeof StoreCatalogsRouteWithChildren
   '/checkout': typeof StoreCheckoutRoute
   '/compare': typeof StoreCompareRoute
   '/configurator': typeof StoreConfiguratorRoute
@@ -512,6 +532,7 @@ export interface FileRoutesByTo {
   '/account/quotations': typeof AccountQuotationsRoute
   '/account/tax-invoices': typeof AccountTaxInvoicesRoute
   '/account/wishlist': typeof AccountWishlistRoute
+  '/admin/banners': typeof AdminBannersRoute
   '/admin/catalogs': typeof AdminCatalogsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/coupons': typeof AdminCouponsRoute
@@ -549,10 +570,12 @@ export interface FileRoutesByTo {
   '/api/v1/admin-tax-invoice': typeof ApiV1AdminTaxInvoiceRoute
   '/api/v1/catalog-asset': typeof ApiV1CatalogAssetRoute
   '/api/v1/customer-document': typeof ApiV1CustomerDocumentRoute
+  '/api/v1/hero-banner': typeof ApiV1HeroBannerRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
   '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
+  '/catalogs': typeof StoreCatalogsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -583,6 +606,7 @@ export interface FileRoutesById {
   '/account/quotations': typeof AccountQuotationsRoute
   '/account/tax-invoices': typeof AccountTaxInvoicesRoute
   '/account/wishlist': typeof AccountWishlistRoute
+  '/admin/banners': typeof AdminBannersRoute
   '/admin/catalogs': typeof AdminCatalogsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/coupons': typeof AdminCouponsRoute
@@ -620,10 +644,12 @@ export interface FileRoutesById {
   '/api/v1/admin-tax-invoice': typeof ApiV1AdminTaxInvoiceRoute
   '/api/v1/catalog-asset': typeof ApiV1CatalogAssetRoute
   '/api/v1/customer-document': typeof ApiV1CustomerDocumentRoute
+  '/api/v1/hero-banner': typeof ApiV1HeroBannerRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
   '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
+  '/_store/catalogs/': typeof StoreCatalogsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -655,6 +681,7 @@ export interface FileRouteTypes {
     | '/account/quotations'
     | '/account/tax-invoices'
     | '/account/wishlist'
+    | '/admin/banners'
     | '/admin/catalogs'
     | '/admin/categories'
     | '/admin/coupons'
@@ -691,10 +718,12 @@ export interface FileRouteTypes {
     | '/api/v1/admin-tax-invoice'
     | '/api/v1/catalog-asset'
     | '/api/v1/customer-document'
+    | '/api/v1/hero-banner'
     | '/api/v1/payment-slip'
     | '/api/v1/products'
     | '/api/v1/profile-avatar'
     | '/api/v1/wallet-topup-slip'
+    | '/catalogs/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -703,7 +732,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/about'
     | '/cart'
-    | '/catalogs'
     | '/checkout'
     | '/compare'
     | '/configurator'
@@ -720,6 +748,7 @@ export interface FileRouteTypes {
     | '/account/quotations'
     | '/account/tax-invoices'
     | '/account/wishlist'
+    | '/admin/banners'
     | '/admin/catalogs'
     | '/admin/categories'
     | '/admin/coupons'
@@ -757,10 +786,12 @@ export interface FileRouteTypes {
     | '/api/v1/admin-tax-invoice'
     | '/api/v1/catalog-asset'
     | '/api/v1/customer-document'
+    | '/api/v1/hero-banner'
     | '/api/v1/payment-slip'
     | '/api/v1/products'
     | '/api/v1/profile-avatar'
     | '/api/v1/wallet-topup-slip'
+    | '/catalogs'
   id:
     | '__root__'
     | '/_store'
@@ -790,6 +821,7 @@ export interface FileRouteTypes {
     | '/account/quotations'
     | '/account/tax-invoices'
     | '/account/wishlist'
+    | '/admin/banners'
     | '/admin/catalogs'
     | '/admin/categories'
     | '/admin/coupons'
@@ -827,10 +859,12 @@ export interface FileRouteTypes {
     | '/api/v1/admin-tax-invoice'
     | '/api/v1/catalog-asset'
     | '/api/v1/customer-document'
+    | '/api/v1/hero-banner'
     | '/api/v1/payment-slip'
     | '/api/v1/products'
     | '/api/v1/profile-avatar'
     | '/api/v1/wallet-topup-slip'
+    | '/_store/catalogs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -847,6 +881,7 @@ export interface RootRouteChildren {
   ApiV1AdminTaxInvoiceRoute: typeof ApiV1AdminTaxInvoiceRoute
   ApiV1CatalogAssetRoute: typeof ApiV1CatalogAssetRoute
   ApiV1CustomerDocumentRoute: typeof ApiV1CustomerDocumentRoute
+  ApiV1HeroBannerRoute: typeof ApiV1HeroBannerRoute
   ApiV1PaymentSlipRoute: typeof ApiV1PaymentSlipRoute
   ApiV1ProductsRoute: typeof ApiV1ProductsRoute
   ApiV1ProfileAvatarRoute: typeof ApiV1ProfileAvatarRoute
@@ -1079,6 +1114,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCatalogsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/banners': {
+      id: '/admin/banners'
+      path: '/banners'
+      fullPath: '/admin/banners'
+      preLoaderRoute: typeof AdminBannersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/account/wishlist': {
       id: '/account/wishlist'
       path: '/wishlist'
@@ -1212,6 +1254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoreAboutRouteImport
       parentRoute: typeof StoreRoute
     }
+    '/_store/catalogs/': {
+      id: '/_store/catalogs/'
+      path: '/'
+      fullPath: '/catalogs/'
+      preLoaderRoute: typeof StoreCatalogsIndexRouteImport
+      parentRoute: typeof StoreCatalogsRoute
+    }
     '/api/v1/wallet-topup-slip': {
       id: '/api/v1/wallet-topup-slip'
       path: '/api/v1/wallet-topup-slip'
@@ -1238,6 +1287,13 @@ declare module '@tanstack/react-router' {
       path: '/api/v1/payment-slip'
       fullPath: '/api/v1/payment-slip'
       preLoaderRoute: typeof ApiV1PaymentSlipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/hero-banner': {
+      id: '/api/v1/hero-banner'
+      path: '/api/v1/hero-banner'
+      fullPath: '/api/v1/hero-banner'
+      preLoaderRoute: typeof ApiV1HeroBannerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/v1/customer-document': {
@@ -1336,10 +1392,12 @@ declare module '@tanstack/react-router' {
 
 interface StoreCatalogsRouteChildren {
   StoreCatalogsIdRoute: typeof StoreCatalogsIdRoute
+  StoreCatalogsIndexRoute: typeof StoreCatalogsIndexRoute
 }
 
 const StoreCatalogsRouteChildren: StoreCatalogsRouteChildren = {
   StoreCatalogsIdRoute: StoreCatalogsIdRoute,
+  StoreCatalogsIndexRoute: StoreCatalogsIndexRoute,
 }
 
 const StoreCatalogsRouteWithChildren = StoreCatalogsRoute._addFileChildren(
@@ -1472,6 +1530,7 @@ const AdminQuotationsRouteWithChildren = AdminQuotationsRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
+  AdminBannersRoute: typeof AdminBannersRoute
   AdminCatalogsRoute: typeof AdminCatalogsRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminCouponsRoute: typeof AdminCouponsRoute
@@ -1492,6 +1551,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminBannersRoute: AdminBannersRoute,
   AdminCatalogsRoute: AdminCatalogsRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminCouponsRoute: AdminCouponsRoute,
@@ -1544,6 +1604,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1AdminTaxInvoiceRoute: ApiV1AdminTaxInvoiceRoute,
   ApiV1CatalogAssetRoute: ApiV1CatalogAssetRoute,
   ApiV1CustomerDocumentRoute: ApiV1CustomerDocumentRoute,
+  ApiV1HeroBannerRoute: ApiV1HeroBannerRoute,
   ApiV1PaymentSlipRoute: ApiV1PaymentSlipRoute,
   ApiV1ProductsRoute: ApiV1ProductsRoute,
   ApiV1ProfileAvatarRoute: ApiV1ProfileAvatarRoute,

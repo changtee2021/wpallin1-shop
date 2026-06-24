@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import { openPdfDocument } from "@/lib/pdf-to-pages";
 import {
   formatFileSize,
   pdfSizeHint,
@@ -16,16 +17,25 @@ import {
 import { prepareFileForUpload } from "@/lib/media-compress";
 import { cn } from "@/lib/utils";
 
+type PdfMeta = {
+  fileUrl: string;
+  fileSize: number;
+  storagePath?: string;
+  pageCount?: number;
+};
+
 type Props = {
   accessToken: string | undefined;
+  catalogId?: string;
   coverImageUrl: string;
   pdfUrl: string;
   onCoverChange: (url: string) => void;
-  onPdfChange: (url: string) => void;
+  onPdfChange: (url: string, meta?: PdfMeta) => void;
 };
 
 export function CatalogAssetUpload({
   accessToken,
+  catalogId,
   coverImageUrl,
   pdfUrl,
   onCoverChange,
@@ -40,6 +50,17 @@ export function CatalogAssetUpload({
   const [pdfProgress, setPdfProgress] = useState(0);
   const [pdfHint, setPdfHint] = useState<string | null>(null);
   const [pendingPdfFile, setPendingPdfFile] = useState<File | null>(null);
+
+  async function countPdfPages(fileUrl: string): Promise<number | undefined> {
+    try {
+      const doc = await openPdfDocument(fileUrl);
+      const count = doc.numPages;
+      doc.destroy();
+      return count;
+    } catch {
+      return undefined;
+    }
+  }
 
   async function uploadCover(file: File) {
     if (!accessToken) {
@@ -89,14 +110,18 @@ export function CatalogAssetUpload({
     setUploadingPdf(true);
     setPdfProgress(0);
     try {
-      const { fileUrl } = await uploadCatalogAsset(
+      const { fileUrl, fileSize, storagePath } = await uploadCatalogAsset(
         file,
         "pdf",
         accessToken,
         setPdfProgress,
+        catalogId,
       );
-      onPdfChange(fileUrl);
-      toast.success("อัปโหลด PDF แล้ว");
+      const pageCount = await countPdfPages(fileUrl);
+      onPdfChange(fileUrl, { fileUrl, fileSize, storagePath, pageCount });
+      toast.success(
+        pageCount ? `อัปโหลด PDF แล้ว (${pageCount} หน้า)` : "อัปโหลด PDF แล้ว",
+      );
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "อัปโหลดไม่สำเร็จ");
     } finally {
@@ -106,7 +131,6 @@ export function CatalogAssetUpload({
   }
 
   async function generateCoverFromPdf() {
-    const source = pendingPdfFile ?? (pdfUrl ? null : null);
     if (!pendingPdfFile) {
       toast.error("เลือกไฟล์ PDF ก่อน หรืออัปโหลด PDF แล้ว");
       return;
@@ -136,9 +160,11 @@ export function CatalogAssetUpload({
         <h3 className="font-medium">ไฟล์แคตตาล็อก</h3>
         <p className="mt-1 text-xs text-muted-foreground">
           PDF แนะนำไม่เกิน 25MB (สูงสุด 50MB) —
-          รูปปกบีบอัดอัตโนมัติในเบราว์เซอร์ PDF/วิดีโอ/เสียงใหญ่ใช้ CLI:{" "}
-          <code className="rounded bg-muted px-1">npm run media:compress</code>{" "}
-          (ดู docs/MEDIA-COMPRESS.md)
+          {catalogId
+            ? " แทนที่ PDF จะใช้ URL เดิม (pdf/{id}.pdf)"
+            : " บันทึกแคตตาล็อกครั้งแรกก่อน แล้วอัปโหลด PDF เพื่อ URL คงที่"}{" "}
+          CLI:{" "}
+          <code className="rounded bg-muted px-1">npm run media:compress</code>
         </p>
       </div>
 

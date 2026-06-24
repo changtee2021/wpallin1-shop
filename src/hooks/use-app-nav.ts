@@ -54,18 +54,18 @@ export function useAppNavItems(cartCount = 0): AppNavItem[] {
         icon: Package,
       },
       {
-        id: "settings",
-        to: "/account",
-        label: "ตั้งค่า",
-        icon: User,
-        search: { tab: "settings", section: "personal" },
-      },
-      {
         id: "more",
         to: "#",
         label: "เพิ่มเติม",
         icon: MoreHorizontal,
         isMore: true,
+      },
+      {
+        id: "settings",
+        to: "/account",
+        label: "ตั้งค่า",
+        icon: User,
+        search: { tab: "settings", section: "personal" },
       },
     ];
   }

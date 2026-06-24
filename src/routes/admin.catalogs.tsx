@@ -29,6 +29,7 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   deleteAdminMarketingCatalog,
   deleteAdminMarketingCatalogCategory,
+  fetchAdminCatalogViewStats,
   fetchAdminMarketingCatalogCategories,
   fetchAdminMarketingCatalogs,
   fetchAdminProducts,
@@ -37,9 +38,13 @@ import {
 } from "@/lib/api.functions";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import type {
+  CatalogStatus,
+  CatalogViewStatsDto,
+  CatalogVisibility,
   MarketingCatalogCategoryDto,
   MarketingCatalogDto,
 } from "@/types/api/marketing-catalogs";
+import { slugifyCatalogTitle } from "@/lib/catalog-slug";
 
 export const Route = createFileRoute("/admin/catalogs")({
   component: AdminCatalogsPage,
@@ -47,32 +52,46 @@ export const Route = createFileRoute("/admin/catalogs")({
 
 type CatalogFormState = {
   id?: string;
+  slug: string;
   categoryId: string;
   title: string;
   brand: string;
   description: string;
   coverImageUrl: string;
   pdfUrl: string;
+  pdfStoragePath: string;
   externalLink: string;
   tags: string;
+  version: string;
+  pageCount: number | null;
+  fileSize: number | null;
+  visibility: CatalogVisibility;
+  allowDownload: boolean;
+  isFeatured: boolean;
+  status: CatalogStatus;
   sortOrder: number;
-  isPublic: boolean;
-  isActive: boolean;
   productIds: string[];
 };
 
 const emptyForm = (): CatalogFormState => ({
+  slug: "",
   categoryId: "",
   title: "",
   brand: "",
   description: "",
   coverImageUrl: "",
   pdfUrl: "",
+  pdfStoragePath: "",
   externalLink: "",
   tags: "",
+  version: "",
+  pageCount: null,
+  fileSize: null,
+  visibility: "public",
+  allowDownload: false,
+  isFeatured: false,
+  status: "published",
   sortOrder: 0,
-  isPublic: true,
-  isActive: true,
   productIds: [],
 });
 
@@ -90,6 +109,9 @@ function AdminCatalogsPage() {
   const [listCategory, setListCategory] = useState<string | "all">("all");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<CatalogFormState>(emptyForm());
+  const [viewStats, setViewStats] = useState<
+    Record<string, CatalogViewStatsDto>
+  >({});
 
   async function reload() {
     const [cats, items, productRows] = await Promise.all([
@@ -106,6 +128,20 @@ function AdminCatalogsPage() {
         sku: row.sku,
       })),
     );
+
+    if (items.length) {
+      try {
+        const stats = await fetchAdminCatalogViewStats({
+          data: { catalogIds: items.map((item) => item.id) },
+          ...authOpts,
+        });
+        setViewStats(Object.fromEntries(stats.map((row) => [row.catalogId, row])));
+      } catch {
+        setViewStats({});
+      }
+    } else {
+      setViewStats({});
+    }
   }
 
   useEffect(() => {
@@ -147,17 +183,24 @@ function AdminCatalogsPage() {
   function openEdit(catalog: MarketingCatalogDto) {
     setForm({
       id: catalog.id,
+      slug: catalog.slug,
       categoryId: catalog.categoryId ?? "",
       title: catalog.title,
       brand: catalog.brand ?? "",
       description: catalog.description ?? "",
       coverImageUrl: catalog.coverImageUrl ?? "",
       pdfUrl: catalog.pdfUrl ?? "",
+      pdfStoragePath: catalog.pdfStoragePath ?? "",
       externalLink: catalog.externalLink ?? "",
       tags: catalog.tags.join(", "),
+      version: catalog.version ?? "",
+      pageCount: catalog.pageCount,
+      fileSize: catalog.fileSize,
+      visibility: catalog.visibility,
+      allowDownload: catalog.allowDownload,
+      isFeatured: catalog.isFeatured,
+      status: catalog.status,
       sortOrder: catalog.sortOrder,
-      isPublic: catalog.isPublic,
-      isActive: catalog.isActive,
       productIds: catalog.productIds,
     });
     setOpen(true);
@@ -166,27 +209,37 @@ function AdminCatalogsPage() {
   async function handleSaveCatalog(e: React.FormEvent) {
     e.preventDefault();
     try {
-      await saveAdminMarketingCatalog({
+      const result = await saveAdminMarketingCatalog({
         data: {
           id: form.id,
+          slug: form.slug || slugifyCatalogTitle(form.title, form.id),
           categoryId: form.categoryId || null,
           title: form.title,
           brand: form.brand || null,
           description: form.description || null,
           coverImageUrl: form.coverImageUrl || null,
           pdfUrl: form.pdfUrl || null,
+          pdfStoragePath: form.pdfStoragePath || null,
           externalLink: form.externalLink || null,
           tags: form.tags
             .split(",")
             .map((tag) => tag.trim())
             .filter(Boolean),
+          version: form.version || null,
+          pageCount: form.pageCount,
+          fileSize: form.fileSize,
+          visibility: form.visibility,
+          allowDownload: form.allowDownload,
+          isFeatured: form.isFeatured,
+          status: form.status,
           sortOrder: form.sortOrder,
-          isPublic: form.isPublic,
-          isActive: form.isActive,
           productIds: form.productIds,
         },
         ...authOpts,
       });
+      if (!form.id && result.id) {
+        setForm((current) => ({ ...current, id: result.id }));
+      }
       toast.success("บันทึกแคตตาล็อกแล้ว");
       setOpen(false);
       await reload();
@@ -333,17 +386,26 @@ function AdminCatalogsPage() {
                     {catalog.brand ? ` · ${catalog.brand}` : ""}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {catalog.isPublic ? "สาธารณะ" : "ซ่อน"} ·{" "}
-                    {catalog.isActive ? "เปิดใช้งาน" : "ปิด"} · ผูกสินค้า{" "}
-                    {catalog.productIds.length} รายการ
+                    {catalog.visibility} · {catalog.status} ·{" "}
+                    {catalog.pageCount ? `${catalog.pageCount} หน้า · ` : ""}
+                    ผูกสินค้า {catalog.productIds.length} รายการ
+                    {viewStats[catalog.id] ? (
+                      <>
+                        {" "}
+                        · เปิดดู {viewStats[catalog.id].views7d}/
+                        {viewStats[catalog.id].views30d}/
+                        {viewStats[catalog.id].viewsAll} (7d/30d/ทั้งหมด)
+                      </>
+                    ) : null}
                   </p>
                 </div>
               </div>
               <div className="flex gap-2">
-                {catalog.isPublic && catalog.isActive ? (
+                {catalog.status === "published" &&
+                catalog.visibility === "public" ? (
                   <Button variant="outline" size="sm" asChild>
                     <a
-                      href={`/catalogs/${catalog.id}`}
+                      href={`/catalogs/${catalog.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -396,6 +458,68 @@ function AdminCatalogsPage() {
                   }
                   required
                 />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label>Slug (URL)</Label>
+                <Input
+                  value={form.slug}
+                  onChange={(e) =>
+                    setForm((current) => ({ ...current, slug: e.target.value }))
+                  }
+                  placeholder={slugifyCatalogTitle(
+                    form.title || "catalog",
+                    form.id,
+                  )}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>เวอร์ชัน</Label>
+                <Input
+                  value={form.version}
+                  onChange={(e) =>
+                    setForm((current) => ({
+                      ...current,
+                      version: e.target.value,
+                    }))
+                  }
+                  placeholder="2026 / R.01"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>การมองเห็น</Label>
+                <Select
+                  value={form.visibility}
+                  onValueChange={(value: CatalogVisibility) =>
+                    setForm((current) => ({ ...current, visibility: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">สาธารณะ</SelectItem>
+                    <SelectItem value="dealer">Dealer only</SelectItem>
+                    <SelectItem value="private">Private</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>สถานะ</Label>
+                <Select
+                  value={form.status}
+                  onValueChange={(value: CatalogStatus) =>
+                    setForm((current) => ({ ...current, status: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="published">Published</SelectItem>
+                    <SelectItem value="archived">Archived</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label>หมวด</Label>
@@ -474,13 +598,20 @@ function AdminCatalogsPage() {
 
             <CatalogAssetUpload
               accessToken={session?.access_token}
+              catalogId={form.id}
               coverImageUrl={form.coverImageUrl}
               pdfUrl={form.pdfUrl}
               onCoverChange={(url) =>
                 setForm((current) => ({ ...current, coverImageUrl: url }))
               }
-              onPdfChange={(url) =>
-                setForm((current) => ({ ...current, pdfUrl: url }))
+              onPdfChange={(url, meta) =>
+                setForm((current) => ({
+                  ...current,
+                  pdfUrl: url,
+                  pdfStoragePath: meta?.storagePath ?? current.pdfStoragePath,
+                  pageCount: meta?.pageCount ?? current.pageCount,
+                  fileSize: meta?.fileSize ?? current.fileSize,
+                }))
               }
             />
 
@@ -500,27 +631,27 @@ function AdminCatalogsPage() {
             <div className="flex flex-wrap gap-4">
               <label className="flex items-center gap-2 text-sm">
                 <Checkbox
-                  checked={form.isPublic}
+                  checked={form.allowDownload}
                   onCheckedChange={(checked) =>
                     setForm((current) => ({
                       ...current,
-                      isPublic: checked === true,
+                      allowDownload: checked === true,
                     }))
                   }
                 />
-                แสดงสาธารณะ
+                อนุญาตดาวน์โหลด PDF
               </label>
               <label className="flex items-center gap-2 text-sm">
                 <Checkbox
-                  checked={form.isActive}
+                  checked={form.isFeatured}
                   onCheckedChange={(checked) =>
                     setForm((current) => ({
                       ...current,
-                      isActive: checked === true,
+                      isFeatured: checked === true,
                     }))
                   }
                 />
-                เปิดใช้งาน
+                แคตตาล็อกแนะนำ
               </label>
             </div>
 

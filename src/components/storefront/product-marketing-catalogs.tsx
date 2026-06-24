@@ -39,7 +39,7 @@ export function ProductMarketingCatalogs({ catalogs }: Props) {
                   className="bg-accent hover:bg-accent/90"
                   asChild
                 >
-                  <Link to="/catalogs/$id" params={{ id: catalog.id }}>
+                  <Link to="/catalogs/$id" params={{ id: catalog.slug }}>
                     <FileText className="size-4" />
                     ดูแคตตาล็อก
                   </Link>

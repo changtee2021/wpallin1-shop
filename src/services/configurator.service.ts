@@ -7,8 +7,26 @@ import {
   validateDimensions,
 } from "@/domain/configurator";
 import { calcCustomCurtainPrice } from "@/domain/pricing";
+import { resolveProductTypeShowcase } from "@/lib/configurator-product-showcase";
 
 const CUSTOM_PRODUCT_SLUG = "custom-curtain";
+
+type OptionRow = {
+  option_group: string;
+  option_key: string;
+  option_label: string;
+  price_delta: number;
+  sort_order: number;
+  metadata: Record<string, unknown> | null;
+};
+
+type ShowcaseRow = {
+  slug: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  retail_price: number;
+};
 
 export async function listConfiguratorCatalog(
   supabase: SupabaseClient,
@@ -22,11 +40,26 @@ export async function listConfiguratorCatalog(
 
   if (!product) throw new Error("ไม่พบสินค้าสั่งทำ");
 
-  const { data: options } = await supabase
-    .from("product_options")
-    .select("option_group, option_key, option_label, price_delta, sort_order")
-    .eq("product_id", product.id)
-    .order("sort_order");
+  const [{ data: options, error: optionsError }, showcaseResult] =
+    await Promise.all([
+    supabase
+      .from("product_options")
+      .select(
+        "option_group, option_key, option_label, price_delta, sort_order, metadata",
+      )
+      .eq("product_id", product.id)
+      .order("sort_order"),
+    supabase
+      .from("products_public")
+      .select("slug, name, description, image_url, retail_price")
+      .eq("product_type", "standard")
+      .not("image_url", "is", null)
+      .order("sort_order"),
+  ]);
+
+  if (optionsError) throw new Error(optionsError.message);
+
+  const showcaseRows = showcaseResult.error ? [] : showcaseResult.data;
 
   const { data: fabrics } = await supabase
     .from("fabrics")
@@ -67,18 +100,53 @@ export async function listConfiguratorCatalog(
     .maybeSingle();
 
   const vars = (formula?.variables ?? {}) as Record<string, number>;
+  const showcaseProducts = (showcaseRows ?? []).map((row) => {
+    const r = row as ShowcaseRow;
+    return {
+      slug: r.slug,
+      name: r.name,
+      description: r.description,
+      imageUrl: r.image_url,
+      retailPrice: Number(r.retail_price),
+    };
+  });
+
   const mapOpts = (group: string) =>
     (options ?? [])
-      .filter((o) => o.option_group === group)
-      .map((o) => ({
-        key: o.option_key,
-        label: o.option_label,
-        priceDelta: Number(o.price_delta),
-      }));
+      .filter((o) => (o as OptionRow).option_group === group)
+      .map((o) => {
+        const row = o as OptionRow;
+        return {
+          key: row.option_key,
+          label: row.option_label,
+          priceDelta: Number(row.price_delta),
+        };
+      });
+
+  const mapProductTypes = () =>
+    (options ?? [])
+      .filter((o) => (o as OptionRow).option_group === "product_type")
+      .map((o) => {
+        const row = o as OptionRow;
+        const showcase = resolveProductTypeShowcase(
+          row.option_key,
+          row.metadata,
+          showcaseProducts,
+        );
+        return {
+          key: row.option_key,
+          label: row.option_label,
+          priceDelta: Number(row.price_delta),
+          imageUrl: showcase.imageUrl,
+          description: showcase.description,
+          startingPrice: showcase.startingPrice,
+          showcaseSlug: showcase.showcaseSlug,
+        };
+      });
 
   return {
     customProductId: product.id,
-    productTypes: mapOpts("product_type"),
+    productTypes: mapProductTypes(),
     railOptions: mapOpts("rail"),
     installationOptions: mapOpts("installation"),
     fabrics: (fabrics ?? []).map((f) => ({

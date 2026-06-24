@@ -1,9 +1,23 @@
 import { Link } from "@tanstack/react-router";
 
+import { HomeHeroSlider } from "@/components/storefront/home/home-hero-slider";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/i18n";
+import type { HeroBannerDto } from "@/types/api/hero-banners";
 
-export function HomeHero() {
+type HomeHeroProps = {
+  banners?: HeroBannerDto[];
+};
+
+export function HomeHero({ banners = [] }: HomeHeroProps) {
+  if (banners.length > 0) {
+    return <HomeHeroSlider banners={banners} />;
+  }
+
+  return <HomeHeroFallback />;
+}
+
+function HomeHeroFallback() {
   const { t } = useT();
 
   return (

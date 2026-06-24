@@ -116,6 +116,49 @@ export const fetchCategories = createServerFn({ method: "GET" }).handler(
   },
 );
 
+export const fetchHeroBanners = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const { listHeroBanners } = await import("@/services/hero-banner.service");
+    const supabase = await getAdminClient();
+    return listHeroBanners(supabase, { activeOnly: true });
+  },
+);
+
+export const fetchAdminHeroBanners = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context.userId);
+    const { listHeroBanners } = await import("@/services/hero-banner.service");
+    const supabase = await getAdminClient();
+    return listHeroBanners(supabase);
+  });
+
+export const saveAdminHeroBanners = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        banners: z.array(
+          z.object({
+            id: z.string().min(1),
+            imageUrl: z.string().url(),
+            linkUrl: z.string().nullable().optional(),
+            alt: z.string().nullable().optional(),
+            sortOrder: z.number().int(),
+            isActive: z.boolean(),
+          }),
+        ),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const { saveHeroBanners } = await import("@/services/hero-banner.service");
+    const supabase = await getAdminClient();
+    await saveHeroBanners(supabase, data.banners);
+    return { ok: true };
+  });
+
 export const fetchProductBySlug = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) =>
     z.object({ slug: z.string().min(1) }).parse(input),
@@ -972,7 +1015,13 @@ export { fetchAdminMemberProfile } from "@/lib/server-fns/member-admin";
 export {
   fetchPublicMarketingCatalogs,
   fetchPublicMarketingCatalog,
+  fetchPublicMarketingCatalogBySlug,
+  fetchMarketingCatalogAccess,
+  fetchMarketingCatalogRef,
+  fetchRelatedMarketingCatalogs,
   fetchProductMarketingCatalogs,
+  recordCatalogView,
+  fetchAdminCatalogViewStats,
   fetchAdminMarketingCatalogCategories,
   fetchAdminMarketingCatalogs,
   saveAdminMarketingCatalogCategory,

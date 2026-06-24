@@ -102,13 +102,6 @@ export function AccountProfileSummary({
       key: "dashboard",
     },
     {
-      to: "/account",
-      search: { tab: "settings", section: "personal" },
-      label: t("account.settings"),
-      icon: Settings,
-      key: "settings",
-    },
-    {
       to: "/account/orders",
       label: t("account.orders"),
       icon: Package,
@@ -158,6 +151,13 @@ export function AccountProfileSummary({
           },
         ]
       : []),
+    {
+      to: "/account",
+      search: { tab: "settings", section: "personal" },
+      label: t("account.settings"),
+      icon: Settings,
+      key: "settings",
+    },
   ];
 
   return (

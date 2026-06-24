@@ -42,7 +42,7 @@ function linksForZone(
 ): MoreLink[] {
   if (zone === "store") {
     const links: MoreLink[] = [
-      { to: "/configurator", label: "ออกแบบผ้าม่าน", icon: SlidersHorizontal },
+      { to: "/configurator", label: "Custom", icon: SlidersHorizontal },
       { to: "/about", label: "เกี่ยวกับเรา", icon: Store },
     ];
     if (user) {
@@ -68,21 +68,23 @@ function linksForZone(
   if (zone === "account") {
     return [
       {
-        to: "/account",
-        label: "ตั้งค่า",
-        icon: Settings,
-        search: { tab: "settings", section: "personal" },
-      },
-      {
         to: "/account/tax-invoices",
         label: "ใบกำกับภาษี",
         icon: FileText,
       },
       { to: "/account/notifications", label: "แจ้งเตือน", icon: Bell },
       { to: "/account/quotations", label: "ใบเสนอราคา", icon: FileText },
+      { to: "/account/wishlist", label: "รายการโปรด", icon: Heart },
+      { to: "/account/affiliate", label: "Affiliate", icon: Share2 },
       { to: "/shop", label: "กลับร้านค้า", icon: Store },
       ...(isDealer ? [{ to: "/dealer", label: "ตัวแทน", icon: Store }] : []),
       ...(isAdmin ? [{ to: "/admin", label: "แอดมิน", icon: Shield }] : []),
+      {
+        to: "/account",
+        label: "ตั้งค่า",
+        icon: Settings,
+        search: { tab: "settings", section: "personal" },
+      },
     ];
   }
 

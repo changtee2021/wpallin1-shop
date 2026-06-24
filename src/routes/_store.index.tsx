@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { CategoryRail } from "@/components/storefront/category-rail";
+import { CategoryImageGrid } from "@/components/storefront/category-image-grid";
 import { HomeCatalogCta } from "@/components/storefront/catalog-category-hero";
 import { HomeCapabilities } from "@/components/storefront/home/home-capabilities";
 import { HomeCta } from "@/components/storefront/home/home-cta";
@@ -10,11 +10,11 @@ import { HomeSolutions } from "@/components/storefront/home/home-solutions";
 import { ProductFeed } from "@/components/storefront/product-feed";
 import { useMemberProductPrices } from "@/hooks/use-member-product-prices";
 import { useT } from "@/i18n";
-import { fetchCategories, fetchPublicProducts } from "@/lib/api.functions";
+import { fetchCategories, fetchHeroBanners, fetchPublicProducts } from "@/lib/api.functions";
 
 export const Route = createFileRoute("/_store/")({
   loader: async () => {
-    const [featuredResult, categories] = await Promise.all([
+    const [featuredResult, categories, heroBanners] = await Promise.all([
       fetchPublicProducts({
         data: {
           pageSize: 8,
@@ -24,6 +24,7 @@ export const Route = createFileRoute("/_store/")({
         },
       }),
       fetchCategories(),
+      fetchHeroBanners(),
     ]);
 
     let featuredProducts = featuredResult.data;
@@ -34,26 +35,26 @@ export const Route = createFileRoute("/_store/")({
       featuredProducts = fallback.data;
     }
 
-    return { featuredProducts, categories };
+    return { featuredProducts, categories, heroBanners };
   },
   component: HomePage,
 });
 
 function HomePage() {
   const { t } = useT();
-  const { featuredProducts, categories } = Route.useLoaderData();
+  const { featuredProducts, categories, heroBanners } = Route.useLoaderData();
   const memberPrices = useMemberProductPrices(featuredProducts);
 
   return (
     <div className="mx-auto max-w-7xl space-y-10 px-4 py-6 sm:px-6 sm:py-8 lg:space-y-14">
-      <HomeHero />
+      <HomeHero banners={heroBanners} />
       <HomeCapabilities />
       {categories.length > 0 && (
         <section>
           <h2 className="mb-4 text-lg font-bold text-primary sm:text-xl">
             {t("home.categories.title")}
           </h2>
-          <CategoryRail categories={categories} />
+          <CategoryImageGrid categories={categories} />
         </section>
       )}
       <HomeCatalogCta

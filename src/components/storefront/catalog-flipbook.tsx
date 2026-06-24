@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { CatalogFlipbookPage } from "@/components/storefront/catalog-flipbook-page";
+import { CatalogPage } from "@/components/storefront/catalog-page";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/i18n";
 import {
@@ -255,7 +255,7 @@ export function CatalogFlipbook({ pdfUrl, title, className }: Props) {
             {Array.from({ length: numPages }, (_, index) => {
               const pageNumber = index + 1;
               return (
-                <CatalogFlipbookPage
+                <CatalogPage
                   key={pageNumber}
                   pageNumber={pageNumber}
                   src={pageImages[pageNumber]}

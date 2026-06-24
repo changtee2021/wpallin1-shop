@@ -35,12 +35,16 @@ export function uploadCatalogAsset(
   kind: "cover" | "pdf",
   accessToken: string,
   onProgress?: (percent: number) => void,
-): Promise<{ fileUrl: string; fileSize: number }> {
+  catalogId?: string,
+): Promise<{ fileUrl: string; fileSize: number; storagePath?: string }> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
     formData.append("file", file);
     formData.append("kind", kind);
+    if (kind === "pdf" && catalogId) {
+      formData.append("catalogId", catalogId);
+    }
 
     xhr.open("POST", "/api/v1/catalog-asset");
     xhr.setRequestHeader("Authorization", `Bearer ${accessToken}`);
@@ -51,7 +55,12 @@ export function uploadCatalogAsset(
     };
 
     xhr.onload = () => {
-      let json: { fileUrl?: string; fileSize?: number; error?: string } = {};
+      let json: {
+        fileUrl?: string;
+        fileSize?: number;
+        storagePath?: string;
+        error?: string;
+      } = {};
       try {
         json = JSON.parse(xhr.responseText) as typeof json;
       } catch {
@@ -62,6 +71,7 @@ export function uploadCatalogAsset(
         resolve({
           fileUrl: json.fileUrl,
           fileSize: json.fileSize ?? file.size,
+          storagePath: json.storagePath,
         });
         return;
       }
@@ -84,7 +94,8 @@ export async function renderPdfCoverBlob(
   ).toString();
 
   const data = new Uint8Array(await file.arrayBuffer());
-  const pdf = await pdfjs.getDocument({ data, isEvalSupported: false }).promise;
+  const loadingTask = pdfjs.getDocument({ data, isEvalSupported: false });
+  const pdf = await loadingTask.promise;
   const page = await pdf.getPage(1);
   const viewport = page.getViewport({ scale });
   const canvas = document.createElement("canvas");
@@ -95,7 +106,7 @@ export async function renderPdfCoverBlob(
   canvas.height = viewport.height;
   await page.render({ canvasContext: context, viewport, canvas }).promise;
   page.cleanup();
-  await pdf.destroy();
+  await loadingTask.destroy().catch(() => undefined);
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(

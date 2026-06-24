@@ -1,83 +1,185 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Download, ExternalLink } from "lucide-react";
+import {
+  createFileRoute,
+  Link,
+  notFound,
+  redirect,
+} from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { useEffect, useState } from "react";
+import { z } from "zod";
 
-import { CatalogFlipbook } from "@/components/storefront/catalog-flipbook";
+import { CatalogDealerLock } from "@/components/storefront/catalog-dealer-lock";
+import { CatalogStickyCta } from "@/components/storefront/catalog-sticky-cta";
+import { CatalogViewer } from "@/components/storefront/catalog-viewer";
+import { MarketingCatalogGrid } from "@/components/storefront/marketing-catalog-grid";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { fetchPublicMarketingCatalog } from "@/lib/api.functions";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  fetchMarketingCatalogAccess,
+  fetchRelatedMarketingCatalogs,
+} from "@/lib/api.functions";
+import { authServerFnOptions } from "@/lib/server-fn-auth";
+import { isUuid } from "@/lib/catalog-slug";
+import { absoluteUrl, getDefaultOgImageUrl } from "@/lib/public-url";
+import { useT } from "@/i18n";
+import type {
+  MarketingCatalogAccessDto,
+  MarketingCatalogDto,
+} from "@/types/api/marketing-catalogs";
+
+const searchSchema = z.object({
+  page: z.coerce.number().int().positive().optional(),
+});
 
 export const Route = createFileRoute("/_store/catalogs/$id")({
+  validateSearch: searchSchema,
+  head: ({ loaderData }) => {
+    if (!loaderData?.access) return {};
+    const { catalog } = loaderData.access;
+    const canonical = absoluteUrl(`/catalogs/${catalog.slug}`);
+    const description =
+      catalog.description?.slice(0, 160) ??
+      `${catalog.title} — WP ALL product catalog`;
+    const ogImage = catalog.coverImageUrl ?? getDefaultOgImageUrl();
+
+    return {
+      meta: [
+        { title: `${catalog.title} | WP ALL Catalog` },
+        { name: "description", content: description },
+        { property: "og:type", content: "article" },
+        { property: "og:title", content: catalog.title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: canonical },
+        { property: "og:image", content: ogImage },
+      ],
+      links: [{ rel: "canonical", href: canonical }],
+    };
+  },
   loader: async ({ params }) => {
-    const catalog = await fetchPublicMarketingCatalog({
-      data: { id: params.id },
+    const access = await fetchMarketingCatalogAccess({
+      data: { ref: params.id },
     });
-    if (!catalog) throw new Error("Catalog not found");
-    return { catalog };
+    if (!access) throw notFound();
+
+    if (isUuid(params.id) && access.catalog.slug !== params.id) {
+      throw redirect({
+        to: "/catalogs/$id",
+        params: { id: access.catalog.slug },
+        replace: true,
+      });
+    }
+
+    const related =
+      access.access === "full"
+        ? await fetchRelatedMarketingCatalogs({
+            data: { catalogId: access.catalog.id, limit: 4 },
+          })
+        : [];
+
+    return { access, related };
   },
   component: CatalogViewerPage,
 });
 
 function CatalogViewerPage() {
-  const { catalog } = Route.useLoaderData();
+  const { t } = useT();
+  const { session } = useAuth();
+  const authOpts = authServerFnOptions(session);
+  const loaderData = Route.useLoaderData();
+  const [access, setAccess] = useState<MarketingCatalogAccessDto>(
+    loaderData.access,
+  );
+  const [related, setRelated] = useState<MarketingCatalogDto[]>(
+    loaderData.related,
+  );
+  const { page } = Route.useSearch();
+  const { catalog } = access;
+  const locked = access.access === "locked";
+
+  useEffect(() => {
+    setAccess(loaderData.access);
+    setRelated(loaderData.related);
+  }, [loaderData.access, loaderData.related]);
+
+  useEffect(() => {
+    if (!session?.access_token) return;
+    void (async () => {
+      const next = await fetchMarketingCatalogAccess({
+        data: { ref: catalog.slug },
+        ...authOpts,
+      });
+      if (!next) return;
+      setAccess(next);
+      if (next.access === "full") {
+        const items = await fetchRelatedMarketingCatalogs({
+          data: { catalogId: next.catalog.id, limit: 4 },
+          ...authOpts,
+        });
+        setRelated(items);
+      } else {
+        setRelated([]);
+      }
+    })();
+  }, [session?.access_token, catalog.slug, authOpts]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <Button variant="ghost" asChild>
+    <div className="mx-auto max-w-7xl px-4 py-6 pb-28 sm:px-6 sm:py-8">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <Button variant="ghost" size="sm" asChild>
           <Link to="/catalogs">
             <ArrowLeft className="size-4" />
-            กลับหน้าแคตตาล็อก
+            {t("catalogs.viewer.back")}
           </Link>
         </Button>
-        <div className="flex flex-wrap gap-2">
-          {catalog.externalLink ? (
-            <Button variant="outline" asChild>
-              <a
-                href={catalog.externalLink}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <ExternalLink className="size-4" />
-                เปิดลิงก์ภายนอก
-              </a>
-            </Button>
-          ) : null}
-          {catalog.pdfUrl ? (
-            <Button variant="outline" asChild>
-              <a
-                href={catalog.pdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Download className="size-4" />
-                ดาวน์โหลด PDF
-              </a>
-            </Button>
-          ) : null}
-        </div>
       </div>
 
-      <Card className="mb-6 shadow-sm">
-        <CardContent className="space-y-2 p-4 sm:p-6">
-          <h1 className="text-2xl font-bold">{catalog.title}</h1>
-          {catalog.brand ? (
-            <p className="text-muted-foreground">{catalog.brand}</p>
+      <header className="mb-6 space-y-2">
+        <h1 className="text-xl font-bold sm:text-2xl">{catalog.title}</h1>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+          {catalog.categoryName ? <span>{catalog.categoryName}</span> : null}
+          {catalog.version ? (
+            <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+              {catalog.version}
+            </span>
           ) : null}
-          {catalog.description ? (
-            <p className="text-sm text-muted-foreground">
-              {catalog.description}
-            </p>
+          {catalog.pageCount ? (
+            <span>
+              {catalog.pageCount} {t("catalogs.card.pages")}
+            </span>
           ) : null}
-        </CardContent>
-      </Card>
+        </div>
+        {catalog.description ? (
+          <p className="text-sm text-muted-foreground">{catalog.description}</p>
+        ) : null}
+      </header>
 
-      {catalog.pdfUrl ? (
-        <CatalogFlipbook pdfUrl={catalog.pdfUrl} title={catalog.title} />
+      {locked ? (
+        <CatalogDealerLock catalog={catalog} />
+      ) : catalog.pdfUrl ? (
+        <CatalogViewer
+          pdfUrl={catalog.pdfUrl}
+          title={catalog.title}
+          slug={catalog.slug}
+          catalogId={catalog.id}
+          allowDownload={catalog.allowDownload}
+          initialPage={page ?? 1}
+        />
       ) : (
         <div className="rounded-xl border border-dashed p-12 text-center text-muted-foreground">
-          ยังไม่มีไฟล์ PDF สำหรับแคตตาล็อกนี้
+          {t("catalogs.viewer.noPdf")}
         </div>
       )}
+
+      {!locked && related.length > 0 ? (
+        <section className="mt-12">
+          <h2 className="mb-4 text-lg font-semibold">
+            {t("catalogs.viewer.related")}
+          </h2>
+          <MarketingCatalogGrid catalogs={related} compact />
+        </section>
+      ) : null}
+
+      {!locked ? <CatalogStickyCta /> : null}
     </div>
   );
 }

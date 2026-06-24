@@ -10,7 +10,15 @@ export type ConfiguratorDraft = {
 };
 
 export type ConfiguratorCatalog = {
-  productTypes: Array<{ key: string; label: string; priceDelta: number }>;
+  productTypes: Array<{
+    key: string;
+    label: string;
+    priceDelta: number;
+    imageUrl: string | null;
+    description: string | null;
+    startingPrice: number | null;
+    showcaseSlug: string | null;
+  }>;
   fabrics: Array<{
     id: string;
     code: string;

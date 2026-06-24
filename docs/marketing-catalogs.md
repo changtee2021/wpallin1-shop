@@ -1,8 +1,6 @@
-# Marketing PDF catalogs
+# Marketing PDF catalogs (E-book Viewer)
 
-ระบบแคตตาล็อกการตลาด (PDF) สำหรับให้ลูกค้าดูออนไลน์ และผูกกับสินค้าในหน้ารายละเอียด
-
-เพิ่มใน commit `70611e4` (2026-06-24).
+ระบบแคตตาล็อกการตลาด (PDF) — อ่านบนเว็บแบบ E-book (mobile scroll + desktop pro viewer)
 
 ---
 
@@ -10,95 +8,65 @@
 
 | Zone | Path | Description |
 |------|------|-------------|
-| Storefront | `/catalogs` | รายการแคตตาล็อก + filter ตามหมวด |
-| Storefront | `/catalogs/$id` | ดู PDF ใน iframe |
-| Storefront | `/products/$slug` | แสดงแคตตาล็อกที่ผูกกับสินค้า |
-| Admin | `/admin/catalogs` | CRUD หมวด, แคตตาล็อก, อัปโหลดไฟล์ |
+| Storefront | `/catalogs` | รายการ + ค้นหา + filter หมวด + การ์ด premium |
+| Storefront | `/catalogs/$slug` | E-book viewer (`?page=10` deep link) |
+| Storefront | `/catalogs/$uuid` | Redirect → slug (legacy) |
+| Storefront | `/products/$slug` | แคตตาล็อกที่ผูกกับสินค้า |
+| Admin | `/admin/catalogs` | CRUD + upload + visibility/status |
 | API | `POST /api/v1/catalog-asset` | อัปโหลด cover/PDF (admin only) |
 
-เมนู storefront: **แคตตาล็อก** ใน header + mobile menu.
+---
+
+## Viewer modes
+
+| Device | Mode |
+|--------|------|
+| Mobile | Vertical scroll + lazy page render |
+| Desktop | Thumbnail sidebar + pro toolbar (default) |
+| Desktop | Optional flipbook toggle |
+
+Sticky CTA: **ขอใบเสนอราคา** + **ทัก LINE** (`VITE_LINE_OA_URL`, default `https://lin.ee/vopHClz`)
 
 ---
 
-## Data model
+## Data model (v2)
 
-Schema: `wpall_retail` (migration **pending** — see below)
+Schema: `wpall_retail`
 
-### `marketing_catalog_categories`
+Migrations:
+- `20260627110000_wpall_retail_marketing_catalogs.sql`
+- `20260627120000_wpall_retail_catalog_bucket_limit.sql`
+- **`20260628100000_wpall_retail_marketing_catalogs_v2.sql`** — slug, visibility, status, analytics
 
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | UUID | PK |
-| `name` | TEXT | ชื่อหมวด |
-| `sort_order` | INT | ลำดับแสดง |
-| `is_active` | BOOL | ปิดไม่แสดง |
+Key fields on `marketing_catalogs`:
+- `slug`, `version`, `page_count`, `file_size`
+- `visibility`: `public` | `dealer` | `private`
+- `status`: `draft` | `published` | `archived`
+- `allow_download`, `is_featured`, `pdf_storage_path`
 
-### `marketing_catalogs`
-
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | UUID | PK |
-| `category_id` | UUID | FK → categories (nullable) |
-| `title` | TEXT | ชื่อแคตตาล็อก |
-| `brand` | TEXT | แบรนด์ (optional) |
-| `description` | TEXT | คำอธิบาย |
-| `cover_image_url` | TEXT | รูปปก |
-| `pdf_url` | TEXT | ลิงก์ PDF |
-| `external_link` | TEXT | ลิงก์ภายนอก (optional) |
-| `tags` | TEXT[] | แท็กค้นหา |
-| `sort_order` | INT | ลำดับ |
-| `is_public` | BOOL | แสดงบน storefront |
-| `is_active` | BOOL | เปิดใช้งาน |
-
-### `marketing_catalog_products`
-
-| Column | Type | Notes |
-|--------|------|-------|
-| `catalog_id` | UUID | FK |
-| `product_id` | UUID | FK → products |
+Analytics: `marketing_catalog_views`
 
 ---
 
-## Storage
+## Stable PDF URL
 
-| Bucket | Access | Path pattern |
-|--------|--------|--------------|
-| `wpall-retail-catalogs` | Public read, admin write | `cover/{uuid}.ext`, `pdf/{uuid}.ext` |
-
-Upload limits (`/api/v1/catalog-asset`):
-
-- Max size: **25 MB**
-- Types: JPEG, PNG, WebP, PDF
-- Rate limit: 20 req/min per admin (เมื่อมี Upstash)
+เมื่อมี `catalogId` แล้ว อัปโหลด PDF จะ upsert ที่ `pdf/{catalogId}.pdf` — URL ไม่เปลี่ยนเมื่อ replace
 
 ---
 
-## บีบอัดไฟล์ก่อนอัปโหลด
+## Phase 2 features
 
-PDF จากดีไซน์มักใหญ่มาก (100MB+) — **บีบอัดก่อน** เพื่อให้ flipbook โหลดเร็ว:
+- **In-catalog search** — search text inside PDF, jump to page
+- **View analytics** — admin list shows 7d / 30d / all-time views
+- **Dealer-only catalogs** — lock screen + register/login CTA
+- **Flipbook preference** — persisted in localStorage on desktop
+- **SEO** — OG meta on viewer, public catalogs in sitemap
 
-```bash
-cd wpallin1-shop
-npm run media:compress -- "path/to/catalog.pdf"
+
+```powershell
+cd "C:\Users\Admin\WP GROUP\wp-group-erp"
+supabase db push
 ```
-
-- แนะนำ output &lt; **25 MB** (แอดมินเตือน &gt; 25 MB, บล็อก &gt; 50 MB)
-- รูปปกบีบอัดอัตโนมัติในเบราว์เซอร์เมื่ออัปโหลด
-- วิดีโอ/เสียงใช้ CLI เดียวกัน (ต้องมี ffmpeg)
-
-คู่มือเต็ม: **[docs/MEDIA-COMPRESS.md](./MEDIA-COMPRESS.md)**
-
----
-
-## Admin workflow
-
-1. เปิด `/admin/catalogs`
-2. **หมวด** — สร้างหมวด (เช่น "ม่านจีบ", "มู่ลี่")
-3. **เพิ่มแคตตาล็อก** — กรอกชื่อ, แบรนด์, คำอธิบาย
-4. กด **อัปโหลด** สำหรับ cover และ PDF
-5. เลือกสินค้าที่เกี่ยวข้อง (multi-select)
-6. ตั้ง `เผยแพร่` (`is_public`) + `ใช้งาน` (`is_active`)
-7. บันทึก → ตรวจที่ `/catalogs`
 
 ---
 
@@ -106,48 +74,10 @@ npm run media:compress -- "path/to/catalog.pdf"
 
 | File | Role |
 |------|------|
+| `src/components/storefront/catalog-viewer.tsx` | Viewer shell |
+| `src/components/storefront/catalog-scroll-viewer.tsx` | Mobile |
+| `src/components/storefront/catalog-pro-viewer.tsx` | Desktop |
+| `src/components/storefront/catalog-flipbook.tsx` | Optional flipbook |
+| `src/lib/pdf-to-pages.ts` | pdfjs-dist render |
 | `src/services/marketing-catalog.service.ts` | DB queries |
-| `src/lib/server-fns/marketing-catalogs.ts` | Server functions |
-| `src/types/api/marketing-catalogs.ts` | DTOs |
-| `src/routes/_store.catalogs.tsx` | List page |
-| `src/routes/_store.catalogs.$id.tsx` | PDF viewer |
-| `src/routes/admin.catalogs.tsx` | Admin UI |
-| `src/routes/api/v1/catalog-asset.ts` | Upload API |
-| `src/components/storefront/marketing-catalog-grid.tsx` | Grid cards |
-| `src/components/storefront/product-marketing-catalogs.tsx` | Product page links |
-
----
-
-## Migration requirement
-
-แอปพร้อมแล้ว แต่ **ต้องมี migration ใน wp-group-erp** ก่อนใช้งาน production:
-
-```
-20260627100000_wpall_retail_marketing_catalogs.sql
-```
-
-```powershell
-cd "C:\Users\Admin\WP GROUP\wp-group-erp"
-supabase db push
-```
-
-ดูสถานะ: `docs/MIGRATIONS.md`
-
----
-
-## Troubleshooting
-
-| Problem | Fix |
-|---------|-----|
-| หน้าแคตตาล็อก error / ว่าง | Apply marketing catalogs migration |
-| Upload 400/403 | ตรวจ admin role, ขนาดไฟล์, MIME type |
-| PDF ไม่แสดงใน iframe | ตรวจ bucket public + URL ถูกต้อง; บาง browser block mixed content |
-| ไม่เห็นในหน้าสินค้า | ผูก product ใน admin + `is_public` + `is_active` |
-
----
-
-## Related
-
-- `docs/ADMIN-GUIDE.md` — เมนูแอดมิน
-- `docs/MIGRATIONS.md` — DDL list
-- `CHANGELOG.md` — release note
+| `docs/MEDIA-COMPRESS.md` | บีบอัด PDF ก่อนอัปโหลด |
