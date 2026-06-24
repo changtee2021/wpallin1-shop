@@ -3,6 +3,7 @@ import { CheckCircle2, PackageCheck, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { ProductMarketingCatalogs } from "@/components/storefront/product-marketing-catalogs";
 import { ProductImage } from "@/components/storefront/product-image";
 import { ProductOptionSelectors } from "@/components/storefront/product-option-selectors";
 import { ProductReviews } from "@/components/storefront/product-reviews";
@@ -16,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
 import {
   fetchProductBySlug,
+  fetchProductMarketingCatalogs,
   fetchProductReviewSummary,
 } from "@/lib/api.functions";
 import { formatPrice } from "@/lib/format";
@@ -95,13 +97,17 @@ export const Route = createFileRoute("/_store/products/$slug")({
       data: { productId: product.id },
     }).catch(() => ({ average: 0, count: 0 }));
 
-    return { product, reviewSummary };
+    const marketingCatalogs = await fetchProductMarketingCatalogs({
+      data: { productId: product.id },
+    }).catch(() => []);
+
+    return { product, reviewSummary, marketingCatalogs };
   },
   component: ProductDetailPage,
 });
 
 function ProductDetailPage() {
-  const { product } = Route.useLoaderData();
+  const { product, marketingCatalogs } = Route.useLoaderData();
   const { addItem } = useCart();
   const [qty, setQty] = useState(product.moq);
   const [adding, setAdding] = useState(false);
@@ -258,6 +264,8 @@ function ProductDetailPage() {
               </CardContent>
             </Card>
           )}
+
+          <ProductMarketingCatalogs catalogs={marketingCatalogs} />
 
           {attributeEntries.length > 0 && (
             <Card className="mt-4">

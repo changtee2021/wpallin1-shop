@@ -11,7 +11,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { useT } from "@/i18n";
 
 const navLinks = [
+  { to: "/" as const, key: "nav.home" as const, exact: true },
   { to: "/shop" as const, key: "nav.shop" as const },
+  { to: "/catalogs" as const, key: "nav.catalogs" as const },
   { to: "/configurator" as const, key: "nav.configurator" as const },
   { to: "/about" as const, key: "nav.about" as const },
 ];
@@ -122,6 +124,7 @@ export function StorefrontHeader() {
               to={item.to}
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
               activeProps={{ className: "text-primary font-semibold" }}
+              activeOptions={item.exact ? { exact: true } : undefined}
             >
               {t(item.key)}
             </Link>

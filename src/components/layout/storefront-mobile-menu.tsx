@@ -13,7 +13,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { useT } from "@/i18n";
 
 const storeLinks = [
+  { to: "/", key: "nav.home" as const },
   { to: "/shop", key: "nav.shop" as const },
+  { to: "/catalogs", key: "nav.catalogs" as const },
   { to: "/configurator", key: "nav.configurator" as const },
   { to: "/about", key: "nav.about" as const },
   { to: "/contact", key: "nav.contact" as const },

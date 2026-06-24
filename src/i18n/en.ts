@@ -7,6 +7,7 @@ export const en: Translations = {
   "app.tagline": "Quality curtains and blinds — retail and wholesale",
   "nav.home": "Home",
   "nav.shop": "Shop",
+  "nav.catalogs": "Catalogs",
   "nav.configurator": "Custom curtains",
   "nav.about": "About",
   "nav.contact": "Contact",

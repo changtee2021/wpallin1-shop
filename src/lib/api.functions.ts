@@ -961,3 +961,15 @@ export {
 } from "@/lib/server-fns/wholesale";
 
 export { fetchAdminMemberProfile } from "@/lib/server-fns/member-admin";
+
+export {
+  fetchPublicMarketingCatalogs,
+  fetchPublicMarketingCatalog,
+  fetchProductMarketingCatalogs,
+  fetchAdminMarketingCatalogCategories,
+  fetchAdminMarketingCatalogs,
+  saveAdminMarketingCatalogCategory,
+  deleteAdminMarketingCatalogCategory,
+  saveAdminMarketingCatalog,
+  deleteAdminMarketingCatalog,
+} from "@/lib/server-fns/marketing-catalogs";

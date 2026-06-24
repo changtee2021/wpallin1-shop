@@ -5,6 +5,7 @@ export const th: Translations = {
   "app.tagline": "ศูนย์กลางผ้าม่าน — ครบวงจร ตั้งแต่เลือกจนถึงติดตั้ง",
   "nav.home": "หน้าแรก",
   "nav.shop": "ร้านค้า",
+  "nav.catalogs": "แคตตาล็อก",
   "nav.configurator": "สั่งทำผ้าม่าน",
   "nav.about": "เกี่ยวกับเรา",
   "nav.contact": "ติดต่อเรา",
