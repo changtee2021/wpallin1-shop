@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { CheckCircle2, PackageCheck, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -25,7 +26,6 @@ import {
 import { absoluteUrl, getDefaultOgImageUrl } from "@/lib/public-url";
 import { buildProductJsonLd } from "@/lib/seo-structured-data";
 import { trackRecentlyViewed } from "@/lib/recently-viewed";
-import { useT } from "@/i18n";
 
 const ATTRIBUTE_LABELS: Record<string, string> = {
   color: "สี",
@@ -103,11 +103,10 @@ export const Route = createFileRoute("/_store/products/$slug")({
 function ProductDetailPage() {
   const { product } = Route.useLoaderData();
   const { addItem } = useCart();
-  const { t } = useT();
   const [qty, setQty] = useState(product.moq);
   const [adding, setAdding] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState<SelectedProductOptions>(
-    () => {
+  const [selectedOptions, setSelectedOptions] =
+    useState<SelectedProductOptions>(() => {
       const initial: SelectedProductOptions = {};
       for (const group of product.optionGroups) {
         if (group.choices[0]) {
@@ -115,14 +114,19 @@ function ProductDetailPage() {
         }
       }
       return initial;
-    },
-  );
+    });
 
   const optionSnapshot = buildOptionSnapshot(
     product.optionGroups,
     selectedOptions,
   );
   const displayPrice = product.retailPrice + optionSnapshot.priceDelta;
+  const selectedOptionRows = Object.entries(optionSnapshot.optionLabels).map(
+    ([groupKey, label]) => ({
+      group: optionSnapshot.groupLabels[groupKey] ?? groupKey,
+      label,
+    }),
+  );
 
   useEffect(() => {
     trackRecentlyViewed(product);
@@ -140,6 +144,13 @@ function ProductDetailPage() {
     }
   }
 
+  function handleQtyChange(value: string) {
+    const nextQty = Number(value);
+    setQty(
+      Number.isFinite(nextQty) ? Math.max(product.moq, nextQty) : product.moq,
+    );
+  }
+
   const hasDiscount =
     product.compareAtPrice != null &&
     product.compareAtPrice > product.retailPrice;
@@ -151,7 +162,7 @@ function ProductDetailPage() {
     : [];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-7xl px-4 py-8 pb-24 sm:px-6 md:pb-8">
       <div className="grid gap-10 lg:grid-cols-2">
         <div className="aspect-square overflow-hidden rounded-2xl bg-muted/30">
           <ProductImage src={product.imageUrl} alt={product.name} />
@@ -166,7 +177,7 @@ function ProductDetailPage() {
           {product.description && (
             <p className="mt-3 text-muted-foreground">{product.description}</p>
           )}
-          <div className="mt-4 flex items-baseline gap-3">
+          <div className="mt-4 flex flex-wrap items-baseline gap-3">
             <p className="text-3xl font-bold text-accent">
               {formatPrice(displayPrice)}
             </p>
@@ -175,9 +186,14 @@ function ProductDetailPage() {
                 {formatPrice(product.compareAtPrice!)}
               </p>
             )}
+            {optionSnapshot.priceDelta > 0 && (
+              <Badge variant="outline" className="rounded-full">
+                รวม option +{formatPrice(optionSnapshot.priceDelta)}
+              </Badge>
+            )}
           </div>
           <Separator className="my-6" />
-          <Card>
+          <Card className="border-muted/80 shadow-sm">
             <CardContent className="grid gap-2 p-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">SKU</span>
@@ -222,6 +238,27 @@ function ProductDetailPage() {
             onChange={setSelectedOptions}
           />
 
+          {selectedOptionRows.length > 0 && (
+            <Card className="mt-4 border-primary/20 bg-primary/5 shadow-sm">
+              <CardContent className="p-4">
+                <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-primary">
+                  <CheckCircle2 className="size-4" />
+                  ตัวเลือกที่เลือก
+                </div>
+                <div className="grid gap-2 text-sm">
+                  {selectedOptionRows.map((row) => (
+                    <div key={row.group} className="flex justify-between gap-4">
+                      <span className="text-muted-foreground">{row.group}</span>
+                      <span className="text-right font-medium">
+                        {row.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {attributeEntries.length > 0 && (
             <Card className="mt-4">
               <CardContent className="p-4">
@@ -241,26 +278,73 @@ function ProductDetailPage() {
               </CardContent>
             </Card>
           )}
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Input
-              type="number"
-              min={product.moq}
-              value={qty}
-              onChange={(e) => setQty(Number(e.target.value))}
-              className="w-24"
-            />
-            <Button
-              className="bg-accent hover:bg-accent/90"
-              disabled={adding}
-              onClick={() => void handleAddToCart()}
-            >
-              {adding ? "กำลังเพิ่ม..." : t("nav.cart")}
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/cart">ดูตะกร้า</Link>
-            </Button>
-            <WishlistButton productId={product.id} />
+          <Card className="mt-6 border-accent/20 bg-accent/5 shadow-sm">
+            <CardContent className="space-y-4 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold">
+                <PackageCheck className="size-4 text-accent" />
+                พร้อมเพิ่มลงตะกร้า
+              </div>
+              <div className="grid gap-3 sm:grid-cols-[120px_1fr] sm:items-end">
+                <label className="grid gap-1 text-sm">
+                  <span className="font-medium">จำนวน</span>
+                  <Input
+                    type="number"
+                    min={product.moq}
+                    value={qty}
+                    onChange={(e) => handleQtyChange(e.target.value)}
+                    className="h-11"
+                  />
+                </label>
+                <div className="rounded-xl bg-background p-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">ขั้นต่ำ</span>
+                    <span>
+                      {product.moq} {product.unit ?? "ชิ้น"}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex justify-between font-semibold">
+                    <span>รวมโดยประมาณ</span>
+                    <span className="text-accent">
+                      {formatPrice(displayPrice * qty)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto]">
+                <Button
+                  size="lg"
+                  className="bg-accent hover:bg-accent/90"
+                  disabled={adding}
+                  onClick={() => void handleAddToCart()}
+                >
+                  <ShoppingCart className="size-4" />
+                  {adding ? "กำลังเพิ่ม..." : "เพิ่มลงตะกร้า"}
+                </Button>
+                <Button variant="outline" size="lg" asChild>
+                  <Link to="/cart">ดูตะกร้า</Link>
+                </Button>
+                <WishlistButton productId={product.id} />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 p-3 shadow-lg backdrop-blur md:hidden">
+        <div className="mx-auto flex max-w-7xl items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium">{product.name}</p>
+            <p className="text-sm font-bold text-accent">
+              {formatPrice(displayPrice)}
+            </p>
           </div>
+          <Button
+            className="bg-accent hover:bg-accent/90"
+            disabled={adding}
+            onClick={() => void handleAddToCart()}
+          >
+            <ShoppingCart className="size-4" />
+            {adding ? "เพิ่ม..." : "ใส่ตะกร้า"}
+          </Button>
         </div>
       </div>
       <div className="mt-12">
