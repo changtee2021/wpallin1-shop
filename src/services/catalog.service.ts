@@ -4,6 +4,7 @@ import { emptyProductList, normalizeProductListQuery } from "@/domain/catalog";
 import type { CategoryDto } from "@/types/api/categories";
 import type { ApiListResponse } from "@/types/api/common";
 import type { ProductListQuery, ProductPublicDto } from "@/types/api/products";
+import { listProductOptionGroups } from "@/services/product-options.service";
 
 type ProductRow = {
   id: string;
@@ -79,6 +80,7 @@ function mapProduct(
       row.attributes && typeof row.attributes === "object"
         ? row.attributes
         : null,
+    optionGroups: [],
     createdAt: row.created_at,
   };
 }
@@ -175,7 +177,9 @@ export async function getProductBySlug(
 
   if (error) throw new Error(error.message);
   if (!data) return null;
-  return mapProduct(data as ProductRow, categories);
+  const product = mapProduct(data as ProductRow, categories);
+  product.optionGroups = await listProductOptionGroups(supabase, product.id);
+  return product;
 }
 
 export async function getProductById(
@@ -191,5 +195,7 @@ export async function getProductById(
 
   if (error) throw new Error(error.message);
   if (!data) return null;
-  return mapProduct(data as ProductRow, categories);
+  const product = mapProduct(data as ProductRow, categories);
+  product.optionGroups = await listProductOptionGroups(supabase, product.id);
+  return product;
 }

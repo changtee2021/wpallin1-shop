@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/page-header";
+import { ProductOptionsEditor } from "@/components/admin/product-options-editor";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { fetchCategories, saveAdminProduct } from "@/lib/api.functions";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
+import type { AdminOptionGroupInput } from "@/domain/product-options";
 import type { CategoryDto } from "@/types/api/categories";
 
 export const Route = createFileRoute("/admin/products/new")({
@@ -50,6 +52,7 @@ function AdminProductNewPage() {
     isFeatured: false,
     isActive: true,
   });
+  const [optionGroups, setOptionGroups] = useState<AdminOptionGroupInput[]>([]);
 
   useEffect(() => {
     void fetchCategories().then(setCategories);
@@ -66,6 +69,7 @@ function AdminProductNewPage() {
           categoryId: form.categoryId || null,
           retailPrice: Number(form.retailPrice),
           stockQty: Number(form.stockQty),
+          optionGroups,
         },
         ...authServerFnOptions(session),
       });
@@ -170,6 +174,10 @@ function AdminProductNewPage() {
             onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
           />
         </div>
+        <ProductOptionsEditor
+          groups={optionGroups}
+          onChange={setOptionGroups}
+        />
         <div className="flex gap-6">
           <label className="flex items-center gap-2 text-sm">
             <Checkbox

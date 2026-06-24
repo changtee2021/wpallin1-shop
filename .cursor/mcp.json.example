@@ -3,6 +3,13 @@
     "chrome-devtools": {
       "command": "npx",
       "args": ["-y", "chrome-devtools-mcp@latest"]
+    },
+    "browser": {
+      "command": "node",
+      "args": [
+        "C:/Users/Admin/.cursor/plugins/cache/cursor-public/browse/release_v0.2.4/dist/src/mcp-server.js"
+      ],
+      "cwd": "C:/Users/Admin/.cursor/plugins/cache/cursor-public/browse/release_v0.2.4"
     }
   }
 }

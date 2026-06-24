@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { ProductImage } from "@/components/storefront/product-image";
+import { ProductOptionSelectors } from "@/components/storefront/product-option-selectors";
 import { ProductReviews } from "@/components/storefront/product-reviews";
 import { RecentlyViewedSection } from "@/components/storefront/recently-viewed-section";
 import { WishlistButton } from "@/components/storefront/wishlist-button";
@@ -17,6 +18,10 @@ import {
   fetchProductReviewSummary,
 } from "@/lib/api.functions";
 import { formatPrice } from "@/lib/format";
+import {
+  buildOptionSnapshot,
+  type SelectedProductOptions,
+} from "@/domain/product-options";
 import { absoluteUrl, getDefaultOgImageUrl } from "@/lib/public-url";
 import { buildProductJsonLd } from "@/lib/seo-structured-data";
 import { trackRecentlyViewed } from "@/lib/recently-viewed";
@@ -101,6 +106,23 @@ function ProductDetailPage() {
   const { t } = useT();
   const [qty, setQty] = useState(product.moq);
   const [adding, setAdding] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState<SelectedProductOptions>(
+    () => {
+      const initial: SelectedProductOptions = {};
+      for (const group of product.optionGroups) {
+        if (group.choices[0]) {
+          initial[group.groupKey] = group.choices[0].key;
+        }
+      }
+      return initial;
+    },
+  );
+
+  const optionSnapshot = buildOptionSnapshot(
+    product.optionGroups,
+    selectedOptions,
+  );
+  const displayPrice = product.retailPrice + optionSnapshot.priceDelta;
 
   useEffect(() => {
     trackRecentlyViewed(product);
@@ -109,7 +131,7 @@ function ProductDetailPage() {
   async function handleAddToCart() {
     setAdding(true);
     try {
-      await addItem(product.id, qty);
+      await addItem(product.id, qty, selectedOptions);
       toast.success("เพิ่มลงตะกร้าแล้ว");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "เพิ่มไม่สำเร็จ");
@@ -146,7 +168,7 @@ function ProductDetailPage() {
           )}
           <div className="mt-4 flex items-baseline gap-3">
             <p className="text-3xl font-bold text-accent">
-              {formatPrice(product.retailPrice)}
+              {formatPrice(displayPrice)}
             </p>
             {hasDiscount && (
               <p className="text-lg text-muted-foreground line-through">
@@ -193,6 +215,12 @@ function ProductDetailPage() {
               )}
             </CardContent>
           </Card>
+
+          <ProductOptionSelectors
+            groups={product.optionGroups}
+            value={selectedOptions}
+            onChange={setSelectedOptions}
+          />
 
           {attributeEntries.length > 0 && (
             <Card className="mt-4">

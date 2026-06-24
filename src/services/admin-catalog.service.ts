@@ -1,6 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import type { AdminOptionGroupInput } from "@/domain/product-options";
 import type { ProductPublicDto } from "@/types/api/products";
+import {
+  listProductOptionGroups,
+  syncProductOptionGroups,
+} from "@/services/product-options.service";
 
 export type AdminProductInput = {
   name: string;
@@ -15,6 +20,7 @@ export type AdminProductInput = {
   imageUrl?: string;
   isFeatured?: boolean;
   isActive?: boolean;
+  optionGroups?: AdminOptionGroupInput[];
 };
 
 export type AdminProductRow = {
@@ -73,6 +79,7 @@ export async function getAdminProduct(
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!data) return null;
+  const optionGroups = await listProductOptionGroups(supabase, id);
   return {
     id: data.id,
     name: data.name,
@@ -87,6 +94,7 @@ export async function getAdminProduct(
     imageUrl: data.image_url ?? undefined,
     isFeatured: data.is_featured,
     isActive: data.is_active,
+    optionGroups,
   };
 }
 
@@ -113,6 +121,9 @@ export async function createProduct(
     .select("id")
     .single();
   if (error) throw new Error(error.message);
+  if (input.optionGroups?.length) {
+    await syncProductOptionGroups(supabase, data.id, input.optionGroups);
+  }
   return data.id;
 }
 
@@ -140,6 +151,9 @@ export async function updateProduct(
     })
     .eq("id", id);
   if (error) throw new Error(error.message);
+  if (input.optionGroups !== undefined) {
+    await syncProductOptionGroups(supabase, id, input.optionGroups);
+  }
 }
 
 export async function toggleProductActive(

@@ -57,9 +57,13 @@ export function useCart() {
   }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const addItem = useCallback(
-    async (productId: string, qty = 1) => {
+    async (
+      productId: string,
+      qty = 1,
+      selectedOptions?: Record<string, string>,
+    ) => {
       const data = await addProductToCart({
-        data: { sessionId, productId, qty },
+        data: { sessionId, productId, qty, selectedOptions },
         ...fnOpts,
       });
       setCart(data);

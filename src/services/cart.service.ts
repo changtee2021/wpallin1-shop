@@ -1,8 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { validateCartQty } from "@/domain/cart";
+import {
+  buildOptionSnapshot,
+  optionsSnapshotKey,
+  type SelectedProductOptions,
+  validateSelectedOptions,
+} from "@/domain/product-options";
 import { calcCartSubtotal, calcLineTotal } from "@/domain/pricing";
 import { getProductById } from "@/services/catalog.service";
+import { listProductOptionGroups } from "@/services/product-options.service";
 import {
   getProductPricingRow,
   resolveProductUnitPrice,
@@ -56,7 +63,9 @@ async function mapCartItems(
 ): Promise<CartItemDto[]> {
   const { data, error } = await supabase
     .from("cart_items")
-    .select("id, product_id, product_name, sku, qty, unit_price, line_total")
+    .select(
+      "id, product_id, product_name, sku, qty, unit_price, line_total, config_snapshot",
+    )
     .eq("cart_id", cartId)
     .order("created_at", { ascending: true });
 
@@ -67,10 +76,29 @@ async function mapCartItems(
     let imageUrl: string | null = null;
     let slug: string | null = null;
     if (row.product_id) {
-      const product = await getProductById(supabase, row.product_id);
-      imageUrl = product?.imageUrl ?? null;
-      slug = product?.slug ?? null;
+      const { data: productRow } = await supabase
+        .from("products_public")
+        .select("slug, image_url")
+        .eq("id", row.product_id)
+        .maybeSingle();
+      imageUrl = productRow?.image_url ?? null;
+      slug = productRow?.slug ?? null;
     }
+
+    const snapshot = (row.config_snapshot ?? {}) as {
+      optionLabels?: Record<string, string>;
+      groupLabels?: Record<string, string>;
+    };
+    const optionSummary =
+      snapshot.optionLabels && Object.keys(snapshot.optionLabels).length
+        ? Object.entries(snapshot.optionLabels)
+            .map(([groupKey, label]) => {
+              const groupLabel = snapshot.groupLabels?.[groupKey] ?? groupKey;
+              return `${groupLabel}: ${label}`;
+            })
+            .join(" · ")
+        : null;
+
     items.push({
       id: row.id,
       productId: row.product_id,
@@ -81,6 +109,7 @@ async function mapCartItems(
       lineTotal: Number(row.line_total),
       imageUrl,
       slug,
+      optionSummary,
     });
   }
   return items;
@@ -167,9 +196,22 @@ export async function addToCart(
   ctx: CartContext,
   productId: string,
   qty = 1,
+  selectedOptions: SelectedProductOptions = {},
 ): Promise<CartDto> {
   const product = await getProductById(supabase, productId);
   if (!product) throw new Error("ไม่พบสินค้า");
+
+  const optionGroups = await listProductOptionGroups(supabase, productId);
+  const optionErr = validateSelectedOptions(optionGroups, selectedOptions);
+  if (optionErr) throw new Error(optionErr);
+
+  const optionSnapshot = buildOptionSnapshot(optionGroups, selectedOptions);
+  const configSnapshot = {
+    options: optionSnapshot.options,
+    optionLabels: optionSnapshot.optionLabels,
+    groupLabels: optionSnapshot.groupLabels,
+  };
+  const snapshotKey = optionsSnapshotKey(configSnapshot);
 
   const pricing = await getProductPricingRow(supabase, productId);
   const orderStep = pricing?.orderStep ?? 1;
@@ -177,19 +219,26 @@ export async function addToCart(
   if (err) throw new Error(err);
 
   const cart = await resolveCart(supabase, ctx);
-  const unitPrice = await resolveProductUnitPrice(
+  let unitPrice = await resolveProductUnitPrice(
     supabase,
     ctx.userId,
     productId,
     qty,
   );
+  unitPrice = Math.round((unitPrice + optionSnapshot.priceDelta) * 100) / 100;
 
-  const { data: existing } = await supabase
+  const { data: existingRows } = await supabase
     .from("cart_items")
-    .select("id, qty")
+    .select("id, qty, config_snapshot")
     .eq("cart_id", cart.id)
-    .eq("product_id", productId)
-    .maybeSingle();
+    .eq("product_id", productId);
+
+  const existing = (existingRows ?? []).find(
+    (row) =>
+      optionsSnapshotKey(
+        (row.config_snapshot ?? {}) as { options?: SelectedProductOptions },
+      ) === snapshotKey,
+  );
 
   if (existing) {
     const newQty = Number(existing.qty) + qty;
@@ -216,6 +265,7 @@ export async function addToCart(
       qty,
       unit_price: unitPrice,
       line_total: lineTotal,
+      config_snapshot: configSnapshot,
     });
     if (error) throw new Error(error.message);
   }
@@ -314,7 +364,16 @@ export async function mergeGuestCartToUser(
     .eq("cart_id", guestCart.id);
 
   for (const item of guestItems ?? []) {
-    await addToCart(supabase, { userId }, item.product_id!, Number(item.qty));
+    const options =
+      ((item.config_snapshot ?? {}) as { options?: SelectedProductOptions })
+        .options ?? {};
+    await addToCart(
+      supabase,
+      { userId },
+      item.product_id!,
+      Number(item.qty),
+      options,
+    );
   }
 
   await supabase.from("carts").delete().eq("id", guestCart.id);

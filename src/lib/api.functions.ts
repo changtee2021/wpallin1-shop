@@ -267,6 +267,7 @@ export const addProductToCart = createServerFn({ method: "POST" })
       cartContext(context.userId, data.sessionId),
       data.productId,
       data.qty ?? 1,
+      data.selectedOptions ?? {},
     );
   });
 

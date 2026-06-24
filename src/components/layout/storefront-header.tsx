@@ -23,26 +23,27 @@ export function StorefrontHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b bg-white shadow-sm">
-      <div className="bg-primary py-1 text-center text-xs text-primary-foreground sm:text-sm">
-        {t("app.tagline")}
-      </div>
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex h-16 items-center gap-3 md:gap-6">
+        <div className="flex h-14 items-center gap-2 sm:h-16 sm:gap-3 md:gap-6">
           <Link to="/" className="flex shrink-0 items-center">
             <img
               src="/brand/logo-color.png"
               alt="WP ALL"
-              className="h-9 w-auto object-contain sm:h-10"
+              className="h-8 w-auto object-contain sm:h-10"
             />
           </Link>
 
           <StorefrontMobileMenu />
 
-          <div className="hidden flex-1 md:block">
+          <div className="min-w-0 flex-1 lg:hidden">
+            <SearchBar compact />
+          </div>
+
+          <div className="hidden min-w-0 flex-1 lg:block">
             <SearchBar />
           </div>
 
-          <div className="ml-auto flex items-center gap-1 sm:gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
             {user ? <NotificationBell /> : null}
             <Button
               variant="ghost"
@@ -114,11 +115,7 @@ export function StorefrontHeader() {
           </div>
         </div>
 
-        <div className="pb-3 md:hidden">
-          <SearchBar compact />
-        </div>
-
-        <nav className="hidden border-t py-2 md:flex md:items-center md:gap-6">
+        <nav className="hidden border-t py-2 lg:flex lg:items-center lg:gap-6">
           {navLinks.map((item) => (
             <Link
               key={item.to}

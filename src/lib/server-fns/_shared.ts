@@ -17,6 +17,20 @@ export const cartCtxSchema = z.object({
 export const addToCartSchema = cartCtxSchema.extend({
   productId: z.string().uuid(),
   qty: z.number().positive().optional(),
+  selectedOptions: z.record(z.string(), z.string()).optional(),
+});
+
+export const productOptionChoiceSchema = z.object({
+  key: z.string().min(1),
+  label: z.string().min(1),
+  priceDelta: z.number().optional(),
+});
+
+export const productOptionGroupSchema = z.object({
+  groupKey: z.string().min(1),
+  groupLabel: z.string().min(1),
+  required: z.boolean().optional(),
+  choices: z.array(productOptionChoiceSchema).min(1),
 });
 
 export const cartItemSchema = cartCtxSchema.extend({
@@ -50,6 +64,7 @@ export const adminProductSchema = z.object({
   imageUrl: z.string().optional(),
   isFeatured: z.boolean().optional(),
   isActive: z.boolean().optional(),
+  optionGroups: z.array(productOptionGroupSchema).optional(),
 });
 
 export async function getAdminClient() {

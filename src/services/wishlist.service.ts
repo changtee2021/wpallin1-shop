@@ -43,6 +43,7 @@ export async function listWishlistProducts(
           p.attributes && typeof p.attributes === "object"
             ? (p.attributes as Record<string, unknown>)
             : null,
+        optionGroups: [],
       } satisfies ProductPublicDto;
     })
     .filter(Boolean) as ProductPublicDto[];

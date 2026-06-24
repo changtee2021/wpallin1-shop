@@ -8,6 +8,7 @@ export type CartItemDto = {
   lineTotal: number;
   imageUrl: string | null;
   slug: string | null;
+  optionSummary: string | null;
 };
 
 export type CartDto = {

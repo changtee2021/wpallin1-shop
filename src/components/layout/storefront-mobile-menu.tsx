@@ -29,7 +29,7 @@ export function StorefrontMobileMenu() {
       <Button
         variant="ghost"
         size="icon"
-        className="rounded-full md:hidden"
+        className="rounded-full lg:hidden"
         onClick={() => setOpen(true)}
         aria-label="Menu"
       >

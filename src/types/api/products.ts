@@ -1,5 +1,18 @@
 export type ProductType = "standard" | "custom";
 
+export type ProductOptionChoiceDto = {
+  key: string;
+  label: string;
+  priceDelta: number;
+};
+
+export type ProductOptionGroupDto = {
+  groupKey: string;
+  groupLabel: string;
+  required: boolean;
+  choices: ProductOptionChoiceDto[];
+};
+
 export type ProductPublicDto = {
   id: string;
   slug: string;
@@ -20,6 +33,7 @@ export type ProductPublicDto = {
   unit: string | null;
   weightKg: number | null;
   attributes: Record<string, unknown> | null;
+  optionGroups: ProductOptionGroupDto[];
   createdAt?: string | null;
 };
 

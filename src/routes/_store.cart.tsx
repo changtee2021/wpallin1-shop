@@ -116,6 +116,11 @@ function CartPage() {
                   <p className="font-medium">{item.productName}</p>
                 )}
                 <p className="text-sm text-muted-foreground">{item.sku}</p>
+                {item.optionSummary && (
+                  <p className="text-sm text-muted-foreground">
+                    {item.optionSummary}
+                  </p>
+                )}
                 <p className="mt-1 font-semibold text-accent">
                   {formatPrice(item.unitPrice)}
                 </p>

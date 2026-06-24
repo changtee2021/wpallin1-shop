@@ -35,11 +35,14 @@ Failures report:
 
 For interactive “click every button” testing in Agent chat, enable one of:
 
-### Option A — Browserbase Browse (recommended in Marketplace)
+### Option A — Browserbase Browse (local Chrome, no API key)
 
-1. Cursor → Extensions/Marketplace → **Browserbase Browse** → **Add to Cursor**
-2. Complete Browserbase API setup when prompted
-3. Agent mode → ask: *“smoke test wpallin1-shop with browser MCP”*
+1. Cursor → Marketplace → **Browserbase Browse** → **Add to Cursor** (installs the plugin)
+2. Merge into `%USERPROFILE%\.cursor\mcp.json` (see `.cursor/mcp.json.example` in this repo)
+3. Reload Cursor → MCP panel should show **browser** with tools like `browser_navigate`, `browser_snapshot`
+4. Agent mode → ask: *“smoke test wpallin1-shop with browser MCP”*
+
+Local mode launches Chrome on your machine via `browse-cli`; no Browserbase cloud account required.
 
 ### Option B — Chrome DevTools MCP
 
