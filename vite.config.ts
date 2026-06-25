@@ -15,7 +15,7 @@ export default defineConfig({
   },
   vite: {
     optimizeDeps: {
-      include: ["pdfjs-dist"],
+      include: ["pdfjs-dist/legacy/build/pdf.mjs"],
     },
   },
 });

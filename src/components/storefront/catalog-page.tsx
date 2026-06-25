@@ -25,10 +25,10 @@ export const CatalogPage = forwardRef<HTMLDivElement, Props>(
           <img
             src={src}
             alt={`หน้า ${pageNumber}`}
-            className="max-w-full object-contain transition-transform duration-200"
+            className="h-full max-h-full w-full max-w-full object-contain transition-transform duration-200"
             style={{ transform: zoom !== 1 ? `scale(${zoom})` : undefined }}
             draggable={false}
-            loading="lazy"
+            loading={pageNumber <= 2 ? "eager" : "lazy"}
           />
         ) : (
           <div className="flex aspect-[3/4] w-full max-w-lg flex-col items-center justify-center gap-3 p-6">

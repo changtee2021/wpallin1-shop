@@ -1019,6 +1019,7 @@ export {
   fetchMarketingCatalogAccess,
   fetchMarketingCatalogRef,
   fetchRelatedMarketingCatalogs,
+  fetchCatalogCategoryProducts,
   fetchProductMarketingCatalogs,
   recordCatalogView,
   fetchAdminCatalogViewStats,

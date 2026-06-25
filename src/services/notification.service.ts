@@ -17,6 +17,8 @@ export type NotificationEvent =
   | "wallet_topup_rejected"
   | "dealer_approved"
   | "dealer_rejected"
+  | "credit_order_approved"
+  | "credit_order_rejected"
   | "tier_upgraded"
   | "quotation_sent"
   | "quotation_accepted"
@@ -67,6 +69,16 @@ const EVENT_COPY: Record<
   dealer_rejected: () => ({
     title: "ใบสมัครตัวแทนไม่ผ่าน",
     body: "ติดต่อฝ่ายขายสำหรับรายละเอียด",
+  }),
+  credit_order_approved: (m) => ({
+    title: "อนุมัติวงเงินเครดิตแล้ว",
+    body: `ออเดอร์ ${m.orderNumber ?? ""} ได้รับอนุมัติให้ชำระแบบเครดิต`,
+    href: m.orderId ? `/account/orders/${m.orderId}` : "/account/orders",
+  }),
+  credit_order_rejected: (m) => ({
+    title: "ออเดอร์เครดิตไม่ผ่าน",
+    body: `ออเดอร์ ${m.orderNumber ?? ""} ไม่ผ่านการอนุมัติเครดิต`,
+    href: m.orderId ? `/account/orders/${m.orderId}` : "/account/orders",
   }),
   tier_upgraded: (m) => ({
     title: "เลื่อนระดับสมาชิก",

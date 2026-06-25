@@ -10,6 +10,7 @@ import {
 } from "@/services/cart.service";
 import { getProductById } from "@/services/catalog.service";
 import { incrementCouponUsage } from "@/services/coupon.service";
+import { decrementStockForPaidOrder } from "@/services/inventory.service";
 import {
   recordPaidOrderStats,
   resolveProductUnitPrice,
@@ -178,6 +179,7 @@ export async function placeOrder(
   if (isWalletPaid) {
     await debitWalletForOrder(supabase, userId, order.id, totals.grandTotal);
     await recordPaidOrderStats(supabase, userId, totals.grandTotal);
+    await decrementStockForPaidOrder(supabase, order.id);
     const { createProductionJob } =
       await import("@/services/admin-order.service");
     await createProductionJob(supabase, order.id);
@@ -353,6 +355,7 @@ export async function placeOrderOnBehalf(
       input.customerUserId,
       totals.grandTotal,
     );
+    await decrementStockForPaidOrder(supabase, order.id);
     const { createProductionJob } =
       await import("@/services/admin-order.service");
     await createProductionJob(supabase, order.id);

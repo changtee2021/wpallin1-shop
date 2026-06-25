@@ -8,13 +8,16 @@ import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 
+import { CatalogCategoryProducts } from "@/components/storefront/catalog-category-products";
 import { CatalogDealerLock } from "@/components/storefront/catalog-dealer-lock";
 import { CatalogStickyCta } from "@/components/storefront/catalog-sticky-cta";
 import { CatalogViewer } from "@/components/storefront/catalog-viewer";
 import { MarketingCatalogGrid } from "@/components/storefront/marketing-catalog-grid";
 import { Button } from "@/components/ui/button";
+import { useMemberProductPrices } from "@/hooks/use-member-product-prices";
 import { useAuth } from "@/hooks/use-auth";
 import {
+  fetchCatalogCategoryProducts,
   fetchMarketingCatalogAccess,
   fetchRelatedMarketingCatalogs,
 } from "@/lib/api.functions";
@@ -22,6 +25,7 @@ import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { isUuid } from "@/lib/catalog-slug";
 import { absoluteUrl, getDefaultOgImageUrl } from "@/lib/public-url";
 import { useT } from "@/i18n";
+import type { ProductPublicDto } from "@/types/api/products";
 import type {
   MarketingCatalogAccessDto,
   MarketingCatalogDto,
@@ -76,7 +80,14 @@ export const Route = createFileRoute("/_store/catalogs/$id")({
           })
         : [];
 
-    return { access, related };
+    const categoryProducts =
+      access.access === "full"
+        ? await fetchCatalogCategoryProducts({
+            data: { catalogId: access.catalog.id, limit: 8 },
+          })
+        : { products: [], shopCategorySlug: null };
+
+    return { access, related, categoryProducts };
   },
   component: CatalogViewerPage,
 });
@@ -92,6 +103,13 @@ function CatalogViewerPage() {
   const [related, setRelated] = useState<MarketingCatalogDto[]>(
     loaderData.related,
   );
+  const [categoryProducts, setCategoryProducts] = useState<ProductPublicDto[]>(
+    loaderData.categoryProducts.products,
+  );
+  const [shopCategorySlug, setShopCategorySlug] = useState<string | null>(
+    loaderData.categoryProducts.shopCategorySlug,
+  );
+  const memberPrices = useMemberProductPrices(categoryProducts);
   const { page } = Route.useSearch();
   const { catalog } = access;
   const locked = access.access === "locked";
@@ -99,7 +117,9 @@ function CatalogViewerPage() {
   useEffect(() => {
     setAccess(loaderData.access);
     setRelated(loaderData.related);
-  }, [loaderData.access, loaderData.related]);
+    setCategoryProducts(loaderData.categoryProducts.products);
+    setShopCategorySlug(loaderData.categoryProducts.shopCategorySlug);
+  }, [loaderData.access, loaderData.related, loaderData.categoryProducts]);
 
   useEffect(() => {
     if (!session?.access_token) return;
@@ -111,34 +131,52 @@ function CatalogViewerPage() {
       if (!next) return;
       setAccess(next);
       if (next.access === "full") {
-        const items = await fetchRelatedMarketingCatalogs({
-          data: { catalogId: next.catalog.id, limit: 4 },
-          ...authOpts,
-        });
+        const [items, productsResult] = await Promise.all([
+          fetchRelatedMarketingCatalogs({
+            data: { catalogId: next.catalog.id, limit: 4 },
+            ...authOpts,
+          }),
+          fetchCatalogCategoryProducts({
+            data: { catalogId: next.catalog.id, limit: 8 },
+          }),
+        ]);
         setRelated(items);
+        setCategoryProducts(productsResult.products);
+        setShopCategorySlug(productsResult.shopCategorySlug);
       } else {
         setRelated([]);
+        setCategoryProducts([]);
+        setShopCategorySlug(null);
       }
     })();
   }, [session?.access_token, catalog.slug, authOpts]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 pb-28 sm:px-6 sm:py-8">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <Button variant="ghost" size="sm" asChild>
+    <div className="mx-auto max-w-7xl px-3 py-4 pb-8 sm:px-6 sm:py-6 md:py-8">
+      <div className="mb-3 flex items-center justify-between gap-3 sm:mb-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 px-2 sm:h-9 sm:px-3"
+          asChild
+        >
           <Link to="/catalogs">
-            <ArrowLeft className="size-4" />
-            {t("catalogs.viewer.back")}
+            <ArrowLeft className="size-4 shrink-0" />
+            <span className="hidden sm:inline">
+              {t("catalogs.viewer.back")}
+            </span>
           </Link>
         </Button>
       </div>
 
-      <header className="mb-6 space-y-2">
-        <h1 className="text-xl font-bold sm:text-2xl">{catalog.title}</h1>
-        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+      <header className="mb-4 space-y-1.5 sm:mb-6 sm:space-y-2">
+        <h1 className="text-lg font-bold leading-tight sm:text-2xl">
+          {catalog.title}
+        </h1>
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground sm:text-sm">
           {catalog.categoryName ? <span>{catalog.categoryName}</span> : null}
           {catalog.version ? (
-            <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+            <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] sm:text-xs">
               {catalog.version}
             </span>
           ) : null}
@@ -149,26 +187,42 @@ function CatalogViewerPage() {
           ) : null}
         </div>
         {catalog.description ? (
-          <p className="text-sm text-muted-foreground">{catalog.description}</p>
+          <p className="line-clamp-2 text-xs text-muted-foreground sm:line-clamp-none sm:text-sm">
+            {catalog.description}
+          </p>
         ) : null}
       </header>
 
       {locked ? (
         <CatalogDealerLock catalog={catalog} />
       ) : catalog.pdfUrl ? (
-        <CatalogViewer
-          pdfUrl={catalog.pdfUrl}
-          title={catalog.title}
-          slug={catalog.slug}
-          catalogId={catalog.id}
-          allowDownload={catalog.allowDownload}
-          initialPage={page ?? 1}
-        />
+        <>
+          <CatalogViewer
+            pdfUrl={catalog.pdfUrl}
+            title={catalog.title}
+            slug={catalog.slug}
+            catalogId={catalog.id}
+            allowDownload={catalog.allowDownload}
+            initialPage={page ?? 1}
+          />
+          <CatalogStickyCta className="mt-4 sm:mt-6" />
+        </>
       ) : (
         <div className="rounded-xl border border-dashed p-12 text-center text-muted-foreground">
           {t("catalogs.viewer.noPdf")}
         </div>
       )}
+
+      {!locked && categoryProducts.length > 0 ? (
+        <section className="mt-10 sm:mt-12">
+          <CatalogCategoryProducts
+            products={categoryProducts}
+            categoryName={catalog.categoryName}
+            shopCategorySlug={shopCategorySlug}
+            memberPrices={memberPrices}
+          />
+        </section>
+      ) : null}
 
       {!locked && related.length > 0 ? (
         <section className="mt-12">
@@ -179,7 +233,6 @@ function CatalogViewerPage() {
         </section>
       ) : null}
 
-      {!locked ? <CatalogStickyCta /> : null}
     </div>
   );
 }

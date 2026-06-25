@@ -5,6 +5,7 @@ import type {
   AdminOrderSummaryDto,
   OrderStatus,
 } from "@/types/api/orders";
+import { decrementStockForPaidOrder } from "@/services/inventory.service";
 
 const SLIP_BUCKET = "wpall-retail-payment-slips";
 
@@ -267,6 +268,7 @@ export async function verifyPaymentSlip(
     "Admin verified payment slip",
   );
 
+  await decrementStockForPaidOrder(supabase, orderId);
   await createProductionJob(supabase, orderId);
 
   if (order?.user_id) {

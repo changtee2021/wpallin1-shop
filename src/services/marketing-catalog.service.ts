@@ -1,6 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { slugifyCatalogTitle } from "@/lib/catalog-slug";
+import { resolveShopCategorySlugForMarketingCategory } from "@/lib/marketing-catalog-products";
+import {
+  getPublicProductsByIds,
+  listPublicProducts,
+} from "@/services/catalog.service";
 import type {
   CatalogStatus,
   CatalogViewDevice,
@@ -11,6 +16,7 @@ import type {
   MarketingCatalogDto,
   MarketingCatalogInput,
 } from "@/types/api/marketing-catalogs";
+import type { ProductPublicDto } from "@/types/api/products";
 
 const CATALOG_SELECT =
   "id, slug, category_id, title, brand, description, cover_image_url, pdf_url, pdf_storage_path, external_link, tags, version, page_count, file_size, visibility, allow_download, is_featured, status, sort_order, is_public, is_active, created_at, updated_at, marketing_catalog_categories(name)";
@@ -134,7 +140,9 @@ async function fetchCatalogRows(
     .order("created_at", { ascending: false });
 
   if (filter?.storefront) {
-    query = query.eq("status", "published").in("visibility", ["public", "dealer"]);
+    query = query
+      .eq("status", "published")
+      .in("visibility", ["public", "dealer"]);
   } else if (filter?.publicOnly) {
     query = query.eq("status", "published").eq("visibility", "public");
   }
@@ -209,7 +217,9 @@ export async function resolveMarketingCatalogAccess(
     query = query.eq("slug", ref);
   }
 
-  query = query.eq("status", "published").in("visibility", ["public", "dealer"]);
+  query = query
+    .eq("status", "published")
+    .in("visibility", ["public", "dealer"]);
 
   const { data, error } = await query.maybeSingle();
   if (error) throw new Error(error.message);
@@ -321,6 +331,48 @@ export async function listRelatedMarketingCatalogs(
     .filter((item) => item.id !== catalog.id)
     .filter((item) => item.visibility === "public" || approved)
     .slice(0, limit);
+}
+
+export async function listProductsForMarketingCatalog(
+  supabase: SupabaseClient,
+  catalog: MarketingCatalogDto,
+  limit = 8,
+): Promise<{ products: ProductPublicDto[]; shopCategorySlug: string | null }> {
+  const seen = new Set<string>();
+  const products: ProductPublicDto[] = [];
+
+  if (catalog.productIds.length) {
+    const linked = await getPublicProductsByIds(supabase, catalog.productIds);
+    for (const product of linked) {
+      if (products.length >= limit) break;
+      if (seen.has(product.id)) continue;
+      seen.add(product.id);
+      products.push(product);
+    }
+  }
+
+  const shopCategorySlug = await resolveShopCategorySlugForMarketingCategory(
+    supabase,
+    catalog.categoryId,
+  );
+
+  if (products.length < limit && shopCategorySlug) {
+    const { data } = await listPublicProducts(supabase, {
+      category: shopCategorySlug,
+      pageSize: limit,
+      sortBy: "created_at",
+      sortDir: "desc",
+    });
+
+    for (const product of data) {
+      if (products.length >= limit) break;
+      if (seen.has(product.id)) continue;
+      seen.add(product.id);
+      products.push(product);
+    }
+  }
+
+  return { products, shopCategorySlug };
 }
 
 export async function listMarketingCatalogsForProduct(

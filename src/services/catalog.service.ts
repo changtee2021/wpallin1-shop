@@ -199,3 +199,29 @@ export async function getProductById(
   product.optionGroups = await listProductOptionGroups(supabase, product.id);
   return product;
 }
+
+export async function getPublicProductsByIds(
+  supabase: SupabaseClient,
+  ids: string[],
+): Promise<ProductPublicDto[]> {
+  if (!ids.length) return [];
+
+  const categories = await loadCategoryMap(supabase);
+  const { data, error } = await supabase
+    .from("products_public")
+    .select("*")
+    .in("id", ids);
+
+  if (error) throw new Error(error.message);
+
+  const byId = new Map(
+    (data ?? []).map((row) => [
+      row.id as string,
+      mapProduct(row as ProductRow, categories),
+    ]),
+  );
+
+  return ids
+    .map((id) => byId.get(id))
+    .filter((product): product is ProductPublicDto => Boolean(product));
+}

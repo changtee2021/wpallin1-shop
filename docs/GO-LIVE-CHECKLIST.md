@@ -58,6 +58,7 @@ Production URL: **https://wpallin1-shop.vercel.app**
 - [ ] Wallet top-up: ขอ → แอดมินอนุมัติ
 - [ ] B2B: อัปโหลด KYC → เปิดเครดิต (ถ้าใช้)
 - [ ] ตัวเลือกสินค้า (สี/ขนาด): เลือก → ตะกร้า → checkout สะท้อนตัวเลือกถูกต้อง
+- [ ] สต็อกลดอัตโนมัติหลัง order จ่ายแล้ว และ `/admin/inventory` แสดงสินค้าต่ำกว่า threshold
 
 ---
 
@@ -96,7 +97,7 @@ Production URL: **https://wpallin1-shop.vercel.app**
 | หัวข้อ | สถานะ |
 |--------|--------|
 | Product options ใน order line items | ตรวจ E2E ก่อน go-live |
-| Stock decrement อัตโนมัติหลัง checkout | ตรวจ business rule |
+| Stock decrement อัตโนมัติหลัง checkout | ทำแล้วเมื่อ order ชำระผ่าน wallet, อนุมัติสลิป, หรืออนุมัติเครดิต |
 | English i18n ครบทุกหน้า | บางหน้ายัง TH-first |
 | Header teal ตาม CI mockup | ดู `docs/design.md` |
 | DB Heavent webfont | รอ license |

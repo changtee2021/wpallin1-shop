@@ -13,6 +13,7 @@ import {
   listAdminMarketingCatalogCategories,
   listAdminMarketingCatalogs,
   listMarketingCatalogsForProduct,
+  listProductsForMarketingCatalog,
   listPublicMarketingCatalogs,
   listRelatedMarketingCatalogs,
   recordMarketingCatalogView,
@@ -108,6 +109,31 @@ export const fetchRelatedMarketingCatalogs = createServerFn({ method: "GET" })
       access.catalog,
       data.limit ?? 4,
       context.userId ?? null,
+    );
+  });
+
+export const fetchCatalogCategoryProducts = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        catalogId: z.string().uuid(),
+        limit: z.number().int().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const supabase = await getAdminClient();
+    const access = await resolveMarketingCatalogAccess(
+      supabase,
+      data.catalogId,
+    );
+    if (!access || access.access !== "full") {
+      return { products: [], shopCategorySlug: null };
+    }
+    return listProductsForMarketingCatalog(
+      supabase,
+      access.catalog,
+      data.limit ?? 8,
     );
   });
 

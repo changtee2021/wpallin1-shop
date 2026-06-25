@@ -1,10 +1,13 @@
-import * as pdfjs from "pdfjs-dist";
+import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 
 let workerConfigured = false;
 
 function ensureWorker() {
   if (workerConfigured || typeof window === "undefined") return;
-  pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+    "pdfjs-dist/legacy/build/pdf.worker.min.mjs",
+    import.meta.url,
+  ).toString();
   workerConfigured = true;
 }
 
@@ -13,9 +16,17 @@ export type PdfSearchHit = {
   snippet: string;
 };
 
+export type PdfRenderOptions = {
+  maxWidth?: number;
+  quality?: number;
+};
+
 export type PdfDocumentHandle = {
   numPages: number;
-  renderPage: (pageNumber: number, scale?: number) => Promise<string>;
+  renderPage: (
+    pageNumber: number,
+    options?: PdfRenderOptions,
+  ) => Promise<string>;
   extractPageText: (pageNumber: number) => Promise<string>;
   searchText: (
     query: string,
@@ -63,12 +74,26 @@ export async function openPdfDocument(
 
   return {
     numPages: pdf.numPages,
-    async renderPage(pageNumber: number, scale = 1.5) {
+    async renderPage(pageNumber: number, options?: PdfRenderOptions) {
       const cache = getCache();
       const cached = cache.get(pageNumber);
       if (cached) return cached;
 
       const page = await pdf.getPage(pageNumber);
+      const quality = options?.quality ?? 0.85;
+      const dpr =
+        typeof window !== "undefined"
+          ? Math.min(window.devicePixelRatio, 2)
+          : 1;
+      let scale = 1.2;
+      if (options?.maxWidth) {
+        const base = page.getViewport({ scale: 1 });
+        scale = Math.min(
+          2,
+          Math.max(0.85, (options.maxWidth * dpr) / base.width),
+        );
+      }
+
       const viewport = page.getViewport({ scale });
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
@@ -78,7 +103,7 @@ export async function openPdfDocument(
       canvas.height = viewport.height;
 
       await page.render({ canvasContext: context, viewport, canvas }).promise;
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+      const dataUrl = canvas.toDataURL("image/jpeg", quality);
       cache.set(pageNumber, dataUrl);
       page.cleanup();
       return dataUrl;
@@ -130,12 +155,13 @@ export async function preloadPdfPages(
   handle: PdfDocumentHandle,
   centerPage: number,
   radius = 2,
+  options?: PdfRenderOptions,
 ) {
   const start = Math.max(1, centerPage - radius);
   const end = Math.min(handle.numPages, centerPage + radius);
   const tasks: Promise<string>[] = [];
   for (let page = start; page <= end; page += 1) {
-    tasks.push(handle.renderPage(page));
+    tasks.push(handle.renderPage(page, options));
   }
   await Promise.all(tasks);
 }

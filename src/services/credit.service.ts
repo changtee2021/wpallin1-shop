@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { hasApprovedKyc } from "@/services/documents.service";
+import { decrementStockForPaidOrder } from "@/services/inventory.service";
 
 export type CreditAccountDto = {
   id: string;
@@ -318,6 +319,7 @@ export async function approveCreditOrder(
     .eq("id", orderId);
   if (updateErr) throw new Error(updateErr.message);
 
+  await decrementStockForPaidOrder(supabase, orderId);
   const { createProductionJob } =
     await import("@/services/admin-order.service");
   await createProductionJob(supabase, orderId);

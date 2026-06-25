@@ -44,16 +44,16 @@ Apply in timestamp order. All paths relative to `wp-group-erp/supabase/migration
 | `20260624100000_wpall_retail_mock_products.sql` | QA mock products |
 | `20260625100000_wpall_retail_mock_product_images.sql` | Mock product images |
 | `20260626100000_wpall_retail_mock_product_options.sql` | Mock selectable options (color, size, material) |
+| `20260627100000_wpall_retail_order_tax_invoices.sql` | Tax invoice support |
+| `20260627110000_wpall_retail_marketing_catalogs.sql` | Marketing PDF catalog tables + storage bucket |
+| `20260627120000_wpall_retail_catalog_bucket_limit.sql` | Larger catalog PDF storage limits |
+| `20260628100000_wpall_retail_marketing_catalogs_v2.sql` | Catalog slug, visibility, analytics, dealer access |
 
 ---
 
-## Pending — marketing PDF catalogs
+## Marketing PDF catalogs
 
-**Required for commit `70611e4` (marketing catalogs feature).**
-
-| Migration | Status | Summary |
-|-----------|--------|---------|
-| `20260627100000_wpall_retail_marketing_catalogs.sql` | **Not yet in wp-group-erp** | Tables + storage for PDF catalogs |
+Marketing catalog migrations are present in `wp-group-erp/supabase/migrations/`.
 
 Expected objects (from app code):
 
@@ -62,14 +62,15 @@ Expected objects (from app code):
 | `marketing_catalog_categories` | Group catalogs (e.g. ม่าน, มู่ลี่) |
 | `marketing_catalogs` | Title, brand, cover, PDF URL, tags, visibility |
 | `marketing_catalog_products` | Link catalogs ↔ products |
+| `marketing_catalog_views` | Catalog page/device view analytics |
 | Storage bucket `wpall-retail-catalogs` | Public PDF/cover uploads (admin write) |
 
-Until this migration is applied:
+If these migrations are not applied to the shared ERP project:
 
 - `/catalogs` and `/admin/catalogs` will fail on DB queries
 - Upload API `POST /api/v1/catalog-asset` will fail on storage
 
-**Action:** Add migration to `wp-group-erp`, then `supabase db push`.
+**Action:** Run `supabase db push` from `wp-group-erp`, then verify the tables and bucket exist.
 
 Feature doc: `docs/marketing-catalogs.md`
 

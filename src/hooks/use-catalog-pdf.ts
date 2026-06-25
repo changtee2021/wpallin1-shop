@@ -4,6 +4,7 @@ import {
   openPdfDocument,
   preloadPdfPages,
   type PdfDocumentHandle,
+  type PdfRenderOptions,
 } from "@/lib/pdf-to-pages";
 
 export function useCatalogPdf(pdfUrl: string) {
@@ -30,17 +31,18 @@ export function useCatalogPdf(pdfUrl: string) {
         if (!active) return;
         setDoc(handle);
         setNumPages(handle.numPages);
-        const first = await handle.renderPage(1);
+        const first = await handle.renderPage(1, { quality: 0.85 });
         if (!active) return;
         setPageImages({ 1: first });
-        await preloadPdfPages(handle, 1, 2);
-        if (!active) return;
-        const batch: Record<number, string> = { 1: first };
-        for (let page = 2; page <= Math.min(handle.numPages, 3); page += 1) {
-          batch[page] = await handle.renderPage(page);
-        }
-        if (!active) return;
-        setPageImages((prev) => ({ ...prev, ...batch }));
+        setLoading(false);
+        void preloadPdfPages(handle, 1, 2, { quality: 0.85 }).then(async () => {
+          if (!active) return;
+          for (let page = 2; page <= Math.min(handle!.numPages, 3); page += 1) {
+            const src = await handle!.renderPage(page, { quality: 0.85 });
+            if (!active) return;
+            setPageImages((prev) => ({ ...prev, [page]: src }));
+          }
+        });
       } catch (err) {
         if (!active) return;
         setError(err instanceof Error ? err.message : "Failed to load PDF");
@@ -57,13 +59,13 @@ export function useCatalogPdf(pdfUrl: string) {
   }, [pdfUrl]);
 
   const ensurePageLoaded = useCallback(
-    async (pageNumber: number, scale?: number) => {
+    async (pageNumber: number, options?: PdfRenderOptions) => {
       if (!doc) return;
-      if (pageImagesRef.current[pageNumber] && !scale) return;
-      const src = await doc.renderPage(pageNumber, scale);
+      if (pageImagesRef.current[pageNumber] && !options) return;
+      const src = await doc.renderPage(pageNumber, options);
       setPageImages((prev) => ({ ...prev, [pageNumber]: src }));
-      if (!scale) {
-        await preloadPdfPages(doc, pageNumber, 2);
+      if (!options) {
+        await preloadPdfPages(doc, pageNumber, 2, { quality: 0.85 });
       }
     },
     [doc],
