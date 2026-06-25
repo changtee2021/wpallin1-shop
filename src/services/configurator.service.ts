@@ -63,7 +63,9 @@ export async function listConfiguratorCatalog(
 
   const { data: fabrics } = await supabase
     .from("fabrics")
-    .select("id, code, name, price_per_meter, collection_id, color_id")
+    .select(
+      "id, code, name, price_per_meter, collection_id, color_id, swatch_url",
+    )
     .eq("is_active", true)
     .order("name");
 
@@ -111,6 +113,12 @@ export async function listConfiguratorCatalog(
     };
   });
 
+  const optionImageUrl = (metadata: Record<string, unknown> | null) => {
+    if (typeof metadata?.image_url === "string") return metadata.image_url;
+    if (typeof metadata?.imageUrl === "string") return metadata.imageUrl;
+    return null;
+  };
+
   const mapOpts = (group: string) =>
     (options ?? [])
       .filter((o) => (o as OptionRow).option_group === group)
@@ -120,6 +128,7 @@ export async function listConfiguratorCatalog(
           key: row.option_key,
           label: row.option_label,
           priceDelta: Number(row.price_delta),
+          imageUrl: optionImageUrl(row.metadata),
         };
       });
 
@@ -157,6 +166,7 @@ export async function listConfiguratorCatalog(
         ? (collMap.get(f.collection_id) ?? null)
         : null,
       colorHex: f.color_id ? (colorMap.get(f.color_id) ?? null) : null,
+      swatchUrl: f.swatch_url ?? null,
       pricePerMeter: Number(f.price_per_meter),
     })),
     limits: {

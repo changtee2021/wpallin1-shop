@@ -1,40 +1,45 @@
 import { ProductImage } from "@/components/storefront/product-image";
-import type { ConfiguratorCatalog } from "@/domain/configurator";
-
-type FabricPreview = ConfiguratorCatalog["fabrics"][number] | null;
+import type { ConfiguratorPreviewState } from "@/domain/configurator";
 
 export function PreviewPanel({
-  fabric,
-  productImageUrl,
-  productLabel,
-  widthCm,
-  heightCm,
+  preview,
 }: {
-  fabric: FabricPreview;
-  productImageUrl?: string | null;
-  productLabel?: string | null;
-  widthCm: number;
-  heightCm: number;
+  preview: ConfiguratorPreviewState;
 }) {
-  const aspect = Math.min(widthCm / Math.max(heightCm, 1), 2);
-  const showRoomPreview = Boolean(productImageUrl);
+  const aspect = Math.min(preview.widthCm / Math.max(preview.heightCm, 1), 2);
+  const showRoomPreview = Boolean(preview.imageUrl);
 
   return (
-    <div className="rounded-xl border bg-muted/20 p-4 sm:p-6">
+    <div className="rounded-xl border bg-muted/20 p-4 sm:p-6 lg:sticky lg:top-4">
       {showRoomPreview ? (
         <div className="relative mx-auto aspect-[4/3] w-full max-w-3xl overflow-hidden rounded-lg border bg-background shadow-sm">
           <ProductImage
-            src={productImageUrl}
-            alt={productLabel ?? "Custom product preview"}
-            imgClassName="object-cover"
+            key={preview.imageUrl ?? "preview"}
+            src={preview.imageUrl}
+            alt={preview.productTypeLabel ?? "Custom product preview"}
+            imgClassName="object-cover transition-opacity duration-300"
           />
-          {fabric && (
+          {(preview.fabricSwatchUrl || preview.fabricColorHex) && (
             <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-full border bg-background/95 px-3 py-1.5 text-xs shadow-sm backdrop-blur-sm">
-              <span
-                className="inline-block size-4 shrink-0 rounded-full border"
-                style={{ background: fabric.colorHex ?? "#ccc" }}
-              />
-              <span className="font-medium text-foreground">{fabric.name}</span>
+              {preview.fabricSwatchUrl ? (
+                <span className="relative inline-block size-5 shrink-0 overflow-hidden rounded-full border">
+                  <ProductImage
+                    src={preview.fabricSwatchUrl}
+                    alt={preview.fabricName ?? "Fabric"}
+                    imgClassName="object-cover"
+                  />
+                </span>
+              ) : (
+                <span
+                  className="inline-block size-4 shrink-0 rounded-full border"
+                  style={{ background: preview.fabricColorHex ?? "#ccc" }}
+                />
+              )}
+              {preview.fabricName && (
+                <span className="font-medium text-foreground">
+                  {preview.fabricName}
+                </span>
+              )}
             </div>
           )}
         </div>
@@ -44,27 +49,37 @@ export function PreviewPanel({
           style={{ maxHeight: 320 }}
         >
           <div
-            className="rounded-sm border shadow-md transition-all"
+            className="rounded-sm border shadow-md transition-all duration-300"
             style={{
               width: `${Math.min(80, 40 * aspect)}%`,
               height: `${Math.min(70, 35 / aspect)}%`,
-              background:
-                fabric?.colorHex ?? "linear-gradient(135deg,#e5e7eb,#d1d5db)",
+              background: preview.fabricSwatchUrl
+                ? `url(${preview.fabricSwatchUrl}) center/cover`
+                : (preview.fabricColorHex ??
+                  "linear-gradient(135deg,#e5e7eb,#d1d5db)"),
             }}
           />
         </div>
       )}
 
-      <div className="mt-4 text-center text-sm text-muted-foreground">
-        {productLabel && (
-          <p className="font-medium text-foreground">{productLabel}</p>
-        )}
-        {fabric ? (
-          <p>
-            {widthCm} x {heightCm} ซม. — ตัวอย่างสีผ้าที่เลือก
+      <div className="mt-4 space-y-1 text-center text-sm text-muted-foreground">
+        {preview.productTypeLabel && (
+          <p className="font-medium text-foreground">
+            {preview.productTypeLabel}
           </p>
-        ) : (
-          <p>ภาพตัวอย่างในห้องจริง | Room preview — เลือกผ้าเพื่อดูสี</p>
+        )}
+        <p>
+          {preview.widthCm} x {preview.heightCm} ซม.
+          {preview.fabricName
+            ? ` — ${preview.fabricName}`
+            : " — เลือกตัวเลือกเพื่อดูตัวอย่าง"}
+        </p>
+        {(preview.railLabel || preview.installationLabel) && (
+          <p className="text-xs">
+            {[preview.railLabel, preview.installationLabel]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
         )}
       </div>
     </div>

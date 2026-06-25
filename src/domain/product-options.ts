@@ -2,6 +2,7 @@ export type ProductOptionChoiceDto = {
   key: string;
   label: string;
   priceDelta: number;
+  imageUrl?: string;
 };
 
 export type ProductOptionGroupDto = {

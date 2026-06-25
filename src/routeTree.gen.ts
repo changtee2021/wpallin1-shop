@@ -61,6 +61,7 @@ import { Route as StoreCheckoutRouteImport } from './routes/_store.checkout'
 import { Route as StoreCatalogsRouteImport } from './routes/_store.catalogs'
 import { Route as StoreCartRouteImport } from './routes/_store.cart'
 import { Route as StoreAboutRouteImport } from './routes/_store.about'
+import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
 import { Route as StoreCatalogsIndexRouteImport } from './routes/_store.catalogs.index'
 import { Route as ApiV1WalletTopupSlipRouteImport } from './routes/api/v1/wallet-topup-slip'
 import { Route as ApiV1ProfileAvatarRouteImport } from './routes/api/v1/profile-avatar'
@@ -340,6 +341,11 @@ const StoreAboutRoute = StoreAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => StoreRoute,
 } as any)
+const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminProductsRoute,
+} as any)
 const StoreCatalogsIndexRoute = StoreCatalogsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -508,6 +514,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
   '/catalogs/': typeof StoreCatalogsIndexRoute
+  '/admin/products/': typeof AdminProductsIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -541,7 +548,6 @@ export interface FileRoutesByTo {
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/members': typeof AdminMembersRouteWithChildren
   '/admin/orders': typeof AdminOrdersRouteWithChildren
-  '/admin/products': typeof AdminProductsRouteWithChildren
   '/admin/quotations': typeof AdminQuotationsRouteWithChildren
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sales-order': typeof AdminSalesOrderRoute
@@ -576,6 +582,7 @@ export interface FileRoutesByTo {
   '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
   '/catalogs': typeof StoreCatalogsIndexRoute
+  '/admin/products': typeof AdminProductsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -650,6 +657,7 @@ export interface FileRoutesById {
   '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
   '/_store/catalogs/': typeof StoreCatalogsIndexRoute
+  '/admin/products/': typeof AdminProductsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -724,6 +732,7 @@ export interface FileRouteTypes {
     | '/api/v1/profile-avatar'
     | '/api/v1/wallet-topup-slip'
     | '/catalogs/'
+    | '/admin/products/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -757,7 +766,6 @@ export interface FileRouteTypes {
     | '/admin/inventory'
     | '/admin/members'
     | '/admin/orders'
-    | '/admin/products'
     | '/admin/quotations'
     | '/admin/reports'
     | '/admin/sales-order'
@@ -792,6 +800,7 @@ export interface FileRouteTypes {
     | '/api/v1/profile-avatar'
     | '/api/v1/wallet-topup-slip'
     | '/catalogs'
+    | '/admin/products'
   id:
     | '__root__'
     | '/_store'
@@ -865,6 +874,7 @@ export interface FileRouteTypes {
     | '/api/v1/profile-avatar'
     | '/api/v1/wallet-topup-slip'
     | '/_store/catalogs/'
+    | '/admin/products/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1254,6 +1264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoreAboutRouteImport
       parentRoute: typeof StoreRoute
     }
+    '/admin/products/': {
+      id: '/admin/products/'
+      path: '/'
+      fullPath: '/admin/products/'
+      preLoaderRoute: typeof AdminProductsIndexRouteImport
+      parentRoute: typeof AdminProductsRoute
+    }
     '/_store/catalogs/': {
       id: '/_store/catalogs/'
       path: '/'
@@ -1506,11 +1523,13 @@ const AdminOrdersRouteWithChildren = AdminOrdersRoute._addFileChildren(
 interface AdminProductsRouteChildren {
   AdminProductsIdRoute: typeof AdminProductsIdRoute
   AdminProductsNewRoute: typeof AdminProductsNewRoute
+  AdminProductsIndexRoute: typeof AdminProductsIndexRoute
 }
 
 const AdminProductsRouteChildren: AdminProductsRouteChildren = {
   AdminProductsIdRoute: AdminProductsIdRoute,
   AdminProductsNewRoute: AdminProductsNewRoute,
+  AdminProductsIndexRoute: AdminProductsIndexRoute,
 }
 
 const AdminProductsRouteWithChildren = AdminProductsRoute._addFileChildren(

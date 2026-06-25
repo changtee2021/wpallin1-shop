@@ -1,3 +1,5 @@
+import { getConfiguratorFallbackImage } from "@/lib/configurator-product-showcase";
+
 export type ConfiguratorProductType = "pleated" | "eyelet" | "wave";
 
 export type ConfiguratorDraft = {
@@ -25,13 +27,20 @@ export type ConfiguratorCatalog = {
     name: string;
     collectionName: string | null;
     colorHex: string | null;
+    swatchUrl: string | null;
     pricePerMeter: number;
   }>;
-  railOptions: Array<{ key: string; label: string; priceDelta: number }>;
+  railOptions: Array<{
+    key: string;
+    label: string;
+    priceDelta: number;
+    imageUrl: string | null;
+  }>;
   installationOptions: Array<{
     key: string;
     label: string;
     priceDelta: number;
+    imageUrl: string | null;
   }>;
   customProductId: string;
   limits: {
@@ -60,6 +69,53 @@ export const CONFIGURATOR_STEPS = [
 ] as const;
 
 export type ConfiguratorStep = (typeof CONFIGURATOR_STEPS)[number];
+
+export type ConfiguratorPreviewState = {
+  imageUrl: string | null;
+  fabricSwatchUrl: string | null;
+  fabricColorHex: string | null;
+  fabricName: string | null;
+  productTypeLabel: string | null;
+  railLabel: string | null;
+  installationLabel: string | null;
+  widthCm: number;
+  heightCm: number;
+};
+
+export function resolveConfiguratorPreview(
+  draft: ConfiguratorDraft,
+  catalog: ConfiguratorCatalog,
+): ConfiguratorPreviewState {
+  const productType = catalog.productTypes.find(
+    (o) => o.key === draft.productType,
+  );
+  const fabric = catalog.fabrics.find((f) => f.id === draft.fabricId);
+  const rail = catalog.railOptions.find((o) => o.key === draft.railOptionKey);
+  const installation = catalog.installationOptions.find(
+    (o) => o.key === draft.installationOptionKey,
+  );
+
+  let imageUrl: string | null = null;
+  if (rail?.imageUrl) {
+    imageUrl = rail.imageUrl;
+  } else if (productType?.imageUrl) {
+    imageUrl = productType.imageUrl;
+  } else if (draft.productType) {
+    imageUrl = getConfiguratorFallbackImage(draft.productType);
+  }
+
+  return {
+    imageUrl,
+    fabricSwatchUrl: fabric?.swatchUrl ?? null,
+    fabricColorHex: fabric?.colorHex ?? null,
+    fabricName: fabric?.name ?? null,
+    productTypeLabel: productType?.label ?? null,
+    railLabel: rail?.label ?? null,
+    installationLabel: installation?.label ?? null,
+    widthCm: draft.widthCm,
+    heightCm: draft.heightCm,
+  };
+}
 
 export function validateDimensions(
   draft: ConfiguratorDraft,

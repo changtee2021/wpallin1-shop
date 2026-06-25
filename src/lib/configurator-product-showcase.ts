@@ -13,7 +13,7 @@ const MATCH_TERMS: Record<string, string[]> = {
 };
 
 /** Fallback art when no linked product or metadata image exists. */
-const FALLBACK_IMAGES: Record<string, string> = {
+export const CONFIGURATOR_FALLBACK_IMAGES: Record<string, string> = {
   pleated:
     "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&h=600&fit=crop",
   eyelet:
@@ -58,10 +58,15 @@ export function resolveProductTypeShowcase(
   const matched = matchShowcaseProduct(key, products);
 
   return {
-    imageUrl: metaImage ?? matched?.imageUrl ?? FALLBACK_IMAGES[key] ?? null,
+    imageUrl:
+      metaImage ?? matched?.imageUrl ?? CONFIGURATOR_FALLBACK_IMAGES[key] ?? null,
     description:
       metaDesc ?? matched?.description ?? FALLBACK_DESCRIPTIONS[key] ?? null,
     startingPrice: matched?.retailPrice ?? null,
     showcaseSlug: matched?.slug ?? null,
   };
+}
+
+export function getConfiguratorFallbackImage(key: string): string | null {
+  return CONFIGURATOR_FALLBACK_IMAGES[key] ?? null;
 }

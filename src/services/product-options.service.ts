@@ -42,6 +42,12 @@ function groupRows(rows: OptionRow[]): ProductOptionGroupDto[] {
       key: row.option_key,
       label: row.option_label,
       priceDelta: Number(row.price_delta),
+      imageUrl:
+        typeof meta.image_url === "string"
+          ? meta.image_url
+          : typeof meta.imageUrl === "string"
+            ? meta.imageUrl
+            : undefined,
     });
   }
 
@@ -87,6 +93,15 @@ export async function syncProductOptionGroups(
       const label = choice.label.trim();
       if (!key || !label) continue;
 
+      const existingMeta =
+        typeof group.groupLabel === "string"
+          ? { group_label: group.groupLabel.trim() || groupKey }
+          : { group_label: groupKey };
+      const metadata: Record<string, unknown> = { ...existingMeta };
+      if (choice.imageUrl?.trim()) {
+        metadata.image_url = choice.imageUrl.trim();
+      }
+
       rows.push({
         product_id: productId,
         option_group: groupKey,
@@ -96,7 +111,7 @@ export async function syncProductOptionGroups(
         price_delta: choice.priceDelta ?? 0,
         is_required: group.required ?? false,
         sort_order: sortOrder++,
-        metadata: { group_label: group.groupLabel.trim() || groupKey },
+        metadata,
       });
     }
   }

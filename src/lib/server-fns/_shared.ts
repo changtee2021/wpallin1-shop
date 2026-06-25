@@ -24,6 +24,7 @@ export const productOptionChoiceSchema = z.object({
   key: z.string().min(1),
   label: z.string().min(1),
   priceDelta: z.number().optional(),
+  imageUrl: z.string().optional(),
 });
 
 export const productOptionGroupSchema = z.object({

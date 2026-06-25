@@ -1,5 +1,6 @@
 import { Plus, Trash2 } from "lucide-react";
 
+import { ProductImage } from "@/components/storefront/product-image";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -181,41 +182,64 @@ export function ProductOptionsEditor({ groups, onChange }: Props) {
             {group.choices.map((choice, choiceIndex) => (
               <div
                 key={`${choice.key}-${choiceIndex}`}
-                className="flex flex-wrap items-end gap-2"
+                className="space-y-2 rounded border bg-background p-2"
               >
-                <Input
-                  className="min-w-[140px] flex-1"
-                  placeholder="ชื่อ เช่น ทราย"
-                  value={choice.label}
-                  onChange={(e) => {
-                    const label = e.target.value;
-                    updateChoice(groupIndex, choiceIndex, {
-                      label,
-                      key: choice.key || slugifyOptionKey(label),
-                    });
-                  }}
-                />
-                <Input
-                  className="w-28"
-                  type="number"
-                  step="0.01"
-                  placeholder="+ราคา"
-                  value={choice.priceDelta}
-                  onChange={(e) =>
-                    updateChoice(groupIndex, choiceIndex, {
-                      priceDelta: Number(e.target.value),
-                    })
-                  }
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  disabled={group.choices.length <= 1}
-                  onClick={() => removeChoice(groupIndex, choiceIndex)}
-                >
-                  <Trash2 className="size-4" />
-                </Button>
+                <div className="flex flex-wrap items-end gap-2">
+                  <Input
+                    className="min-w-[140px] flex-1"
+                    placeholder="ชื่อ เช่น ทราย"
+                    value={choice.label}
+                    onChange={(e) => {
+                      const label = e.target.value;
+                      updateChoice(groupIndex, choiceIndex, {
+                        label,
+                        key: choice.key || slugifyOptionKey(label),
+                      });
+                    }}
+                  />
+                  <Input
+                    className="w-28"
+                    type="number"
+                    step="0.01"
+                    placeholder="+ราคา"
+                    value={choice.priceDelta}
+                    onChange={(e) =>
+                      updateChoice(groupIndex, choiceIndex, {
+                        priceDelta: Number(e.target.value),
+                      })
+                    }
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    disabled={group.choices.length <= 1}
+                    onClick={() => removeChoice(groupIndex, choiceIndex)}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+                <div className="flex flex-wrap items-end gap-2">
+                  <Input
+                    className="min-w-[200px] flex-1"
+                    placeholder="URL รูป preview (Custom)"
+                    value={choice.imageUrl ?? ""}
+                    onChange={(e) =>
+                      updateChoice(groupIndex, choiceIndex, {
+                        imageUrl: e.target.value,
+                      })
+                    }
+                  />
+                  {choice.imageUrl?.trim() ? (
+                    <div className="relative size-12 shrink-0 overflow-hidden rounded border">
+                      <ProductImage
+                        src={choice.imageUrl.trim()}
+                        alt={choice.label || "Preview"}
+                        imgClassName="object-cover"
+                      />
+                    </div>
+                  ) : null}
+                </div>
               </div>
             ))}
             <Button
