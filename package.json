@@ -15,7 +15,9 @@
     "test:smoke:ui": "playwright test e2e/smoke.spec.ts --ui",
     "catalog:compress": "node scripts/compress-catalog-pdf.mjs",
     "catalog:seed-roller": "node scripts/seed-roller-blinds-catalog.mjs",
-    "media:compress": "node scripts/compress-media.mjs"
+    "media:compress": "node scripts/compress-media.mjs",
+    "deploy:preview": "vercel deploy --yes --scope passawutaplus-9338s-projects",
+    "deploy:prod": "npm run build && vercel deploy --prod --yes --scope passawutaplus-9338s-projects"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
