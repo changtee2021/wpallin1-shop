@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -17,6 +17,12 @@ import {
 } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
+import {
+  calcSelectedSubtotal,
+  filterCartItems,
+  parseItemIds,
+  proportionalDiscount,
+} from "@/lib/cart-selection";
 import {
   checkoutOrder,
   fetchAccountAddresses,
@@ -37,6 +43,7 @@ const checkoutSearchSchema = z.object({
   orderId: z.string().uuid().optional(),
   paymentId: z.string().uuid().optional(),
   orderNumber: z.string().optional(),
+  items: z.string().optional(),
 });
 
 export const Route = createFileRoute("/_store/checkout")({
@@ -49,6 +56,21 @@ function CheckoutPage() {
   const { cart, refresh } = useCart();
   const navigate = useNavigate();
   const search = Route.useSearch();
+  const selectedIds = useMemo(() => parseItemIds(search.items), [search.items]);
+  const selectedItems = useMemo(
+    () => filterCartItems(cart.items, selectedIds),
+    [cart.items, selectedIds],
+  );
+  const checkoutItems = selectedIds.length ? selectedItems : cart.items;
+  const checkoutSubtotal =
+    selectedIds.length > 0
+      ? calcSelectedSubtotal(selectedItems)
+      : cart.subtotal;
+  const checkoutDiscount =
+    selectedIds.length > 0
+      ? proportionalDiscount(cart.subtotal, cart.discount, checkoutSubtotal)
+      : cart.discount;
+  const checkoutTotal = Math.max(0, checkoutSubtotal - checkoutDiscount);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<
@@ -145,6 +167,7 @@ function CheckoutPage() {
           ...form,
           paymentMethod,
           affiliateCode: getAffiliateRef() ?? undefined,
+          itemIds: selectedIds.length ? selectedIds : undefined,
         },
         ...authServerFnOptions(session),
       });
@@ -183,6 +206,26 @@ function CheckoutPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
       <h1 className="mb-6 text-2xl font-bold">ชำระเงิน</h1>
+      {checkoutItems.length > 0 ? (
+        <Card className="mb-6">
+          <CardContent className="space-y-2 p-4">
+            <h2 className="font-semibold">รายการที่สั่ง</h2>
+            {checkoutItems.map((item) => (
+              <div
+                key={item.id}
+                className="flex justify-between gap-3 text-sm"
+              >
+                <span className="min-w-0 truncate">
+                  {item.productName} x{item.qty}
+                </span>
+                <span className="shrink-0 font-medium">
+                  {formatPrice(item.lineTotal)}
+                </span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      ) : null}
       <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
         <Card>
           <CardContent className="space-y-4 p-4">
@@ -327,9 +370,7 @@ function CheckoutPage() {
             )}
             <div className="flex justify-between text-lg font-bold">
               <span>ยอดชำระ</span>
-              <span className="text-accent">
-                {formatPrice(Math.max(0, cart.subtotal - cart.discount))}
-              </span>
+              <span className="text-accent">{formatPrice(checkoutTotal)}</span>
             </div>
           </CardContent>
         </Card>
@@ -338,7 +379,7 @@ function CheckoutPage() {
           type="submit"
           className="w-full bg-accent hover:bg-accent/90"
           size="lg"
-          disabled={submitting || !cart.items.length}
+          disabled={submitting || !checkoutItems.length}
         >
           {submitting ? "กำลังสั่งซื้อ..." : "ยืนยันคำสั่งซื้อ"}
         </Button>

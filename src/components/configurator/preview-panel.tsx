@@ -10,23 +10,24 @@ export function PreviewPanel({
   const showRoomPreview = Boolean(preview.imageUrl);
 
   return (
-    <div className="rounded-xl border bg-muted/20 p-4 sm:p-6 lg:sticky lg:top-4">
+    <div className="isolate min-w-0 rounded-xl border bg-muted/20 p-4 sm:p-6 lg:sticky lg:top-4 lg:z-0">
       {showRoomPreview ? (
-        <div className="relative mx-auto aspect-[4/3] w-full max-w-3xl overflow-hidden rounded-lg border bg-background shadow-sm">
+        <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-lg border bg-background shadow-sm">
           <ProductImage
             key={preview.imageUrl ?? "preview"}
             src={preview.imageUrl}
             alt={preview.productTypeLabel ?? "Custom product preview"}
-            imgClassName="object-cover transition-opacity duration-300"
+            fill
+            imgClassName="transition-opacity duration-300"
           />
           {(preview.fabricSwatchUrl || preview.fabricColorHex) && (
-            <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-full border bg-background/95 px-3 py-1.5 text-xs shadow-sm backdrop-blur-sm">
+            <div className="absolute bottom-3 left-3 z-10 flex items-center gap-2 rounded-full border bg-background/95 px-3 py-1.5 text-xs shadow-sm backdrop-blur-sm">
               {preview.fabricSwatchUrl ? (
                 <span className="relative inline-block size-5 shrink-0 overflow-hidden rounded-full border">
                   <ProductImage
                     src={preview.fabricSwatchUrl}
                     alt={preview.fabricName ?? "Fabric"}
-                    imgClassName="object-cover"
+                    fill
                   />
                 </span>
               ) : (
@@ -44,10 +45,7 @@ export function PreviewPanel({
           )}
         </div>
       ) : (
-        <div
-          className="mx-auto flex aspect-video max-w-lg items-end justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-background p-4"
-          style={{ maxHeight: 320 }}
-        >
+        <div className="mx-auto flex aspect-[4/3] w-full max-w-lg items-end justify-center overflow-hidden rounded-lg border-2 border-dashed border-muted-foreground/30 bg-background p-4">
           <div
             className="rounded-sm border shadow-md transition-all duration-300"
             style={{

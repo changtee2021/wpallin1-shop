@@ -104,6 +104,7 @@ export type CheckoutInput = {
   note?: string;
   paymentMethod?: "bank_transfer" | "wallet" | "credit";
   affiliateCode?: string;
+  itemIds?: string[];
 };
 
 export type CheckoutResult = {

@@ -8,6 +8,8 @@ type ProductImageProps = {
   className?: string;
   imgClassName?: string;
   showLabel?: boolean;
+  /** Parent must be `relative` with defined size (e.g. aspect-ratio box). */
+  fill?: boolean;
 };
 
 const PLACEHOLDER_GRADIENTS = [
@@ -38,13 +40,20 @@ export function ProductImage({
   className,
   imgClassName,
   showLabel = true,
+  fill = false,
 }: ProductImageProps) {
   if (src) {
     return (
       <img
         src={src}
         alt={alt}
-        className={cn("size-full object-cover", imgClassName, className)}
+        className={cn(
+          fill
+            ? "absolute inset-0 h-full w-full object-cover"
+            : "block h-full w-full max-h-full max-w-full object-cover",
+          imgClassName,
+          className,
+        )}
         loading="lazy"
       />
     );

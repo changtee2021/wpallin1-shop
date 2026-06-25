@@ -22,10 +22,7 @@ function formatStartingPrice(opt: ConfiguratorProductType): string {
 }
 
 function pickHeroImage(productTypes: ConfiguratorProductType[]): string {
-  return (
-    productTypes.find((p) => p.imageUrl)?.imageUrl ??
-    DEFAULT_HERO_IMAGE
-  );
+  return productTypes.find((p) => p.imageUrl)?.imageUrl ?? DEFAULT_HERO_IMAGE;
 }
 
 export function ConfiguratorProductGrid({
@@ -40,12 +37,8 @@ export function ConfiguratorProductGrid({
   return (
     <div className="space-y-6">
       <div className="overflow-hidden rounded-xl border bg-muted/20 shadow-sm">
-        <div className="relative aspect-[21/9] max-h-72 w-full sm:aspect-[2.4/1]">
-          <ProductImage
-            src={heroImage}
-            alt="Custom curtains preview"
-            imgClassName="object-cover"
-          />
+        <div className="relative aspect-[21/9] max-h-72 w-full overflow-hidden sm:aspect-[2.4/1]">
+          <ProductImage src={heroImage} alt="Custom curtains preview" fill />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
           <div className="absolute bottom-0 left-0 p-4 sm:p-6">
             <Badge className="mb-2 bg-accent text-white hover:bg-accent">

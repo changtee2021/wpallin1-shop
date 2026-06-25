@@ -13,6 +13,7 @@ import { CookieConsent } from "@/components/cookie-consent";
 import { Toaster } from "@/components/ui/sonner";
 import { LocaleSync } from "@/components/locale-sync";
 import { AuthProvider } from "@/hooks/use-auth";
+import { CartProvider } from "@/hooks/use-cart";
 import { I18nProvider } from "@/i18n";
 import appCss from "@/styles.css?url";
 import { getDefaultOgImageUrl, getPublicUrl } from "@/lib/public-url";
@@ -105,10 +106,12 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <AuthProvider>
-          <LocaleSync />
-          <Outlet />
-          <Toaster position="top-center" richColors />
-          <CookieConsent />
+          <CartProvider>
+            <LocaleSync />
+            <Outlet />
+            <Toaster position="top-center" richColors />
+            <CookieConsent />
+          </CartProvider>
         </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>

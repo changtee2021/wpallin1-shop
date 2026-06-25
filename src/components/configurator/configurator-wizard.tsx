@@ -3,7 +3,8 @@ import { RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { ConfiguratorChat } from "@/components/configurator/configurator-chat";
+import { ConfiguratorForm } from "@/components/configurator/configurator-form";
+import { ConfiguratorProductGrid } from "@/components/configurator/configurator-product-grid";
 import { PreviewPanel } from "@/components/configurator/preview-panel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -111,6 +112,20 @@ export function ConfiguratorWizard({
     );
   }
 
+  if (!draft.productType) {
+    return (
+      <ConfiguratorProductGrid
+        productTypes={catalog.productTypes}
+        onSelect={(key) =>
+          setDraft({
+            ...INITIAL_DRAFT,
+            productType: key as ConfiguratorDraft["productType"],
+          })
+        }
+      />
+    );
+  }
+
   const preview = resolveConfiguratorPreview(draft, catalog);
 
   async function handleAddToCart() {
@@ -154,12 +169,15 @@ export function ConfiguratorWizard({
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-      <PreviewPanel preview={preview} />
-      <ConfiguratorChat
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:items-start">
+      <div className="min-w-0">
+        <PreviewPanel preview={preview} />
+      </div>
+      <ConfiguratorForm
         catalog={catalog}
         draft={draft}
         onDraftChange={setDraft}
+        onResetProduct={() => setDraft(INITIAL_DRAFT)}
         price={price}
         submitting={submitting}
         onAddToCart={() => void handleAddToCart()}
@@ -170,12 +188,13 @@ export function ConfiguratorWizard({
 
 function ConfiguratorLoadingSkeleton() {
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)]">
       <Skeleton className="aspect-[4/3] w-full rounded-xl" />
       <div className="space-y-3 rounded-xl border p-4">
-        <Skeleton className="h-12 w-3/4" />
-        <Skeleton className="h-12 w-1/2" />
-        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-12 w-full" />
       </div>
     </div>
   );

@@ -9,6 +9,8 @@ export type CartItemDto = {
   imageUrl: string | null;
   slug: string | null;
   optionSummary: string | null;
+  selectedOptions: Record<string, string>;
+  optionsEditable: boolean;
 };
 
 export type CartDto = {

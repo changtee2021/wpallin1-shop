@@ -9,6 +9,7 @@ import {
   cartContext,
   cartCtxSchema,
   cartItemSchema,
+  updateCartItemOptionsSchema,
   checkoutSchema,
   getAdminClient,
   productListSchema,
@@ -19,11 +20,13 @@ import {
   listPublicProducts,
   getProductBySlug,
 } from "@/services/catalog.service";
+import { listProductOptionGroups } from "@/services/product-options.service";
 import { getProductReviewSummary } from "@/services/review.service";
 import {
   getCart,
   addToCart,
   updateCartItemQty,
+  updateCartItemOptions,
   removeCartItem,
   mergeGuestCartToUser,
   resolveCartForContext,
@@ -348,6 +351,28 @@ export const updateCartItem = createServerFn({ method: "POST" })
     );
   });
 
+export const saveCartItemOptions = createServerFn({ method: "POST" })
+  .middleware([optionalSupabaseAuth])
+  .inputValidator((input: unknown) => updateCartItemOptionsSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const supabase = await getAdminClient();
+    return updateCartItemOptions(
+      supabase,
+      cartContext(context.userId, data.sessionId),
+      data.itemId,
+      data.selectedOptions,
+    );
+  });
+
+export const fetchProductOptionGroups = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z.object({ productId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const supabase = await getAdminClient();
+    return listProductOptionGroups(supabase, data.productId);
+  });
+
 export const removeFromCart = createServerFn({ method: "POST" })
   .middleware([optionalSupabaseAuth])
   .inputValidator((input: unknown) =>
@@ -648,6 +673,297 @@ export const addConfiguratorToCart = createServerFn({ method: "POST" })
     );
   });
 
+const customLimitsSchema = z.object({
+  minWidthCm: z.number().int().min(1).max(10000),
+  maxWidthCm: z.number().int().min(1).max(10000),
+  minHeightCm: z.number().int().min(1).max(10000),
+  maxHeightCm: z.number().int().min(1).max(10000),
+});
+
+const adminFabricSchema = z.object({
+  id: z.string().uuid().optional(),
+  code: z.string().min(1).max(32),
+  name: z.string().min(1).max(200),
+  collectionId: z.string().uuid().nullable().optional(),
+  colorId: z.string().uuid().nullable().optional(),
+  pricePerMeter: z.number().min(0),
+  rollWidthCm: z.number().int().min(1).max(1000).optional(),
+  swatchUrl: z.string().nullable().optional(),
+  isActive: z.boolean().optional(),
+});
+
+const configuratorConditionSchema = z.record(z.string(), z.string());
+
+const configuratorAssetSchema = z.object({
+  id: z.string().uuid().optional(),
+  productId: z.string().uuid(),
+  assetType: z.enum(["preview", "swatch", "base", "overlay"]),
+  name: z.string().min(1).max(200),
+  publicUrl: z.string().url(),
+  storagePath: z.string().nullable().optional(),
+  altText: z.string().nullable().optional(),
+});
+
+const configuratorPreviewRuleSchema = z.object({
+  id: z.string().uuid().optional(),
+  productId: z.string().uuid(),
+  name: z.string().min(1).max(200),
+  priority: z.number().int().min(0).max(10000),
+  conditions: configuratorConditionSchema,
+  assetId: z.string().uuid().nullable().optional(),
+  fallbackImageUrl: z.string().nullable().optional(),
+  isActive: z.boolean().optional(),
+});
+
+const configuratorBomRuleSchema = z.object({
+  id: z.string().uuid().optional(),
+  productId: z.string().uuid(),
+  name: z.string().min(1).max(200),
+  priority: z.number().int().min(0).max(10000),
+  conditions: configuratorConditionSchema,
+  outputs: z.record(z.string(), z.unknown()),
+  isActive: z.boolean().optional(),
+});
+
+export const fetchAdminCustomSettings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ productId: z.string().uuid().optional() }).parse(input ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { getAdminCustomSettings } =
+      await import("@/services/admin-custom.service");
+    return getAdminCustomSettings(supabase, data.productId);
+  });
+
+export const fetchAdminCustomProjects = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { listAdminCustomProjects } =
+      await import("@/services/admin-custom.service");
+    return listAdminCustomProjects(supabase);
+  });
+
+export const createAdminCustomProject = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        name: z.string().min(1),
+        slug: z.string().min(1),
+        categoryId: z.string().uuid().nullable().optional(),
+        isActive: z.boolean().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { createAdminCustomProject: createProject } =
+      await import("@/services/admin-custom.service");
+    const id = await createProject(supabase, data);
+    return { id };
+  });
+
+export const saveAdminCustomProduct = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        productId: z.string().uuid(),
+        name: z.string().min(1),
+        slug: z.string().min(1),
+        categoryId: z.string().uuid().nullable().optional(),
+        isActive: z.boolean().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { saveAdminCustomProduct: saveProduct } =
+      await import("@/services/admin-custom.service");
+    await saveProduct(supabase, data.productId, data);
+    return { ok: true };
+  });
+
+export const saveAdminCustomOptions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        productId: z.string().uuid(),
+        optionGroups: z.array(productOptionGroupSchema),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { saveAdminCustomOptions: saveOptions } =
+      await import("@/services/admin-custom.service");
+    await saveOptions(supabase, data.productId, data.optionGroups);
+    return { ok: true };
+  });
+
+export const saveAdminCustomLimits = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        productId: z.string().uuid(),
+        formulaId: z.string().uuid().nullable(),
+        limits: customLimitsSchema,
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { saveAdminCustomLimits: saveLimits } =
+      await import("@/services/admin-custom.service");
+    await saveLimits(supabase, data.productId, data.formulaId, data.limits);
+    return { ok: true };
+  });
+
+export const fetchAdminFabrics = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { listAdminFabrics, listFabricCollections, listColorOptions } =
+      await import("@/services/admin-custom.service");
+    const [fabrics, collections, colors] = await Promise.all([
+      listAdminFabrics(supabase),
+      listFabricCollections(supabase),
+      listColorOptions(supabase),
+    ]);
+    return { fabrics, collections, colors };
+  });
+
+export const saveAdminFabric = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => adminFabricSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { saveAdminFabric: saveFabric } =
+      await import("@/services/admin-custom.service");
+    const id = await saveFabric(supabase, data);
+    return { id };
+  });
+
+export const toggleAdminFabricActive = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), isActive: z.boolean() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { toggleAdminFabricActive: toggleFabric } =
+      await import("@/services/admin-custom.service");
+    await toggleFabric(supabase, data.id, data.isActive);
+    return { ok: true };
+  });
+
+export const fetchAdminConfiguratorRules = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ productId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const {
+      listAdminConfiguratorAssets,
+      listAdminConfiguratorPreviewRules,
+      listAdminConfiguratorBomRules,
+    } = await import("@/services/admin-custom.service");
+    const [assets, previewRules, bomRules] = await Promise.all([
+      listAdminConfiguratorAssets(supabase, data.productId),
+      listAdminConfiguratorPreviewRules(supabase, data.productId),
+      listAdminConfiguratorBomRules(supabase, data.productId),
+    ]);
+    return { assets, previewRules, bomRules };
+  });
+
+export const saveAdminConfiguratorAsset = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => configuratorAssetSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { saveAdminConfiguratorAsset: saveAsset } =
+      await import("@/services/admin-custom.service");
+    const id = await saveAsset(supabase, data);
+    return { id };
+  });
+
+export const saveAdminConfiguratorPreviewRule = createServerFn({
+  method: "POST",
+})
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    configuratorPreviewRuleSchema.parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { saveAdminConfiguratorPreviewRule: saveRule } =
+      await import("@/services/admin-custom.service");
+    const id = await saveRule(supabase, data);
+    return { id };
+  });
+
+export const toggleAdminConfiguratorPreviewRule = createServerFn({
+  method: "POST",
+})
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), isActive: z.boolean() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { toggleAdminConfiguratorPreviewRule: toggleRule } =
+      await import("@/services/admin-custom.service");
+    await toggleRule(supabase, data.id, data.isActive);
+    return { ok: true };
+  });
+
+export const saveAdminConfiguratorBomRule = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => configuratorBomRuleSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { saveAdminConfiguratorBomRule: saveRule } =
+      await import("@/services/admin-custom.service");
+    const id = await saveRule(supabase, data);
+    return { id };
+  });
+
+export const toggleAdminConfiguratorBomRule = createServerFn({
+  method: "POST",
+})
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), isActive: z.boolean() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const supabase = await getAdminClient();
+    const { toggleAdminConfiguratorBomRule: toggleRule } =
+      await import("@/services/admin-custom.service");
+    await toggleRule(supabase, data.id, data.isActive);
+    return { ok: true };
+  });
+
 export const applyCartCoupon = createServerFn({ method: "POST" })
   .middleware([optionalSupabaseAuth])
   .inputValidator((input: unknown) =>
@@ -928,8 +1244,11 @@ export {
   fetchUserQuotations,
   fetchAdminQuotations,
   fetchQuotationDetail,
+  fetchPublicQuotation,
   sendQuotation,
+  saveQuotationTerms,
   respondQuotation,
+  respondPublicQuotation,
   convertQuotation,
 } from "@/lib/server-fns/quotations";
 

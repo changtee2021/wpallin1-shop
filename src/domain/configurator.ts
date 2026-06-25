@@ -25,7 +25,9 @@ export type ConfiguratorCatalog = {
     id: string;
     code: string;
     name: string;
+    collectionId: string | null;
     collectionName: string | null;
+    colorId: string | null;
     colorHex: string | null;
     swatchUrl: string | null;
     pricePerMeter: number;
@@ -41,6 +43,12 @@ export type ConfiguratorCatalog = {
     label: string;
     priceDelta: number;
     imageUrl: string | null;
+  }>;
+  previewRules: Array<{
+    id: string;
+    priority: number;
+    conditions: Record<string, string>;
+    imageUrl: string;
   }>;
   customProductId: string;
   limits: {
@@ -82,6 +90,58 @@ export type ConfiguratorPreviewState = {
   heightCm: number;
 };
 
+function getDraftConditionValue(
+  key: string,
+  draft: ConfiguratorDraft,
+  fabric: ConfiguratorCatalog["fabrics"][number] | undefined,
+): string | null {
+  switch (key) {
+    case "product_type":
+      return draft.productType;
+    case "fabric_id":
+      return draft.fabricId;
+    case "fabric_collection_id":
+      return fabric?.collectionId ?? null;
+    case "color_id":
+      return fabric?.colorId ?? null;
+    case "rail":
+      return draft.railOptionKey;
+    case "installation":
+      return draft.installationOptionKey;
+    default:
+      return null;
+  }
+}
+
+function resolvePreviewRuleImage(
+  draft: ConfiguratorDraft,
+  catalog: ConfiguratorCatalog,
+  fabric: ConfiguratorCatalog["fabrics"][number] | undefined,
+): string | null {
+  let best: { imageUrl: string; score: number; priority: number } | null = null;
+
+  for (const rule of catalog.previewRules) {
+    const entries = Object.entries(rule.conditions);
+    if (entries.length === 0) continue;
+    const matches = entries.every(([key, expected]) => {
+      const actual = getDraftConditionValue(key, draft, fabric);
+      return actual === expected;
+    });
+    if (!matches) continue;
+
+    const score = entries.length;
+    if (
+      !best ||
+      score > best.score ||
+      (score === best.score && rule.priority < best.priority)
+    ) {
+      best = { imageUrl: rule.imageUrl, score, priority: rule.priority };
+    }
+  }
+
+  return best?.imageUrl ?? null;
+}
+
 export function resolveConfiguratorPreview(
   draft: ConfiguratorDraft,
   catalog: ConfiguratorCatalog,
@@ -95,12 +155,12 @@ export function resolveConfiguratorPreview(
     (o) => o.key === draft.installationOptionKey,
   );
 
-  let imageUrl: string | null = null;
-  if (rail?.imageUrl) {
+  let imageUrl = resolvePreviewRuleImage(draft, catalog, fabric);
+  if (!imageUrl && rail?.imageUrl) {
     imageUrl = rail.imageUrl;
-  } else if (productType?.imageUrl) {
+  } else if (!imageUrl && productType?.imageUrl) {
     imageUrl = productType.imageUrl;
-  } else if (draft.productType) {
+  } else if (!imageUrl && draft.productType) {
     imageUrl = getConfiguratorFallbackImage(draft.productType);
   }
 

@@ -6,6 +6,7 @@ import { recordAffiliateConversion } from "@/services/affiliate.service";
 import {
   clearCart,
   getCart,
+  removeCartItems,
   resolveCartForContext,
 } from "@/services/cart.service";
 import { getProductById } from "@/services/catalog.service";
@@ -59,6 +60,13 @@ export async function placeOrder(
     )
     .eq("cart_id", cartRow.id);
 
+  const selectedItemIds = input.itemIds?.length
+    ? new Set(input.itemIds)
+    : null;
+  const checkoutItems = (cartItems ?? []).filter((item) =>
+    selectedItemIds ? selectedItemIds.has(item.id) : true,
+  );
+  if (!checkoutItems.length) throw new Error("ไม่มีรายการที่เลือก");
   const orderItems: Array<{
     product_id: string | null;
     product_name: string;
@@ -68,7 +76,7 @@ export async function placeOrder(
     line_total: number;
   }> = [];
 
-  for (const item of cartItems ?? []) {
+  for (const item of checkoutItems) {
     if (item.configuration_id) {
       orderItems.push({
         product_id: item.product_id,
@@ -103,7 +111,13 @@ export async function placeOrder(
 
   const subtotal = orderItems.reduce((s, i) => s + i.line_total, 0);
   const shippingFee = await getDefaultShippingFee(supabase);
-  const discount = Number(cartRow.discount ?? cartDto.discount);
+  const fullCartDiscount = Number(cartRow.discount ?? cartDto.discount);
+  const discount =
+    selectedItemIds && cartDto.subtotal > 0
+      ? Math.round(
+          ((fullCartDiscount * subtotal) / cartDto.subtotal) * 100,
+        ) / 100
+      : fullCartDiscount;
   const totals = calcOrderTotals(subtotal, shippingFee, discount);
   const shippingAddress = toAddressJson(input);
   const paymentMethod = input.paymentMethod ?? "bank_transfer";
@@ -203,7 +217,18 @@ export async function placeOrder(
     );
   }
 
-  await clearCart(supabase, cartRow.id);
+  if (selectedItemIds) {
+    await removeCartItems(supabase, cartRow.id, input.itemIds!);
+    const remainingCount = (cartItems?.length ?? 0) - checkoutItems.length;
+    if (remainingCount <= 0) {
+      await supabase
+        .from("carts")
+        .update({ discount: 0, coupon_code: null })
+        .eq("id", cartRow.id);
+    }
+  } else {
+    await clearCart(supabase, cartRow.id);
+  }
 
   const bankAccounts = await getBankAccounts(supabase);
 

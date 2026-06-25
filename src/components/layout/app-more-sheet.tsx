@@ -104,6 +104,7 @@ function linksForZone(
     { to: "/admin/dealers", label: "ตัวแทน", icon: Store },
     { to: "/admin/coupons", label: "คูปอง", icon: Tag },
     { to: "/admin/inventory", label: "สต็อก", icon: Boxes },
+    { to: "/admin/custom", label: "Custom", icon: SlidersHorizontal },
     { to: "/admin/reports", label: "รายงาน", icon: BarChart3 },
     { to: "/admin/support", label: "Support", icon: Bell },
     { to: "/shop", label: "ร้านค้า", icon: Store },

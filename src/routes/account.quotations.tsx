@@ -1,13 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/page-header";
+import {
+  QuotationDocument,
+  quotationStatusLabels,
+} from "@/components/quotations/quotation-document";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
-import { fetchUserQuotations, respondQuotation } from "@/lib/api.functions";
+import {
+  fetchQuotationDetail,
+  fetchUserQuotations,
+  respondQuotation,
+} from "@/lib/api.functions";
 import { formatDate, formatPrice } from "@/lib/format";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import type { QuotationDto } from "@/types/api/quotations";
@@ -19,10 +34,16 @@ export const Route = createFileRoute("/account/quotations")({
 function AccountQuotationsPage() {
   const { session } = useAuth();
   const [quotes, setQuotes] = useState<QuotationDto[]>([]);
+  const [viewQuote, setViewQuote] = useState<QuotationDto | null>(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
   const authOpts = authServerFnOptions(session);
 
+  async function loadList() {
+    setQuotes(await fetchUserQuotations(authOpts));
+  }
+
   useEffect(() => {
-    void fetchUserQuotations(authOpts).then(setQuotes);
+    void loadList();
   }, [session]);
 
   async function respond(id: string, accept: boolean) {
@@ -32,9 +53,31 @@ function AccountQuotationsPage() {
         ...authOpts,
       });
       toast.success(accept ? "ยอมรับใบเสนอแล้ว" : "ปฏิเสธใบเสนอแล้ว");
-      setQuotes(await fetchUserQuotations(authOpts));
+      await loadList();
+      if (viewQuote?.id === id) {
+        setViewQuote(
+          await fetchQuotationDetail({
+            data: { quotationId: id },
+            ...authOpts,
+          }),
+        );
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "ไม่สำเร็จ");
+    }
+  }
+
+  async function openDetail(id: string) {
+    setLoadingDetail(true);
+    setViewQuote(null);
+    try {
+      setViewQuote(
+        await fetchQuotationDetail({ data: { quotationId: id }, ...authOpts }),
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "โหลดไม่สำเร็จ");
+    } finally {
+      setLoadingDetail(false);
     }
   }
 
@@ -61,26 +104,80 @@ function AccountQuotationsPage() {
                     {formatDate(q.createdAt)}
                   </p>
                 </div>
-                <Badge>{q.status}</Badge>
-                {q.status === "sent" ? (
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => void respond(q.id, true)}>
-                      ยอมรับ
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => void respond(q.id, false)}
-                    >
-                      ปฏิเสธ
-                    </Button>
-                  </div>
-                ) : null}
+                <Badge variant="secondary">
+                  {quotationStatusLabels[q.status] ?? q.status}
+                </Badge>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => void openDetail(q.id)}
+                  >
+                    <Eye className="mr-1 size-4" />
+                    ดูใบเสนอ
+                  </Button>
+                  {q.status === "sent" ? (
+                    <>
+                      <Button
+                        size="sm"
+                        onClick={() => void respond(q.id, true)}
+                      >
+                        ยอมรับ
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => void respond(q.id, false)}
+                      >
+                        ปฏิเสธ
+                      </Button>
+                    </>
+                  ) : null}
+                </div>
               </CardContent>
             </Card>
           ))
         )}
       </div>
+
+      <Dialog
+        open={Boolean(viewQuote) || loadingDetail}
+        onOpenChange={(open) => {
+          if (!open) setViewQuote(null);
+        }}
+      >
+        <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {viewQuote?.quotationNumber ?? "กำลังโหลด..."}
+            </DialogTitle>
+          </DialogHeader>
+          {loadingDetail ? (
+            <p className="text-muted-foreground">กำลังโหลด...</p>
+          ) : viewQuote ? (
+            <div className="space-y-4">
+              {viewQuote.status === "sent" ? (
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => void respond(viewQuote.id, true)}
+                  >
+                    ยอมรับ
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => void respond(viewQuote.id, false)}
+                  >
+                    ปฏิเสธ
+                  </Button>
+                </div>
+              ) : null}
+              <QuotationDocument quote={viewQuote} />
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

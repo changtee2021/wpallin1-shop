@@ -28,6 +28,14 @@ type ShowcaseRow = {
   retail_price: number;
 };
 
+type PreviewRuleRow = {
+  id: string;
+  priority: number;
+  conditions: Record<string, unknown> | null;
+  asset_id: string | null;
+  fallback_image_url: string | null;
+};
+
 export async function listConfiguratorCatalog(
   supabase: SupabaseClient,
 ): Promise<ConfiguratorCatalog> {
@@ -40,8 +48,11 @@ export async function listConfiguratorCatalog(
 
   if (!product) throw new Error("ไม่พบสินค้าสั่งทำ");
 
-  const [{ data: options, error: optionsError }, showcaseResult] =
-    await Promise.all([
+  const [
+    { data: options, error: optionsError },
+    showcaseResult,
+    previewRulesResult,
+  ] = await Promise.all([
     supabase
       .from("product_options")
       .select(
@@ -55,11 +66,20 @@ export async function listConfiguratorCatalog(
       .eq("product_type", "standard")
       .not("image_url", "is", null)
       .order("sort_order"),
+    supabase
+      .from("configurator_preview_rules")
+      .select("id, priority, conditions, asset_id, fallback_image_url")
+      .eq("product_id", product.id)
+      .eq("is_active", true)
+      .order("priority"),
   ]);
 
   if (optionsError) throw new Error(optionsError.message);
 
   const showcaseRows = showcaseResult.error ? [] : showcaseResult.data;
+  const previewRuleRows = previewRulesResult.error
+    ? []
+    : ((previewRulesResult.data ?? []) as PreviewRuleRow[]);
 
   const { data: fabrics } = await supabase
     .from("fabrics")
@@ -90,8 +110,21 @@ export async function listConfiguratorCatalog(
         .in("id", colorIds as string[])
     : { data: [] };
 
+  const previewAssetIds = [
+    ...new Set(previewRuleRows.map((r) => r.asset_id).filter(Boolean)),
+  ];
+  const { data: previewAssets } = previewAssetIds.length
+    ? await supabase
+        .from("configurator_assets")
+        .select("id, public_url")
+        .in("id", previewAssetIds as string[])
+    : { data: [] };
+
   const collMap = new Map((collections ?? []).map((c) => [c.id, c.name]));
   const colorMap = new Map((colors ?? []).map((c) => [c.id, c.hex_value]));
+  const previewAssetMap = new Map(
+    (previewAssets ?? []).map((a) => [a.id, a.public_url]),
+  );
 
   const { data: formula } = await supabase
     .from("custom_price_formulas")
@@ -162,13 +195,38 @@ export async function listConfiguratorCatalog(
       id: f.id,
       code: f.code,
       name: f.name,
+      collectionId: f.collection_id,
       collectionName: f.collection_id
         ? (collMap.get(f.collection_id) ?? null)
         : null,
+      colorId: f.color_id,
       colorHex: f.color_id ? (colorMap.get(f.color_id) ?? null) : null,
       swatchUrl: f.swatch_url ?? null,
       pricePerMeter: Number(f.price_per_meter),
     })),
+    previewRules: previewRuleRows
+      .map((rule) => ({
+        id: rule.id,
+        priority: Number(rule.priority),
+        conditions: Object.fromEntries(
+          Object.entries(rule.conditions ?? {})
+            .filter(([, value]) => typeof value === "string" && value)
+            .map(([key, value]) => [key, String(value)]),
+        ),
+        imageUrl: rule.asset_id
+          ? (previewAssetMap.get(rule.asset_id) ?? rule.fallback_image_url)
+          : rule.fallback_image_url,
+      }))
+      .filter(
+        (
+          rule,
+        ): rule is {
+          id: string;
+          priority: number;
+          conditions: Record<string, string>;
+          imageUrl: string;
+        } => Boolean(rule.imageUrl),
+      ),
     limits: {
       minWidthCm: vars.min_width_cm ?? 50,
       maxWidthCm: vars.max_width_cm ?? 600,

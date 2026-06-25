@@ -14,9 +14,13 @@ import {
   BarChart3,
   Boxes,
   CreditCard,
+  SlidersHorizontal,
 } from "lucide-react";
 
-import { SidebarNav, type SidebarNavGroup } from "@/components/layout/sidebar-nav";
+import {
+  SidebarNav,
+  type SidebarNavGroup,
+} from "@/components/layout/sidebar-nav";
 import { useT } from "@/i18n";
 
 export function AdminSidebar() {
@@ -25,7 +29,9 @@ export function AdminSidebar() {
   const groups: SidebarNavGroup[] = [
     {
       label: "ภาพรวม",
-      items: [{ to: "/admin", label: t("admin.overview"), icon: LayoutDashboard }],
+      items: [
+        { to: "/admin", label: t("admin.overview"), icon: LayoutDashboard },
+      ],
     },
     {
       label: "การขาย",
@@ -54,6 +60,7 @@ export function AdminSidebar() {
       label: "สินค้า & สต็อก",
       items: [
         { to: "/admin/products", label: t("admin.products"), icon: Package },
+        { to: "/admin/custom", label: "Custom", icon: SlidersHorizontal },
         { to: "/admin/categories", label: "หมวดหมู่", icon: Package },
         { to: "/admin/inventory", label: "สต็อก", icon: Boxes },
         { to: "/admin/catalogs", label: "แคตตาล็อก PDF", icon: FileText },
@@ -73,7 +80,9 @@ export function AdminSidebar() {
     },
     {
       label: "ตั้งค่า",
-      items: [{ to: "/admin/settings", label: t("admin.settings"), icon: Settings }],
+      items: [
+        { to: "/admin/settings", label: t("admin.settings"), icon: Settings },
+      ],
     },
   ];
 

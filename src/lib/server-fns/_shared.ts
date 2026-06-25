@@ -39,6 +39,45 @@ export const cartItemSchema = cartCtxSchema.extend({
   qty: z.number().optional(),
 });
 
+export const updateCartItemOptionsSchema = cartCtxSchema.extend({
+  itemId: z.string().uuid(),
+  selectedOptions: z.record(z.string(), z.string()),
+});
+
+export const quotationBuyerSchema = z
+  .object({
+    customerName: z.string().min(1),
+    customerPhone: z.string().min(1),
+    customerEmail: z.string().email().optional().or(z.literal("")),
+    customerType: z.enum(["individual", "juristic"]).default("individual"),
+    taxId: z.string().optional(),
+    companyName: z.string().optional(),
+    companyBranch: z.string().optional(),
+    line1: z.string().min(1),
+    district: z.string().optional(),
+    province: z.string().optional(),
+    postalCode: z.string().optional(),
+    note: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.customerType === "juristic") {
+      if (!data.companyName?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "กรุณากรอกชื่อบริษัท",
+          path: ["companyName"],
+        });
+      }
+      if (!data.taxId?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "กรุณากรอกเลขผู้เสียภาษี",
+          path: ["taxId"],
+        });
+      }
+    }
+  });
+
 export const checkoutSchema = z.object({
   recipientName: z.string().min(1),
   phone: z.string().min(1),
@@ -50,6 +89,7 @@ export const checkoutSchema = z.object({
   note: z.string().optional(),
   paymentMethod: z.enum(["bank_transfer", "wallet", "credit"]).optional(),
   affiliateCode: z.string().optional(),
+  itemIds: z.array(z.string().uuid()).optional(),
 });
 
 export const adminProductSchema = z.object({

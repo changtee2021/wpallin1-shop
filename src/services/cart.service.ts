@@ -23,37 +23,43 @@ type CartContext = {
 
 async function resolveCart(supabase: SupabaseClient, ctx: CartContext) {
   if (ctx.userId) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("carts")
       .select("id, subtotal, discount")
       .eq("user_id", ctx.userId)
+      .order("updated_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
+    if (error) throw new Error(error.message);
     if (data) return data;
-    const { data: created, error } = await supabase
+    const { data: created, error: insertError } = await supabase
       .from("carts")
       .insert({ user_id: ctx.userId })
       .select("id, subtotal, discount")
       .single();
-    if (error) throw new Error(error.message);
+    if (insertError) throw new Error(insertError.message);
     return created;
   }
 
   if (!ctx.sessionId) throw new Error("Missing cart session");
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("carts")
     .select("id, subtotal, discount")
     .eq("session_id", ctx.sessionId)
+    .order("updated_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
+  if (error) throw new Error(error.message);
 
   if (data) return data;
 
-  const { data: created, error } = await supabase
+  const { data: created, error: insertError } = await supabase
     .from("carts")
     .insert({ session_id: ctx.sessionId })
     .select("id, subtotal, discount")
     .single();
-  if (error) throw new Error(error.message);
+  if (insertError) throw new Error(insertError.message);
   return created;
 }
 
@@ -64,7 +70,7 @@ async function mapCartItems(
   const { data, error } = await supabase
     .from("cart_items")
     .select(
-      "id, product_id, product_name, sku, qty, unit_price, line_total, config_snapshot",
+      "id, product_id, product_name, sku, qty, unit_price, line_total, config_snapshot, configuration_id",
     )
     .eq("cart_id", cartId)
     .order("created_at", { ascending: true });
@@ -86,9 +92,11 @@ async function mapCartItems(
     }
 
     const snapshot = (row.config_snapshot ?? {}) as {
+      options?: SelectedProductOptions;
       optionLabels?: Record<string, string>;
       groupLabels?: Record<string, string>;
     };
+    const selectedOptions = snapshot.options ?? {};
     const optionSummary =
       snapshot.optionLabels && Object.keys(snapshot.optionLabels).length
         ? Object.entries(snapshot.optionLabels)
@@ -110,6 +118,8 @@ async function mapCartItems(
       imageUrl,
       slug,
       optionSummary,
+      selectedOptions,
+      optionsEditable: Boolean(row.product_id && !row.configuration_id),
     });
   }
   return items;
@@ -322,6 +332,110 @@ export async function updateCartItemQty(
   return getCart(supabase, ctx);
 }
 
+export async function updateCartItemOptions(
+  supabase: SupabaseClient,
+  ctx: CartContext,
+  itemId: string,
+  selectedOptions: SelectedProductOptions,
+): Promise<CartDto> {
+  const cart = await resolveCart(supabase, ctx);
+  const { data: item, error: itemErr } = await supabase
+    .from("cart_items")
+    .select("id, product_id, configuration_id, qty")
+    .eq("id", itemId)
+    .eq("cart_id", cart.id)
+    .maybeSingle();
+  if (itemErr) throw new Error(itemErr.message);
+  if (!item) throw new Error("ไม่พบรายการในตะกร้า");
+  if (!item.product_id || item.configuration_id) {
+    throw new Error("รายการนี้ไม่สามารถแก้ไขตัวเลือกได้");
+  }
+
+  const product = await getProductById(supabase, item.product_id);
+  if (!product) throw new Error("ไม่พบสินค้า");
+
+  const optionGroups = await listProductOptionGroups(
+    supabase,
+    item.product_id,
+  );
+  if (!optionGroups.length) throw new Error("สินค้านี้ไม่มีตัวเลือกให้แก้ไข");
+
+  const optionErr = validateSelectedOptions(optionGroups, selectedOptions);
+  if (optionErr) throw new Error(optionErr);
+
+  const optionSnapshot = buildOptionSnapshot(optionGroups, selectedOptions);
+  const configSnapshot = {
+    options: optionSnapshot.options,
+    optionLabels: optionSnapshot.optionLabels,
+    groupLabels: optionSnapshot.groupLabels,
+  };
+  const snapshotKey = optionsSnapshotKey(configSnapshot);
+
+  const qty = Number(item.qty);
+  const pricing = await getProductPricingRow(supabase, item.product_id);
+  const orderStep = pricing?.orderStep ?? 1;
+  const qtyErr = validateCartQty(qty, product.moq, product.stock, orderStep);
+  if (qtyErr) throw new Error(qtyErr);
+
+  let unitPrice = await resolveProductUnitPrice(
+    supabase,
+    ctx.userId,
+    item.product_id,
+    qty,
+  );
+  unitPrice = Math.round((unitPrice + optionSnapshot.priceDelta) * 100) / 100;
+  const lineTotal = calcLineTotal(qty, unitPrice);
+
+  const { data: siblingRows } = await supabase
+    .from("cart_items")
+    .select("id, qty, config_snapshot")
+    .eq("cart_id", cart.id)
+    .eq("product_id", item.product_id)
+    .neq("id", itemId);
+
+  const duplicate = (siblingRows ?? []).find(
+    (row) =>
+      optionsSnapshotKey(
+        (row.config_snapshot ?? {}) as { options?: SelectedProductOptions },
+      ) === snapshotKey,
+  );
+
+  if (duplicate) {
+    const mergedQty = Number(duplicate.qty) + qty;
+    const mergeQtyErr = validateCartQty(
+      mergedQty,
+      product.moq,
+      product.stock,
+      orderStep,
+    );
+    if (mergeQtyErr) throw new Error(mergeQtyErr);
+    const mergedLineTotal = calcLineTotal(mergedQty, unitPrice);
+    const { error: mergeErr } = await supabase
+      .from("cart_items")
+      .update({
+        qty: mergedQty,
+        unit_price: unitPrice,
+        line_total: mergedLineTotal,
+      })
+      .eq("id", duplicate.id);
+    if (mergeErr) throw new Error(mergeErr.message);
+    await supabase.from("cart_items").delete().eq("id", itemId);
+  } else {
+    const { error: updateErr } = await supabase
+      .from("cart_items")
+      .update({
+        unit_price: unitPrice,
+        line_total: lineTotal,
+        config_snapshot: configSnapshot,
+      })
+      .eq("id", itemId);
+    if (updateErr) throw new Error(updateErr.message);
+  }
+
+  await recalcCartTotalsInternal(supabase, cart.id);
+  return getCart(supabase, ctx);
+}
+
 export async function removeCartItem(
   supabase: SupabaseClient,
   ctx: CartContext,
@@ -343,6 +457,20 @@ export async function clearCart(supabase: SupabaseClient, cartId: string) {
     .from("carts")
     .update({ subtotal: 0, discount: 0 })
     .eq("id", cartId);
+}
+
+export async function removeCartItems(
+  supabase: SupabaseClient,
+  cartId: string,
+  itemIds: string[],
+) {
+  if (!itemIds.length) return;
+  await supabase
+    .from("cart_items")
+    .delete()
+    .eq("cart_id", cartId)
+    .in("id", itemIds);
+  await recalcCartTotals(supabase, cartId);
 }
 
 export async function mergeGuestCartToUser(
