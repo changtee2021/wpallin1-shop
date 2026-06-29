@@ -13,6 +13,7 @@
     "test:e2e": "playwright test",
     "test:smoke": "playwright test e2e/smoke.spec.ts",
     "test:smoke:ui": "playwright test e2e/smoke.spec.ts --ui",
+    "test:routes": "node scripts/check-routes.mjs",
     "catalog:compress": "node scripts/compress-catalog-pdf.mjs",
     "catalog:seed-roller": "node scripts/seed-roller-blinds-catalog.mjs",
     "media:compress": "node scripts/compress-media.mjs",

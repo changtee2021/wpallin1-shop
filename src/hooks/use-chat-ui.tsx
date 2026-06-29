@@ -39,6 +39,17 @@ export function useChatUi() {
   return ctx;
 }
 
+const noopChatUi: ChatUiContextValue = {
+  open: false,
+  openChat: () => {},
+  closeChat: () => {},
+};
+
+/** Safe for shared headers/menus that render outside a layout-specific provider. */
+export function useChatUiSafe() {
+  return useContext(ChatUiContext) ?? noopChatUi;
+}
+
 export function useChatUiOptional() {
   return useContext(ChatUiContext);
 }

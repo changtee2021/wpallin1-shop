@@ -9,11 +9,13 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { ErrorPageShell } from "@/components/errors/error-page-shell";
+import { ChatWidget } from "@/components/chat/chat-widget";
 import { CookieConsent } from "@/components/cookie-consent";
 import { Toaster } from "@/components/ui/sonner";
 import { LocaleSync } from "@/components/locale-sync";
 import { AuthProvider } from "@/hooks/use-auth";
 import { CartProvider } from "@/hooks/use-cart";
+import { ChatUiProvider } from "@/hooks/use-chat-ui";
 import { I18nProvider } from "@/i18n";
 import appCss from "@/styles.css?url";
 import { getDefaultOgImageUrl, getPublicUrl } from "@/lib/public-url";
@@ -109,10 +111,13 @@ function RootComponent() {
       <I18nProvider>
         <AuthProvider>
           <CartProvider>
-            <LocaleSync />
-            <Outlet />
-            <Toaster position="top-center" richColors />
-            <CookieConsent />
+            <ChatUiProvider>
+              <LocaleSync />
+              <Outlet />
+              <ChatWidget />
+              <Toaster position="top-center" richColors />
+              <CookieConsent />
+            </ChatUiProvider>
           </CartProvider>
         </AuthProvider>
       </I18nProvider>

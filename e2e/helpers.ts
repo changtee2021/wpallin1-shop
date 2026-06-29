@@ -40,7 +40,13 @@ function shouldIgnoreConsoleError(text: string): boolean {
 export async function assertHealthyPage(page: Page, pathLabel: string) {
   await expect(page.getByText("Something went wrong!")).toHaveCount(0);
   await expect(
+    page.getByRole("heading", { name: "เกิดข้อผิดพลาดของระบบ" }),
+  ).toHaveCount(0);
+  await expect(
     page.getByText("useAuth must be used within AuthProvider"),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText(/useChatUi must be used within ChatUiProvider/i),
   ).toHaveCount(0);
 
   const title = await page.title();
@@ -101,8 +107,8 @@ export async function loginAsAdmin(page: Page) {
   const { email, password } = smokeCredentials();
 
   await page.goto("/login");
-  await page.locator("#email").fill(email);
-  await page.locator("#password").fill(password);
+  await page.getByLabel(/อีเมล|email/i).first().fill(email);
+  await page.getByLabel(/รหัสผ่าน|password/i).first().fill(password);
   await page.locator('form button[type="submit"]').click();
 
   await page.waitForURL(/\/account/, { timeout: 20_000 });

@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
-import { useChatUi } from "@/hooks/use-chat-ui";
+import { useChatUiSafe } from "@/hooks/use-chat-ui";
 import { useT } from "@/i18n";
 
 const navLinks = [
@@ -26,7 +26,7 @@ const headerIconClass = "text-white hover:bg-white/10 hover:text-white";
 export function StorefrontHeader() {
   const { t } = useT();
   const { user } = useAuth();
-  const { openChat } = useChatUi();
+  const { openChat } = useChatUiSafe();
   const { cart } = useCart();
 
   return (

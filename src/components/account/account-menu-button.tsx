@@ -25,7 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
-import { useChatUi } from "@/hooks/use-chat-ui";
+import { useChatUiSafe } from "@/hooks/use-chat-ui";
 import { useLocaleControl, useT } from "@/i18n";
 import type { Locale } from "@/i18n/types";
 import { fetchAccountProfileCached } from "@/lib/account-profile-cache";
@@ -51,7 +51,7 @@ export function AccountMenuButton({
   const { t } = useT();
   const { locale, setLocale } = useLocaleControl();
   const { user, session, signOut } = useAuth();
-  const { openChat } = useChatUi();
+  const { openChat } = useChatUiSafe();
   const [profile, setProfile] = useState<AccountProfileDto | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
 

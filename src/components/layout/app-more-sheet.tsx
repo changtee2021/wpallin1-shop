@@ -29,7 +29,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/use-auth";
-import { useChatUi } from "@/hooks/use-chat-ui";
+import { useChatUiSafe } from "@/hooks/use-chat-ui";
 import type { AppNavZone } from "@/hooks/use-app-nav";
 import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -152,7 +152,7 @@ export function AppMoreSheet({
 }) {
   const { t } = useT();
   const { user, isAdmin, isDealer, signOut } = useAuth();
-  const { openChat } = useChatUi();
+  const { openChat } = useChatUiSafe();
   const [helpOpen, setHelpOpen] = useState(false);
   const links = [
     ...leadingLinks,

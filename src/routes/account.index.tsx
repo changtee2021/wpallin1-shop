@@ -91,7 +91,7 @@ const emptyTax = {
 function AccountPage() {
   const { t } = useT();
   const { setLocale: applyLocale } = useLocaleControl();
-  const { session, signOut } = useAuth();
+  const { session, signOut, loading: authLoading } = useAuth();
   const { tab, section } = Route.useSearch();
 
   const [profile, setProfile] = useState<AccountProfileDto | null>(null);
@@ -192,6 +192,8 @@ function AccountPage() {
   }, [authOpts]);
 
   useEffect(() => {
+    if (authLoading || !session?.access_token) return;
+
     let cancelled = false;
 
     void (async () => {
@@ -208,7 +210,7 @@ function AccountPage() {
     return () => {
       cancelled = true;
     };
-  }, [loadProfile]);
+  }, [authLoading, loadProfile, session?.access_token]);
 
   useEffect(() => {
     if (!profile) return;
@@ -433,7 +435,7 @@ function AccountPage() {
     }
   }
 
-  if (loading || !profile) {
+  if (authLoading || loading || !profile) {
     return <PageLoading variant="dashboard" />;
   }
 
