@@ -65,22 +65,13 @@ export function StorefrontMobileMenu({
                 onNavigate={() => setOpen(false)}
               />
             ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted"
-                  onClick={() => setOpen(false)}
-                >
-                  {t("nav.login")}
-                </Link>
-                <Link
-                  to="/signup"
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted"
-                  onClick={() => setOpen(false)}
-                >
-                  {t("nav.signup")}
-                </Link>
-              </>
+              <Link
+                to="/login"
+                className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted"
+                onClick={() => setOpen(false)}
+              >
+                {t("nav.login")}
+              </Link>
             )}
           </nav>
         </SheetContent>

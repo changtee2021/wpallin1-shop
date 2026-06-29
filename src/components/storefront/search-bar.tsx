@@ -9,12 +9,14 @@ type SearchBarProps = {
   className?: string;
   defaultValue?: string;
   compact?: boolean;
+  pill?: boolean;
 };
 
 export function SearchBar({
   className = "",
   defaultValue = "",
   compact = false,
+  pill = false,
 }: SearchBarProps) {
   const { t } = useT();
   const [query, setQuery] = useState(defaultValue);
@@ -34,7 +36,7 @@ export function SearchBar({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t("common.search")}
-        className={`border-primary/20 bg-white pl-10 ${compact ? "h-9" : "h-10"}`}
+        className={`border-primary/20 bg-white pl-10 ${compact ? "h-9" : "h-10"} ${pill ? "rounded-full" : ""}`}
       />
     </form>
   );

@@ -12,12 +12,14 @@ import type { AccountProfileDto } from "@/types/api/profile";
 type AccountMenuButtonProps = {
   className?: string;
   variant?: "header" | "menu";
+  iconOnly?: boolean;
   onNavigate?: () => void;
 };
 
 export function AccountMenuButton({
   className,
   variant = "header",
+  iconOnly = false,
   onNavigate,
 }: AccountMenuButtonProps) {
   const { user, session } = useAuth();
@@ -71,9 +73,11 @@ export function AccountMenuButton({
   return (
     <Button
       variant="ghost"
-      size="sm"
+      size={iconOnly ? "icon" : "sm"}
       className={cn(
-        "max-w-none border-0 bg-transparent px-1 text-white shadow-none hover:bg-white/10 hover:text-white sm:max-w-[200px] sm:px-2",
+        iconOnly
+          ? "rounded-full text-white hover:bg-white/10 hover:text-white"
+          : "max-w-none border-0 bg-transparent px-1 text-white shadow-none hover:bg-white/10 hover:text-white sm:max-w-[200px] sm:px-2",
         className,
       )}
       asChild
@@ -81,9 +85,10 @@ export function AccountMenuButton({
       <Link
         to="/account"
         search={{ tab: "dashboard" }}
-        className="flex items-center gap-2"
+        className={iconOnly ? "flex items-center" : "flex items-center gap-2"}
+        aria-label={displayName}
       >
-        <Avatar className="size-7 shrink-0">
+        <Avatar className={iconOnly ? "size-8 shrink-0" : "size-7 shrink-0"}>
           {profile?.avatarUrl ? (
             <AvatarImage src={profile.avatarUrl} alt={displayName} />
           ) : null}
@@ -91,7 +96,9 @@ export function AccountMenuButton({
             {initials}
           </AvatarFallback>
         </Avatar>
-        <span className="hidden truncate sm:inline">{displayName}</span>
+        {iconOnly ? null : (
+          <span className="hidden truncate sm:inline">{displayName}</span>
+        )}
       </Link>
     </Button>
   );
