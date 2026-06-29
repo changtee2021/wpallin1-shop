@@ -10,6 +10,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { AdminImageUploader } from "@/components/admin/shared/admin-image-uploader";
+import { useAdminConfirm } from "@/components/admin/shared/admin-confirm-dialog";
 import { AdminPreviewLink } from "@/components/admin/shared/admin-preview-link";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -126,6 +127,7 @@ export function InspirationMaterialEditor({
   const [form, setForm] = useState<MaterialEditorState>(initial);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const { confirm, AdminConfirmDialog } = useAdminConfirm();
 
   const previewSlug =
     form.slug.trim() || slugifyCatalogTitle(form.title) || "preview";
@@ -192,7 +194,9 @@ export function InspirationMaterialEditor({
   }
 
   async function handleDelete() {
-    if (!form.id || !window.confirm("ลบวัสดุนี้?")) return;
+    if (!form.id) return;
+    if (!(await confirm({ description: "ลบวัสดุนี้?", destructive: true })))
+      return;
     setDeleting(true);
     try {
       await deleteAdminInspirationMaterial({
@@ -466,6 +470,7 @@ export function InspirationMaterialEditor({
           เผยแพร่
         </Button>
       </div>
+      {AdminConfirmDialog}
     </div>
   );
 }

@@ -52,6 +52,11 @@ Apply in timestamp order. All paths relative to `wp-group-erp/supabase/migration
 | `20260629140000_wpall_retail_inspiration_seed.sql` | Seed 10 inspiration rooms + hotspot tags |
 | `20260629150000_wpall_retail_inspiration_seed_commercial.sql` | Seed 10 commercial inspiration rooms (11–20) |
 | `20260629160000_wpall_retail_inspiration_engagement.sql` | View/like counts + visitor likes for trends |
+| `20260629170000_wpall_retail_inspiration_detail_images.sql` | `detail_images` JSONB on inspiration rooms (swatch admin) |
+| `20260629180000_wpall_retail_inspiration_materials.sql` | Admin-managed `inspiration_materials` + room links |
+| `20260629181000_wpall_retail_admin_media_assets.sql` | Central admin media library table |
+| `20260629140000_wpall_retail_chat.sql` | Web chat conversations, messages, AI usage + settings |
+| `20260629160000_wpall_retail_chat_attachments.sql` | Storage bucket `wpall-retail-chat` for chat attachments |
 
 See also `docs/BUSINESS-ROADMAP.md` for product priorities.
 

@@ -9,7 +9,7 @@ type InspirationRoomSeed = Omit<
 /** Local fallback when DB seed not applied yet — images live in /public/inspiration */
 const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
   {
-    id: "i2010001-0000-4000-8000-000000000001",
+    id: "a2010001-0000-4000-8000-000000000001",
     slug: "bedroom-blackout-navy",
     title: "ห้องนอนโทนกรม — Blackout กันแสงเต็มที่",
     description:
@@ -23,7 +23,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000001",
+        id: "b2010001-0000-4000-8000-000000000001",
         label: "ม่าน Blackout กรมท่า",
         productId: null,
         productSlug: "mock-curtain-blackout-navy",
@@ -36,7 +36,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
         sortOrder: 0,
       },
       {
-        id: "h2010001-0000-4000-8000-000000000002",
+        id: "b2010001-0000-4000-8000-000000000002",
         label: "รางม่านมาตรฐาน",
         productId: null,
         productSlug: "mock-rail-double-3m",
@@ -53,7 +53,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000002",
+    id: "a2010001-0000-4000-8000-000000000002",
     slug: "living-linen-beige",
     title: "ห้องนั่งเล่นโทนเบจ — ผ้า Linen Wave",
     description:
@@ -67,7 +67,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000003",
+        id: "b2010001-0000-4000-8000-000000000003",
         label: "ผ้า Linen เบจ",
         productId: null,
         productSlug: "mock-curtain-linen-sand",
@@ -84,7 +84,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000003",
+    id: "a2010001-0000-4000-8000-000000000003",
     slug: "dining-layered-sheer",
     title: "ห้องทานข้าว — ม่านซ้อน Sheer + ทึบ",
     description:
@@ -98,7 +98,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000004",
+        id: "b2010001-0000-4000-8000-000000000004",
         label: "ม่าน Sheer งาช้าง",
         productId: null,
         productSlug: "mock-curtain-sheer-ivory",
@@ -111,7 +111,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
         sortOrder: 0,
       },
       {
-        id: "h2010001-0000-4000-8000-000000000005",
+        id: "b2010001-0000-4000-8000-000000000005",
         label: "ม่านทึบเทา",
         productId: null,
         productSlug: "mock-curtain-eyelet-charcoal",
@@ -128,7 +128,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000004",
+    id: "a2010001-0000-4000-8000-000000000004",
     slug: "hotel-lobby-motorized",
     title: "ล็อบบี้โรงแรม — ม่านมอเตอร์ Wave",
     description:
@@ -142,7 +142,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000006",
+        id: "b2010001-0000-4000-8000-000000000006",
         label: "ม่าน Wave ถ่าน",
         productId: null,
         productSlug: "mock-curtain-eyelet-charcoal",
@@ -155,7 +155,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
         sortOrder: 0,
       },
       {
-        id: "h2010001-0000-4000-8000-000000000007",
+        id: "b2010001-0000-4000-8000-000000000007",
         label: "ชุดมอเตอร์ม่าน",
         productId: null,
         productSlug: "mock-roller-motorized-kit",
@@ -172,7 +172,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000005",
+    id: "a2010001-0000-4000-8000-000000000005",
     slug: "kids-room-teal",
     title: "ห้องเด็ก — โทนมิ้นท์สดใส",
     description:
@@ -186,7 +186,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000008",
+        id: "b2010001-0000-4000-8000-000000000008",
         label: "ผ้า Linen เขียวมิ้นท์",
         productId: null,
         productSlug: null,
@@ -203,7 +203,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000006",
+    id: "a2010001-0000-4000-8000-000000000006",
     slug: "home-office-grey",
     title: "โฮมออฟฟิศ — โทนเทาเรียบง่าย",
     description:
@@ -217,7 +217,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000009",
+        id: "b2010001-0000-4000-8000-000000000009",
         label: "ม่าน Linen เทา",
         productId: null,
         productSlug: "mock-curtain-eyelet-charcoal",
@@ -234,7 +234,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000007",
+    id: "a2010001-0000-4000-8000-000000000007",
     slug: "condo-balcony-roller",
     title: "คอนโดวิวเมือง — มู่ลี่ม้วนกันแดด",
     description:
@@ -248,7 +248,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000010",
+        id: "b2010001-0000-4000-8000-000000000010",
         label: "มู่ลี่ม้วน Blackout",
         productId: null,
         productSlug: "mock-roller-blackout-white",
@@ -261,7 +261,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
         sortOrder: 0,
       },
       {
-        id: "h2010001-0000-4000-8000-000000000011",
+        id: "b2010001-0000-4000-8000-000000000011",
         label: "ม่าน Sheer ข้างประตู",
         productId: null,
         productSlug: "mock-curtain-sheer-ivory",
@@ -278,7 +278,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000008",
+    id: "a2010001-0000-4000-8000-000000000008",
     slug: "scandi-sheer-white",
     title: "สไตล์สแกนดิ — Sheer โปร่งแสง",
     description:
@@ -292,7 +292,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000012",
+        id: "b2010001-0000-4000-8000-000000000012",
         label: "Sheer ขาว",
         productId: null,
         productSlug: "mock-curtain-sheer-ivory",
@@ -309,7 +309,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000009",
+    id: "a2010001-0000-4000-8000-000000000009",
     slug: "master-suite-teal",
     title: "ห้องนอนหลัก — เขียวมิ้นท์พรีเมียม",
     description:
@@ -323,7 +323,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000013",
+        id: "b2010001-0000-4000-8000-000000000013",
         label: "ม่าน Wave เขียวมิ้นท์",
         productId: null,
         productSlug: null,
@@ -336,7 +336,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
         sortOrder: 0,
       },
       {
-        id: "h2010001-0000-4000-8000-000000000014",
+        id: "b2010001-0000-4000-8000-000000000014",
         label: "รางตกแต่ง",
         productId: null,
         productSlug: "mock-rail-ceiling-4m",
@@ -353,7 +353,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000010",
+    id: "a2010001-0000-4000-8000-000000000010",
     slug: "cafe-zebra-blind",
     title: "คาเฟ่ / ร้านค้า — มู่ลี่ Zebra",
     description:
@@ -367,7 +367,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000015",
+        id: "b2010001-0000-4000-8000-000000000015",
         label: "มู่ลี่ Zebra เทา",
         productId: null,
         productSlug: "mock-zebra-grey",
@@ -384,7 +384,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000011",
+    id: "a2010001-0000-4000-8000-000000000011",
     slug: "restaurant-fine-dining",
     title: "ร้านอาหาร Fine Dining — ม่านจีบหรู",
     description:
@@ -398,7 +398,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000016",
+        id: "b2010001-0000-4000-8000-000000000016",
         label: "ม่านจีบ Charcoal",
         productId: null,
         productSlug: "mock-curtain-eyelet-charcoal",
@@ -411,7 +411,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
         sortOrder: 0,
       },
       {
-        id: "h2010001-0000-4000-8000-000000000017",
+        id: "b2010001-0000-4000-8000-000000000017",
         label: "รางฝ้า 4 เมตร",
         productId: null,
         productSlug: "mock-rail-ceiling-4m",
@@ -428,7 +428,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000012",
+    id: "a2010001-0000-4000-8000-000000000012",
     slug: "spa-wellness-room",
     title: "สปา / Wellness — ผ้า Linen นุ่มสงบ",
     description:
@@ -442,7 +442,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000018",
+        id: "b2010001-0000-4000-8000-000000000018",
         label: "ผ้า Linen Wave เบจ",
         productId: null,
         productSlug: "mock-curtain-linen-sand",
@@ -459,7 +459,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000013",
+    id: "a2010001-0000-4000-8000-000000000013",
     slug: "corporate-meeting-room",
     title: "ห้องประชุม — มู่ลี่ Sunscreen",
     description:
@@ -473,7 +473,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000019",
+        id: "b2010001-0000-4000-8000-000000000019",
         label: "มู่ลี่ Sunscreen 3%",
         productId: null,
         productSlug: "mock-roller-sunscreen-3pct",
@@ -486,7 +486,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
         sortOrder: 0,
       },
       {
-        id: "h2010001-0000-4000-8000-000000000020",
+        id: "b2010001-0000-4000-8000-000000000020",
         label: "ชุดมอเตอร์ม่าน",
         productId: null,
         productSlug: "mock-roller-motorized-kit",
@@ -503,7 +503,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000014",
+    id: "a2010001-0000-4000-8000-000000000014",
     slug: "showroom-home-staging",
     title: "โชว์รูมบ้านตัวอย่าง — Staging กลางๆ",
     description:
@@ -517,7 +517,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000021",
+        id: "b2010001-0000-4000-8000-000000000021",
         label: "ผ้า Linen สีทราย",
         productId: null,
         productSlug: "mock-curtain-linen-sand",
@@ -534,7 +534,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000015",
+    id: "a2010001-0000-4000-8000-000000000015",
     slug: "coworking-lounge",
     title: "Co-working — มู่ลี่ Zebra โมเดิร์น",
     description:
@@ -548,7 +548,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000022",
+        id: "b2010001-0000-4000-8000-000000000022",
         label: "มู่ลี่ Zebra เทา",
         productId: null,
         productSlug: "mock-zebra-grey",
@@ -565,7 +565,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000016",
+    id: "a2010001-0000-4000-8000-000000000016",
     slug: "boutique-fashion-store",
     title: "ร้านค้า Boutique — Sheer โชว์สินค้า",
     description:
@@ -579,7 +579,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000023",
+        id: "b2010001-0000-4000-8000-000000000023",
         label: "ม่าน Sheer งาช้าง",
         productId: null,
         productSlug: "mock-curtain-sheer-ivory",
@@ -596,7 +596,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000017",
+    id: "a2010001-0000-4000-8000-000000000017",
     slug: "clinic-waiting-room",
     title: "คลินิก / โรงพยาบาล — มู่ลี่ทึบสะอาด",
     description:
@@ -610,7 +610,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000024",
+        id: "b2010001-0000-4000-8000-000000000024",
         label: "มู่ลี่ม้วน Blackout ขาว",
         productId: null,
         productSlug: "mock-roller-blackout-white",
@@ -627,7 +627,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000018",
+    id: "a2010001-0000-4000-8000-000000000018",
     slug: "wedding-event-ballroom",
     title: "งานแต่ง / ห้องจัดเลี้ยง — Drapery สูง",
     description:
@@ -641,7 +641,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000025",
+        id: "b2010001-0000-4000-8000-000000000025",
         label: "ม่าน Sheer ครีม",
         productId: null,
         productSlug: "mock-curtain-sheer-ivory",
@@ -654,7 +654,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
         sortOrder: 0,
       },
       {
-        id: "h2010001-0000-4000-8000-000000000026",
+        id: "b2010001-0000-4000-8000-000000000026",
         label: "รางคู่ 3 เมตร",
         productId: null,
         productSlug: "mock-rail-double-3m",
@@ -671,7 +671,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000019",
+    id: "a2010001-0000-4000-8000-000000000019",
     slug: "airbnb-vacation-rental",
     title: "Airbnb / ที่พักพักผ่อน — สไตล์รีสอร์ท",
     description:
@@ -685,7 +685,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000027",
+        id: "b2010001-0000-4000-8000-000000000027",
         label: "ม่าน Linen เขียวมิ้นท์",
         productId: null,
         productSlug: null,
@@ -698,7 +698,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
         sortOrder: 0,
       },
       {
-        id: "h2010001-0000-4000-8000-000000000028",
+        id: "b2010001-0000-4000-8000-000000000028",
         label: "Sheer ข้างหน้าต่าง",
         productId: null,
         productSlug: "mock-curtain-sheer-ivory",
@@ -715,7 +715,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     updatedAt: "2026-06-29T00:00:00Z",
   },
   {
-    id: "i2010001-0000-4000-8000-000000000020",
+    id: "a2010001-0000-4000-8000-000000000020",
     slug: "photo-studio-blackout",
     title: "สตูดิโอถ่ายภาพ — Blackout ควบคุมแสง",
     description:
@@ -729,7 +729,7 @@ const INSPIRATION_FALLBACK_RAW: InspirationRoomSeed[] = [
     status: "published",
     hotspots: [
       {
-        id: "h2010001-0000-4000-8000-000000000029",
+        id: "b2010001-0000-4000-8000-000000000029",
         label: "ม่าน Blackout กรมท่า",
         productId: null,
         productSlug: "mock-curtain-blackout-navy",

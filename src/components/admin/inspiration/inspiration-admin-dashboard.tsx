@@ -46,6 +46,7 @@ type Props = {
   rooms: InspirationRoomDto[];
   loading: boolean;
   onRefresh: () => Promise<void>;
+  initialStatusFilter?: "all" | InspirationRoomStatus;
 };
 
 const STATUS_LABELS: Record<InspirationRoomStatus, string> = {
@@ -59,11 +60,12 @@ export function InspirationAdminDashboard({
   rooms,
   loading,
   onRefresh,
+  initialStatusFilter = "all",
 }: Props) {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "all" | InspirationRoomStatus
-  >("all");
+  >(initialStatusFilter);
   const [busyId, setBusyId] = useState<string | null>(null);
   const { confirm, AdminConfirmDialog } = useAdminConfirm();
 

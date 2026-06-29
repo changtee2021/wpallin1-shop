@@ -59,6 +59,7 @@ function AdminOverviewPage() {
       title: "Inspiration แบบร่าง",
       value: stats.inspirationDraftCount,
       to: "/admin/inspiration",
+      search: { status: "draft" },
     },
     {
       title: "สินค้าใกล้หมด",
