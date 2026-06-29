@@ -36,11 +36,14 @@ import { Route as AdminQuotationsRouteImport } from './routes/admin.quotations'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminMembersRouteImport } from './routes/admin.members'
+import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminInventoryRouteImport } from './routes/admin.inventory'
+import { Route as AdminInspirationRouteImport } from './routes/admin.inspiration'
 import { Route as AdminDealersRouteImport } from './routes/admin.dealers'
 import { Route as AdminCustomRouteImport } from './routes/admin.custom'
 import { Route as AdminCreditRouteImport } from './routes/admin.credit'
 import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
+import { Route as AdminChatRouteImport } from './routes/admin.chat'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminCatalogsRouteImport } from './routes/admin.catalogs'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
@@ -54,6 +57,7 @@ import { Route as StoreTermsRouteImport } from './routes/_store.terms'
 import { Route as StoreShopRouteImport } from './routes/_store.shop'
 import { Route as StoreQuickOrderRouteImport } from './routes/_store.quick-order'
 import { Route as StorePrivacyRouteImport } from './routes/_store.privacy'
+import { Route as StoreInspirationRouteImport } from './routes/_store.inspiration'
 import { Route as StoreErrorRouteImport } from './routes/_store.error'
 import { Route as StoreCookiesRouteImport } from './routes/_store.cookies'
 import { Route as StoreContactRouteImport } from './routes/_store.contact'
@@ -65,28 +69,43 @@ import { Route as StoreCartRouteImport } from './routes/_store.cart'
 import { Route as StoreAboutRouteImport } from './routes/_store.about'
 import { Route as AdminQuotationsIndexRouteImport } from './routes/admin.quotations.index'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
+import { Route as AdminInspirationIndexRouteImport } from './routes/admin.inspiration.index'
+import { Route as AdminCustomIndexRouteImport } from './routes/admin.custom.index'
+import { Route as StoreInspirationIndexRouteImport } from './routes/_store.inspiration.index'
 import { Route as StoreCatalogsIndexRouteImport } from './routes/_store.catalogs.index'
 import { Route as StoreCartIndexRouteImport } from './routes/_store.cart.index'
 import { Route as ApiV1WalletTopupSlipRouteImport } from './routes/api/v1/wallet-topup-slip'
 import { Route as ApiV1ProfileAvatarRouteImport } from './routes/api/v1/profile-avatar'
 import { Route as ApiV1ProductsRouteImport } from './routes/api/v1/products'
+import { Route as ApiV1ProductImageRouteImport } from './routes/api/v1/product-image'
 import { Route as ApiV1PaymentSlipRouteImport } from './routes/api/v1/payment-slip'
+import { Route as ApiV1InspirationImageRouteImport } from './routes/api/v1/inspiration-image'
 import { Route as ApiV1HeroBannerRouteImport } from './routes/api/v1/hero-banner'
 import { Route as ApiV1CustomerDocumentRouteImport } from './routes/api/v1/customer-document'
 import { Route as ApiV1ConfiguratorAssetRouteImport } from './routes/api/v1/configurator-asset'
+import { Route as ApiV1ChatAttachmentRouteImport } from './routes/api/v1/chat-attachment'
 import { Route as ApiV1CatalogAssetRouteImport } from './routes/api/v1/catalog-asset'
 import { Route as ApiV1AdminTaxInvoiceRouteImport } from './routes/api/v1/admin-tax-invoice'
+import { Route as ApiV1AdminMediaRouteImport } from './routes/api/v1/admin-media'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as AdminQuotationsQuotationIdRouteImport } from './routes/admin.quotations.$quotationId'
 import { Route as AdminProductsNewRouteImport } from './routes/admin.products.new'
 import { Route as AdminProductsIdRouteImport } from './routes/admin.products.$id'
 import { Route as AdminOrdersOrderIdRouteImport } from './routes/admin.orders.$orderId'
 import { Route as AdminMembersUserIdRouteImport } from './routes/admin.members.$userId'
+import { Route as AdminInspirationMaterialsRouteImport } from './routes/admin.inspiration.materials'
+import { Route as AdminCustomRulesRouteImport } from './routes/admin.custom.rules'
+import { Route as AdminCustomProjectsRouteImport } from './routes/admin.custom.projects'
+import { Route as AdminCustomFabricsRouteImport } from './routes/admin.custom.fabrics'
 import { Route as AccountOrdersOrderIdRouteImport } from './routes/account.orders.$orderId'
 import { Route as StoreProductsSlugRouteImport } from './routes/_store.products.$slug'
+import { Route as StoreInspirationSlugRouteImport } from './routes/_store.inspiration.$slug'
 import { Route as StoreDealerRegisterRouteImport } from './routes/_store.dealer.register'
 import { Route as StoreCatalogsIdRouteImport } from './routes/_store.catalogs.$id'
 import { Route as StoreCartSummaryRouteImport } from './routes/_store.cart.summary'
+import { Route as AdminInspirationRoomsIdRouteImport } from './routes/admin.inspiration.rooms.$id'
+import { Route as AdminInspirationMaterialsIdRouteImport } from './routes/admin.inspiration.materials.$id'
+import { Route as StoreInspirationMaterialsSlugRouteImport } from './routes/_store.inspiration.materials.$slug'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -222,9 +241,19 @@ const AdminMembersRoute = AdminMembersRouteImport.update({
   path: '/members',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMediaRoute = AdminMediaRouteImport.update({
+  id: '/media',
+  path: '/media',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminInventoryRoute = AdminInventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminInspirationRoute = AdminInspirationRouteImport.update({
+  id: '/inspiration',
+  path: '/inspiration',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminDealersRoute = AdminDealersRouteImport.update({
@@ -245,6 +274,11 @@ const AdminCreditRoute = AdminCreditRouteImport.update({
 const AdminCouponsRoute = AdminCouponsRouteImport.update({
   id: '/coupons',
   path: '/coupons',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminChatRoute = AdminChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
@@ -312,6 +346,11 @@ const StorePrivacyRoute = StorePrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => StoreRoute,
 } as any)
+const StoreInspirationRoute = StoreInspirationRouteImport.update({
+  id: '/inspiration',
+  path: '/inspiration',
+  getParentRoute: () => StoreRoute,
+} as any)
 const StoreErrorRoute = StoreErrorRouteImport.update({
   id: '/error',
   path: '/error',
@@ -367,6 +406,21 @@ const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminProductsRoute,
 } as any)
+const AdminInspirationIndexRoute = AdminInspirationIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminInspirationRoute,
+} as any)
+const AdminCustomIndexRoute = AdminCustomIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminCustomRoute,
+} as any)
+const StoreInspirationIndexRoute = StoreInspirationIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StoreInspirationRoute,
+} as any)
 const StoreCatalogsIndexRoute = StoreCatalogsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -392,9 +446,19 @@ const ApiV1ProductsRoute = ApiV1ProductsRouteImport.update({
   path: '/api/v1/products',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1ProductImageRoute = ApiV1ProductImageRouteImport.update({
+  id: '/api/v1/product-image',
+  path: '/api/v1/product-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1PaymentSlipRoute = ApiV1PaymentSlipRouteImport.update({
   id: '/api/v1/payment-slip',
   path: '/api/v1/payment-slip',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1InspirationImageRoute = ApiV1InspirationImageRouteImport.update({
+  id: '/api/v1/inspiration-image',
+  path: '/api/v1/inspiration-image',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiV1HeroBannerRoute = ApiV1HeroBannerRouteImport.update({
@@ -412,6 +476,11 @@ const ApiV1ConfiguratorAssetRoute = ApiV1ConfiguratorAssetRouteImport.update({
   path: '/api/v1/configurator-asset',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1ChatAttachmentRoute = ApiV1ChatAttachmentRouteImport.update({
+  id: '/api/v1/chat-attachment',
+  path: '/api/v1/chat-attachment',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1CatalogAssetRoute = ApiV1CatalogAssetRouteImport.update({
   id: '/api/v1/catalog-asset',
   path: '/api/v1/catalog-asset',
@@ -420,6 +489,11 @@ const ApiV1CatalogAssetRoute = ApiV1CatalogAssetRouteImport.update({
 const ApiV1AdminTaxInvoiceRoute = ApiV1AdminTaxInvoiceRouteImport.update({
   id: '/api/v1/admin-tax-invoice',
   path: '/api/v1/admin-tax-invoice',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1AdminMediaRoute = ApiV1AdminMediaRouteImport.update({
+  id: '/api/v1/admin-media',
+  path: '/api/v1/admin-media',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
@@ -453,6 +527,27 @@ const AdminMembersUserIdRoute = AdminMembersUserIdRouteImport.update({
   path: '/$userId',
   getParentRoute: () => AdminMembersRoute,
 } as any)
+const AdminInspirationMaterialsRoute =
+  AdminInspirationMaterialsRouteImport.update({
+    id: '/materials',
+    path: '/materials',
+    getParentRoute: () => AdminInspirationRoute,
+  } as any)
+const AdminCustomRulesRoute = AdminCustomRulesRouteImport.update({
+  id: '/rules',
+  path: '/rules',
+  getParentRoute: () => AdminCustomRoute,
+} as any)
+const AdminCustomProjectsRoute = AdminCustomProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => AdminCustomRoute,
+} as any)
+const AdminCustomFabricsRoute = AdminCustomFabricsRouteImport.update({
+  id: '/fabrics',
+  path: '/fabrics',
+  getParentRoute: () => AdminCustomRoute,
+} as any)
 const AccountOrdersOrderIdRoute = AccountOrdersOrderIdRouteImport.update({
   id: '/$orderId',
   path: '/$orderId',
@@ -462,6 +557,11 @@ const StoreProductsSlugRoute = StoreProductsSlugRouteImport.update({
   id: '/products/$slug',
   path: '/products/$slug',
   getParentRoute: () => StoreRoute,
+} as any)
+const StoreInspirationSlugRoute = StoreInspirationSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => StoreInspirationRoute,
 } as any)
 const StoreDealerRegisterRoute = StoreDealerRegisterRouteImport.update({
   id: '/dealer/register',
@@ -478,6 +578,23 @@ const StoreCartSummaryRoute = StoreCartSummaryRouteImport.update({
   path: '/summary',
   getParentRoute: () => StoreCartRoute,
 } as any)
+const AdminInspirationRoomsIdRoute = AdminInspirationRoomsIdRouteImport.update({
+  id: '/rooms/$id',
+  path: '/rooms/$id',
+  getParentRoute: () => AdminInspirationRoute,
+} as any)
+const AdminInspirationMaterialsIdRoute =
+  AdminInspirationMaterialsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AdminInspirationMaterialsRoute,
+  } as any)
+const StoreInspirationMaterialsSlugRoute =
+  StoreInspirationMaterialsSlugRouteImport.update({
+    id: '/materials/$slug',
+    path: '/materials/$slug',
+    getParentRoute: () => StoreInspirationRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof StoreIndexRoute
@@ -497,6 +614,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof StoreContactRoute
   '/cookies': typeof StoreCookiesRoute
   '/error': typeof StoreErrorRoute
+  '/inspiration': typeof StoreInspirationRouteWithChildren
   '/privacy': typeof StorePrivacyRoute
   '/quick-order': typeof StoreQuickOrderRoute
   '/shop': typeof StoreShopRoute
@@ -510,11 +628,14 @@ export interface FileRoutesByFullPath {
   '/admin/banners': typeof AdminBannersRoute
   '/admin/catalogs': typeof AdminCatalogsRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/chat': typeof AdminChatRoute
   '/admin/coupons': typeof AdminCouponsRoute
   '/admin/credit': typeof AdminCreditRoute
-  '/admin/custom': typeof AdminCustomRoute
+  '/admin/custom': typeof AdminCustomRouteWithChildren
   '/admin/dealers': typeof AdminDealersRoute
+  '/admin/inspiration': typeof AdminInspirationRouteWithChildren
   '/admin/inventory': typeof AdminInventoryRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/members': typeof AdminMembersRouteWithChildren
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/products': typeof AdminProductsRouteWithChildren
@@ -536,27 +657,42 @@ export interface FileRoutesByFullPath {
   '/cart/summary': typeof StoreCartSummaryRoute
   '/catalogs/$id': typeof StoreCatalogsIdRoute
   '/dealer/register': typeof StoreDealerRegisterRoute
+  '/inspiration/$slug': typeof StoreInspirationSlugRoute
   '/products/$slug': typeof StoreProductsSlugRoute
   '/account/orders/$orderId': typeof AccountOrdersOrderIdRoute
+  '/admin/custom/fabrics': typeof AdminCustomFabricsRoute
+  '/admin/custom/projects': typeof AdminCustomProjectsRoute
+  '/admin/custom/rules': typeof AdminCustomRulesRoute
+  '/admin/inspiration/materials': typeof AdminInspirationMaterialsRouteWithChildren
   '/admin/members/$userId': typeof AdminMembersUserIdRoute
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/quotations/$quotationId': typeof AdminQuotationsQuotationIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/v1/admin-media': typeof ApiV1AdminMediaRoute
   '/api/v1/admin-tax-invoice': typeof ApiV1AdminTaxInvoiceRoute
   '/api/v1/catalog-asset': typeof ApiV1CatalogAssetRoute
+  '/api/v1/chat-attachment': typeof ApiV1ChatAttachmentRoute
   '/api/v1/configurator-asset': typeof ApiV1ConfiguratorAssetRoute
   '/api/v1/customer-document': typeof ApiV1CustomerDocumentRoute
   '/api/v1/hero-banner': typeof ApiV1HeroBannerRoute
+  '/api/v1/inspiration-image': typeof ApiV1InspirationImageRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
+  '/api/v1/product-image': typeof ApiV1ProductImageRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
   '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
   '/cart/': typeof StoreCartIndexRoute
   '/catalogs/': typeof StoreCatalogsIndexRoute
+  '/inspiration/': typeof StoreInspirationIndexRoute
+  '/admin/custom/': typeof AdminCustomIndexRoute
+  '/admin/inspiration/': typeof AdminInspirationIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/quotations/': typeof AdminQuotationsIndexRoute
+  '/inspiration/materials/$slug': typeof StoreInspirationMaterialsSlugRoute
+  '/admin/inspiration/materials/$id': typeof AdminInspirationMaterialsIdRoute
+  '/admin/inspiration/rooms/$id': typeof AdminInspirationRoomsIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -583,11 +719,12 @@ export interface FileRoutesByTo {
   '/admin/banners': typeof AdminBannersRoute
   '/admin/catalogs': typeof AdminCatalogsRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/chat': typeof AdminChatRoute
   '/admin/coupons': typeof AdminCouponsRoute
   '/admin/credit': typeof AdminCreditRoute
-  '/admin/custom': typeof AdminCustomRoute
   '/admin/dealers': typeof AdminDealersRoute
   '/admin/inventory': typeof AdminInventoryRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/members': typeof AdminMembersRouteWithChildren
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/reports': typeof AdminReportsRoute
@@ -608,27 +745,42 @@ export interface FileRoutesByTo {
   '/cart/summary': typeof StoreCartSummaryRoute
   '/catalogs/$id': typeof StoreCatalogsIdRoute
   '/dealer/register': typeof StoreDealerRegisterRoute
+  '/inspiration/$slug': typeof StoreInspirationSlugRoute
   '/products/$slug': typeof StoreProductsSlugRoute
   '/account/orders/$orderId': typeof AccountOrdersOrderIdRoute
+  '/admin/custom/fabrics': typeof AdminCustomFabricsRoute
+  '/admin/custom/projects': typeof AdminCustomProjectsRoute
+  '/admin/custom/rules': typeof AdminCustomRulesRoute
+  '/admin/inspiration/materials': typeof AdminInspirationMaterialsRouteWithChildren
   '/admin/members/$userId': typeof AdminMembersUserIdRoute
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/quotations/$quotationId': typeof AdminQuotationsQuotationIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/v1/admin-media': typeof ApiV1AdminMediaRoute
   '/api/v1/admin-tax-invoice': typeof ApiV1AdminTaxInvoiceRoute
   '/api/v1/catalog-asset': typeof ApiV1CatalogAssetRoute
+  '/api/v1/chat-attachment': typeof ApiV1ChatAttachmentRoute
   '/api/v1/configurator-asset': typeof ApiV1ConfiguratorAssetRoute
   '/api/v1/customer-document': typeof ApiV1CustomerDocumentRoute
   '/api/v1/hero-banner': typeof ApiV1HeroBannerRoute
+  '/api/v1/inspiration-image': typeof ApiV1InspirationImageRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
+  '/api/v1/product-image': typeof ApiV1ProductImageRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
   '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
   '/cart': typeof StoreCartIndexRoute
   '/catalogs': typeof StoreCatalogsIndexRoute
+  '/inspiration': typeof StoreInspirationIndexRoute
+  '/admin/custom': typeof AdminCustomIndexRoute
+  '/admin/inspiration': typeof AdminInspirationIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
   '/admin/quotations': typeof AdminQuotationsIndexRoute
+  '/inspiration/materials/$slug': typeof StoreInspirationMaterialsSlugRoute
+  '/admin/inspiration/materials/$id': typeof AdminInspirationMaterialsIdRoute
+  '/admin/inspiration/rooms/$id': typeof AdminInspirationRoomsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -649,6 +801,7 @@ export interface FileRoutesById {
   '/_store/contact': typeof StoreContactRoute
   '/_store/cookies': typeof StoreCookiesRoute
   '/_store/error': typeof StoreErrorRoute
+  '/_store/inspiration': typeof StoreInspirationRouteWithChildren
   '/_store/privacy': typeof StorePrivacyRoute
   '/_store/quick-order': typeof StoreQuickOrderRoute
   '/_store/shop': typeof StoreShopRoute
@@ -662,11 +815,14 @@ export interface FileRoutesById {
   '/admin/banners': typeof AdminBannersRoute
   '/admin/catalogs': typeof AdminCatalogsRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/chat': typeof AdminChatRoute
   '/admin/coupons': typeof AdminCouponsRoute
   '/admin/credit': typeof AdminCreditRoute
-  '/admin/custom': typeof AdminCustomRoute
+  '/admin/custom': typeof AdminCustomRouteWithChildren
   '/admin/dealers': typeof AdminDealersRoute
+  '/admin/inspiration': typeof AdminInspirationRouteWithChildren
   '/admin/inventory': typeof AdminInventoryRoute
+  '/admin/media': typeof AdminMediaRoute
   '/admin/members': typeof AdminMembersRouteWithChildren
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/products': typeof AdminProductsRouteWithChildren
@@ -689,27 +845,42 @@ export interface FileRoutesById {
   '/_store/cart/summary': typeof StoreCartSummaryRoute
   '/_store/catalogs/$id': typeof StoreCatalogsIdRoute
   '/_store/dealer/register': typeof StoreDealerRegisterRoute
+  '/_store/inspiration/$slug': typeof StoreInspirationSlugRoute
   '/_store/products/$slug': typeof StoreProductsSlugRoute
   '/account/orders/$orderId': typeof AccountOrdersOrderIdRoute
+  '/admin/custom/fabrics': typeof AdminCustomFabricsRoute
+  '/admin/custom/projects': typeof AdminCustomProjectsRoute
+  '/admin/custom/rules': typeof AdminCustomRulesRoute
+  '/admin/inspiration/materials': typeof AdminInspirationMaterialsRouteWithChildren
   '/admin/members/$userId': typeof AdminMembersUserIdRoute
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/quotations/$quotationId': typeof AdminQuotationsQuotationIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/v1/admin-media': typeof ApiV1AdminMediaRoute
   '/api/v1/admin-tax-invoice': typeof ApiV1AdminTaxInvoiceRoute
   '/api/v1/catalog-asset': typeof ApiV1CatalogAssetRoute
+  '/api/v1/chat-attachment': typeof ApiV1ChatAttachmentRoute
   '/api/v1/configurator-asset': typeof ApiV1ConfiguratorAssetRoute
   '/api/v1/customer-document': typeof ApiV1CustomerDocumentRoute
   '/api/v1/hero-banner': typeof ApiV1HeroBannerRoute
+  '/api/v1/inspiration-image': typeof ApiV1InspirationImageRoute
   '/api/v1/payment-slip': typeof ApiV1PaymentSlipRoute
+  '/api/v1/product-image': typeof ApiV1ProductImageRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
   '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
   '/_store/cart/': typeof StoreCartIndexRoute
   '/_store/catalogs/': typeof StoreCatalogsIndexRoute
+  '/_store/inspiration/': typeof StoreInspirationIndexRoute
+  '/admin/custom/': typeof AdminCustomIndexRoute
+  '/admin/inspiration/': typeof AdminInspirationIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/quotations/': typeof AdminQuotationsIndexRoute
+  '/_store/inspiration/materials/$slug': typeof StoreInspirationMaterialsSlugRoute
+  '/admin/inspiration/materials/$id': typeof AdminInspirationMaterialsIdRoute
+  '/admin/inspiration/rooms/$id': typeof AdminInspirationRoomsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -731,6 +902,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookies'
     | '/error'
+    | '/inspiration'
     | '/privacy'
     | '/quick-order'
     | '/shop'
@@ -744,11 +916,14 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/catalogs'
     | '/admin/categories'
+    | '/admin/chat'
     | '/admin/coupons'
     | '/admin/credit'
     | '/admin/custom'
     | '/admin/dealers'
+    | '/admin/inspiration'
     | '/admin/inventory'
+    | '/admin/media'
     | '/admin/members'
     | '/admin/orders'
     | '/admin/products'
@@ -770,27 +945,42 @@ export interface FileRouteTypes {
     | '/cart/summary'
     | '/catalogs/$id'
     | '/dealer/register'
+    | '/inspiration/$slug'
     | '/products/$slug'
     | '/account/orders/$orderId'
+    | '/admin/custom/fabrics'
+    | '/admin/custom/projects'
+    | '/admin/custom/rules'
+    | '/admin/inspiration/materials'
     | '/admin/members/$userId'
     | '/admin/orders/$orderId'
     | '/admin/products/$id'
     | '/admin/products/new'
     | '/admin/quotations/$quotationId'
     | '/api/public/health'
+    | '/api/v1/admin-media'
     | '/api/v1/admin-tax-invoice'
     | '/api/v1/catalog-asset'
+    | '/api/v1/chat-attachment'
     | '/api/v1/configurator-asset'
     | '/api/v1/customer-document'
     | '/api/v1/hero-banner'
+    | '/api/v1/inspiration-image'
     | '/api/v1/payment-slip'
+    | '/api/v1/product-image'
     | '/api/v1/products'
     | '/api/v1/profile-avatar'
     | '/api/v1/wallet-topup-slip'
     | '/cart/'
     | '/catalogs/'
+    | '/inspiration/'
+    | '/admin/custom/'
+    | '/admin/inspiration/'
     | '/admin/products/'
     | '/admin/quotations/'
+    | '/inspiration/materials/$slug'
+    | '/admin/inspiration/materials/$id'
+    | '/admin/inspiration/rooms/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -817,11 +1007,12 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/catalogs'
     | '/admin/categories'
+    | '/admin/chat'
     | '/admin/coupons'
     | '/admin/credit'
-    | '/admin/custom'
     | '/admin/dealers'
     | '/admin/inventory'
+    | '/admin/media'
     | '/admin/members'
     | '/admin/orders'
     | '/admin/reports'
@@ -842,27 +1033,42 @@ export interface FileRouteTypes {
     | '/cart/summary'
     | '/catalogs/$id'
     | '/dealer/register'
+    | '/inspiration/$slug'
     | '/products/$slug'
     | '/account/orders/$orderId'
+    | '/admin/custom/fabrics'
+    | '/admin/custom/projects'
+    | '/admin/custom/rules'
+    | '/admin/inspiration/materials'
     | '/admin/members/$userId'
     | '/admin/orders/$orderId'
     | '/admin/products/$id'
     | '/admin/products/new'
     | '/admin/quotations/$quotationId'
     | '/api/public/health'
+    | '/api/v1/admin-media'
     | '/api/v1/admin-tax-invoice'
     | '/api/v1/catalog-asset'
+    | '/api/v1/chat-attachment'
     | '/api/v1/configurator-asset'
     | '/api/v1/customer-document'
     | '/api/v1/hero-banner'
+    | '/api/v1/inspiration-image'
     | '/api/v1/payment-slip'
+    | '/api/v1/product-image'
     | '/api/v1/products'
     | '/api/v1/profile-avatar'
     | '/api/v1/wallet-topup-slip'
     | '/cart'
     | '/catalogs'
+    | '/inspiration'
+    | '/admin/custom'
+    | '/admin/inspiration'
     | '/admin/products'
     | '/admin/quotations'
+    | '/inspiration/materials/$slug'
+    | '/admin/inspiration/materials/$id'
+    | '/admin/inspiration/rooms/$id'
   id:
     | '__root__'
     | '/_store'
@@ -882,6 +1088,7 @@ export interface FileRouteTypes {
     | '/_store/contact'
     | '/_store/cookies'
     | '/_store/error'
+    | '/_store/inspiration'
     | '/_store/privacy'
     | '/_store/quick-order'
     | '/_store/shop'
@@ -895,11 +1102,14 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/catalogs'
     | '/admin/categories'
+    | '/admin/chat'
     | '/admin/coupons'
     | '/admin/credit'
     | '/admin/custom'
     | '/admin/dealers'
+    | '/admin/inspiration'
     | '/admin/inventory'
+    | '/admin/media'
     | '/admin/members'
     | '/admin/orders'
     | '/admin/products'
@@ -922,27 +1132,42 @@ export interface FileRouteTypes {
     | '/_store/cart/summary'
     | '/_store/catalogs/$id'
     | '/_store/dealer/register'
+    | '/_store/inspiration/$slug'
     | '/_store/products/$slug'
     | '/account/orders/$orderId'
+    | '/admin/custom/fabrics'
+    | '/admin/custom/projects'
+    | '/admin/custom/rules'
+    | '/admin/inspiration/materials'
     | '/admin/members/$userId'
     | '/admin/orders/$orderId'
     | '/admin/products/$id'
     | '/admin/products/new'
     | '/admin/quotations/$quotationId'
     | '/api/public/health'
+    | '/api/v1/admin-media'
     | '/api/v1/admin-tax-invoice'
     | '/api/v1/catalog-asset'
+    | '/api/v1/chat-attachment'
     | '/api/v1/configurator-asset'
     | '/api/v1/customer-document'
     | '/api/v1/hero-banner'
+    | '/api/v1/inspiration-image'
     | '/api/v1/payment-slip'
+    | '/api/v1/product-image'
     | '/api/v1/products'
     | '/api/v1/profile-avatar'
     | '/api/v1/wallet-topup-slip'
     | '/_store/cart/'
     | '/_store/catalogs/'
+    | '/_store/inspiration/'
+    | '/admin/custom/'
+    | '/admin/inspiration/'
     | '/admin/products/'
     | '/admin/quotations/'
+    | '/_store/inspiration/materials/$slug'
+    | '/admin/inspiration/materials/$id'
+    | '/admin/inspiration/rooms/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -957,12 +1182,16 @@ export interface RootRouteChildren {
   AuthCallbackRoute: typeof AuthCallbackRoute
   QuoteTokenRoute: typeof QuoteTokenRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
+  ApiV1AdminMediaRoute: typeof ApiV1AdminMediaRoute
   ApiV1AdminTaxInvoiceRoute: typeof ApiV1AdminTaxInvoiceRoute
   ApiV1CatalogAssetRoute: typeof ApiV1CatalogAssetRoute
+  ApiV1ChatAttachmentRoute: typeof ApiV1ChatAttachmentRoute
   ApiV1ConfiguratorAssetRoute: typeof ApiV1ConfiguratorAssetRoute
   ApiV1CustomerDocumentRoute: typeof ApiV1CustomerDocumentRoute
   ApiV1HeroBannerRoute: typeof ApiV1HeroBannerRoute
+  ApiV1InspirationImageRoute: typeof ApiV1InspirationImageRoute
   ApiV1PaymentSlipRoute: typeof ApiV1PaymentSlipRoute
+  ApiV1ProductImageRoute: typeof ApiV1ProductImageRoute
   ApiV1ProductsRoute: typeof ApiV1ProductsRoute
   ApiV1ProfileAvatarRoute: typeof ApiV1ProfileAvatarRoute
   ApiV1WalletTopupSlipRoute: typeof ApiV1WalletTopupSlipRoute
@@ -1159,11 +1388,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMembersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/media': {
+      id: '/admin/media'
+      path: '/media'
+      fullPath: '/admin/media'
+      preLoaderRoute: typeof AdminMediaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/inventory': {
       id: '/admin/inventory'
       path: '/inventory'
       fullPath: '/admin/inventory'
       preLoaderRoute: typeof AdminInventoryRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/inspiration': {
+      id: '/admin/inspiration'
+      path: '/inspiration'
+      fullPath: '/admin/inspiration'
+      preLoaderRoute: typeof AdminInspirationRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/dealers': {
@@ -1192,6 +1435,13 @@ declare module '@tanstack/react-router' {
       path: '/coupons'
       fullPath: '/admin/coupons'
       preLoaderRoute: typeof AdminCouponsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/chat': {
+      id: '/admin/chat'
+      path: '/chat'
+      fullPath: '/admin/chat'
+      preLoaderRoute: typeof AdminChatRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/categories': {
@@ -1285,6 +1535,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StorePrivacyRouteImport
       parentRoute: typeof StoreRoute
     }
+    '/_store/inspiration': {
+      id: '/_store/inspiration'
+      path: '/inspiration'
+      fullPath: '/inspiration'
+      preLoaderRoute: typeof StoreInspirationRouteImport
+      parentRoute: typeof StoreRoute
+    }
     '/_store/error': {
       id: '/_store/error'
       path: '/error'
@@ -1362,6 +1619,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsIndexRouteImport
       parentRoute: typeof AdminProductsRoute
     }
+    '/admin/inspiration/': {
+      id: '/admin/inspiration/'
+      path: '/'
+      fullPath: '/admin/inspiration/'
+      preLoaderRoute: typeof AdminInspirationIndexRouteImport
+      parentRoute: typeof AdminInspirationRoute
+    }
+    '/admin/custom/': {
+      id: '/admin/custom/'
+      path: '/'
+      fullPath: '/admin/custom/'
+      preLoaderRoute: typeof AdminCustomIndexRouteImport
+      parentRoute: typeof AdminCustomRoute
+    }
+    '/_store/inspiration/': {
+      id: '/_store/inspiration/'
+      path: '/'
+      fullPath: '/inspiration/'
+      preLoaderRoute: typeof StoreInspirationIndexRouteImport
+      parentRoute: typeof StoreInspirationRoute
+    }
     '/_store/catalogs/': {
       id: '/_store/catalogs/'
       path: '/'
@@ -1397,11 +1675,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/product-image': {
+      id: '/api/v1/product-image'
+      path: '/api/v1/product-image'
+      fullPath: '/api/v1/product-image'
+      preLoaderRoute: typeof ApiV1ProductImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/payment-slip': {
       id: '/api/v1/payment-slip'
       path: '/api/v1/payment-slip'
       fullPath: '/api/v1/payment-slip'
       preLoaderRoute: typeof ApiV1PaymentSlipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/inspiration-image': {
+      id: '/api/v1/inspiration-image'
+      path: '/api/v1/inspiration-image'
+      fullPath: '/api/v1/inspiration-image'
+      preLoaderRoute: typeof ApiV1InspirationImageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/v1/hero-banner': {
@@ -1425,6 +1717,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1ConfiguratorAssetRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/chat-attachment': {
+      id: '/api/v1/chat-attachment'
+      path: '/api/v1/chat-attachment'
+      fullPath: '/api/v1/chat-attachment'
+      preLoaderRoute: typeof ApiV1ChatAttachmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/catalog-asset': {
       id: '/api/v1/catalog-asset'
       path: '/api/v1/catalog-asset'
@@ -1437,6 +1736,13 @@ declare module '@tanstack/react-router' {
       path: '/api/v1/admin-tax-invoice'
       fullPath: '/api/v1/admin-tax-invoice'
       preLoaderRoute: typeof ApiV1AdminTaxInvoiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/admin-media': {
+      id: '/api/v1/admin-media'
+      path: '/api/v1/admin-media'
+      fullPath: '/api/v1/admin-media'
+      preLoaderRoute: typeof ApiV1AdminMediaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/health': {
@@ -1481,6 +1787,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMembersUserIdRouteImport
       parentRoute: typeof AdminMembersRoute
     }
+    '/admin/inspiration/materials': {
+      id: '/admin/inspiration/materials'
+      path: '/materials'
+      fullPath: '/admin/inspiration/materials'
+      preLoaderRoute: typeof AdminInspirationMaterialsRouteImport
+      parentRoute: typeof AdminInspirationRoute
+    }
+    '/admin/custom/rules': {
+      id: '/admin/custom/rules'
+      path: '/rules'
+      fullPath: '/admin/custom/rules'
+      preLoaderRoute: typeof AdminCustomRulesRouteImport
+      parentRoute: typeof AdminCustomRoute
+    }
+    '/admin/custom/projects': {
+      id: '/admin/custom/projects'
+      path: '/projects'
+      fullPath: '/admin/custom/projects'
+      preLoaderRoute: typeof AdminCustomProjectsRouteImport
+      parentRoute: typeof AdminCustomRoute
+    }
+    '/admin/custom/fabrics': {
+      id: '/admin/custom/fabrics'
+      path: '/fabrics'
+      fullPath: '/admin/custom/fabrics'
+      preLoaderRoute: typeof AdminCustomFabricsRouteImport
+      parentRoute: typeof AdminCustomRoute
+    }
     '/account/orders/$orderId': {
       id: '/account/orders/$orderId'
       path: '/$orderId'
@@ -1494,6 +1828,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/products/$slug'
       preLoaderRoute: typeof StoreProductsSlugRouteImport
       parentRoute: typeof StoreRoute
+    }
+    '/_store/inspiration/$slug': {
+      id: '/_store/inspiration/$slug'
+      path: '/$slug'
+      fullPath: '/inspiration/$slug'
+      preLoaderRoute: typeof StoreInspirationSlugRouteImport
+      parentRoute: typeof StoreInspirationRoute
     }
     '/_store/dealer/register': {
       id: '/_store/dealer/register'
@@ -1515,6 +1856,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/cart/summary'
       preLoaderRoute: typeof StoreCartSummaryRouteImport
       parentRoute: typeof StoreCartRoute
+    }
+    '/admin/inspiration/rooms/$id': {
+      id: '/admin/inspiration/rooms/$id'
+      path: '/rooms/$id'
+      fullPath: '/admin/inspiration/rooms/$id'
+      preLoaderRoute: typeof AdminInspirationRoomsIdRouteImport
+      parentRoute: typeof AdminInspirationRoute
+    }
+    '/admin/inspiration/materials/$id': {
+      id: '/admin/inspiration/materials/$id'
+      path: '/$id'
+      fullPath: '/admin/inspiration/materials/$id'
+      preLoaderRoute: typeof AdminInspirationMaterialsIdRouteImport
+      parentRoute: typeof AdminInspirationMaterialsRoute
+    }
+    '/_store/inspiration/materials/$slug': {
+      id: '/_store/inspiration/materials/$slug'
+      path: '/materials/$slug'
+      fullPath: '/inspiration/materials/$slug'
+      preLoaderRoute: typeof StoreInspirationMaterialsSlugRouteImport
+      parentRoute: typeof StoreInspirationRoute
     }
   }
 }
@@ -1547,6 +1909,21 @@ const StoreCatalogsRouteWithChildren = StoreCatalogsRoute._addFileChildren(
   StoreCatalogsRouteChildren,
 )
 
+interface StoreInspirationRouteChildren {
+  StoreInspirationSlugRoute: typeof StoreInspirationSlugRoute
+  StoreInspirationIndexRoute: typeof StoreInspirationIndexRoute
+  StoreInspirationMaterialsSlugRoute: typeof StoreInspirationMaterialsSlugRoute
+}
+
+const StoreInspirationRouteChildren: StoreInspirationRouteChildren = {
+  StoreInspirationSlugRoute: StoreInspirationSlugRoute,
+  StoreInspirationIndexRoute: StoreInspirationIndexRoute,
+  StoreInspirationMaterialsSlugRoute: StoreInspirationMaterialsSlugRoute,
+}
+
+const StoreInspirationRouteWithChildren =
+  StoreInspirationRoute._addFileChildren(StoreInspirationRouteChildren)
+
 interface StoreRouteChildren {
   StoreAboutRoute: typeof StoreAboutRoute
   StoreCartRoute: typeof StoreCartRouteWithChildren
@@ -1557,6 +1934,7 @@ interface StoreRouteChildren {
   StoreContactRoute: typeof StoreContactRoute
   StoreCookiesRoute: typeof StoreCookiesRoute
   StoreErrorRoute: typeof StoreErrorRoute
+  StoreInspirationRoute: typeof StoreInspirationRouteWithChildren
   StorePrivacyRoute: typeof StorePrivacyRoute
   StoreQuickOrderRoute: typeof StoreQuickOrderRoute
   StoreShopRoute: typeof StoreShopRoute
@@ -1576,6 +1954,7 @@ const StoreRouteChildren: StoreRouteChildren = {
   StoreContactRoute: StoreContactRoute,
   StoreCookiesRoute: StoreCookiesRoute,
   StoreErrorRoute: StoreErrorRoute,
+  StoreInspirationRoute: StoreInspirationRouteWithChildren,
   StorePrivacyRoute: StorePrivacyRoute,
   StoreQuickOrderRoute: StoreQuickOrderRoute,
   StoreShopRoute: StoreShopRoute,
@@ -1621,6 +2000,53 @@ const AccountRouteChildren: AccountRouteChildren = {
 
 const AccountRouteWithChildren =
   AccountRoute._addFileChildren(AccountRouteChildren)
+
+interface AdminCustomRouteChildren {
+  AdminCustomFabricsRoute: typeof AdminCustomFabricsRoute
+  AdminCustomProjectsRoute: typeof AdminCustomProjectsRoute
+  AdminCustomRulesRoute: typeof AdminCustomRulesRoute
+  AdminCustomIndexRoute: typeof AdminCustomIndexRoute
+}
+
+const AdminCustomRouteChildren: AdminCustomRouteChildren = {
+  AdminCustomFabricsRoute: AdminCustomFabricsRoute,
+  AdminCustomProjectsRoute: AdminCustomProjectsRoute,
+  AdminCustomRulesRoute: AdminCustomRulesRoute,
+  AdminCustomIndexRoute: AdminCustomIndexRoute,
+}
+
+const AdminCustomRouteWithChildren = AdminCustomRoute._addFileChildren(
+  AdminCustomRouteChildren,
+)
+
+interface AdminInspirationMaterialsRouteChildren {
+  AdminInspirationMaterialsIdRoute: typeof AdminInspirationMaterialsIdRoute
+}
+
+const AdminInspirationMaterialsRouteChildren: AdminInspirationMaterialsRouteChildren =
+  {
+    AdminInspirationMaterialsIdRoute: AdminInspirationMaterialsIdRoute,
+  }
+
+const AdminInspirationMaterialsRouteWithChildren =
+  AdminInspirationMaterialsRoute._addFileChildren(
+    AdminInspirationMaterialsRouteChildren,
+  )
+
+interface AdminInspirationRouteChildren {
+  AdminInspirationMaterialsRoute: typeof AdminInspirationMaterialsRouteWithChildren
+  AdminInspirationIndexRoute: typeof AdminInspirationIndexRoute
+  AdminInspirationRoomsIdRoute: typeof AdminInspirationRoomsIdRoute
+}
+
+const AdminInspirationRouteChildren: AdminInspirationRouteChildren = {
+  AdminInspirationMaterialsRoute: AdminInspirationMaterialsRouteWithChildren,
+  AdminInspirationIndexRoute: AdminInspirationIndexRoute,
+  AdminInspirationRoomsIdRoute: AdminInspirationRoomsIdRoute,
+}
+
+const AdminInspirationRouteWithChildren =
+  AdminInspirationRoute._addFileChildren(AdminInspirationRouteChildren)
 
 interface AdminMembersRouteChildren {
   AdminMembersUserIdRoute: typeof AdminMembersUserIdRoute
@@ -1680,11 +2106,14 @@ interface AdminRouteChildren {
   AdminBannersRoute: typeof AdminBannersRoute
   AdminCatalogsRoute: typeof AdminCatalogsRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminChatRoute: typeof AdminChatRoute
   AdminCouponsRoute: typeof AdminCouponsRoute
   AdminCreditRoute: typeof AdminCreditRoute
-  AdminCustomRoute: typeof AdminCustomRoute
+  AdminCustomRoute: typeof AdminCustomRouteWithChildren
   AdminDealersRoute: typeof AdminDealersRoute
+  AdminInspirationRoute: typeof AdminInspirationRouteWithChildren
   AdminInventoryRoute: typeof AdminInventoryRoute
+  AdminMediaRoute: typeof AdminMediaRoute
   AdminMembersRoute: typeof AdminMembersRouteWithChildren
   AdminOrdersRoute: typeof AdminOrdersRouteWithChildren
   AdminProductsRoute: typeof AdminProductsRouteWithChildren
@@ -1702,11 +2131,14 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBannersRoute: AdminBannersRoute,
   AdminCatalogsRoute: AdminCatalogsRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminChatRoute: AdminChatRoute,
   AdminCouponsRoute: AdminCouponsRoute,
   AdminCreditRoute: AdminCreditRoute,
-  AdminCustomRoute: AdminCustomRoute,
+  AdminCustomRoute: AdminCustomRouteWithChildren,
   AdminDealersRoute: AdminDealersRoute,
+  AdminInspirationRoute: AdminInspirationRouteWithChildren,
   AdminInventoryRoute: AdminInventoryRoute,
+  AdminMediaRoute: AdminMediaRoute,
   AdminMembersRoute: AdminMembersRouteWithChildren,
   AdminOrdersRoute: AdminOrdersRouteWithChildren,
   AdminProductsRoute: AdminProductsRouteWithChildren,
@@ -1751,12 +2183,16 @@ const rootRouteChildren: RootRouteChildren = {
   AuthCallbackRoute: AuthCallbackRoute,
   QuoteTokenRoute: QuoteTokenRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
+  ApiV1AdminMediaRoute: ApiV1AdminMediaRoute,
   ApiV1AdminTaxInvoiceRoute: ApiV1AdminTaxInvoiceRoute,
   ApiV1CatalogAssetRoute: ApiV1CatalogAssetRoute,
+  ApiV1ChatAttachmentRoute: ApiV1ChatAttachmentRoute,
   ApiV1ConfiguratorAssetRoute: ApiV1ConfiguratorAssetRoute,
   ApiV1CustomerDocumentRoute: ApiV1CustomerDocumentRoute,
   ApiV1HeroBannerRoute: ApiV1HeroBannerRoute,
+  ApiV1InspirationImageRoute: ApiV1InspirationImageRoute,
   ApiV1PaymentSlipRoute: ApiV1PaymentSlipRoute,
+  ApiV1ProductImageRoute: ApiV1ProductImageRoute,
   ApiV1ProductsRoute: ApiV1ProductsRoute,
   ApiV1ProfileAvatarRoute: ApiV1ProfileAvatarRoute,
   ApiV1WalletTopupSlipRoute: ApiV1WalletTopupSlipRoute,

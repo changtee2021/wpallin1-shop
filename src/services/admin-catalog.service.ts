@@ -28,6 +28,7 @@ export type AdminProductRow = {
   slug: string;
   sku: string | null;
   name: string;
+  imageUrl: string | null;
   retailPrice: number;
   stockQty: number;
   isActive: boolean;
@@ -41,7 +42,7 @@ export async function listAdminProducts(
   const { data, error } = await supabase
     .from("products")
     .select(
-      "id, slug, sku, name, retail_price, stock_qty, is_active, is_featured, category_id",
+      "id, slug, sku, name, image_url, retail_price, stock_qty, is_active, is_featured, category_id",
     )
     .order("updated_at", { ascending: false });
 
@@ -58,6 +59,7 @@ export async function listAdminProducts(
     slug: row.slug,
     sku: row.sku,
     name: row.name,
+    imageUrl: row.image_url ?? null,
     retailPrice: Number(row.retail_price),
     stockQty: Number(row.stock_qty),
     isActive: row.is_active,

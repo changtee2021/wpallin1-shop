@@ -38,9 +38,11 @@ const INITIAL_DRAFT: ConfiguratorDraft = {
 export function ConfiguratorWizard({
   initialCatalog = null,
   initialError = null,
+  initialDraft = {},
 }: {
   initialCatalog?: ConfiguratorCatalog | null;
   initialError?: string | null;
+  initialDraft?: Partial<ConfiguratorDraft>;
 }) {
   const { session } = useAuth();
   const { refresh } = useCart();
@@ -49,7 +51,10 @@ export function ConfiguratorWizard({
     initialCatalog,
   );
   const [loadError, setLoadError] = useState<string | null>(initialError);
-  const [draft, setDraft] = useState<ConfiguratorDraft>(INITIAL_DRAFT);
+  const [draft, setDraft] = useState<ConfiguratorDraft>({
+    ...INITIAL_DRAFT,
+    ...initialDraft,
+  });
   const [price, setPrice] = useState<ConfiguratorPriceBreakdown | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -74,6 +79,11 @@ export function ConfiguratorWizard({
     setCatalog(initialCatalog);
     setLoadError(initialError);
   }, [initialCatalog, initialError]);
+
+  useEffect(() => {
+    if (!Object.keys(initialDraft).length) return;
+    setDraft((current) => ({ ...INITIAL_DRAFT, ...current, ...initialDraft }));
+  }, [initialDraft]);
 
   useEffect(() => {
     if (!catalog || !draft.productType || !draft.fabricId) {

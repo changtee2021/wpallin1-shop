@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { PageLoading } from "@/components/loading";
+import { AdminImageUploader } from "@/components/admin/shared/admin-image-uploader";
+import { AdminPreviewLink } from "@/components/admin/shared/admin-preview-link";
 import { PageHeader } from "@/components/layout/page-header";
 import { ProductOptionsEditor } from "@/components/admin/product-options-editor";
 import { Button } from "@/components/ui/button";
@@ -24,6 +26,7 @@ import {
   saveAdminProduct,
 } from "@/lib/api.functions";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
+import { PRODUCT_IMAGE_ENDPOINT } from "@/lib/admin-image-upload";
 import type { AdminOptionGroupInput } from "@/domain/product-options";
 import type { CategoryDto } from "@/types/api/categories";
 
@@ -105,7 +108,24 @@ function AdminProductEditPage() {
 
   return (
     <div className="max-w-2xl">
-      <PageHeader title="แก้ไขสินค้า" description={form.name} />
+      <PageHeader
+        title="แก้ไขสินค้า"
+        description={form.name}
+        actions={
+          form.slug ? (
+            <AdminPreviewLink
+              href={`/products/${form.slug}`}
+              label="ดูหน้าร้าน"
+              disabled={!form.isActive}
+              onClick={() => {
+                if (!form.isActive) {
+                  toast.warning("เปิดขายสินค้าก่อนจึงจะดูหน้าร้านได้");
+                }
+              }}
+            />
+          ) : null
+        }
+      />
       <form onSubmit={(e) => void handleSubmit(e)} className="mt-6 space-y-4">
         <div>
           <Label>ชื่อสินค้า</Label>
@@ -182,13 +202,13 @@ function AdminProductEditPage() {
             />
           </div>
         </div>
-        <div>
-          <Label>URL รูปภาพ</Label>
-          <Input
-            value={form.imageUrl}
-            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-          />
-        </div>
+        <AdminImageUploader
+          accessToken={session?.access_token}
+          imageUrl={form.imageUrl}
+          onImageUrlChange={(url) => setForm({ ...form, imageUrl: url })}
+          uploadEndpoint={PRODUCT_IMAGE_ENDPOINT}
+          label="รูปสินค้า"
+        />
         <ProductOptionsEditor
           groups={optionGroups}
           onChange={setOptionGroups}

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { PageLoading } from "@/components/loading";
@@ -9,11 +9,19 @@ import { fetchAdminDashboard } from "@/lib/api.functions";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { formatPrice } from "@/lib/format";
 import { useT } from "@/i18n";
+import { cn } from "@/lib/utils";
 import type { AdminDashboardDto } from "@/services/settings.service";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminOverviewPage,
 });
+
+type DashboardCard = {
+  title: string;
+  value: string | number;
+  to: string;
+  search?: Record<string, unknown>;
+};
 
 function AdminOverviewPage() {
   const { t } = useT();
@@ -26,40 +34,65 @@ function AdminOverviewPage() {
 
   if (!stats) return <PageLoading variant="dashboard" />;
 
-  const cards = [
+  const cards: DashboardCard[] = [
     {
       title: "ยอดขายวันนี้",
-      value: stats ? formatPrice(stats.todaySales) : "—",
+      value: formatPrice(stats.todaySales),
+      to: "/admin/reports",
     },
     {
       title: "ออเดอร์รอตรวจสลิป",
-      value: stats?.pendingSlipVerification ?? "—",
+      value: stats.pendingSlipVerification,
+      to: "/admin/orders",
     },
     {
       title: "ใบเสนอราคาเปิด",
-      value: stats?.openQuotations ?? "—",
+      value: stats.openQuotations,
+      to: "/admin/quotations",
     },
     {
       title: "ใบสมัครตัวแทนรออนุมัติ",
-      value: stats?.pendingDealerApps ?? "—",
+      value: stats.pendingDealerApps,
+      to: "/admin/dealers",
+    },
+    {
+      title: "Inspiration แบบร่าง",
+      value: stats.inspirationDraftCount,
+      to: "/admin/inspiration",
+    },
+    {
+      title: "สินค้าใกล้หมด",
+      value: stats.lowStockCount,
+      to: "/admin/inventory",
     },
   ];
 
   return (
     <div>
       <PageHeader title={t("admin.overview")} description="แดชบอร์ดแอดมิน" />
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {cards.map((card) => (
-          <Card key={card.title}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {card.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{card.value}</p>
-            </CardContent>
-          </Card>
+          <Link
+            key={card.title}
+            to={card.to}
+            search={card.search}
+            className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Card
+              className={cn(
+                "h-full transition-colors hover:border-primary/40 hover:bg-muted/30",
+              )}
+            >
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  {card.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">{card.value}</p>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
     </div>

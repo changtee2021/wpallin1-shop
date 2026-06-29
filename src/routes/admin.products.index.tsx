@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { ImageIcon, Plus } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
+import { AdminListToolbar } from "@/components/admin/shared/admin-list-toolbar";
 import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -13,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchAdminProducts } from "@/lib/api.functions";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
@@ -30,6 +31,7 @@ function AdminProductsPage() {
   const { session } = useAuth();
   const [products, setProducts] = useState<AdminProductRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     void fetchAdminProducts(authServerFnOptions(session))
@@ -38,20 +40,41 @@ function AdminProductsPage() {
       .finally(() => setLoading(false));
   }, [session]);
 
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return products;
+    return products.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.slug.toLowerCase().includes(q) ||
+        (p.sku?.toLowerCase().includes(q) ?? false) ||
+        (p.categoryName?.toLowerCase().includes(q) ?? false),
+    );
+  }, [products, query]);
+
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <PageHeader
-          title={t("admin.products")}
-          description="จัดการสินค้าในร้าน"
+      <PageHeader
+        title={t("admin.products")}
+        description="จัดการสินค้าในร้าน"
+        actions={
+          <Button asChild className="bg-primary">
+            <Link to="/admin/products/new">
+              <Plus className="mr-2 size-4" />
+              เพิ่มสินค้า
+            </Link>
+          </Button>
+        }
+      />
+
+      <div className="mb-4">
+        <AdminListToolbar
+          query={query}
+          onQueryChange={setQuery}
+          placeholder="ค้นหาชื่อ, SKU, slug…"
         />
-        <Button asChild className="bg-primary">
-          <Link to="/admin/products/new">
-            <Plus className="mr-2 size-4" />
-            เพิ่มสินค้า
-          </Link>
-        </Button>
       </div>
+
       {loading ? (
         <PageLoading variant="table" />
       ) : (
@@ -59,6 +82,7 @@ function AdminProductsPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-14">รูป</TableHead>
                 <TableHead>SKU</TableHead>
                 <TableHead>ชื่อ</TableHead>
                 <TableHead>หมวด</TableHead>
@@ -69,18 +93,31 @@ function AdminProductsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.length === 0 ? (
+              {filtered.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={7}
+                    colSpan={8}
                     className="h-24 text-center text-muted-foreground"
                   >
-                    ยังไม่มีสินค้า
+                    {products.length === 0 ? "ยังไม่มีสินค้า" : "ไม่พบสินค้า"}
                   </TableCell>
                 </TableRow>
               ) : (
-                products.map((p) => (
+                filtered.map((p) => (
                   <TableRow key={p.id}>
+                    <TableCell>
+                      {p.imageUrl ? (
+                        <img
+                          src={p.imageUrl}
+                          alt=""
+                          className="size-10 rounded-md border object-cover"
+                        />
+                      ) : (
+                        <div className="flex size-10 items-center justify-center rounded-md border bg-muted">
+                          <ImageIcon className="size-4 text-muted-foreground" />
+                        </div>
+                      )}
+                    </TableCell>
                     <TableCell>{p.sku ?? "—"}</TableCell>
                     <TableCell className="font-medium">{p.name}</TableCell>
                     <TableCell>{p.categoryName ?? "—"}</TableCell>

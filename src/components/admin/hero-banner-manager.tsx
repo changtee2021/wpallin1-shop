@@ -9,6 +9,7 @@ import {
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { AdminPreviewLink } from "@/components/admin/shared/admin-preview-link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,8 @@ type Props = {
   banners: HeroBannerDto[];
   onChange: (banners: HeroBannerDto[]) => void;
   activeLabel?: string;
+  previewHref?: string;
+  previewLabel?: string;
 };
 
 export function HeroBannerManager({
@@ -35,6 +38,8 @@ export function HeroBannerManager({
   banners,
   onChange,
   activeLabel = "แสดงบนหน้าแรก",
+  previewHref,
+  previewLabel = "ดูตัวอย่างหน้าร้าน",
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -100,6 +105,11 @@ export function HeroBannerManager({
 
   return (
     <div className="space-y-4">
+      {previewHref ? (
+        <div className="flex justify-end">
+          <AdminPreviewLink href={previewHref} label={previewLabel} />
+        </div>
+      ) : null}
       <Card>
         <CardContent className="space-y-4 p-4">
           <div>

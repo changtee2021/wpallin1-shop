@@ -22,6 +22,7 @@ export const saveAdminCategory = createServerFn({ method: "POST" })
         id: z.string().uuid().optional(),
         name: z.string().min(1),
         slug: z.string().min(1),
+        imageUrl: z.string().nullable().optional(),
         sortOrder: z.number().int().optional(),
         isActive: z.boolean().optional(),
       })

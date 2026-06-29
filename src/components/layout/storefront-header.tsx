@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingCart } from "lucide-react";
+import { MessageCircle, ShoppingCart } from "lucide-react";
 
 import { AccountMenuButton } from "@/components/account/account-menu-button";
 import { NotificationBell } from "@/components/notifications/notification-bell";
@@ -8,13 +8,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
+import { useChatUi } from "@/hooks/use-chat-ui";
 import { useT } from "@/i18n";
 
 const navLinks = [
   { to: "/" as const, key: "nav.home" as const, exact: true },
+  { to: "/inspiration" as const, key: "nav.inspiration" as const },
   { to: "/shop" as const, key: "nav.shop" as const },
-  { to: "/catalogs" as const, key: "nav.catalogs" as const },
   { to: "/configurator" as const, key: "nav.configurator" as const },
+  { to: "/catalogs" as const, key: "nav.catalogs" as const },
+  { to: "/dealer/register" as const, key: "nav.dealerRegister" as const },
   { to: "/about" as const, key: "nav.about" as const },
 ];
 
@@ -23,6 +26,7 @@ const headerIconClass = "text-white hover:bg-white/10 hover:text-white";
 export function StorefrontHeader() {
   const { t } = useT();
   const { user } = useAuth();
+  const { openChat } = useChatUi();
   const { cart } = useCart();
 
   return (
@@ -67,13 +71,24 @@ export function StorefrontHeader() {
             {user ? (
               <AccountMenuButton />
             ) : (
-              <Button
-                size="sm"
-                className="hidden bg-accent hover:bg-accent/90 sm:inline-flex"
-                asChild
-              >
-                <Link to="/login">{t("nav.login")}</Link>
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`rounded-full ${headerIconClass}`}
+                  onClick={() => openChat()}
+                  aria-label={t("account.chat")}
+                >
+                  <MessageCircle className="size-5" />
+                </Button>
+                <Button
+                  size="sm"
+                  className="hidden bg-accent hover:bg-accent/90 sm:inline-flex"
+                  asChild
+                >
+                  <Link to="/login">{t("nav.login")}</Link>
+                </Button>
+              </>
             )}
           </div>
         </div>

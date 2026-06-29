@@ -108,6 +108,8 @@ function AdminBannersPage() {
             banners={homeBanners}
             onChange={setHomeBanners}
             activeLabel="แสดงบนหน้าแรก"
+            previewHref="/"
+            previewLabel="ดูหน้าแรก"
           />
           <Button
             type="button"
@@ -127,6 +129,8 @@ function AdminBannersPage() {
             banners={shopBanners}
             onChange={setShopBanners}
             activeLabel="แสดงบนหน้าสินค้ารวม"
+            previewHref="/shop"
+            previewLabel="ดูหน้าร้าน"
           />
           <Button
             type="button"

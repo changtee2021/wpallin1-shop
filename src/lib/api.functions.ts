@@ -135,15 +135,21 @@ const smartSearchInputSchema = productListSchema.extend({
 });
 
 export const fetchSmartSearchProducts = createServerFn({ method: "GET" })
+  .middleware([optionalSupabaseAuth])
   .inputValidator((input: unknown) => smartSearchInputSchema.parse(input ?? {}))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     await enforceRateLimit("smart-search", data.query.slice(0, 64), {
       requests: 10,
       window: "1 m",
     });
     const supabase = await getAdminClient();
+    const { resolveChatAiAccess } = await import("@/lib/chat-ai-eligibility");
+    const aiAccess = await resolveChatAiAccess(supabase, context.userId);
     const { query, ...listOptions } = data;
-    return smartSearchProducts(supabase, query, listOptions);
+    return smartSearchProducts(supabase, query, {
+      ...listOptions,
+      allowLlm: aiAccess.canUseLlm,
+    });
   });
 
 export const fetchHeroBanners = createServerFn({ method: "GET" }).handler(
@@ -1352,6 +1358,24 @@ export {
 } from "@/lib/server-fns/support";
 
 export {
+  fetchChatSession,
+  fetchChatAiAccess,
+  sendChatMessage,
+  requestChatHandoff,
+  fetchAdminChatConversations,
+  fetchAdminChatDetail,
+  assignAdminChat,
+  sendStaffChatMessage,
+  closeAdminChat,
+  fetchChatSettingsAdmin,
+  saveChatSettingsAdmin,
+  searchChatProducts,
+  fetchChatUserQuotations,
+  sendStaffChatProducts,
+  sendStaffChatQuotation,
+} from "@/lib/server-fns/chat";
+
+export {
   fetchAffiliateDashboard,
   registerAffiliate,
   createAffiliateLinkFn,
@@ -1429,6 +1453,32 @@ export {
   saveAdminMarketingCatalog,
   deleteAdminMarketingCatalog,
 } from "@/lib/server-fns/marketing-catalogs";
+
+export {
+  fetchPublicInspirationRooms,
+  fetchPublicInspirationRoomBySlug,
+  fetchAdminInspirationRooms,
+  fetchAdminInspirationRoomById,
+  saveAdminInspirationRoom,
+  deleteAdminInspirationRoom,
+  duplicateAdminInspirationRoom,
+  reorderAdminInspirationRooms,
+  incrementInspirationViewFn,
+  toggleInspirationRoomLikeFn,
+} from "@/lib/server-fns/inspiration";
+
+export {
+  fetchPublicInspirationMaterials,
+  fetchAdminInspirationMaterials,
+  fetchAdminInspirationMaterialById,
+  saveAdminInspirationMaterial,
+  deleteAdminInspirationMaterial,
+  seedAdminInspirationMaterials,
+} from "@/lib/server-fns/inspiration-materials";
+
+export { fetchAdminMediaAssets } from "@/lib/server-fns/admin-media";
+
+export { searchAdminQuickNavFn } from "@/lib/server-fns/admin-nav";
 
 export {
   fetchUserTaxInvoiceOverview,

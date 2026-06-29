@@ -159,10 +159,13 @@ async function parseIntentWithLlm(query: string): Promise<SearchIntent | null> {
 
 export async function parseSearchIntent(
   query: string,
+  options?: { allowLlm?: boolean },
 ): Promise<{ intent: SearchIntent; source: "llm" | "fallback" }> {
-  const llmIntent = await parseIntentWithLlm(query);
-  if (llmIntent) {
-    return { intent: llmIntent, source: "llm" };
+  if (options?.allowLlm !== false) {
+    const llmIntent = await parseIntentWithLlm(query);
+    if (llmIntent) {
+      return { intent: llmIntent, source: "llm" };
+    }
   }
   return { intent: parseFallbackIntent(query), source: "fallback" };
 }
@@ -175,15 +178,18 @@ export type SmartSearchResult = ApiListResponse<ProductPublicDto> & {
 export async function smartSearchProducts(
   supabase: SupabaseClient,
   query: string,
-  options: Omit<ProductListQuery, "search" | "category"> = {},
+  options: Omit<ProductListQuery, "search" | "category"> & {
+    allowLlm?: boolean;
+  } = {},
 ): Promise<SmartSearchResult> {
-  const { intent, source } = await parseSearchIntent(query);
+  const { allowLlm, ...listOptions } = options;
+  const { intent, source } = await parseSearchIntent(query, { allowLlm });
   const listQuery = searchIntentToProductQuery(
     intent,
-    options.page,
-    options.pageSize,
-    options.sortBy,
-    options.sortDir,
+    listOptions.page,
+    listOptions.pageSize,
+    listOptions.sortBy,
+    listOptions.sortDir,
   );
   const products = await listPublicProducts(supabase, listQuery);
   return { ...products, intent, source };

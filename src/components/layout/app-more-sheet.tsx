@@ -6,8 +6,10 @@ import {
   CircleHelp,
   FileText,
   Heart,
+  ImageIcon,
   LayoutDashboard,
   LogOut,
+  MessageCircle,
   Settings,
   Share2,
   Shield,
@@ -27,6 +29,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/use-auth";
+import { useChatUi } from "@/hooks/use-chat-ui";
 import type { AppNavZone } from "@/hooks/use-app-nav";
 import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -36,7 +39,7 @@ type MoreLink = {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   search?: Record<string, unknown>;
-  action?: "help";
+  action?: "help" | "chat";
 };
 
 function linksForZone(
@@ -61,6 +64,16 @@ function linksForZone(
         label: "Affiliate",
         icon: Share2,
       });
+      links.push({
+        label: "help",
+        icon: CircleHelp,
+        action: "help",
+      });
+      links.push({
+        label: "chat",
+        icon: MessageCircle,
+        action: "chat",
+      });
     }
     return links;
   }
@@ -83,6 +96,11 @@ function linksForZone(
         label: "help",
         icon: CircleHelp,
         action: "help",
+      },
+      {
+        label: "chat",
+        icon: MessageCircle,
+        action: "chat",
       },
       {
         to: "/account",
@@ -109,6 +127,9 @@ function linksForZone(
     { to: "/admin/dealers", label: "ตัวแทน", icon: Store },
     { to: "/admin/coupons", label: "คูปอง", icon: Tag },
     { to: "/admin/inventory", label: "สต็อก", icon: Boxes },
+    { to: "/admin/inspiration", label: "Inspiration", icon: ImageIcon },
+    { to: "/admin/banners", label: "แบนเนอร์", icon: ImageIcon },
+    { to: "/admin/catalogs", label: "แคตตาล็อก", icon: FileText },
     { to: "/admin/custom", label: "Custom", icon: SlidersHorizontal },
     { to: "/admin/reports", label: "รายงาน", icon: BarChart3 },
     { to: "/admin/support", label: "Support", icon: Bell },
@@ -131,6 +152,7 @@ export function AppMoreSheet({
 }) {
   const { t } = useT();
   const { user, isAdmin, isDealer, signOut } = useAuth();
+  const { openChat } = useChatUi();
   const [helpOpen, setHelpOpen] = useState(false);
   const links = [
     ...leadingLinks,
@@ -162,6 +184,25 @@ export function AppMoreSheet({
                   >
                     <link.icon className="size-5 text-muted-foreground" />
                     {t("account.help")}
+                  </button>
+                );
+              }
+
+              if (link.action === "chat") {
+                return (
+                  <button
+                    key="chat"
+                    type="button"
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium hover:bg-muted",
+                    )}
+                    onClick={() => {
+                      onOpenChange(false);
+                      openChat();
+                    }}
+                  >
+                    <link.icon className="size-5 text-muted-foreground" />
+                    {t("account.chat")}
                   </button>
                 );
               }

@@ -27,7 +27,9 @@ export type NotificationEvent =
   | "assisted_order_created"
   | "quote_request"
   | "topup_pending"
-  | "dealer_app_pending";
+  | "dealer_app_pending"
+  | "chat_handoff_pending"
+  | "chat_staff_reply";
 
 const EVENT_COPY: Record<
   NotificationEvent,
@@ -134,6 +136,21 @@ const EVENT_COPY: Record<
     title: "ใบสมัครตัวแทน",
     body: m.companyName ? `${m.companyName} รออนุมัติ` : "มีใบสมัครรออนุมัติ",
     href: "/admin/dealers",
+  }),
+  chat_handoff_pending: (m) => ({
+    title: "แชทรอเจ้าหน้าที่",
+    body: m.guestName ? `${m.guestName} ขอคุยกับเจ้าหน้าที่` : "มีแชทรอตอบ",
+    href:
+      typeof m.href === "string"
+        ? m.href
+        : m.conversationId
+          ? `/admin/chat?conversation=${m.conversationId}`
+          : "/admin/chat",
+  }),
+  chat_staff_reply: (m) => ({
+    title: "เจ้าหน้าที่ตอบแชทแล้ว",
+    body: "มีข้อความใหม่จากทีม WP ALL",
+    href: typeof m.href === "string" ? m.href : "/",
   }),
 };
 

@@ -48,6 +48,12 @@ Apply in timestamp order. All paths relative to `wp-group-erp/supabase/migration
 | `20260627110000_wpall_retail_marketing_catalogs.sql` | Marketing PDF catalog tables + storage bucket |
 | `20260627120000_wpall_retail_catalog_bucket_limit.sql` | Larger catalog PDF storage limits |
 | `20260628100000_wpall_retail_marketing_catalogs_v2.sql` | Catalog slug, visibility, analytics, dealer access |
+| `20260629130000_wpall_retail_inspiration_rooms.sql` | Inspiration mood board rooms + product hotspots |
+| `20260629140000_wpall_retail_inspiration_seed.sql` | Seed 10 inspiration rooms + hotspot tags |
+| `20260629150000_wpall_retail_inspiration_seed_commercial.sql` | Seed 10 commercial inspiration rooms (11–20) |
+| `20260629160000_wpall_retail_inspiration_engagement.sql` | View/like counts + visitor likes for trends |
+
+See also `docs/BUSINESS-ROADMAP.md` for product priorities.
 
 ---
 

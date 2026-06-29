@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { AdminMemberPicker } from "@/components/admin/shared/admin-member-picker";
 import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -42,10 +43,12 @@ function AdminCreditPage() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     userId: "",
+    memberLabel: null as string | null,
     creditLimit: 50000,
     creditTermDays: 30,
     minOrderAmount: 5000,
   });
+  const authOpts = authServerFnOptions(session);
   const [payAmounts, setPayAmounts] = useState<Record<string, string>>({});
 
   async function load() {
@@ -65,10 +68,19 @@ function AdminCreditPage() {
 
   async function handleUpsert(e: React.FormEvent) {
     e.preventDefault();
+    if (!form.userId) {
+      toast.error("กรุณาเลือกสมาชิก");
+      return;
+    }
     try {
       await adminUpsertCreditAccount({
-        data: form,
-        ...authServerFnOptions(session),
+        data: {
+          userId: form.userId,
+          creditLimit: form.creditLimit,
+          creditTermDays: form.creditTermDays,
+          minOrderAmount: form.minOrderAmount,
+        },
+        ...authOpts,
       });
       toast.success("บันทึกวงเงินแล้ว");
       await load();
@@ -252,13 +264,18 @@ function AdminCreditPage() {
                 className="grid gap-3 max-w-md"
               >
                 <div>
-                  <Label>User ID (UUID)</Label>
-                  <Input
-                    value={form.userId}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, userId: e.target.value }))
+                  <Label>สมาชิก</Label>
+                  <AdminMemberPicker
+                    authOpts={authOpts}
+                    value={form.userId || null}
+                    label={form.memberLabel}
+                    onChange={(userId, displayName) =>
+                      setForm((f) => ({
+                        ...f,
+                        userId: userId ?? "",
+                        memberLabel: displayName,
+                      }))
                     }
-                    required
                   />
                 </div>
                 <div>

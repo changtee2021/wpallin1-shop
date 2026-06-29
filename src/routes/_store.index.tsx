@@ -5,15 +5,20 @@ import { CategoryImageGrid } from "@/components/storefront/category-image-grid";
 import { HomeCatalogCta } from "@/components/storefront/catalog-category-hero";
 import { HomeCapabilities } from "@/components/storefront/home/home-capabilities";
 import { HomeCta } from "@/components/storefront/home/home-cta";
+import { HomeDealerCta } from "@/components/storefront/home/home-dealer-cta";
 import { HomeHero } from "@/components/storefront/home/home-hero";
+import { HomeInspirationPreview } from "@/components/storefront/home/home-inspiration-preview";
 import { HomeProcess } from "@/components/storefront/home/home-process";
 import { HomeSolutions } from "@/components/storefront/home/home-solutions";
+import { HomeValuePillars } from "@/components/storefront/home/home-value-pillars";
 import { ProductFeed } from "@/components/storefront/product-feed";
+import { resolveInspirationRooms } from "@/data/inspiration-fallback";
 import { useMemberProductPrices } from "@/hooks/use-member-product-prices";
 import { useT } from "@/i18n";
 import {
   fetchCategories,
   fetchHeroBanners,
+  fetchPublicInspirationRooms,
   fetchPublicProducts,
 } from "@/lib/api.functions";
 
@@ -25,21 +30,29 @@ export const Route = createFileRoute("/_store/")({
       sortDir: "desc" as const,
     };
 
-    const [featuredResult, fallbackResult, categories, heroBanners] =
-      await Promise.all([
-        fetchPublicProducts({
-          data: { ...productQuery, featured: true },
-        }),
-        fetchPublicProducts({ data: productQuery }),
-        fetchCategories(),
-        fetchHeroBanners(),
-      ]);
+    const [
+      featuredResult,
+      fallbackResult,
+      categories,
+      heroBanners,
+      inspirationRooms,
+    ] = await Promise.all([
+      fetchPublicProducts({
+        data: { ...productQuery, featured: true },
+      }),
+      fetchPublicProducts({ data: productQuery }),
+      fetchCategories(),
+      fetchHeroBanners(),
+      fetchPublicInspirationRooms().then((rooms) =>
+        resolveInspirationRooms(async () => rooms),
+      ),
+    ]);
 
     const featuredProducts = featuredResult.data.length
       ? featuredResult.data
       : fallbackResult.data;
 
-    return { featuredProducts, categories, heroBanners };
+    return { featuredProducts, categories, heroBanners, inspirationRooms };
   },
   pendingComponent: () => <PageLoading variant="grid" />,
   component: HomePage,
@@ -47,12 +60,15 @@ export const Route = createFileRoute("/_store/")({
 
 function HomePage() {
   const { t } = useT();
-  const { featuredProducts, categories, heroBanners } = Route.useLoaderData();
+  const { featuredProducts, categories, heroBanners, inspirationRooms } =
+    Route.useLoaderData();
   const memberPrices = useMemberProductPrices(featuredProducts);
 
   return (
     <div className="mx-auto max-w-7xl space-y-10 px-4 py-6 sm:px-6 sm:py-8 md:space-y-14">
       <HomeHero banners={heroBanners} />
+      <HomeValuePillars />
+      <HomeInspirationPreview rooms={inspirationRooms} />
       <HomeCapabilities />
       {categories.length > 0 && (
         <section>
@@ -75,6 +91,7 @@ function HomePage() {
         seeAllLabel={t("home.featured.seeAll")}
       />
       <HomeSolutions />
+      <HomeDealerCta />
       <HomeProcess />
       <HomeCta />
     </div>

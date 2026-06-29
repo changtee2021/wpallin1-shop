@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -162,6 +162,11 @@ function AdminSupportPage() {
       <PageHeader
         title="ติดต่อ / Feedback"
         description="ดู ticket จากสมาชิกและ feedback จากผู้เยี่ยมชม"
+        actions={
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/admin/chat">เปิดแชทลูกค้า</Link>
+          </Button>
+        }
       />
 
       <Tabs

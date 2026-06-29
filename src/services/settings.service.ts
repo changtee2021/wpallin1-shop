@@ -12,6 +12,8 @@ export type AdminDashboardDto = {
   pendingSlipVerification: number;
   openQuotations: number;
   pendingDealerApps: number;
+  inspirationDraftCount: number;
+  lowStockCount: number;
 };
 
 export async function getSettings(
@@ -56,7 +58,14 @@ export async function getAdminDashboardStats(
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
 
-  const [salesRes, pendingRes, quotesRes, dealerRes] = await Promise.all([
+  const [
+    salesRes,
+    pendingRes,
+    quotesRes,
+    dealerRes,
+    inspirationRes,
+    lowStockRes,
+  ] = await Promise.all([
     supabase
       .from("orders")
       .select("grand_total")
@@ -74,6 +83,15 @@ export async function getAdminDashboardStats(
       .from("dealer_applications")
       .select("id", { count: "exact", head: true })
       .eq("status", "pending"),
+    supabase
+      .from("inspiration_rooms")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "draft"),
+    supabase
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .eq("is_active", true)
+      .lte("stock_qty", 5),
   ]);
 
   const todaySales = (salesRes.data ?? []).reduce(
@@ -86,5 +104,7 @@ export async function getAdminDashboardStats(
     pendingSlipVerification: pendingRes.count ?? 0,
     openQuotations: quotesRes.count ?? 0,
     pendingDealerApps: dealerRes.count ?? 0,
+    inspirationDraftCount: inspirationRes.count ?? 0,
+    lowStockCount: lowStockRes.count ?? 0,
   };
 }

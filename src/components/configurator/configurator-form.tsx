@@ -1,10 +1,13 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Share2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { ProductImage } from "@/components/storefront/product-image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useT } from "@/i18n";
+import { buildConfiguratorShareUrl } from "@/lib/configurator-share";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type {
@@ -32,6 +35,7 @@ export function ConfiguratorForm({
   submitting,
   onAddToCart,
 }: Props) {
+  const { t } = useT();
   const selectedType = catalog.productTypes.find(
     (o) => o.key === draft.productType,
   );
@@ -49,6 +53,20 @@ export function ConfiguratorForm({
     !!draft.railOptionKey &&
     !!draft.installationOptionKey &&
     !!price;
+
+  async function handleShare() {
+    const url = buildConfiguratorShareUrl(draft);
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "WP ALL Custom", url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      toast.success(t("configurator.shareCopied"));
+    } catch {
+      toast.error(t("configurator.shareFailed"));
+    }
+  }
 
   return (
     <div className="flex min-w-0 max-h-[calc(100vh-8rem)] flex-col rounded-xl border bg-card md:max-h-[calc(100vh-6rem)] md:z-10">
@@ -220,7 +238,7 @@ export function ConfiguratorForm({
         </Card>
       </div>
 
-      <div className="shrink-0 border-t bg-card p-4">
+      <div className="shrink-0 space-y-2 border-t bg-card p-4">
         <div className="mb-3 flex items-end justify-between gap-2">
           <span className="text-xs font-semibold tracking-wide text-muted-foreground">
             LIVE PRICE | ราคา
@@ -236,6 +254,16 @@ export function ConfiguratorForm({
           onClick={onAddToCart}
         >
           {submitting ? "กำลังใส่ตะกร้า..." : "ADD TO CART | ใส่ตะกร้า"}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          disabled={!draft.productType || !draft.fabricId}
+          onClick={() => void handleShare()}
+        >
+          <Share2 className="size-4" />
+          {t("configurator.share")}
         </Button>
       </div>
     </div>

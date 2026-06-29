@@ -75,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async (_event, nextSession) => {
         setSession(nextSession);
         setUser(nextSession?.user ?? null);
+        setLoading(false);
         if (nextSession?.user) {
           setRoles(await loadRoles(nextSession.user.id));
         } else {

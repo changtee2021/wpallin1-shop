@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BookOpen, ExternalLink, Pencil, Plus, Trash2 } from "lucide-react";
+import { BookOpen, Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { useAdminConfirm } from "@/components/admin/shared/admin-confirm-dialog";
+import { AdminPreviewLink } from "@/components/admin/shared/admin-preview-link";
 import { PageHeader } from "@/components/layout/page-header";
 import { CatalogAssetUpload } from "@/components/admin/catalog-asset-upload";
 import { Button } from "@/components/ui/button";
@@ -98,6 +100,7 @@ const emptyForm = (): CatalogFormState => ({
 function AdminCatalogsPage() {
   const { session } = useAuth();
   const authOpts = authServerFnOptions(session);
+  const { confirm, AdminConfirmDialog } = useAdminConfirm();
   const [categories, setCategories] = useState<MarketingCatalogCategoryDto[]>(
     [],
   );
@@ -251,7 +254,8 @@ function AdminCatalogsPage() {
   }
 
   async function handleDeleteCatalog(id: string) {
-    if (!confirm("ลบแคตตาล็อกนี้?")) return;
+    if (!(await confirm({ description: "ลบแคตตาล็อกนี้?", destructive: true })))
+      return;
     try {
       await deleteAdminMarketingCatalog({ data: { id }, ...authOpts });
       toast.success("ลบแล้ว");
@@ -262,7 +266,8 @@ function AdminCatalogsPage() {
   }
 
   async function handleDeleteCategory(id: string) {
-    if (!confirm("ลบหมวดนี้?")) return;
+    if (!(await confirm({ description: "ลบหมวดนี้?", destructive: true })))
+      return;
     try {
       await deleteAdminMarketingCatalogCategory({ data: { id }, ...authOpts });
       toast.success("ลบหมวดแล้ว");
@@ -405,16 +410,11 @@ function AdminCatalogsPage() {
               <div className="flex gap-2">
                 {catalog.status === "published" &&
                 catalog.visibility === "public" ? (
-                  <Button variant="outline" size="sm" asChild>
-                    <a
-                      href={`/catalogs/${catalog.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <ExternalLink className="size-4" />
-                      ดูออนไลน์
-                    </a>
-                  </Button>
+                  <AdminPreviewLink
+                    href={`/catalogs/${catalog.slug}`}
+                    label="ดูออนไลน์"
+                    className="h-8 px-3 text-xs"
+                  />
                 ) : null}
                 <Button
                   variant="outline"
@@ -686,6 +686,7 @@ function AdminCatalogsPage() {
           </form>
         </DialogContent>
       </Dialog>
+      <AdminConfirmDialog />
     </div>
   );
 }

@@ -14,7 +14,11 @@ import {
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { DealerApplicationDto } from "@/services/dealer.service";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  getMyDealerApplication,
+  type DealerApplicationDto,
+} from "@/services/dealer.service";
 
 type DealerApplicationBannerProps = {
   application: DealerApplicationDto | null;
@@ -156,14 +160,27 @@ export function DealerApplicationBannerSection({
 
   useEffect(() => {
     if (!session || isDealer) {
+      setApplication(null);
       setLoading(false);
       return;
     }
 
     let cancelled = false;
+    setLoading(true);
+
     void fetchMyDealerApplication(authServerFnOptions(session))
       .then((app) => {
         if (!cancelled) setApplication(app);
+      })
+      .catch(() => {
+        if (cancelled || !session.user?.id) return;
+        return getMyDealerApplication(supabase, session.user.id)
+          .then((app) => {
+            if (!cancelled) setApplication(app);
+          })
+          .catch(() => {
+            /* banner is optional — ignore */
+          });
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

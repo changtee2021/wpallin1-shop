@@ -49,7 +49,15 @@ function HomeHeroFallback() {
               className="bg-accent text-accent-foreground hover:bg-accent/90"
               asChild
             >
-              <Link to="/shop">{t("home.hero.ctaShop")}</Link>
+              <Link to="/inspiration">{t("home.hero.ctaInspiration")}</Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="secondary"
+              className="bg-white text-primary hover:bg-white/90"
+              asChild
+            >
+              <Link to="/configurator">{t("home.hero.ctaConfigurator")}</Link>
             </Button>
             <Button
               size="lg"
@@ -57,7 +65,7 @@ function HomeHeroFallback() {
               className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
               asChild
             >
-              <Link to="/contact">{t("home.hero.ctaContact")}</Link>
+              <Link to="/shop">{t("home.hero.ctaShop")}</Link>
             </Button>
           </div>
         </div>

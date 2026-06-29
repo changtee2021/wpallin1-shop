@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/page-header";
+import { AdminImageUploader } from "@/components/admin/shared/admin-image-uploader";
 import { ProductOptionsEditor } from "@/components/admin/product-options-editor";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,6 +20,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { fetchCategories, saveAdminProduct } from "@/lib/api.functions";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
+import { PRODUCT_IMAGE_ENDPOINT } from "@/lib/admin-image-upload";
 import type { AdminOptionGroupInput } from "@/domain/product-options";
 import type { CategoryDto } from "@/types/api/categories";
 
@@ -169,13 +171,13 @@ function AdminProductNewPage() {
             />
           </div>
         </div>
-        <div>
-          <Label>URL รูปภาพ</Label>
-          <Input
-            value={form.imageUrl}
-            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-          />
-        </div>
+        <AdminImageUploader
+          accessToken={session?.access_token}
+          imageUrl={form.imageUrl}
+          onImageUrlChange={(url) => setForm({ ...form, imageUrl: url })}
+          uploadEndpoint={PRODUCT_IMAGE_ENDPOINT}
+          label="รูปสินค้า"
+        />
         <ProductOptionsEditor
           groups={optionGroups}
           onChange={setOptionGroups}
