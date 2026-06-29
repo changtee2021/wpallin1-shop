@@ -85,6 +85,16 @@ If these migrations are not applied to the shared ERP project:
 
 Feature doc: `docs/marketing-catalogs.md`
 
+**Inspiration materials seed** (after rooms exist in DB):
+
+```powershell
+cd wpallin1-shop
+node scripts/seed-inspiration-materials.mjs
+# or: npm run seed:inspiration-materials
+```
+
+Admin materials tab also auto-seeds from hotspots on first load when the table is empty.
+
 ---
 
 ## Storage buckets (wpall_retail)

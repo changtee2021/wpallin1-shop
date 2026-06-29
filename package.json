@@ -16,6 +16,7 @@
     "catalog:compress": "node scripts/compress-catalog-pdf.mjs",
     "catalog:seed-roller": "node scripts/seed-roller-blinds-catalog.mjs",
     "media:compress": "node scripts/compress-media.mjs",
+    "seed:inspiration-materials": "node scripts/seed-inspiration-materials.mjs",
     "deploy:preview": "vercel deploy --yes --scope passawutaplus-9338s-projects",
     "deploy:prod": "npm run build && vercel deploy --prod --yes --scope passawutaplus-9338s-projects"
   },

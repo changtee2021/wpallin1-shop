@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { slugifyCatalogTitle } from "@/lib/catalog-slug";
 import { buildInspirationMaterials } from "@/lib/inspiration-materials";
 import type { FabricPublicDto } from "@/lib/inspiration-material-profiles";
+import { listAdminInspirationRooms } from "@/services/inspiration.service";
 import type {
   InspirationMaterialAdminDto,
   InspirationMaterialInput,
@@ -171,7 +172,21 @@ export async function listAdminMaterials(
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
-  return mapMaterialRows(supabase, (data ?? []) as MaterialRow[]);
+  const rows = (data ?? []) as MaterialRow[];
+  if (!rows.length) {
+    const rooms = await listAdminInspirationRooms(supabase);
+    if (rooms.length) {
+      await seedMaterialsFromAggregate(supabase, rooms);
+      const { data: seeded, error: seedError } = await supabase
+        .from("inspiration_materials")
+        .select(MATERIAL_SELECT)
+        .order("sort_order")
+        .order("created_at", { ascending: false });
+      if (seedError) throw new Error(seedError.message);
+      return mapMaterialRows(supabase, (seeded ?? []) as MaterialRow[]);
+    }
+  }
+  return mapMaterialRows(supabase, rows);
 }
 
 export async function getAdminMaterialById(
