@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
@@ -25,7 +26,7 @@ function AdminReportsPage() {
   }, [session]);
 
   if (!reports) {
-    return <p className="text-muted-foreground">กำลังโหลด...</p>;
+    return <PageLoading variant="dashboard" />;
   }
 
   return (

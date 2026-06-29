@@ -25,7 +25,7 @@ export function HomeProcess() {
       <h2 className="mb-8 text-center text-xl font-bold text-primary sm:text-2xl">
         {t("home.process.title")}
       </h2>
-      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-5">
         {steps.map(({ icon: Icon, labelKey }, index) => (
           <div
             key={labelKey}
@@ -40,7 +40,7 @@ export function HomeProcess() {
             {index < steps.length - 1 && (
               <span
                 aria-hidden
-                className="absolute top-6 left-[calc(50%+1.5rem)] hidden h-px w-[calc(100%-3rem)] bg-primary/20 lg:block"
+                className="absolute top-6 left-[calc(50%+1.5rem)] hidden h-px w-[calc(100%-3rem)] bg-primary/20 md:block"
               />
             )}
           </div>

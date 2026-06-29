@@ -1,0 +1,16 @@
+export {
+  AuthPageSkeleton,
+  CartPageSkeleton,
+  DashboardPageSkeleton,
+  DefaultPageSkeleton,
+  DetailPageSkeleton,
+  FormPageSkeleton,
+  GridPageSkeleton,
+  InlineRowsSkeleton,
+  ListPageSkeleton,
+  PageHeaderSkeleton,
+  PageLoading,
+  RoutePendingFallback,
+  TablePageSkeleton,
+  type PageSkeletonVariant,
+} from "@/components/loading/page-skeletons";

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchUserQuotations, respondQuotation } from "@/lib/api.functions";
 import { formatDate, formatPrice } from "@/lib/format";
-import { authServerFnOptions } from "@/lib/server-fn-auth";
+import { useAuthServerFnOptions } from "@/lib/server-fn-auth";
 import type { QuotationDto } from "@/types/api/quotations";
 
 export const Route = createFileRoute("/dealer/quotations")({
@@ -18,11 +19,19 @@ export const Route = createFileRoute("/dealer/quotations")({
 function DealerQuotationsPage() {
   const { session } = useAuth();
   const [quotes, setQuotes] = useState<QuotationDto[]>([]);
-  const authOpts = authServerFnOptions(session);
+  const [loading, setLoading] = useState(true);
+  const authOpts = useAuthServerFnOptions(session);
 
   useEffect(() => {
-    void fetchUserQuotations(authOpts).then(setQuotes);
-  }, [session]);
+    setLoading(true);
+    void fetchUserQuotations(authOpts)
+      .then(setQuotes)
+      .finally(() => setLoading(false));
+  }, [authOpts]);
+
+  if (loading) {
+    return <PageLoading variant="list" />;
+  }
 
   return (
     <div>

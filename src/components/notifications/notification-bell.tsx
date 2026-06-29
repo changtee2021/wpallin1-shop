@@ -17,7 +17,7 @@ import {
   markNotificationReadFn,
 } from "@/lib/api.functions";
 import { formatDate } from "@/lib/format";
-import { authServerFnOptions } from "@/lib/server-fn-auth";
+import { useAuthServerFnOptions } from "@/lib/server-fn-auth";
 import { useNotificationsRealtime } from "@/hooks/use-notifications-realtime";
 import type { NotificationDto } from "@/services/notification.service";
 
@@ -30,7 +30,19 @@ export function NotificationBell({
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(0);
   const [items, setItems] = useState<NotificationDto[]>([]);
-  const authOpts = authServerFnOptions(session);
+  const authOpts = useAuthServerFnOptions(session);
+
+  const loadUnread = useCallback(async () => {
+    if (!user) return;
+    const count = await fetchUnreadNotificationCount(authOpts);
+    setUnread(count);
+  }, [authOpts, user]);
+
+  const loadList = useCallback(async () => {
+    if (!user) return;
+    const list = await fetchNotifications(authOpts);
+    setItems(list);
+  }, [authOpts, user]);
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -43,10 +55,15 @@ export function NotificationBell({
   }, [authOpts, user]);
 
   useEffect(() => {
-    void load();
-    const interval = setInterval(() => void load(), 60_000);
+    void loadUnread();
+    const interval = setInterval(() => void loadUnread(), 60_000);
     return () => clearInterval(interval);
-  }, [load]);
+  }, [loadUnread]);
+
+  useEffect(() => {
+    if (!open) return;
+    void loadList();
+  }, [open, loadList]);
 
   useNotificationsRealtime(user?.id, load);
 

@@ -37,7 +37,7 @@ export function CatalogCategoryHero({
       <h2 className="mb-4 text-lg font-semibold text-primary sm:text-xl">
         {title}
       </h2>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
         {categories.map((category) => {
           const Icon = categoryIcons[category.name] ?? BookOpen;
           const count = counts[category.id] ?? 0;

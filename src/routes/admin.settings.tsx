@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -63,7 +64,7 @@ function AdminSettingsPage() {
   }
 
   if (loading) {
-    return <p className="text-muted-foreground">{t("common.loading")}</p>;
+    return <PageLoading variant="form" />;
   }
 
   return (

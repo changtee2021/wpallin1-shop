@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { ProductFeed } from "@/components/storefront/product-feed";
 import { Button } from "@/components/ui/button";
@@ -46,7 +47,7 @@ function AccountWishlistPage() {
     <div>
       <PageHeader title="รายการโปรด" description="สินค้าที่บันทึกไว้" />
       {loading ? (
-        <p className="text-muted-foreground">กำลังโหลด...</p>
+        <PageLoading variant="grid" />
       ) : products.length === 0 ? (
         <Card>
           <CardContent className="space-y-4 p-8 text-center">

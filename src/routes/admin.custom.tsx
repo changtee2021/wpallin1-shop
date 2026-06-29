@@ -12,6 +12,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { InlineRowsSkeleton, PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { ProductImage } from "@/components/storefront/product-image";
 import { Badge } from "@/components/ui/badge";
@@ -527,7 +528,7 @@ function AdminCustomPage() {
   }
 
   if (loading) {
-    return <p className="text-muted-foreground">กำลังโหลด...</p>;
+    return <PageLoading variant="form" />;
   }
 
   const ruleImageUrl = ruleForm.previewImageUrl;
@@ -575,7 +576,7 @@ function AdminCustomPage() {
 
           <form
             onSubmit={(e) => void handleCreateProject(e)}
-            className="grid gap-3 rounded-xl border bg-muted/20 p-3 lg:grid-cols-[1fr_1fr_1fr_auto]"
+            className="grid gap-3 rounded-xl border bg-muted/20 p-3 md:grid-cols-[1fr_1fr_1fr_auto]"
           >
             <div>
               <Label>ชื่อ Project / สินค้า</Label>
@@ -670,9 +671,7 @@ function AdminCustomPage() {
       </Card>
 
       {loadingProject ? (
-        <p className="rounded-xl border p-6 text-center text-sm text-muted-foreground">
-          กำลังโหลด Project...
-        </p>
+        <InlineRowsSkeleton rows={4} className="rounded-xl border p-6" />
       ) : null}
 
       <Card>

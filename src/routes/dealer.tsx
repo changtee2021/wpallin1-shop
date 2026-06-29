@@ -17,8 +17,8 @@ function DealerLayout() {
     <div className="flex min-h-screen flex-col bg-background">
       <StorefrontHeader />
       <div className="flex-1 bg-muted/20 pb-20 md:pb-0">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[260px_1fr]">
-          <div className="hidden lg:block">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 md:grid-cols-[260px_1fr]">
+          <div className="hidden md:block">
             <DealerSidebar />
           </div>
           <div className="min-w-0">

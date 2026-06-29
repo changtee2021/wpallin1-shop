@@ -23,7 +23,9 @@ export function filterCartItems(
 }
 
 export function calcSelectedSubtotal(items: CartItemDto[]): number {
-  return Math.round(items.reduce((sum, item) => sum + item.lineTotal, 0) * 100) / 100;
+  return (
+    Math.round(items.reduce((sum, item) => sum + item.lineTotal, 0) * 100) / 100
+  );
 }
 
 export function calcSelectedQty(items: CartItemDto[]): number {

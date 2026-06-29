@@ -10,7 +10,7 @@ export function PreviewPanel({
   const showRoomPreview = Boolean(preview.imageUrl);
 
   return (
-    <div className="isolate min-w-0 rounded-xl border bg-muted/20 p-4 sm:p-6 lg:sticky lg:top-4 lg:z-0">
+    <div className="isolate min-w-0 rounded-xl border bg-muted/20 p-4 sm:p-6 md:sticky md:top-4 md:z-0">
       {showRoomPreview ? (
         <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-lg border bg-background shadow-sm">
           <ProductImage

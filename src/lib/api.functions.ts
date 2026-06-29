@@ -19,7 +19,10 @@ import {
   listCategories,
   listPublicProducts,
   getProductBySlug,
+  getShopFilterFacets,
 } from "@/services/catalog.service";
+import { smartSearchProducts } from "@/services/smart-search.service";
+import { enforceRateLimit } from "@/lib/rate-limit";
 import { listProductOptionGroups } from "@/services/product-options.service";
 import { getProductReviewSummary } from "@/services/review.service";
 import {
@@ -95,6 +98,7 @@ import {
   listDealerApplications,
   approveDealerApplication,
   rejectDealerApplication,
+  getMyDealerApplication,
 } from "@/services/dealer.service";
 import {
   listDealerProducts,
@@ -119,11 +123,42 @@ export const fetchCategories = createServerFn({ method: "GET" }).handler(
   },
 );
 
+export const fetchShopFilterFacets = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const supabase = await getAdminClient();
+    return getShopFilterFacets(supabase);
+  },
+);
+
+const smartSearchInputSchema = productListSchema.extend({
+  query: z.string().min(1).max(500),
+});
+
+export const fetchSmartSearchProducts = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) => smartSearchInputSchema.parse(input ?? {}))
+  .handler(async ({ data }) => {
+    await enforceRateLimit("smart-search", data.query.slice(0, 64), {
+      requests: 10,
+      window: "1 m",
+    });
+    const supabase = await getAdminClient();
+    const { query, ...listOptions } = data;
+    return smartSearchProducts(supabase, query, listOptions);
+  });
+
 export const fetchHeroBanners = createServerFn({ method: "GET" }).handler(
   async () => {
     const { listHeroBanners } = await import("@/services/hero-banner.service");
     const supabase = await getAdminClient();
-    return listHeroBanners(supabase, { activeOnly: true });
+    return listHeroBanners(supabase, "home", { activeOnly: true });
+  },
+);
+
+export const fetchShopHeroBanners = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const { listHeroBanners } = await import("@/services/hero-banner.service");
+    const supabase = await getAdminClient();
+    return listHeroBanners(supabase, "shop", { activeOnly: true });
   },
 );
 
@@ -133,7 +168,16 @@ export const fetchAdminHeroBanners = createServerFn({ method: "GET" })
     await requireAdmin(context.userId);
     const { listHeroBanners } = await import("@/services/hero-banner.service");
     const supabase = await getAdminClient();
-    return listHeroBanners(supabase);
+    return listHeroBanners(supabase, "home");
+  });
+
+export const fetchAdminShopHeroBanners = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context.userId);
+    const { listHeroBanners } = await import("@/services/hero-banner.service");
+    const supabase = await getAdminClient();
+    return listHeroBanners(supabase, "shop");
   });
 
 export const saveAdminHeroBanners = createServerFn({ method: "POST" })
@@ -158,7 +202,33 @@ export const saveAdminHeroBanners = createServerFn({ method: "POST" })
     await requireAdmin(context.userId);
     const { saveHeroBanners } = await import("@/services/hero-banner.service");
     const supabase = await getAdminClient();
-    await saveHeroBanners(supabase, data.banners);
+    await saveHeroBanners(supabase, "home", data.banners);
+    return { ok: true };
+  });
+
+export const saveAdminShopHeroBanners = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        banners: z.array(
+          z.object({
+            id: z.string().min(1),
+            imageUrl: z.string().url(),
+            linkUrl: z.string().nullable().optional(),
+            alt: z.string().nullable().optional(),
+            sortOrder: z.number().int(),
+            isActive: z.boolean(),
+          }),
+        ),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.userId);
+    const { saveHeroBanners } = await import("@/services/hero-banner.service");
+    const supabase = await getAdminClient();
+    await saveHeroBanners(supabase, "shop", data.banners);
     return { ok: true };
   });
 
@@ -1005,9 +1075,19 @@ export const submitDealerApplication = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await submitDealerApplicationFn(context.supabase, context.userId, data);
-    return { ok: true };
+    const result = await submitDealerApplicationFn(
+      context.supabase,
+      context.userId,
+      data,
+    );
+    return { ok: true, id: result.id };
   });
+
+export const fetchMyDealerApplication = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) =>
+    getMyDealerApplication(context.supabase, context.userId),
+  );
 
 export const fetchDealerApplications = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

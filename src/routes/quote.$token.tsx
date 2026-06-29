@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import {
   QuotationDocument,
   quotationStatusLabels,
@@ -47,11 +48,7 @@ function PublicQuotationPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center text-muted-foreground">
-        กำลังโหลด...
-      </div>
-    );
+    return <PageLoading variant="detail" className="min-h-screen" />;
   }
 
   if (!quote) {

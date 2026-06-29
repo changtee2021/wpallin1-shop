@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -71,7 +72,7 @@ function AdminMembersPage() {
         description="ดูยอดซื้อสะสม กระเป๋าเงิน และกำหนด tier"
       />
       {loading ? (
-        <p className="text-muted-foreground">กำลังโหลด...</p>
+        <PageLoading variant="table" />
       ) : (
         <div className="space-y-3">
           {members.map((m) => (

@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { TicketPercent } from "lucide-react";
 
 import { ProductImage } from "@/components/storefront/product-image";
 import { ProductShareButton } from "@/components/storefront/product-share-button";
@@ -17,6 +18,14 @@ type ProductCardProps = {
   showCompare?: boolean;
 };
 
+function saleDiscountPercent(
+  compareAtPrice: number,
+  salePrice: number,
+): number {
+  if (compareAtPrice <= salePrice) return 0;
+  return Math.round(((compareAtPrice - salePrice) / compareAtPrice) * 100);
+}
+
 export function ProductCard({
   product,
   memberPrice,
@@ -30,6 +39,10 @@ export function ProductCard({
     !hasMemberDiscount &&
     product.compareAtPrice != null &&
     product.compareAtPrice > product.retailPrice;
+  const saleDiscountPct =
+    hasCompareDiscount && product.compareAtPrice
+      ? saleDiscountPercent(product.compareAtPrice, product.retailPrice)
+      : 0;
   const selected = isSelected(product.id);
 
   return (
@@ -51,6 +64,13 @@ export function ProductCard({
           <Badge className="absolute top-2 left-2 bg-accent text-white hover:bg-accent">
             แนะนำ
           </Badge>
+        )}
+
+        {saleDiscountPct > 0 && (
+          <div className="pointer-events-none absolute bottom-2 left-2 z-10 flex items-center gap-1 rounded-full bg-accent/10 px-2 py-1 text-[11px] font-semibold text-accent backdrop-blur-sm">
+            <TicketPercent className="size-3.5 shrink-0" aria-hidden />
+            <span>ลด {saleDiscountPct}%</span>
+          </div>
         )}
 
         {showCompare && (

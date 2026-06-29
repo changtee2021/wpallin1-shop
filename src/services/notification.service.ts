@@ -17,6 +17,7 @@ export type NotificationEvent =
   | "wallet_topup_rejected"
   | "dealer_approved"
   | "dealer_rejected"
+  | "dealer_app_submitted"
   | "credit_order_approved"
   | "credit_order_rejected"
   | "tier_upgraded"
@@ -66,9 +67,15 @@ const EVENT_COPY: Record<
     body: "เข้าใช้งานพอร์ทัลตัวแทนได้",
     href: "/dealer",
   }),
-  dealer_rejected: () => ({
+  dealer_rejected: (m) => ({
     title: "ใบสมัครตัวแทนไม่ผ่าน",
-    body: "ติดต่อฝ่ายขายสำหรับรายละเอียด",
+    body: m.reviewNote ? String(m.reviewNote) : "ติดต่อฝ่ายขายสำหรับรายละเอียด",
+    href: "/dealer/register",
+  }),
+  dealer_app_submitted: (m) => ({
+    title: "รับใบสมัครตัวแทนแล้ว",
+    body: `ใบสมัคร ${m.companyName ?? ""} อยู่ระหว่างตรวจสอบ`,
+    href: "/dealer/register",
   }),
   credit_order_approved: (m) => ({
     title: "อนุมัติวงเงินเครดิตแล้ว",
@@ -123,9 +130,9 @@ const EVENT_COPY: Record<
     body: "มีคำขอเติมเงินรอตรวจ",
     href: "/admin/wallet",
   }),
-  dealer_app_pending: () => ({
+  dealer_app_pending: (m) => ({
     title: "ใบสมัครตัวแทน",
-    body: "มีใบสมัครรออนุมัติ",
+    body: m.companyName ? `${m.companyName} รออนุมัติ` : "มีใบสมัครรออนุมัติ",
     href: "/admin/dealers",
   }),
 };

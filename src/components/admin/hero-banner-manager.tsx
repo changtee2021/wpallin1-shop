@@ -27,9 +27,15 @@ type Props = {
   accessToken: string | undefined;
   banners: HeroBannerDto[];
   onChange: (banners: HeroBannerDto[]) => void;
+  activeLabel?: string;
 };
 
-export function HeroBannerManager({ accessToken, banners, onChange }: Props) {
+export function HeroBannerManager({
+  accessToken,
+  banners,
+  onChange,
+  activeLabel = "แสดงบนหน้าแรก",
+}: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -99,8 +105,8 @@ export function HeroBannerManager({ accessToken, banners, onChange }: Props) {
           <div>
             <h2 className="font-semibold">อัปโหลดแบนเนอร์ใหม่</h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              แนะนำภาพแนวนอน (เช่น 1920×640 หรือ 1600×540) — JPG/PNG/WebP ไม่เกิน
-              8MB ระบบบีบอัดรูปอัตโนมัติ
+              แนะนำภาพแนวนอน (เช่น 1920×640 หรือ 1600×540) — JPG/PNG/WebP
+              ไม่เกิน 8MB ระบบบีบอัดรูปอัตโนมัติ
             </p>
           </div>
           <button
@@ -221,7 +227,7 @@ export function HeroBannerManager({ accessToken, banners, onChange }: Props) {
                       updateBanner(banner.id, { isActive: checked })
                     }
                   />
-                  <Label htmlFor={`active-${banner.id}`}>แสดงบนหน้าแรก</Label>
+                  <Label htmlFor={`active-${banner.id}`}>{activeLabel}</Label>
                 </div>
               </CardContent>
             </Card>

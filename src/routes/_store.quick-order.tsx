@@ -101,7 +101,7 @@ function QuickOrderPage() {
         description="พิมพ์ SKU และจำนวน ทีละบรรทัด — รูปแบบ: SKU,จำนวน"
       />
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardContent className="p-4">
             <form onSubmit={(e) => void handleSubmit(e)} className="space-y-3">

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { InlineRowsSkeleton } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -211,10 +212,7 @@ function CheckoutPage() {
           <CardContent className="space-y-2 p-4">
             <h2 className="font-semibold">รายการที่สั่ง</h2>
             {checkoutItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex justify-between gap-3 text-sm"
-              >
+              <div key={item.id} className="flex justify-between gap-3 text-sm">
                 <span className="min-w-0 truncate">
                   {item.productName} x{item.qty}
                 </span>
@@ -460,7 +458,7 @@ function OrderSuccess({
           <div className="rounded-lg border bg-muted/30 p-4 text-left text-sm">
             <p className="mb-2 font-medium">บัญชีโอน</p>
             {bankAccounts.length === 0 ? (
-              <p className="text-muted-foreground">กำลังโหลด...</p>
+              <InlineRowsSkeleton rows={2} />
             ) : (
               bankAccounts.map((b) => (
                 <div key={b.account_no} className="mb-2 last:mb-0">

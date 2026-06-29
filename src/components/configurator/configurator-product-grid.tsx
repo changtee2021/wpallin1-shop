@@ -66,7 +66,7 @@ export function ConfiguratorProductGrid({
           ยังไม่มีสินค้าสั่งทำให้เลือกในขณะนี้
         </p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
           {productTypes.map((opt) => (
             <button
               key={opt.key}

@@ -16,6 +16,7 @@ import {
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -267,11 +268,7 @@ function AccountAffiliatePage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="size-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <PageLoading variant="dashboard" />;
   }
 
   if (!data?.account) {
@@ -365,7 +362,7 @@ function AccountAffiliatePage() {
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
         <StatCard
           label="คลิกทั้งหมด"
           value={acc.totalClicks.toLocaleString("th-TH")}

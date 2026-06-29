@@ -1,6 +1,8 @@
+import { Link } from "@tanstack/react-router";
 import { PackageCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { InlineRowsSkeleton } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,11 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { formatPrice } from "@/lib/format";
 import type { CartItemDto } from "@/types/api/cart";
 import type { QuotationBuyerInput } from "@/types/api/quotations";
+
+type BuyerMode = "account" | "other";
 
 type QuotationPreviewDialogProps = {
   open: boolean;
@@ -32,7 +37,8 @@ type QuotationPreviewDialogProps = {
   subtotal: number;
   discount: number;
   grandTotal: number;
-  initialBuyer?: Partial<QuotationBuyerInput>;
+  profileBuyer?: Partial<QuotationBuyerInput>;
+  profileLoading?: boolean;
   submitting?: boolean;
   onSubmit: (buyer: QuotationBuyerInput) => void;
 };
@@ -52,6 +58,33 @@ const emptyBuyer: QuotationBuyerInput = {
   note: "",
 };
 
+function buildAccountBuyer(
+  profile: Partial<QuotationBuyerInput>,
+): QuotationBuyerInput {
+  return {
+    ...emptyBuyer,
+    ...profile,
+    customerType: profile.customerType ?? "individual",
+  };
+}
+
+function buildOtherBuyer(
+  profile: Partial<QuotationBuyerInput>,
+): QuotationBuyerInput {
+  return {
+    ...emptyBuyer,
+    customerEmail: profile.customerEmail ?? "",
+  };
+}
+
+function hasProfileDetails(profile: Partial<QuotationBuyerInput>): boolean {
+  return Boolean(
+    profile.customerName?.trim() ||
+    profile.customerPhone?.trim() ||
+    profile.line1?.trim(),
+  );
+}
+
 export function QuotationPreviewDialog({
   open,
   onOpenChange,
@@ -59,20 +92,35 @@ export function QuotationPreviewDialog({
   subtotal,
   discount,
   grandTotal,
-  initialBuyer,
+  profileBuyer = {},
+  profileLoading,
   submitting,
   onSubmit,
 }: QuotationPreviewDialogProps) {
+  const [buyerMode, setBuyerMode] = useState<BuyerMode>("account");
   const [buyer, setBuyer] = useState<QuotationBuyerInput>(emptyBuyer);
 
   useEffect(() => {
     if (!open) return;
-    setBuyer({
-      ...emptyBuyer,
-      ...initialBuyer,
-      customerType: initialBuyer?.customerType ?? "individual",
-    });
-  }, [open, initialBuyer]);
+    setBuyerMode("account");
+    setBuyer(buildAccountBuyer(profileBuyer));
+    // Reset mode only when the dialog opens, not when profile data arrives.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- profileBuyer handled below
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || buyerMode !== "account") return;
+    setBuyer(buildAccountBuyer(profileBuyer));
+  }, [open, buyerMode, profileBuyer]);
+
+  function handleBuyerModeChange(mode: BuyerMode) {
+    setBuyerMode(mode);
+    setBuyer(
+      mode === "account"
+        ? buildAccountBuyer(profileBuyer)
+        : buildOtherBuyer(profileBuyer),
+    );
+  }
 
   function updateField<K extends keyof QuotationBuyerInput>(
     key: K,
@@ -158,7 +206,74 @@ export function QuotationPreviewDialog({
         <Separator />
 
         <div className="space-y-4">
-          <p className="text-sm font-semibold">ข้อมูลผู้ซื้อ</p>
+          <div>
+            <p className="text-sm font-semibold">ข้อมูลผู้ซื้อ</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              เลือกว่าจะออกใบเสนอราคาในนามตัวเอง หรือในนามลูกค้า/บริษัทอื่น
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>ออกใบเสนอราคาในนาม</Label>
+            <RadioGroup
+              value={buyerMode}
+              onValueChange={(value) =>
+                handleBuyerModeChange(value as BuyerMode)
+              }
+              className="gap-2"
+            >
+              <label
+                htmlFor="buyer-mode-account"
+                className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 has-[:checked]:border-primary has-[:checked]:bg-primary/5"
+              >
+                <RadioGroupItem
+                  value="account"
+                  id="buyer-mode-account"
+                  className="mt-0.5"
+                />
+                <div className="space-y-0.5">
+                  <span className="text-sm font-medium">
+                    ใช้ข้อมูลจากบัญชีของฉัน
+                  </span>
+                  <p className="text-xs text-muted-foreground">
+                    ดึงชื่อ ที่อยู่ และข้อมูลใบกำกับจากโปรไฟล์
+                  </p>
+                </div>
+              </label>
+              <label
+                htmlFor="buyer-mode-other"
+                className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 has-[:checked]:border-primary has-[:checked]:bg-primary/5"
+              >
+                <RadioGroupItem
+                  value="other"
+                  id="buyer-mode-other"
+                  className="mt-0.5"
+                />
+                <div className="space-y-0.5">
+                  <span className="text-sm font-medium">ออกใบในนามอื่น</span>
+                  <p className="text-xs text-muted-foreground">
+                    เช่น ลูกค้าที่คุณแทน หรือนิติบุคคลคนละชื่อ
+                  </p>
+                </div>
+              </label>
+            </RadioGroup>
+          </div>
+
+          {profileLoading && buyerMode === "account" ? (
+            <InlineRowsSkeleton rows={2} />
+          ) : null}
+
+          {!profileLoading &&
+          buyerMode === "account" &&
+          !hasProfileDetails(profileBuyer) ? (
+            <p className="text-xs text-amber-700">
+              ยังไม่มีข้อมูลในโปรไฟล์ —{" "}
+              <Link to="/account" className="underline underline-offset-2">
+                ไปตั้งค่าบัญชี
+              </Link>{" "}
+              หรือเลือก &quot;ออกใบในนามอื่น&quot; แล้วกรอกเอง
+            </p>
+          ) : null}
 
           <div className="space-y-2">
             <Label>ประเภทลูกค้า</Label>

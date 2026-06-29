@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -51,64 +52,59 @@ function AdminProductsPage() {
           </Link>
         </Button>
       </div>
-      <div className="rounded-xl border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>SKU</TableHead>
-              <TableHead>ชื่อ</TableHead>
-              <TableHead>หมวด</TableHead>
-              <TableHead>ราคาปลีก</TableHead>
-              <TableHead>สต็อก</TableHead>
-              <TableHead>สถานะ</TableHead>
-              <TableHead />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
+      {loading ? (
+        <PageLoading variant="table" />
+      ) : (
+        <div className="rounded-xl border bg-card">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  กำลังโหลด...
-                </TableCell>
+                <TableHead>SKU</TableHead>
+                <TableHead>ชื่อ</TableHead>
+                <TableHead>หมวด</TableHead>
+                <TableHead>ราคาปลีก</TableHead>
+                <TableHead>สต็อก</TableHead>
+                <TableHead>สถานะ</TableHead>
+                <TableHead />
               </TableRow>
-            ) : products.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  ยังไม่มีสินค้า
-                </TableCell>
-              </TableRow>
-            ) : (
-              products.map((p) => (
-                <TableRow key={p.id}>
-                  <TableCell>{p.sku ?? "—"}</TableCell>
-                  <TableCell className="font-medium">{p.name}</TableCell>
-                  <TableCell>{p.categoryName ?? "—"}</TableCell>
-                  <TableCell>{formatPrice(p.retailPrice)}</TableCell>
-                  <TableCell>{p.stockQty}</TableCell>
-                  <TableCell>
-                    <Badge variant={p.isActive ? "default" : "secondary"}>
-                      {p.isActive ? "เปิด" : "ปิด"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link to="/admin/products/$id" params={{ id: p.id }}>
-                        แก้ไข
-                      </Link>
-                    </Button>
+            </TableHeader>
+            <TableBody>
+              {products.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    className="h-24 text-center text-muted-foreground"
+                  >
+                    ยังไม่มีสินค้า
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ) : (
+                products.map((p) => (
+                  <TableRow key={p.id}>
+                    <TableCell>{p.sku ?? "—"}</TableCell>
+                    <TableCell className="font-medium">{p.name}</TableCell>
+                    <TableCell>{p.categoryName ?? "—"}</TableCell>
+                    <TableCell>{formatPrice(p.retailPrice)}</TableCell>
+                    <TableCell>{p.stockQty}</TableCell>
+                    <TableCell>
+                      <Badge variant={p.isActive ? "default" : "secondary"}>
+                        {p.isActive ? "เปิด" : "ปิด"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link to="/admin/products/$id" params={{ id: p.id }}>
+                          แก้ไข
+                        </Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 }

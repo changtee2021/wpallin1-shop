@@ -232,7 +232,6 @@ function CatalogViewerPage() {
           <MarketingCatalogGrid catalogs={related} compact />
         </section>
       ) : null}
-
     </div>
   );
 }

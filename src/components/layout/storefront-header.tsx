@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingCart, User } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 
 import { AccountMenuButton } from "@/components/account/account-menu-button";
 import { NotificationBell } from "@/components/notifications/notification-bell";
@@ -37,12 +37,12 @@ export function StorefrontHeader() {
             />
           </Link>
 
-          <div className="min-w-0 flex-1 lg:hidden">
+          <div className="min-w-0 flex-1 md:hidden">
             <SearchBar compact />
           </div>
 
-          <div className="hidden min-w-0 flex-1 justify-center lg:flex">
-            <SearchBar pill className="max-w-xl" />
+          <div className="hidden min-w-0 flex-1 md:block">
+            <SearchBar />
           </div>
 
           <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
@@ -65,39 +65,20 @@ export function StorefrontHeader() {
               </Link>
             </Button>
             {user ? (
-              <>
-                <span className="lg:hidden">
-                  <AccountMenuButton />
-                </span>
-                <span className="hidden lg:inline-flex">
-                  <AccountMenuButton iconOnly />
-                </span>
-              </>
+              <AccountMenuButton />
             ) : (
-              <>
-                <Button
-                  size="sm"
-                  className="hidden bg-accent hover:bg-accent/90 sm:inline-flex lg:hidden"
-                  asChild
-                >
-                  <Link to="/login">{t("nav.login")}</Link>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={`hidden rounded-full lg:inline-flex ${headerIconClass}`}
-                  asChild
-                >
-                  <Link to="/login" aria-label={t("nav.login")}>
-                    <User className="size-5" />
-                  </Link>
-                </Button>
-              </>
+              <Button
+                size="sm"
+                className="hidden bg-accent hover:bg-accent/90 sm:inline-flex"
+                asChild
+              >
+                <Link to="/login">{t("nav.login")}</Link>
+              </Button>
             )}
           </div>
         </div>
 
-        <nav className="hidden border-t border-white/15 py-2 lg:flex lg:items-center lg:justify-center lg:gap-8">
+        <nav className="hidden border-t border-white/15 py-2 md:flex md:items-center md:justify-center md:gap-6">
           {navLinks.map((item) => (
             <Link
               key={item.to}

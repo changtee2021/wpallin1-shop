@@ -4,11 +4,12 @@ import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type SidebarNavItem = {
-  to: string;
+  to?: string;
   label: string;
   icon: LucideIcon;
   search?: Record<string, unknown>;
   key?: string;
+  onClick?: () => void;
 };
 
 export type SidebarNavGroup = {
@@ -16,14 +17,27 @@ export type SidebarNavGroup = {
   items: SidebarNavItem[];
 };
 
+const navItemClass =
+  "flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
+
 function SidebarNavLink({ item }: { item: SidebarNavItem }) {
+  if (item.onClick) {
+    return (
+      <button type="button" onClick={item.onClick} className={navItemClass}>
+        <item.icon className="size-4 shrink-0" />
+        {item.label}
+      </button>
+    );
+  }
+
+  if (!item.to) return null;
+
   return (
     <Link
-      key={item.key ?? `${item.to}-${item.label}`}
       to={item.to}
       search={item.search}
       preload={false}
-      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      className={navItemClass}
       activeProps={{ className: "bg-muted text-foreground" }}
       activeOptions={{ exact: item.to === "/admin", includeSearch: true }}
     >
@@ -61,7 +75,10 @@ export function SidebarNav({
             ) : null}
             <div className="flex flex-col gap-0.5">
               {group.items.map((item) => (
-                <SidebarNavLink key={item.key ?? `${item.to}-${item.label}`} item={item} />
+                <SidebarNavLink
+                  key={item.key ?? `${item.to}-${item.label}`}
+                  item={item}
+                />
               ))}
             </div>
           </div>

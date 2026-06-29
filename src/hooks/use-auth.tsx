@@ -9,8 +9,9 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 
-import { APP_PUBLIC_URL } from "@/lib/erp-config";
 import { supabase } from "@/integrations/supabase/client";
+import { clearAccountProfileCache } from "@/lib/account-profile-cache";
+import { APP_PUBLIC_URL } from "@/lib/erp-config";
 import { ADMIN_ROLES, DEALER_ROLES, hasAnyRole } from "@/types/api/profile";
 
 type AuthState = {
@@ -22,7 +23,12 @@ type AuthState = {
   isDealer: boolean;
   refreshProfile: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName: string) => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName: string,
+  ) => Promise<{ needsEmailConfirmation: boolean }>;
+  resetPassword: (email: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -93,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const redirectTo = APP_PUBLIC_URL
         ? `${APP_PUBLIC_URL}/auth/callback`
         : undefined;
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -102,9 +108,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       });
       if (error) throw new Error(error.message);
+      return {
+        needsEmailConfirmation: Boolean(data.user && !data.session),
+      };
     },
     [],
   );
+
+  const resetPassword = useCallback(async (email: string) => {
+    const redirectTo = APP_PUBLIC_URL
+      ? `${APP_PUBLIC_URL}/auth/callback`
+      : undefined;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo,
+    });
+    if (error) throw new Error(error.message);
+  }, []);
 
   const signInWithGoogle = useCallback(async () => {
     const redirectTo = APP_PUBLIC_URL
@@ -120,6 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw new Error(error.message);
+    clearAccountProfileCache();
   }, []);
 
   const value = useMemo<AuthState>(
@@ -133,6 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshProfile,
       signIn,
       signUp,
+      resetPassword,
       signInWithGoogle,
       signOut,
     }),
@@ -144,6 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshProfile,
       signIn,
       signUp,
+      resetPassword,
       signInWithGoogle,
       signOut,
     ],

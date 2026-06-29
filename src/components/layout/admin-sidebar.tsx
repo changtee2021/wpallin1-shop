@@ -64,7 +64,7 @@ export function AdminSidebar() {
         { to: "/admin/categories", label: "หมวดหมู่", icon: Package },
         { to: "/admin/inventory", label: "สต็อก", icon: Boxes },
         { to: "/admin/catalogs", label: "แคตตาล็อก PDF", icon: FileText },
-        { to: "/admin/banners", label: "แบนเนอร์หน้าแรก", icon: Image },
+        { to: "/admin/banners", label: "แบนเนอร์", icon: Image },
       ],
     },
     {

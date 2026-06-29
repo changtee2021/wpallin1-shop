@@ -1,5 +1,6 @@
 import {
   Bell,
+  CircleHelp,
   Heart,
   LayoutDashboard,
   Package,
@@ -11,11 +12,13 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { AccountHelpDialog } from "@/components/account/account-help-dialog";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
 import { useT } from "@/i18n";
 import {
@@ -45,6 +48,7 @@ export function AccountProfileSummary({
     null,
   );
   const [loading, setLoading] = useState(true);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     if (!session) return;
@@ -140,7 +144,14 @@ export function AccountProfileSummary({
             key: "dealer",
           },
         ]
-      : []),
+      : [
+          {
+            to: "/dealer/register",
+            label: "สมัครตัวแทน",
+            icon: Store,
+            key: "dealer-register",
+          },
+        ]),
     ...(isAdmin
       ? [
           {
@@ -151,6 +162,12 @@ export function AccountProfileSummary({
           },
         ]
       : []),
+    {
+      label: t("account.help"),
+      icon: CircleHelp,
+      key: "help",
+      onClick: () => setHelpOpen(true),
+    },
     {
       to: "/account",
       search: { tab: "settings", section: "personal" },
@@ -222,7 +239,7 @@ export function AccountProfileSummary({
               {t("account.wallet")} · ยอดใช้ได้
             </p>
             {loading ? (
-              <p className="mt-0.5 text-sm text-muted-foreground">...</p>
+              <Skeleton className="mt-0.5 h-7 w-28" />
             ) : (
               <p className="text-lg font-bold text-accent">
                 {formatPrice(walletBalance)}
@@ -237,6 +254,7 @@ export function AccountProfileSummary({
         </CardContent>
       </Card>
       {showNav ? <SidebarNav title={displayName} items={accountItems} /> : null}
+      <AccountHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
     </div>
   );
 }

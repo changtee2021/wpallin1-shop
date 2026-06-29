@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,6 @@ import {
 } from "@/lib/api.functions";
 import { formatDate } from "@/lib/format";
 import { useAuthServerFnOptions } from "@/lib/server-fn-auth";
-import { useT } from "@/i18n";
 import type { NotificationDto } from "@/services/notification.service";
 
 export const Route = createFileRoute("/account/notifications")({
@@ -22,7 +22,6 @@ export const Route = createFileRoute("/account/notifications")({
 });
 
 function AccountNotificationsPage() {
-  const { t } = useT();
   const { session } = useAuth();
   const authOpts = useAuthServerFnOptions(session);
   const [items, setItems] = useState<NotificationDto[]>([]);
@@ -70,7 +69,7 @@ function AccountNotificationsPage() {
       </div>
       <div className="space-y-2">
         {loading ? (
-          <p className="text-muted-foreground">{t("common.loading")}</p>
+          <PageLoading variant="list" />
         ) : items.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center text-muted-foreground">

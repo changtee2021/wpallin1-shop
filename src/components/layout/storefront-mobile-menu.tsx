@@ -36,7 +36,7 @@ export function StorefrontMobileMenu({
       <Button
         variant="ghost"
         size="icon"
-        className={`rounded-full lg:hidden ${triggerClassName ?? ""}`}
+        className={`rounded-full md:hidden ${triggerClassName ?? ""}`}
         onClick={() => setOpen(true)}
         aria-label="Menu"
       >

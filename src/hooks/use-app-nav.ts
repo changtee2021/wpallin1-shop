@@ -1,6 +1,7 @@
 import { useLocation, useMatchRoute } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 import {
+  Heart,
   Home,
   LayoutDashboard,
   MoreHorizontal,
@@ -25,6 +26,7 @@ export type AppNavItem = {
   exact?: boolean;
   badge?: number;
   isMore?: boolean;
+  isAccountMenu?: boolean;
 };
 
 export function useAppNavZone(): AppNavZone {
@@ -133,13 +135,18 @@ export function useAppNavItems(cartCount = 0): AppNavItem[] {
       icon: ShoppingCart,
       badge: cartCount,
     },
-    { id: "account", to: "/account", label: "บัญชี", icon: User },
     {
-      id: "more",
-      to: "#",
-      label: "เพิ่มเติม",
-      icon: MoreHorizontal,
-      isMore: true,
+      id: "wishlist",
+      to: "/account/wishlist",
+      label: "โปรด",
+      icon: Heart,
+    },
+    {
+      id: "account",
+      to: "/account",
+      label: "บัญชี",
+      icon: User,
+      isAccountMenu: true,
     },
   ];
 }
@@ -147,6 +154,9 @@ export function useAppNavItems(cartCount = 0): AppNavItem[] {
 export function useAppNavActive(item: AppNavItem): boolean {
   const matchRoute = useMatchRoute();
   if (item.isMore) return false;
+  if (item.isAccountMenu) {
+    return !!matchRoute({ to: "/account", fuzzy: true });
+  }
   if (item.exact) return !!matchRoute({ to: item.to, fuzzy: false });
   return !!matchRoute({ to: item.to, fuzzy: true });
 }

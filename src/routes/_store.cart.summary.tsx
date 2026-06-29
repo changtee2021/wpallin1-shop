@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { QuotationPreviewDialog } from "@/components/cart/quotation-preview-dialog";
+import { PageLoading } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -50,9 +51,10 @@ function CartSummaryPage() {
   const [applying, setApplying] = useState(false);
   const [quoting, setQuoting] = useState(false);
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
-  const [initialBuyer, setInitialBuyer] = useState<
+  const [profileBuyer, setProfileBuyer] = useState<
     Partial<QuotationBuyerInput>
   >({});
+  const [profileLoading, setProfileLoading] = useState(false);
 
   const selectedItems = useMemo(
     () => filterCartItems(cart.items, selectedIds),
@@ -69,28 +71,31 @@ function CartSummaryPage() {
 
   useEffect(() => {
     if (!session || !quoteDialogOpen) return;
+    setProfileLoading(true);
     const opts = authServerFnOptions(session);
     void Promise.all([
       fetchAccountProfile(opts),
       fetchAccountAddresses(opts),
       fetchTaxInvoiceProfiles(opts),
-    ]).then(([profile, addresses, taxProfiles]) => {
-      const defaultAddr = addresses.find((a) => a.isDefault) ?? addresses[0];
-      const tax = taxProfiles.find((t) => t.isDefault) ?? taxProfiles[0];
-      setInitialBuyer({
-        customerName: profile.fullName ?? "",
-        customerPhone: profile.phone ?? defaultAddr?.phone ?? "",
-        customerEmail: profile.email ?? user?.email ?? "",
-        customerType: profile.customerType ?? "individual",
-        taxId: tax?.taxId ?? profile.companyTaxId ?? profile.nationalId ?? "",
-        companyName: tax?.companyName ?? "",
-        companyBranch: tax?.branchCode ?? profile.companyBranch ?? "",
-        line1: defaultAddr?.line1 ?? tax?.address ?? "",
-        district: defaultAddr?.district ?? "",
-        province: defaultAddr?.province ?? "",
-        postalCode: defaultAddr?.postalCode ?? "",
-      });
-    });
+    ])
+      .then(([profile, addresses, taxProfiles]) => {
+        const defaultAddr = addresses.find((a) => a.isDefault) ?? addresses[0];
+        const tax = taxProfiles.find((t) => t.isDefault) ?? taxProfiles[0];
+        setProfileBuyer({
+          customerName: profile.fullName ?? "",
+          customerPhone: profile.phone ?? defaultAddr?.phone ?? "",
+          customerEmail: profile.email ?? user?.email ?? "",
+          customerType: profile.customerType ?? "individual",
+          taxId: tax?.taxId ?? profile.companyTaxId ?? profile.nationalId ?? "",
+          companyName: tax?.companyName ?? "",
+          companyBranch: tax?.branchCode ?? profile.companyBranch ?? "",
+          line1: defaultAddr?.line1 ?? tax?.address ?? "",
+          district: defaultAddr?.district ?? "",
+          province: defaultAddr?.province ?? "",
+          postalCode: defaultAddr?.postalCode ?? "",
+        });
+      })
+      .finally(() => setProfileLoading(false));
   }, [session, quoteDialogOpen, user?.email]);
 
   async function handleApplyCoupon() {
@@ -152,11 +157,7 @@ function CartSummaryPage() {
   }
 
   if (loading) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-12 text-center text-muted-foreground">
-        กำลังโหลด...
-      </div>
-    );
+    return <PageLoading variant="cart" />;
   }
 
   if (!selectedItems.length) {
@@ -301,7 +302,8 @@ function CartSummaryPage() {
         subtotal={selectedSubtotal}
         discount={selectedDiscount}
         grandTotal={payableTotal}
-        initialBuyer={initialBuyer}
+        profileBuyer={profileBuyer}
+        profileLoading={profileLoading}
         submitting={quoting}
         onSubmit={(buyer) => void handleSubmitQuote(buyer)}
       />

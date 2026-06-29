@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { ProductOptionsEditor } from "@/components/admin/product-options-editor";
 import { Button } from "@/components/ui/button";
@@ -100,7 +101,7 @@ function AdminProductEditPage() {
     }
   }
 
-  if (loading) return <p className="text-muted-foreground">กำลังโหลด...</p>;
+  if (loading) return <PageLoading variant="form" />;
 
   return (
     <div className="max-w-2xl">

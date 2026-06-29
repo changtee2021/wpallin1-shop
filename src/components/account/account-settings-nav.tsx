@@ -14,41 +14,38 @@ export type SettingsSectionId = (typeof SETTINGS_SECTIONS)[number]["id"];
 type AccountSettingsNavProps = {
   activeSection: SettingsSectionId;
   className?: string;
-  orientation?: "vertical" | "horizontal";
 };
 
 export function AccountSettingsNav({
   activeSection,
   className,
-  orientation = "vertical",
 }: AccountSettingsNavProps) {
   return (
     <nav
       className={cn(
-        orientation === "horizontal"
-          ? "flex gap-1 overflow-x-auto"
-          : "space-y-1",
+        "flex gap-1 overflow-x-auto border-b [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         className,
       )}
     >
-      {SETTINGS_SECTIONS.map((section) => (
-        <Link
-          key={section.id}
-          to="/account"
-          search={{ tab: "settings", section: section.id }}
-          preload={false}
-          className={cn(
-            "rounded-lg px-3 py-2 text-sm transition-colors",
-            orientation === "horizontal" && "shrink-0 whitespace-nowrap",
-            orientation === "vertical" && "block",
-            activeSection === section.id
-              ? "bg-muted font-medium text-foreground"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground",
-          )}
-        >
-          {section.label}
-        </Link>
-      ))}
+      {SETTINGS_SECTIONS.map((section) => {
+        const active = activeSection === section.id;
+        return (
+          <Link
+            key={section.id}
+            to="/account"
+            search={{ tab: "settings", section: section.id }}
+            preload={false}
+            className={cn(
+              "relative shrink-0 whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors",
+              active
+                ? "text-primary after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full after:bg-primary"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {section.label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

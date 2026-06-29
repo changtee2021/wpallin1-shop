@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -118,7 +119,7 @@ function AdminWalletPage() {
       <section>
         <h2 className="mb-3 text-lg font-semibold">คำขอเติมเงินรอตรวจ</h2>
         {loading ? (
-          <p className="text-muted-foreground">กำลังโหลด...</p>
+          <PageLoading variant="table" />
         ) : queue.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-center text-muted-foreground">

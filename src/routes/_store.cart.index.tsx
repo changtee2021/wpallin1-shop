@@ -17,6 +17,8 @@ import {
   CartItemOptionChip,
   CartItemOptionsSheet,
 } from "@/components/cart/cart-item-options-sheet";
+import { PageLoading } from "@/components/loading";
+import { RecentlyViewedSection } from "@/components/storefront/recently-viewed-section";
 import { useCart } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -68,6 +70,10 @@ function CartPage() {
     cart.items.length > 0 && selectedIds.length === cart.items.length;
   const someSelected =
     selectedIds.length > 0 && selectedIds.length < cart.items.length;
+  const cartProductIds = useMemo(
+    () => cart.items.map((item) => item.productId).filter(Boolean) as string[],
+    [cart.items],
+  );
 
   function updateSelection(next: string[]) {
     setSelectedIds(next);
@@ -103,11 +109,7 @@ function CartPage() {
   }
 
   if (loading) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-12 text-center text-muted-foreground">
-        {t("common.loading")}
-      </div>
-    );
+    return <PageLoading variant="cart" />;
   }
 
   if (!cart.items.length) {
@@ -153,7 +155,10 @@ function CartPage() {
           onCheckedChange={(checked) => toggleAll(checked === true)}
           aria-label="เลือกทั้งหมด"
         />
-        <label htmlFor="select-all" className="cursor-pointer text-sm font-medium">
+        <label
+          htmlFor="select-all"
+          className="cursor-pointer text-sm font-medium"
+        >
           เลือกทั้งหมด ({cart.items.length})
         </label>
       </div>
@@ -265,11 +270,20 @@ function CartPage() {
         })}
       </div>
 
+      <RecentlyViewedSection
+        title="สินค้าที่คุณเคยดู"
+        excludeProductIds={cartProductIds}
+        showCompare={false}
+        className="mt-10 border-t pt-8"
+      />
+
       <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 p-3 shadow-lg backdrop-blur md:bottom-0">
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <div className="flex items-center gap-2">
             <Checkbox
-              checked={allSelected ? true : someSelected ? "indeterminate" : false}
+              checked={
+                allSelected ? true : someSelected ? "indeterminate" : false
+              }
               onCheckedChange={(checked) => toggleAll(checked === true)}
               aria-label="เลือกทั้งหมด"
             />

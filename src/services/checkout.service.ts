@@ -60,9 +60,7 @@ export async function placeOrder(
     )
     .eq("cart_id", cartRow.id);
 
-  const selectedItemIds = input.itemIds?.length
-    ? new Set(input.itemIds)
-    : null;
+  const selectedItemIds = input.itemIds?.length ? new Set(input.itemIds) : null;
   const checkoutItems = (cartItems ?? []).filter((item) =>
     selectedItemIds ? selectedItemIds.has(item.id) : true,
   );
@@ -114,9 +112,8 @@ export async function placeOrder(
   const fullCartDiscount = Number(cartRow.discount ?? cartDto.discount);
   const discount =
     selectedItemIds && cartDto.subtotal > 0
-      ? Math.round(
-          ((fullCartDiscount * subtotal) / cartDto.subtotal) * 100,
-        ) / 100
+      ? Math.round(((fullCartDiscount * subtotal) / cartDto.subtotal) * 100) /
+        100
       : fullCartDiscount;
   const totals = calcOrderTotals(subtotal, shippingFee, discount);
   const shippingAddress = toAddressJson(input);

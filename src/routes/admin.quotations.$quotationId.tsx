@@ -3,6 +3,7 @@ import { Download, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import {
   QuotationDocument,
@@ -140,7 +141,7 @@ function AdminQuotationDetailPage() {
   }
 
   if (!detail) {
-    return <p className="text-muted-foreground">กำลังโหลด...</p>;
+    return <PageLoading variant="detail" />;
   }
 
   const canEditTerms = ["draft", "sent"].includes(detail.status);

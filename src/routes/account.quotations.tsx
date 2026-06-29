@@ -3,6 +3,7 @@ import { Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { InlineRowsSkeleton, PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import {
   QuotationDocument,
@@ -34,12 +35,18 @@ export const Route = createFileRoute("/account/quotations")({
 function AccountQuotationsPage() {
   const { session } = useAuth();
   const [quotes, setQuotes] = useState<QuotationDto[]>([]);
+  const [loading, setLoading] = useState(true);
   const [viewQuote, setViewQuote] = useState<QuotationDto | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const authOpts = authServerFnOptions(session);
 
   async function loadList() {
-    setQuotes(await fetchUserQuotations(authOpts));
+    setLoading(true);
+    try {
+      setQuotes(await fetchUserQuotations(authOpts));
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -85,7 +92,9 @@ function AccountQuotationsPage() {
     <div>
       <PageHeader title="ใบเสนอราคา" description="ใบเสนอจากทีมขาย" />
       <div className="space-y-3">
-        {quotes.length === 0 ? (
+        {loading ? (
+          <PageLoading variant="list" />
+        ) : quotes.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center text-muted-foreground">
               ยังไม่มีใบเสนอราคา
@@ -149,11 +158,11 @@ function AccountQuotationsPage() {
         <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {viewQuote?.quotationNumber ?? "กำลังโหลด..."}
+              {viewQuote?.quotationNumber ?? "ใบเสนอราคา"}
             </DialogTitle>
           </DialogHeader>
           {loadingDetail ? (
-            <p className="text-muted-foreground">กำลังโหลด...</p>
+            <InlineRowsSkeleton rows={4} />
           ) : viewQuote ? (
             <div className="space-y-4">
               {viewQuote.status === "sent" ? (

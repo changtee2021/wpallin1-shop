@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { DefaultPageSkeleton } from "@/components/loading";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
@@ -19,7 +20,7 @@ export function CreditPanel() {
       .finally(() => setLoading(false));
   }, [session]);
 
-  if (loading) return <p className="text-muted-foreground">กำลังโหลด...</p>;
+  if (loading) return <DefaultPageSkeleton />;
 
   if (!summary?.account) {
     return (

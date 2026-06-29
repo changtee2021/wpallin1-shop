@@ -169,7 +169,7 @@ export function ConfiguratorWizard({
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:items-start">
+    <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] md:items-start">
       <div className="min-w-0">
         <PreviewPanel preview={preview} />
       </div>
@@ -188,7 +188,7 @@ export function ConfiguratorWizard({
 
 function ConfiguratorLoadingSkeleton() {
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)]">
+    <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(300px,380px)]">
       <Skeleton className="aspect-[4/3] w-full rounded-xl" />
       <div className="space-y-3 rounded-xl border p-4">
         <Skeleton className="h-8 w-full" />

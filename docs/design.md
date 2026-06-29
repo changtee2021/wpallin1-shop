@@ -172,6 +172,10 @@ Implementation: `src/components/storefront/product-card.tsx`
 - 4 ไอเทม: หน้าแรก | สินค้า/แคตตาล็อก | เครื่องมือ/คำนวณ | บัญชี
 - Active = `text-accent`, inactive = muted
 
+### Skeleton loading
+
+- ทุกหน้าต้องมี skeleton ขณะโหลด — ดู [`docs/SKELETON-LOADING.md`](SKELETON-LOADING.md)
+
 ### Buttons
 
 | ประเภท | Style |

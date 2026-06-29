@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -10,6 +9,7 @@ import {
   type SettingsSectionId,
 } from "@/components/account/account-settings-sections";
 import { PageHeader } from "@/components/layout/page-header";
+import { PageLoading } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -434,11 +434,7 @@ function AccountPage() {
   }
 
   if (loading || !profile) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="size-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <PageLoading variant="dashboard" />;
   }
 
   const settingsSectionTitles: Record<SettingsSectionId, string> = {

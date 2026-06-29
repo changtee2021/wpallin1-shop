@@ -55,7 +55,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const mergedUserIdRef = useRef<string | null>(null);
 
-  const fnOpts = useMemo(() => authServerFnOptions(session), [session?.access_token]);
+  const fnOpts = useMemo(
+    () => authServerFnOptions(session),
+    [session?.access_token],
+  );
 
   const refresh = useCallback(async () => {
     const sessionId = getOrCreateCartSessionId();

@@ -354,10 +354,7 @@ export async function updateCartItemOptions(
   const product = await getProductById(supabase, item.product_id);
   if (!product) throw new Error("ไม่พบสินค้า");
 
-  const optionGroups = await listProductOptionGroups(
-    supabase,
-    item.product_id,
-  );
+  const optionGroups = await listProductOptionGroups(supabase, item.product_id);
   if (!optionGroups.length) throw new Error("สินค้านี้ไม่มีตัวเลือกให้แก้ไข");
 
   const optionErr = validateSelectedOptions(optionGroups, selectedOptions);

@@ -2,6 +2,8 @@ import { CheckCircle2, Circle, Loader2, Upload } from "lucide-react";
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -96,7 +98,7 @@ export function DocumentsPanel({ customerType }: DocumentsPanelProps) {
     s === "approved" ? "อนุมัติแล้ว" : s === "rejected" ? "ปฏิเสธ" : "รอตรวจ";
 
   if (loading) {
-    return <p className="text-muted-foreground">กำลังโหลดเอกสาร...</p>;
+    return <PageLoading variant="list" />;
   }
 
   return (

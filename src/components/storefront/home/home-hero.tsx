@@ -29,12 +29,12 @@ function HomeHeroFallback() {
             "repeating-linear-gradient(-45deg, transparent, transparent 12px, rgba(255,255,255,0.15) 12px, rgba(255,255,255,0.15) 24px)",
         }}
       />
-      <div className="relative grid gap-8 px-6 py-10 sm:px-10 sm:py-14 lg:grid-cols-2 lg:items-center lg:gap-12">
+      <div className="relative grid gap-8 px-6 py-10 sm:px-10 sm:py-14 md:grid-cols-2 md:items-center md:gap-12">
         <div className="max-w-xl space-y-4">
           <p className="text-xs font-semibold uppercase tracking-widest text-white/80">
             {t("app.tagline")}
           </p>
-          <h1 className="text-2xl font-bold leading-tight sm:text-3xl lg:text-4xl">
+          <h1 className="text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">
             {t("home.hero.title")}
           </h1>
           <p className="text-sm leading-relaxed text-white/90 sm:text-base">
@@ -62,7 +62,7 @@ function HomeHeroFallback() {
           </div>
         </div>
 
-        <div className="relative hidden lg:block">
+        <div className="relative hidden md:block">
           <div className="aspect-[4/3] overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm">
             <div className="flex h-full flex-col items-center justify-center gap-4 p-8">
               <img

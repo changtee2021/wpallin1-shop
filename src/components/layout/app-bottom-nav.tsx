@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { LayoutDashboard, User } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import { AppMoreSheet } from "@/components/layout/app-more-sheet";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ import {
   type AppNavItem,
 } from "@/hooks/use-app-nav";
 import { useAuth } from "@/hooks/use-auth";
+import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
 
 function BottomNavLink({
@@ -25,17 +27,25 @@ function BottomNavLink({
   const active = useAppNavActive(item);
   const Icon = item.icon;
   const badge = item.id === "cart" ? cartCount : (item.badge ?? 0);
-  const to = item.id === "account" && !isLoggedIn ? "/login" : item.to;
+  let to = item.to;
+  if (item.id === "wishlist" && !isLoggedIn) to = "/login";
 
   return (
     <Link
       to={to}
       search={item.search}
+      aria-current={active ? "page" : undefined}
       className={cn(
         "relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium transition-colors",
-        active ? "text-primary" : "text-muted-foreground hover:text-foreground",
+        active ? "text-accent" : "text-muted-foreground hover:text-foreground",
       )}
     >
+      {active ? (
+        <span
+          aria-hidden
+          className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-accent"
+        />
+      ) : null}
       <span className="relative">
         <Icon className="size-5" />
         {badge > 0 ? (
@@ -49,12 +59,67 @@ function BottomNavLink({
   );
 }
 
+function BottomNavAccountMenuButton({
+  item,
+  onOpen,
+}: {
+  item: AppNavItem;
+  onOpen: () => void;
+}) {
+  const active = useAppNavActive(item);
+  const Icon = item.icon;
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium transition-colors",
+        active ? "text-accent" : "text-muted-foreground hover:text-foreground",
+      )}
+    >
+      {active ? (
+        <span
+          aria-hidden
+          className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-accent"
+        />
+      ) : null}
+      <Icon className="size-5" />
+      {item.label}
+    </button>
+  );
+}
+
 export function AppBottomNav() {
+  const { t } = useT();
   const { cart } = useCart();
   const { user } = useAuth();
   const zone = useAppNavZone();
   const items = useAppNavItems(cart.itemCount);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+
+  const accountMenuLeadingLinks = useMemo(
+    () =>
+      user
+        ? [
+            {
+              to: "/account",
+              label: t("nav.account"),
+              icon: LayoutDashboard,
+              search: { tab: "dashboard" },
+            },
+          ]
+        : [
+            {
+              to: "/login",
+              label: t("nav.login"),
+              icon: User,
+            },
+          ],
+    [t, user],
+  );
 
   return (
     <>
@@ -80,6 +145,16 @@ export function AppBottomNav() {
               );
             }
 
+            if (item.isAccountMenu) {
+              return (
+                <BottomNavAccountMenuButton
+                  key={item.id}
+                  item={item}
+                  onOpen={() => setAccountMenuOpen(true)}
+                />
+              );
+            }
+
             return (
               <BottomNavLink
                 key={item.id}
@@ -91,7 +166,18 @@ export function AppBottomNav() {
           })}
         </div>
       </nav>
-      <AppMoreSheet open={moreOpen} onOpenChange={setMoreOpen} zone={zone} />
+      {zone !== "store" ? (
+        <AppMoreSheet open={moreOpen} onOpenChange={setMoreOpen} zone={zone} />
+      ) : null}
+      {zone === "store" ? (
+        <AppMoreSheet
+          open={accountMenuOpen}
+          onOpenChange={setAccountMenuOpen}
+          zone="store"
+          title={t("nav.account")}
+          leadingLinks={accountMenuLeadingLinks}
+        />
+      ) : null}
     </>
   );
 }

@@ -135,7 +135,9 @@ function AdminCatalogsPage() {
           data: { catalogIds: items.map((item) => item.id) },
           ...authOpts,
         });
-        setViewStats(Object.fromEntries(stats.map((row) => [row.catalogId, row])));
+        setViewStats(
+          Object.fromEntries(stats.map((row) => [row.catalogId, row])),
+        );
       } catch {
         setViewStats({});
       }

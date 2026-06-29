@@ -2,7 +2,17 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { HeroBannerDto } from "@/types/api/hero-banners";
 
-const SETTINGS_KEY = "home.hero_banners";
+export type HeroBannerPlacement = "home" | "shop";
+
+const SETTINGS_KEYS: Record<HeroBannerPlacement, string> = {
+  home: "home.hero_banners",
+  shop: "shop.hero_banners",
+};
+
+const SETTINGS_DESCRIPTIONS: Record<HeroBannerPlacement, string> = {
+  home: "Homepage hero banner slides",
+  shop: "Shop page hero banner slides",
+};
 
 function parseBanners(raw: unknown): HeroBannerDto[] {
   if (!Array.isArray(raw)) return [];
@@ -24,9 +34,7 @@ function parseBanners(raw: unknown): HeroBannerDto[] {
             ? row.linkUrl.trim()
             : null,
         alt:
-          typeof row.alt === "string" && row.alt.trim()
-            ? row.alt.trim()
-            : null,
+          typeof row.alt === "string" && row.alt.trim() ? row.alt.trim() : null,
         sortOrder:
           typeof row.sortOrder === "number" && Number.isFinite(row.sortOrder)
             ? row.sortOrder
@@ -40,12 +48,13 @@ function parseBanners(raw: unknown): HeroBannerDto[] {
 
 export async function listHeroBanners(
   supabase: SupabaseClient,
+  placement: HeroBannerPlacement = "home",
   { activeOnly = false }: { activeOnly?: boolean } = {},
 ): Promise<HeroBannerDto[]> {
   const { data, error } = await supabase
     .from("settings")
     .select("value")
-    .eq("key", SETTINGS_KEY)
+    .eq("key", SETTINGS_KEYS[placement])
     .maybeSingle();
 
   if (error) throw new Error(error.message);
@@ -56,6 +65,7 @@ export async function listHeroBanners(
 
 export async function saveHeroBanners(
   supabase: SupabaseClient,
+  placement: HeroBannerPlacement,
   banners: HeroBannerDto[],
 ): Promise<void> {
   const payload = banners
@@ -70,9 +80,9 @@ export async function saveHeroBanners(
 
   const { error } = await supabase.from("settings").upsert(
     {
-      key: SETTINGS_KEY,
+      key: SETTINGS_KEYS[placement],
       value: payload,
-      description: "Homepage hero banner slides",
+      description: SETTINGS_DESCRIPTIONS[placement],
       is_public: true,
       updated_at: new Date().toISOString(),
     },

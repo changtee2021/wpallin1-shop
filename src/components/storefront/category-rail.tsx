@@ -34,18 +34,23 @@ function CategoryItem({
   active,
   label,
   Icon,
+  className,
 }: {
   to: string;
   search?: Record<string, string | undefined>;
   active: boolean;
   label: string;
   Icon: LucideIcon;
+  className?: string;
 }) {
   return (
     <Link
       to={to}
       search={search}
-      className="group flex flex-col items-center gap-2 text-center"
+      className={cn(
+        "group flex flex-col items-center gap-2 text-center",
+        className,
+      )}
     >
       <span
         className={cn(
@@ -102,9 +107,36 @@ export function CategoryRail({
 
   if (showAll) {
     return (
-      <div className="grid grid-cols-4 gap-x-3 gap-y-4 py-1 sm:gap-x-4 lg:grid-cols-4">
-        {items}
-      </div>
+      <>
+        <div className="grid grid-cols-4 gap-x-3 gap-y-4 py-1 sm:gap-x-4 md:hidden">
+          {items}
+        </div>
+        <div className="hidden md:flex md:flex-nowrap md:items-start md:justify-center md:gap-x-6 lg:gap-x-8 py-1">
+          {showAll ? (
+            <CategoryItem
+              to="/shop"
+              active={!activeSlug}
+              label="ทั้งหมด"
+              Icon={Grid3X3}
+              className="w-16 shrink-0 lg:w-20"
+            />
+          ) : null}
+          {categories.map((cat) => {
+            const Icon = iconMap[cat.slug] ?? Layers;
+            return (
+              <CategoryItem
+                key={cat.id}
+                to="/shop"
+                search={{ category: cat.slug }}
+                active={activeSlug === cat.slug}
+                label={cat.name}
+                Icon={Icon}
+                className="w-16 shrink-0 lg:w-20"
+              />
+            );
+          })}
+        </div>
+      </>
     );
   }
 

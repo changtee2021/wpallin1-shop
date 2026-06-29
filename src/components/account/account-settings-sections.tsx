@@ -137,22 +137,10 @@ export function AccountSettingsSections(props: AccountSettingsSectionsProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-      <div className="lg:hidden">
-        <AccountSettingsNav
-          activeSection={props.section}
-          orientation="horizontal"
-          className="pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        />
-      </div>
+    <div className="flex flex-col gap-6">
+      <AccountSettingsNav activeSection={props.section} />
 
-      <nav className="hidden shrink-0 lg:block lg:w-44">
-        <div className="sticky top-24">
-          <AccountSettingsNav activeSection={props.section} />
-        </div>
-      </nav>
-
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0">
         <SettingsSection title={sectionTitle}>
           {props.section === "personal" ? (
             <PersonalSection {...props} t={t} />

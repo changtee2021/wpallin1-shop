@@ -43,6 +43,26 @@ export type ProductListQuery = {
   category?: string;
   search?: string;
   featured?: boolean;
+  minPrice?: number;
+  maxPrice?: number;
+  productType?: ProductType;
+  inStock?: boolean;
+  style?: string[];
+  color?: string[];
+  material?: string[];
   sortBy?: "name" | "retail_price" | "created_at";
   sortDir?: "asc" | "desc";
+};
+
+export type ShopFilterFacetOption = {
+  value: string;
+  count: number;
+};
+
+export type ShopFilterFacets = {
+  priceRange: { min: number; max: number };
+  categories: Array<{ slug: string; name: string; count: number }>;
+  styles: ShopFilterFacetOption[];
+  colors: ShopFilterFacetOption[];
+  materials: ShopFilterFacetOption[];
 };

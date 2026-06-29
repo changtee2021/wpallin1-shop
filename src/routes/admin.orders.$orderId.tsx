@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -153,7 +154,7 @@ function AdminOrderDetailPage() {
     }
   }
 
-  if (loading) return <p className="text-muted-foreground">กำลังโหลด...</p>;
+  if (loading) return <PageLoading variant="detail" />;
   if (!order) {
     return (
       <Card>
@@ -183,7 +184,7 @@ function AdminOrderDetailPage() {
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardContent className="space-y-3 p-4">
             <h2 className="font-semibold">รายการ</h2>
@@ -242,7 +243,7 @@ function AdminOrderDetailPage() {
         </Card>
 
         {canIssueTaxInvoice && (
-          <Card className="lg:col-span-2">
+          <Card className="md:col-span-2">
             <CardContent className="space-y-4 p-4">
               <h2 className="font-semibold">ใบกำกับภาษี</h2>
               {taxInvoice ? (
@@ -304,7 +305,7 @@ function AdminOrderDetailPage() {
           </Card>
         )}
 
-        <Card className="lg:col-span-2">
+        <Card className="md:col-span-2">
           <CardContent className="space-y-4 p-4">
             <h2 className="font-semibold">เปลี่ยนสถานะ</h2>
             <Select

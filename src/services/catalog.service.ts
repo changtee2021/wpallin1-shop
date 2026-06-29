@@ -1,9 +1,18 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { emptyProductList, normalizeProductListQuery } from "@/domain/catalog";
+import {
+  buildProductSearchOrClause,
+  escapeIlike,
+  expandSearchTerms,
+} from "@/domain/product-search";
 import type { CategoryDto } from "@/types/api/categories";
 import type { ApiListResponse } from "@/types/api/common";
-import type { ProductListQuery, ProductPublicDto } from "@/types/api/products";
+import type {
+  ProductListQuery,
+  ProductPublicDto,
+  ShopFilterFacets,
+} from "@/types/api/products";
 import { listProductOptionGroups } from "@/services/product-options.service";
 
 type ProductRow = {
@@ -23,10 +32,59 @@ type ProductRow = {
   unit: string | null;
   weight_kg: number | null;
   attributes: Record<string, unknown> | null;
+  tags: string[] | null;
   metadata: Record<string, unknown> | null;
   category_id: string | null;
   created_at: string;
 };
+
+function applyAttributeFilter(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  builder: any,
+  key: string,
+  values: string[] | undefined,
+) {
+  if (!values?.length) return builder;
+  const clauses = values.map(
+    (v) => `attributes->>${key}.ilike.%${escapeIlike(v)}%`,
+  );
+  return builder.or(clauses.join(","));
+}
+
+function applyProductFilters(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  builder: any,
+  normalized: ReturnType<typeof normalizeProductListQuery>,
+  categoryId: string | null,
+) {
+  if (normalized.search) {
+    const terms = expandSearchTerms(normalized.search);
+    const orClause = buildProductSearchOrClause(terms);
+    if (orClause) builder = builder.or(orClause);
+  }
+  if (normalized.featured) {
+    builder = builder.eq("is_featured", true);
+  }
+  if (categoryId) {
+    builder = builder.eq("category_id", categoryId);
+  }
+  if (normalized.minPrice != null) {
+    builder = builder.gte("retail_price", normalized.minPrice);
+  }
+  if (normalized.maxPrice != null) {
+    builder = builder.lte("retail_price", normalized.maxPrice);
+  }
+  if (normalized.productType) {
+    builder = builder.eq("product_type", normalized.productType);
+  }
+  if (normalized.inStock) {
+    builder = builder.gt("stock_qty", 0);
+  }
+  builder = applyAttributeFilter(builder, "style", normalized.style);
+  builder = applyAttributeFilter(builder, "color", normalized.color);
+  builder = applyAttributeFilter(builder, "material", normalized.material);
+  return builder;
+}
 
 const categoryCache = new Map<string, { slug: string; name: string }>();
 
@@ -125,17 +183,7 @@ export async function listPublicProducts(
     .from("products_public")
     .select("*", { count: "exact" });
 
-  if (normalized.search) {
-    builder = builder.or(
-      `name.ilike.%${normalized.search}%,sku.ilike.%${normalized.search}%,slug.ilike.%${normalized.search}%`,
-    );
-  }
-  if (normalized.featured) {
-    builder = builder.eq("is_featured", true);
-  }
-  if (categoryId) {
-    builder = builder.eq("category_id", categoryId);
-  }
+  builder = applyProductFilters(builder, normalized, categoryId);
 
   const sortCol = normalized.sortBy ?? "created_at";
   builder = builder.order(sortCol, {
@@ -224,4 +272,93 @@ export async function getPublicProductsByIds(
   return ids
     .map((id) => byId.get(id))
     .filter((product): product is ProductPublicDto => Boolean(product));
+}
+
+function countAttributeValues(
+  rows: ProductRow[],
+  key: string,
+): Array<{ value: string; count: number }> {
+  const counts = new Map<string, number>();
+  for (const row of rows) {
+    const raw = row.attributes?.[key];
+    if (raw == null) continue;
+    const values = Array.isArray(raw) ? raw : [raw];
+    for (const v of values) {
+      const str = String(v).trim();
+      if (!str) continue;
+      counts.set(str, (counts.get(str) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .map(([value, count]) => ({ value, count }))
+    .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
+}
+
+export async function getShopFilterFacets(
+  supabase: SupabaseClient,
+): Promise<ShopFilterFacets> {
+  const categories = await loadCategoryMap(supabase);
+  const { data, error } = await supabase
+    .from("products_public")
+    .select("category_id, retail_price, attributes");
+
+  if (error) {
+    if (error.code === "42P01" || error.message.includes("does not exist")) {
+      return {
+        priceRange: { min: 0, max: 10000 },
+        categories: [],
+        styles: [],
+        colors: [],
+        materials: [],
+      };
+    }
+    throw new Error(error.message);
+  }
+
+  const rows = (data ?? []) as Array<{
+    category_id: string | null;
+    retail_price: number;
+    attributes: Record<string, unknown> | null;
+  }>;
+
+  const categoryCounts = new Map<string, number>();
+  let minPrice = Infinity;
+  let maxPrice = 0;
+
+  for (const row of rows) {
+    const price = Number(row.retail_price);
+    if (Number.isFinite(price)) {
+      minPrice = Math.min(minPrice, price);
+      maxPrice = Math.max(maxPrice, price);
+    }
+    if (row.category_id) {
+      categoryCounts.set(
+        row.category_id,
+        (categoryCounts.get(row.category_id) ?? 0) + 1,
+      );
+    }
+  }
+
+  const facetRows = rows.map((r) => ({
+    attributes: r.attributes,
+  })) as ProductRow[];
+
+  const categoryList = [...categories.entries()]
+    .map(([id, cat]) => ({
+      slug: cat.slug,
+      name: cat.name,
+      count: categoryCounts.get(id) ?? 0,
+    }))
+    .filter((c) => c.count > 0);
+
+  return {
+    priceRange: {
+      min: Number.isFinite(minPrice) ? Math.floor(minPrice) : 0,
+      max: maxPrice > 0 ? Math.ceil(maxPrice) : 10000,
+    },
+    categories: categoryList,
+    styles: countAttributeValues(facetRows, "style"),
+    colors: countAttributeValues(facetRows, "color"),
+    materials: countAttributeValues(facetRows, "material"),
+  };
 }

@@ -6,6 +6,13 @@ export const productListSchema = z.object({
   category: z.string().optional(),
   search: z.string().optional(),
   featured: z.boolean().optional(),
+  minPrice: z.number().min(0).optional(),
+  maxPrice: z.number().min(0).optional(),
+  productType: z.enum(["standard", "custom"]).optional(),
+  inStock: z.boolean().optional(),
+  style: z.array(z.string()).optional(),
+  color: z.array(z.string()).optional(),
+  material: z.array(z.string()).optional(),
   sortBy: z.enum(["name", "retail_price", "created_at"]).optional(),
   sortDir: z.enum(["asc", "desc"]).optional(),
 });

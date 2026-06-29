@@ -59,7 +59,10 @@ export function resolveProductTypeShowcase(
 
   return {
     imageUrl:
-      metaImage ?? matched?.imageUrl ?? CONFIGURATOR_FALLBACK_IMAGES[key] ?? null,
+      metaImage ??
+      matched?.imageUrl ??
+      CONFIGURATOR_FALLBACK_IMAGES[key] ??
+      null,
     description:
       metaDesc ?? matched?.description ?? FALLBACK_DESCRIPTIONS[key] ?? null,
     startingPrice: matched?.retailPrice ?? null,

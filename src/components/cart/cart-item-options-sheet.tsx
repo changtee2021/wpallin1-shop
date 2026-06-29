@@ -1,7 +1,8 @@
-import { ChevronRight, Loader2 } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { InlineRowsSkeleton } from "@/components/loading";
 import { ProductOptionSelectors } from "@/components/storefront/product-option-selectors";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,9 +39,8 @@ export function CartItemOptionsSheet({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [optionGroups, setOptionGroups] = useState<ProductOptionGroupDto[]>([]);
-  const [selectedOptions, setSelectedOptions] = useState<SelectedProductOptions>(
-    {},
-  );
+  const [selectedOptions, setSelectedOptions] =
+    useState<SelectedProductOptions>({});
 
   useEffect(() => {
     if (!open || !item?.productId || !item.optionsEditable) {
@@ -101,10 +101,7 @@ export function CartItemOptionsSheet({
 
         <div className="py-2">
           {loading ? (
-            <div className="flex items-center justify-center gap-2 py-12 text-muted-foreground">
-              <Loader2 className="size-5 animate-spin" />
-              กำลังโหลดตัวเลือก...
-            </div>
+            <InlineRowsSkeleton rows={4} className="py-4" />
           ) : !optionGroups.length ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
               สินค้านี้ไม่มีตัวเลือกให้แก้ไข

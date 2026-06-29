@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -77,7 +78,7 @@ function AdminCreditPage() {
   }
 
   if (loading) {
-    return <p className="text-muted-foreground">กำลังโหลด...</p>;
+    return <PageLoading variant="table" />;
   }
 
   return (

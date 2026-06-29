@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,10 @@ function DealerDashboardPage() {
   useEffect(() => {
     void fetchDealerDashboard(authServerFnOptions(session)).then(setStats);
   }, [session]);
+
+  if (!stats) {
+    return <PageLoading variant="dashboard" />;
+  }
 
   return (
     <div>

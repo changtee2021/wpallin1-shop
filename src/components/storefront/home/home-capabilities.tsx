@@ -14,7 +14,7 @@ export function HomeCapabilities() {
           alt="ม่านในฝัน แค่ปลายนิ้ว — WP ALL"
           loading="lazy"
           decoding="async"
-          className="aspect-[2.4/1] w-full object-cover transition-transform duration-300 group-hover:scale-[1.01] sm:aspect-[2.8/1] lg:aspect-[3/1]"
+          className="aspect-[2.4/1] w-full object-cover transition-transform duration-300 group-hover:scale-[1.01] sm:aspect-[2.8/1] md:aspect-[3/1]"
         />
       </Link>
     </section>

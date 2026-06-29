@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,10 +20,18 @@ function DealerCatalogPage() {
   const { t } = useT();
   const { session } = useAuth();
   const [products, setProducts] = useState<DealerProductDto[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    void fetchDealerCatalog(authServerFnOptions(session)).then(setProducts);
+    setLoading(true);
+    void fetchDealerCatalog(authServerFnOptions(session))
+      .then(setProducts)
+      .finally(() => setLoading(false));
   }, [session]);
+
+  if (loading) {
+    return <PageLoading variant="grid" />;
+  }
 
   return (
     <div>

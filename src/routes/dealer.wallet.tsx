@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,13 +24,24 @@ function DealerWalletPage() {
   const { session } = useAuth();
   const [balance, setBalance] = useState(0);
   const [txs, setTxs] = useState<WalletTransactionDto[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    void fetchWalletSummary(authServerFnOptions(session)).then((w) =>
-      setBalance(w.availableBalance),
-    );
-    void fetchWalletTransactions(authServerFnOptions(session)).then(setTxs);
+    setLoading(true);
+    void Promise.all([
+      fetchWalletSummary(authServerFnOptions(session)),
+      fetchWalletTransactions(authServerFnOptions(session)),
+    ])
+      .then(([wallet, transactions]) => {
+        setBalance(wallet.availableBalance);
+        setTxs(transactions);
+      })
+      .finally(() => setLoading(false));
   }, [session]);
+
+  if (loading) {
+    return <PageLoading variant="list" />;
+  }
 
   return (
     <div>

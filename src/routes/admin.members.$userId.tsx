@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -73,7 +74,7 @@ function AdminMemberDetailPage() {
     void load().finally(() => setLoading(false));
   }, [session, userId]);
 
-  if (loading) return <p className="text-muted-foreground">กำลังโหลด...</p>;
+  if (loading) return <PageLoading variant="detail" />;
   if (!member) return <p className="text-muted-foreground">ไม่พบสมาชิก</p>;
 
   return (

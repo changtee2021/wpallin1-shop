@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -76,7 +77,7 @@ function AccountOrdersPage() {
         description="ประวัติคำสั่งซื้อของคุณ"
       />
       {loading ? (
-        <p className="text-muted-foreground">{t("common.loading")}</p>
+        <PageLoading variant="list" />
       ) : orders.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center text-muted-foreground">

@@ -1,4 +1,6 @@
 import { Loader2 } from "lucide-react";
+
+import { InlineRowsSkeleton } from "@/components/loading";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
@@ -229,7 +231,7 @@ export function BankBookPanel({
         </CardHeader>
         <CardContent className="space-y-2">
           {loadingDocs ? (
-            <p className="text-sm text-muted-foreground">กำลังโหลด...</p>
+            <InlineRowsSkeleton rows={3} />
           ) : docs.length === 0 ? (
             <p className="text-sm text-muted-foreground">ยังไม่มีเอกสาร</p>
           ) : (

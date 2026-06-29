@@ -51,7 +51,7 @@ export function ConfiguratorForm({
     !!price;
 
   return (
-    <div className="flex min-w-0 max-h-[calc(100vh-8rem)] flex-col rounded-xl border bg-card lg:max-h-[calc(100vh-6rem)] lg:z-10">
+    <div className="flex min-w-0 max-h-[calc(100vh-8rem)] flex-col rounded-xl border bg-card md:max-h-[calc(100vh-6rem)] md:z-10">
       <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overflow-x-hidden p-4">
         <div className="space-y-2">
           <button

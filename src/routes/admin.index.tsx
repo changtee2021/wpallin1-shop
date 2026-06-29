@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
@@ -22,6 +23,8 @@ function AdminOverviewPage() {
   useEffect(() => {
     void fetchAdminDashboard(authServerFnOptions(session)).then(setStats);
   }, [session]);
+
+  if (!stats) return <PageLoading variant="dashboard" />;
 
   const cards = [
     {

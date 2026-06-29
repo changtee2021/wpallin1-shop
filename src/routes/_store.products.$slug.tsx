@@ -3,6 +3,7 @@ import { CheckCircle2, PackageCheck, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { ProductMarketingCatalogs } from "@/components/storefront/product-marketing-catalogs";
 import { ProductImage } from "@/components/storefront/product-image";
 import { ProductOptionSelectors } from "@/components/storefront/product-option-selectors";
@@ -103,6 +104,7 @@ export const Route = createFileRoute("/_store/products/$slug")({
 
     return { product, reviewSummary, marketingCatalogs };
   },
+  pendingComponent: () => <PageLoading variant="detail" />,
   component: ProductDetailPage,
 });
 
@@ -169,7 +171,7 @@ function ProductDetailPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 pb-24 sm:px-6 md:pb-8">
-      <div className="grid gap-10 lg:grid-cols-2">
+      <div className="grid gap-10 md:grid-cols-2">
         <div className="aspect-square overflow-hidden rounded-2xl bg-muted/30">
           <ProductImage src={product.imageUrl} alt={product.name} />
         </div>

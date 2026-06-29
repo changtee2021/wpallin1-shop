@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -193,7 +194,7 @@ function AdminSupportPage() {
           </div>
 
           {loading ? (
-            <p className="text-muted-foreground">กำลังโหลด...</p>
+            <PageLoading variant="table" />
           ) : tickets.length === 0 ? (
             <Card>
               <CardContent className="p-8 text-center text-muted-foreground">
@@ -244,7 +245,7 @@ function AdminSupportPage() {
           </div>
 
           {loading ? (
-            <p className="text-muted-foreground">กำลังโหลด...</p>
+            <PageLoading variant="table" />
           ) : guestItems.length === 0 ? (
             <Card>
               <CardContent className="p-8 text-center text-muted-foreground">
@@ -296,7 +297,7 @@ function AdminSupportPage() {
             <DialogTitle>{detail?.subject ?? "Ticket"}</DialogTitle>
           </DialogHeader>
           {detailLoading || !detail ? (
-            <p className="text-muted-foreground">กำลังโหลด...</p>
+            <PageLoading variant="table" />
           ) : (
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">

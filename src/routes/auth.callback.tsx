@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
+import { navigateAfterAuth } from "@/lib/auth-errors";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth/callback")({
@@ -14,7 +15,11 @@ function AuthCallbackPage() {
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => {
-      navigate({ to: data.session ? "/account" : "/login" });
+      if (data.session) {
+        navigateAfterAuth(navigate);
+        return;
+      }
+      void navigate({ to: "/login" });
     });
   }, [navigate]);
 

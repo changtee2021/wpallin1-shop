@@ -15,8 +15,8 @@ function AdminLayout() {
   return (
     <div className="min-h-screen bg-muted/30 pb-20 md:pb-0">
       <StorefrontHeader />
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[220px_1fr]">
-        <div className="hidden lg:block">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 md:grid-cols-[220px_1fr]">
+        <div className="hidden md:block">
           <AdminSidebar />
         </div>
         <div className="min-w-0">

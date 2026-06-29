@@ -33,9 +33,10 @@ export function CatalogSearchSheet({
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<PdfSearchHit[]>([]);
   const [searching, setSearching] = useState(false);
-  const [progress, setProgress] = useState<{ page: number; total: number } | null>(
-    null,
-  );
+  const [progress, setProgress] = useState<{
+    page: number;
+    total: number;
+  } | null>(null);
   const [docRef, setDocRef] = useState<PdfDocumentHandle | null>(null);
 
   const ensureDoc = useCallback(async () => {
@@ -78,7 +79,11 @@ export function CatalogSearchSheet({
               if (e.key === "Enter") void runSearch();
             }}
           />
-          <Button type="button" onClick={() => void runSearch()} disabled={searching}>
+          <Button
+            type="button"
+            onClick={() => void runSearch()}
+            disabled={searching}
+          >
             {searching ? (
               <Loader2 className="size-4 animate-spin" />
             ) : (

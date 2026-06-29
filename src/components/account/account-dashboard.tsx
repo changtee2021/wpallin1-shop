@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { CreditCard, Heart, Package, Receipt } from "lucide-react";
 
+import { InlineRowsSkeleton } from "@/components/loading";
+import { DealerApplicationBannerSection } from "@/components/dealer/dealer-application-banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -118,6 +120,8 @@ export function AccountDashboard({
         </Card>
       )}
 
+      <DealerApplicationBannerSection />
+
       <section>
         <div className="grid grid-cols-3 gap-x-4 gap-y-6">
           <ShortcutLink
@@ -217,7 +221,7 @@ export function AccountDashboard({
           </div>
 
           {loading ? (
-            <p className="text-sm text-muted-foreground">กำลังโหลด...</p>
+            <InlineRowsSkeleton rows={4} />
           ) : displayOrders.length === 0 ? (
             <p className="py-6 text-center text-sm text-muted-foreground">
               {orderTab === "all"

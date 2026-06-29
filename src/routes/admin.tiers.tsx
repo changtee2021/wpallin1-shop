@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -90,12 +91,12 @@ function AdminTiersPage() {
         description="กำหนดยอดซื้อสะสม ส่วนลด และซิงก์ราคาต่อสินค้า"
       />
       {loading ? (
-        <p className="text-muted-foreground">กำลังโหลด...</p>
+        <PageLoading variant="table" />
       ) : (
         <div className="space-y-4">
           {tiers.map((tier) => (
             <Card key={tier.tier}>
-              <CardContent className="grid gap-4 p-4 lg:grid-cols-[1fr_auto]">
+              <CardContent className="grid gap-4 p-4 md:grid-cols-[1fr_auto]">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label>รหัส tier</Label>
@@ -157,7 +158,7 @@ function AdminTiersPage() {
                     </span>
                   </div>
                 </div>
-                <div className="flex flex-col gap-2 lg:items-end">
+                <div className="flex flex-col gap-2 md:items-end">
                   <Button
                     onClick={() => void handleSave(tier)}
                     disabled={saving === tier.tier}

@@ -9,7 +9,6 @@ import { CompareProvider } from "@/hooks/use-compare";
 import { captureAffiliateRefFromUrl } from "@/lib/affiliate-cookie";
 
 export const Route = createFileRoute("/_store")({
-  ssr: false,
   component: StoreLayout,
 });
 
