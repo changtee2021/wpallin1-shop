@@ -107,8 +107,11 @@ export async function loginAsAdmin(page: Page) {
   const { email, password } = smokeCredentials();
 
   await page.goto("/login");
-  await page.getByLabel(/อีเมล|email/i).first().fill(email);
-  await page.getByLabel(/รหัสผ่าน|password/i).first().fill(password);
+  await page.locator('input[type="email"], input[name="email"]').first().fill(email);
+  await page
+    .locator('input[type="password"], input[name="password"]')
+    .first()
+    .fill(password);
   await page.locator('form button[type="submit"]').click();
 
   await page.waitForURL(/\/account/, { timeout: 20_000 });

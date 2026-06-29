@@ -17,20 +17,49 @@ export const Route = createFileRoute("/dealer/quotations")({
 });
 
 function DealerQuotationsPage() {
-  const { session } = useAuth();
+  const { session, loading: authLoading } = useAuth();
   const [quotes, setQuotes] = useState<QuotationDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const authOpts = useAuthServerFnOptions(session);
 
   useEffect(() => {
-    setLoading(true);
-    void fetchUserQuotations(authOpts)
-      .then(setQuotes)
-      .finally(() => setLoading(false));
-  }, [authOpts]);
+    if (authLoading || !session?.access_token) return;
 
-  if (loading) {
+    let cancelled = false;
+    setLoading(true);
+    setLoadError(null);
+
+    void fetchUserQuotations(authOpts)
+      .then((data) => {
+        if (!cancelled) setQuotes(data);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setLoadError(
+            err instanceof Error ? err.message : "โหลดข้อมูลไม่สำเร็จ",
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, authOpts, session?.access_token]);
+
+  if (authLoading || loading) {
     return <PageLoading variant="list" />;
+  }
+
+  if (loadError) {
+    return (
+      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+        {loadError}
+      </div>
+    );
   }
 
   return (

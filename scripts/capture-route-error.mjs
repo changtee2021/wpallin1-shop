@@ -32,9 +32,9 @@ page.on("console", (msg) => {
 });
 
 await page.goto(`${baseURL}/login`, { waitUntil: "domcontentloaded" });
-await page.getByLabel(/อีเมล|email/i).first().fill(process.env.SMOKE_TEST_EMAIL);
+await page.locator('input[type="email"], input[name="email"]').first().fill(process.env.SMOKE_TEST_EMAIL);
 await page
-  .getByLabel(/รหัสผ่าน|password/i)
+  .locator('input[type="password"], input[name="password"]')
   .first()
   .fill(process.env.SMOKE_TEST_PASSWORD);
 await page.locator('form button[type="submit"]').first().click();

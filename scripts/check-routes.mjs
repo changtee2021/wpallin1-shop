@@ -94,8 +94,11 @@ for (const route of PUBLIC_ROUTES) {
 if (email && password) {
   console.log("\nLogging in...");
   await page.goto(`${baseURL}/login`, { waitUntil: "domcontentloaded" });
-  await page.getByLabel(/อีเมล|email/i).first().fill(email);
-  await page.getByLabel(/รหัสผ่าน|password/i).first().fill(password);
+  await page.locator('input[type="email"], input[name="email"]').first().fill(email);
+  await page
+    .locator('input[type="password"], input[name="password"]')
+    .first()
+    .fill(password);
   await page.locator('form button[type="submit"]').first().click();
   await page.waitForURL(/\/account/, { timeout: 30_000 }).catch(() => {});
   console.log(`After login URL: ${page.url()}`);

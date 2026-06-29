@@ -21,26 +21,55 @@ export const Route = createFileRoute("/dealer/wallet")({
 
 function DealerWalletPage() {
   const { t } = useT();
-  const { session } = useAuth();
+  const { session, loading: authLoading } = useAuth();
   const [balance, setBalance] = useState(0);
   const [txs, setTxs] = useState<WalletTransactionDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (authLoading || !session?.access_token) return;
+
+    let cancelled = false;
     setLoading(true);
+    setLoadError(null);
+
     void Promise.all([
       fetchWalletSummary(authServerFnOptions(session)),
       fetchWalletTransactions(authServerFnOptions(session)),
     ])
       .then(([wallet, transactions]) => {
-        setBalance(wallet.availableBalance);
-        setTxs(transactions);
+        if (!cancelled) {
+          setBalance(wallet.availableBalance);
+          setTxs(transactions);
+        }
       })
-      .finally(() => setLoading(false));
-  }, [session]);
+      .catch((err) => {
+        if (!cancelled) {
+          setLoadError(
+            err instanceof Error ? err.message : "โหลดข้อมูลไม่สำเร็จ",
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
 
-  if (loading) {
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, session?.access_token]);
+
+  if (authLoading || loading) {
     return <PageLoading variant="list" />;
+  }
+
+  if (loadError) {
+    return (
+      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+        {loadError}
+      </div>
+    );
   }
 
   return (

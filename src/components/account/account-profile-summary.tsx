@@ -68,6 +68,13 @@ export function AccountProfileSummary({
         setWalletBalance(wallet.availableBalance);
         setWalletPending(wallet.pendingBalance);
         setTierProgress(tier);
+      } catch {
+        if (!cancelled) {
+          setProfile(null);
+          setWalletBalance(0);
+          setWalletPending(0);
+          setTierProgress(null);
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }

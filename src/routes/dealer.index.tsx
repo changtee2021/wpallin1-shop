@@ -18,19 +18,47 @@ export const Route = createFileRoute("/dealer/")({
 
 function DealerDashboardPage() {
   const { t } = useT();
-  const { session } = useAuth();
+  const { session, loading: authLoading } = useAuth();
   const [stats, setStats] = useState<{
     tier: string;
     orderCount: number;
     totalSpent: number;
   } | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    void fetchDealerDashboard(authServerFnOptions(session)).then(setStats);
-  }, [session]);
+    if (authLoading || !session?.access_token) return;
 
-  if (!stats) {
+    let cancelled = false;
+    setLoadError(null);
+
+    void fetchDealerDashboard(authServerFnOptions(session))
+      .then((data) => {
+        if (!cancelled) setStats(data);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setLoadError(
+            err instanceof Error ? err.message : "โหลดข้อมูลไม่สำเร็จ",
+          );
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, session?.access_token]);
+
+  if (authLoading || (!stats && !loadError)) {
     return <PageLoading variant="dashboard" />;
+  }
+
+  if (loadError || !stats) {
+    return (
+      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+        {loadError ?? "โหลดข้อมูลไม่สำเร็จ"}
+      </div>
+    );
   }
 
   return (

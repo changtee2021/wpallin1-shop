@@ -18,19 +18,48 @@ export const Route = createFileRoute("/dealer/catalog")({
 
 function DealerCatalogPage() {
   const { t } = useT();
-  const { session } = useAuth();
+  const { session, loading: authLoading } = useAuth();
   const [products, setProducts] = useState<DealerProductDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    void fetchDealerCatalog(authServerFnOptions(session))
-      .then(setProducts)
-      .finally(() => setLoading(false));
-  }, [session]);
+    if (authLoading || !session?.access_token) return;
 
-  if (loading) {
+    let cancelled = false;
+    setLoading(true);
+    setLoadError(null);
+
+    void fetchDealerCatalog(authServerFnOptions(session))
+      .then((data) => {
+        if (!cancelled) setProducts(data);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setLoadError(
+            err instanceof Error ? err.message : "โหลดข้อมูลไม่สำเร็จ",
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, session?.access_token]);
+
+  if (authLoading || loading) {
     return <PageLoading variant="grid" />;
+  }
+
+  if (loadError) {
+    return (
+      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+        {loadError}
+      </div>
+    );
   }
 
   return (
