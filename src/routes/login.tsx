@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { GoogleAuthButton, PasswordInput } from "@/components/auth/auth-fields";
+import { PageLoading } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -25,7 +26,7 @@ import {
   POST_AUTH_PATH,
   safeAuthRedirect,
 } from "@/lib/auth-errors";
-import { supabase } from "@/integrations/supabase/client";
+import { getSessionUser } from "@/lib/auth-session";
 
 const loginSearchSchema = z.object({
   tab: z.enum(["login", "signup"]).optional().catch("login"),
@@ -37,10 +38,16 @@ type AuthView = "tabs" | "forgot" | "verify-email";
 export const Route = createFileRoute("/login")({
   ssr: false,
   validateSearch: (search) => loginSearchSchema.parse(search),
-  beforeLoad: async () => {
-    const { data } = await supabase.auth.getUser();
-    if (data.user) {
-      throw routerRedirect({ to: POST_AUTH_PATH });
+  pendingComponent: () => (
+    <PageLoading variant="detail" className="min-h-screen" />
+  ),
+  beforeLoad: async ({ search }) => {
+    const user = await getSessionUser();
+    if (user) {
+      const to = search.redirect
+        ? safeAuthRedirect(search.redirect)
+        : POST_AUTH_PATH;
+      throw routerRedirect({ to });
     }
   },
   component: LoginPage,

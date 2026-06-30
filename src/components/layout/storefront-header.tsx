@@ -13,6 +13,7 @@ import { useT } from "@/i18n";
 
 const navLinks = [
   { to: "/order" as const, key: "nav.order" as const },
+  { to: "/inspiration" as const, key: "nav.inspiration" as const },
   { to: "/shop" as const, key: "nav.shop" as const },
   { to: "/catalogs" as const, key: "nav.catalogs" as const },
   { to: "/dealer/register" as const, key: "nav.dealerRegister" as const },

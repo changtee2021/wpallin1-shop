@@ -28,6 +28,7 @@ const password = process.env.SMOKE_TEST_PASSWORD?.trim() ?? "";
 
 const PUBLIC_ROUTES = [
   "/",
+  "/order",
   "/shop",
   "/inspiration",
   "/configurator",

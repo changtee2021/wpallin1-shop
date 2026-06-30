@@ -1,14 +1,15 @@
 import { redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { getSessionUser } from "@/lib/auth-session";
 import { ADMIN_ROLES, DEALER_ROLES, hasAnyRole } from "@/types/api/profile";
 import { listUserRoles } from "@/services/profile.service";
 
 export async function requireAuth() {
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) {
+  const user = await getSessionUser();
+  if (!user) {
     throw redirect({ to: "/login" });
   }
-  return data.user;
+  return user;
 }
 
 async function loadRolesSafe(userId: string): Promise<string[]> {
