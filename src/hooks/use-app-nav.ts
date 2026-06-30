@@ -1,16 +1,17 @@
 import { useLocation, useMatchRoute } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 import {
+  FileText,
   Home,
+  LayoutDashboard,
   MoreHorizontal,
   Package,
   ShoppingBag,
   ShoppingCart,
   Store,
   User,
-  Wallet,
-  FileText,
   Users,
+  Wallet,
   Zap,
 } from "lucide-react";
 
