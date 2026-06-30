@@ -32,11 +32,7 @@ export function ChatUiProvider({ children }: { children: ReactNode }) {
 }
 
 export function useChatUi() {
-  const ctx = useContext(ChatUiContext);
-  if (!ctx) {
-    throw new Error("useChatUi must be used within ChatUiProvider");
-  }
-  return ctx;
+  return useContext(ChatUiContext) ?? noopChatUi;
 }
 
 const noopChatUi: ChatUiContextValue = {
