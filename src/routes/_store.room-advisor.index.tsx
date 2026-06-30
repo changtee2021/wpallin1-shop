@@ -3,7 +3,6 @@ import { Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { PageHeader } from "@/components/layout/page-header";
 import { RoomAdvisorHero } from "@/components/room-advisor/room-advisor-hero";
 import {
   RoomPhotoUploader,
@@ -81,10 +80,6 @@ function RoomAdvisorIndexPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-8 px-4 py-8 sm:px-6">
-      <PageHeader
-        title="AI ที่ปรึกษาห้อง"
-        description="อัปโหลดรูปหน้างาน — AI แนะนำสไตล์และม่านที่เหมาะ"
-      />
       <RoomAdvisorHero />
       <RoomPhotoUploader
         photos={photos}

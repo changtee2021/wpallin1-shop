@@ -2,6 +2,22 @@ import { useEffect, useRef } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 
+function removeChannelSafe(
+  channel: ReturnType<typeof supabase.channel>,
+) {
+  try {
+    void channel.unsubscribe();
+  } catch {
+    // ignore — channel may already be torn down
+  }
+  void supabase.removeChannel(channel);
+}
+
+/**
+ * Live notification inserts for the signed-in user.
+ * Uses a unique channel topic per mount so React re-runs / HMR cannot
+ * call `.on()` after an existing channel has already subscribed.
+ */
 export function useNotificationsRealtime(
   userId: string | undefined,
   onChange: () => void,
@@ -12,22 +28,32 @@ export function useNotificationsRealtime(
   useEffect(() => {
     if (!userId) return;
 
-    const channel = supabase
-      .channel(`notifications:${userId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "wpall_retail",
-          table: "notifications",
-          filter: `user_id=eq.${userId}`,
-        },
-        () => onChangeRef.current(),
-      )
-      .subscribe();
+    const topic = `notifications:${userId}:${crypto.randomUUID()}`;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    try {
+      channel = supabase
+        .channel(topic)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "wpall_retail",
+            table: "notifications",
+            filter: `user_id=eq.${userId}`,
+          },
+          () => {
+            void onChangeRef.current();
+          },
+        )
+        .subscribe();
+    } catch (err) {
+      console.warn("[notifications-realtime] subscribe failed:", err);
+      return;
+    }
 
     return () => {
-      void supabase.removeChannel(channel);
+      if (channel) removeChannelSafe(channel);
     };
   }, [userId]);
 }

@@ -34,6 +34,7 @@ export function SearchBar({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t("common.search")}
+        aria-label={t("common.search")}
         className={`border-primary/20 bg-white pl-10 ${compact ? "h-9" : "h-10"}`}
       />
     </form>

@@ -21,7 +21,7 @@ export function CategoryImageGrid({
   return (
     <div
       className={cn(
-        "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:gap-x-4 md:gap-y-5",
+        "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:gap-5 lg:gap-6",
         className,
       )}
     >

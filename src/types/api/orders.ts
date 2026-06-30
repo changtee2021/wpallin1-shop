@@ -24,6 +24,7 @@ export type OrderSummaryDto = {
 
 export type OrderItemDto = {
   id: string;
+  productId: string | null;
   productName: string;
   sku: string | null;
   qty: number;

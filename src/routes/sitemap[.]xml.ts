@@ -53,10 +53,12 @@ export const Route = createFileRoute("/sitemap.xml")({
               pageSize: 100,
             });
             productEntries.push(
-              ...batch.data.map((product) => ({
-                path: `/products/${product.slug}`,
-                lastmod: formatLastmod(product.createdAt),
-              })),
+              ...batch.data
+                .filter((product) => !product.isMock)
+                .map((product) => ({
+                  path: `/products/${product.slug}`,
+                  lastmod: formatLastmod(product.createdAt),
+                })),
             );
             totalPages = Math.max(1, batch.meta.totalPages || 1);
             page += 1;

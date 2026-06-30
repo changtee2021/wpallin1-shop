@@ -22,7 +22,7 @@ export const CONFIGURATOR_FALLBACK_IMAGES: Record<string, string> = {
 };
 
 const FALLBACK_DESCRIPTIONS: Record<string, string> = {
-  pleated: "ม่านจีบคลassic ให้รูปลอนสวยงาม เหมาะห้องรับแขก",
+  pleated: "ม่านจีบคลาสสิก ให้รูปลอนสวยงาม เหมาะห้องรับแขก",
   eyelet: "ม่านตาไก่ ติดตั้งง่าย ดูโมเดิร์น",
   wave: "ม่าน Wave โค้งนุ่ม ให้ความรู้สึกหรูหรา",
 };

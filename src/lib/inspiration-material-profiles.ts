@@ -443,7 +443,7 @@ const PROFILE_CONTENT: Record<ProfileFamily, LocalizedMaterialProfile> = {
   },
   pleated: {
     composition: lt(
-      "หัวม่านจีบคลassic + ตะขอ/สเตย์ตามแบบ",
+      "หัวม่านจีบคลาสสิก + ตะขอ/สเตย์ตามแบบ",
       "Classic pleated heading with hooks and stays",
     ),
     texture: lt(
@@ -483,7 +483,7 @@ const PROFILE_CONTENT: Record<ProfileFamily, LocalizedMaterialProfile> = {
       lt("ห้องประชุม", "Meeting room"),
     ],
     bestFor: [
-      lt("งานคลassic", "Classic interiors"),
+      lt("งานคลาสสิก", "Classic interiors"),
       lt("พื้นที่ formal", "Formal spaces"),
       lt("ต้องการ volume ม่าน", "Full curtain volume"),
     ],

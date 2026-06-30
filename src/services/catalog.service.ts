@@ -2,6 +2,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { emptyProductList, normalizeProductListQuery } from "@/domain/catalog";
 import {
+  isMockProductSource,
+  sortProductsMockLast,
+} from "@/domain/mock-product";
+import {
   buildProductSearchOrClause,
   escapeIlike,
   expandSearchTerms,
@@ -140,6 +144,7 @@ function mapProduct(
         : null,
     optionGroups: [],
     createdAt: row.created_at,
+    isMock: isMockProductSource(row),
   };
 }
 
@@ -185,10 +190,15 @@ export async function listPublicProducts(
 
   builder = applyProductFilters(builder, normalized, categoryId);
 
-  const sortCol = normalized.sortBy ?? "created_at";
-  builder = builder.order(sortCol, {
-    ascending: normalized.sortDir !== "desc",
-  });
+  if (normalized.sortBy) {
+    builder = builder.order(normalized.sortBy, {
+      ascending: normalized.sortDir !== "desc",
+    });
+  } else {
+    builder = builder
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+  }
   builder = builder.range(normalized.from, normalized.to);
 
   const { data, error, count } = await builder;
@@ -201,8 +211,11 @@ export async function listPublicProducts(
   }
 
   const total = count ?? 0;
+  const mapped = (data ?? []).map((row) =>
+    mapProduct(row as ProductRow, categories),
+  );
   return {
-    data: (data ?? []).map((row) => mapProduct(row as ProductRow, categories)),
+    data: normalized.sortBy ? mapped : sortProductsMockLast(mapped),
     meta: {
       page: normalized.page,
       pageSize: normalized.pageSize,

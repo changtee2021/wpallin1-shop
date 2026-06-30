@@ -12,7 +12,7 @@ import { useChatUiSafe } from "@/hooks/use-chat-ui";
 import { useT } from "@/i18n";
 
 const navLinks = [
-  { to: "/order" as const, key: "nav.order" as const },
+  { to: "/" as const, key: "nav.home" as const, exact: true },
   { to: "/inspiration" as const, key: "nav.inspiration" as const },
   { to: "/shop" as const, key: "nav.shop" as const },
   { to: "/catalogs" as const, key: "nav.catalogs" as const },
@@ -30,28 +30,38 @@ export function StorefrontHeader() {
 
   return (
     <header className="sticky top-0 z-40 bg-gradient-to-r from-primary to-[#126B68] text-white shadow-md">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex h-14 items-center gap-2 sm:h-16 sm:gap-3 md:gap-6">
-          <Link to="/" className="flex shrink-0 items-center">
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        {/* Mobile: logo · search · bell */}
+        <div className="flex h-14 items-center gap-2 py-1 md:hidden">
+          <Link to="/" className="flex shrink-0 items-center" aria-label={t("nav.home")}>
             <img
               src="/brand/logo-mono-dark.png"
               alt="WP ALL"
-              className="h-8 w-auto object-contain mix-blend-screen sm:h-10"
+              className="h-8 w-auto object-contain mix-blend-screen"
             />
           </Link>
+          <SearchBar compact className="min-w-0" />
+          {user ? (
+            <NotificationBell triggerClassName={headerIconClass} />
+          ) : null}
+        </div>
 
-          <div className="min-w-0 flex-1 md:hidden">
-            <SearchBar compact />
-          </div>
-
-          <div className="hidden min-w-0 flex-1 md:block">
+        {/* Desktop: logo · search · actions */}
+        <div className="hidden h-16 items-center gap-4 md:flex lg:gap-6">
+          <Link to="/" className="flex shrink-0 items-center" aria-label={t("nav.home")}>
+            <img
+              src="/brand/logo-mono-dark.png"
+              alt="WP ALL"
+              className="h-10 w-auto object-contain mix-blend-screen"
+            />
+          </Link>
+          <div className="min-w-0 flex-1">
             <SearchBar />
           </div>
-
-          <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <Button
               size="sm"
-              className="hidden bg-accent hover:bg-accent/90 sm:inline-flex"
+              className="bg-accent hover:bg-accent/90"
               asChild
             >
               <Link to="/order">
@@ -65,7 +75,7 @@ export function StorefrontHeader() {
             <Button
               variant="ghost"
               size="icon"
-              className={`relative hidden rounded-full md:inline-flex ${headerIconClass}`}
+              className={`relative rounded-full ${headerIconClass}`}
               asChild
             >
               <Link to="/cart" aria-label={t("nav.cart")}>
@@ -92,7 +102,7 @@ export function StorefrontHeader() {
                 </Button>
                 <Button
                   size="sm"
-                  className="hidden bg-accent hover:bg-accent/90 sm:inline-flex"
+                  className="bg-accent hover:bg-accent/90"
                   asChild
                 >
                   <Link to="/login">{t("nav.login")}</Link>
@@ -102,13 +112,14 @@ export function StorefrontHeader() {
           </div>
         </div>
 
-        <nav className="hidden border-t border-white/15 py-2 md:flex md:items-center md:justify-center md:gap-6">
+        <nav className="hidden border-t border-white/15 py-2.5 md:flex md:items-center md:justify-center md:gap-8 lg:gap-10">
           {navLinks.map((item) => (
             <Link
               key={item.to}
               to={item.to}
               className="text-sm font-medium text-white/80 transition-colors hover:text-white"
               activeProps={{ className: "text-white font-semibold" }}
+              activeOptions={item.exact ? { exact: true } : undefined}
             >
               {t(item.key)}
             </Link>

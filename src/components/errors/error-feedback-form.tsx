@@ -39,6 +39,7 @@ export function ErrorFeedbackForm({
     phone: "",
     subject: defaultSubject,
     message: defaultMessage,
+    companyWebsite: "",
   });
 
   async function handleSubmit(e: React.FormEvent) {
@@ -59,7 +60,7 @@ export function ErrorFeedbackForm({
           ? "ส่งรายงานแล้ว — ทีมงานจะติดต่อกลับทางอีเมล"
           : `รับเรื่องแล้ว (Ref: ${result.referenceId.slice(0, 8)})`,
       );
-      setForm({ ...form, subject: "", message: "" });
+      setForm({ ...form, subject: "", message: "", companyWebsite: "" });
       onSubmitted?.();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "ส่งไม่สำเร็จ");
@@ -81,6 +82,18 @@ export function ErrorFeedbackForm({
           ไม่ต้องเข้าสู่ระบบก็ส่งได้ — ทีมงานจะติดต่อกลับทางอีเมล
         </p>
       )}
+      <div className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden" aria-hidden>
+        <Label htmlFor="fb-company-website">Company website</Label>
+        <Input
+          id="fb-company-website"
+          tabIndex={-1}
+          autoComplete="off"
+          value={form.companyWebsite}
+          onChange={(e) =>
+            setForm({ ...form, companyWebsite: e.target.value })
+          }
+        />
+      </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="fb-name">ชื่อ</Label>

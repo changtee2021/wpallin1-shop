@@ -71,23 +71,32 @@ export const Route = createFileRoute("/_store/products/$slug")({
     const ogImage = product.imageUrl ?? getDefaultOgImageUrl();
     const description = product.description?.slice(0, 160) ?? product.name;
 
+    const meta = [
+      { title: `${product.name} | WP ALL` },
+      { name: "description", content: description },
+      ...(product.isMock
+        ? [{ name: "robots", content: "noindex, follow" }]
+        : []),
+      { property: "og:type", content: "product" },
+      { property: "og:title", content: product.name },
+      { property: "og:description", content: description },
+      { property: "og:url", content: canonical },
+      { property: "og:image", content: ogImage },
+    ];
+
     return {
-      meta: [
-        { title: `${product.name} | WP ALL` },
-        { name: "description", content: description },
-        { property: "og:type", content: "product" },
-        { property: "og:title", content: product.name },
-        { property: "og:description", content: description },
-        { property: "og:url", content: canonical },
-        { property: "og:image", content: ogImage },
-      ],
+      meta,
       links: [{ rel: "canonical", href: canonical }],
-      scripts: [
-        {
-          type: "application/ld+json",
-          children: JSON.stringify(buildProductJsonLd(product, reviewSummary)),
-        },
-      ],
+      scripts: product.isMock
+        ? []
+        : [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify(
+                buildProductJsonLd(product, reviewSummary),
+              ),
+            },
+          ],
     };
   },
   loader: async ({ params }) => {
@@ -178,6 +187,14 @@ function ProductDetailPage() {
         <div>
           {product.categoryName && (
             <Badge variant="secondary">{product.categoryName}</Badge>
+          )}
+          {product.isMock && (
+            <Badge
+              variant="outline"
+              className="ml-2 border-amber-500/60 bg-amber-50 text-amber-900"
+            >
+              ทดสอบระบบ
+            </Badge>
           )}
           <h1 className="mt-3 text-2xl font-bold sm:text-3xl">
             {product.name}

@@ -4,6 +4,7 @@ import { AccountProfileSummary } from "@/components/account/account-profile-summ
 import { RequireAuthGate } from "@/components/auth/require-auth-gate";
 import { AccountSidebar } from "@/components/layout/account-sidebar";
 import { AppBottomNav } from "@/components/layout/app-bottom-nav";
+import { storeSectionClasses } from "@/components/layout/store-page";
 import { StorefrontFooter } from "@/components/layout/storefront-footer";
 import { StorefrontHeader } from "@/components/layout/storefront-header";
 import { PageLoading } from "@/components/loading";
@@ -17,8 +18,8 @@ function AccountLoadingShell() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <StorefrontHeader />
-      <div className="flex-1 bg-muted/20 pb-20 md:pb-0">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div className="flex-1 bg-muted/20 pb-20 lg:pb-0">
+        <div className={storeSectionClasses()}>
           <PageLoading variant="dashboard" />
         </div>
       </div>
@@ -33,8 +34,12 @@ function AccountLayout() {
     <RequireAuthGate loadingShell={<AccountLoadingShell />}>
       <div className="flex min-h-screen flex-col bg-background">
         <StorefrontHeader />
-        <div className="flex-1 bg-muted/20 pb-20 md:pb-0">
-          <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 md:grid-cols-[240px_1fr]">
+        <div className="flex-1 bg-muted/20 pb-20 lg:pb-0">
+          <div
+            className={storeSectionClasses(
+              "grid gap-6 md:grid-cols-[minmax(0,15rem)_1fr] md:gap-8 lg:grid-cols-[minmax(0,16rem)_1fr] lg:gap-10",
+            )}
+          >
             <div className="hidden md:block">
               <AccountSidebar />
             </div>

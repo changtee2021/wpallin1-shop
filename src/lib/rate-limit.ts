@@ -6,6 +6,11 @@ type RateLimitOptions = {
   window: `${number} s` | `${number} m` | `${number} h`;
 };
 
+type EnforceRateLimitOptions = RateLimitOptions & {
+  /** When true (default in production), missing Redis rejects the request. */
+  requiredInProduction?: boolean;
+};
+
 const limiterCache = new Map<string, Ratelimit>();
 
 function getRedis(): Redis | null {
@@ -13,6 +18,13 @@ function getRedis(): Redis | null {
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
   if (!url || !token) return null;
   return new Redis({ url, token });
+}
+
+function isProductionEnv(): boolean {
+  return (
+    process.env.VERCEL_ENV === "production" ||
+    process.env.NODE_ENV === "production"
+  );
 }
 
 function getLimiter(options: RateLimitOptions): Ratelimit | null {
@@ -39,13 +51,27 @@ export class RateLimitError extends Error {
   }
 }
 
+export class RateLimitUnavailableError extends Error {
+  constructor(message = "Service temporarily unavailable") {
+    super(message);
+    this.name = "RateLimitUnavailableError";
+  }
+}
+
 export async function enforceRateLimit(
   scope: string,
   identifier: string,
-  options: RateLimitOptions = { requests: 5, window: "1 m" },
+  options: EnforceRateLimitOptions = { requests: 5, window: "1 m" },
 ): Promise<void> {
-  const limiter = getLimiter(options);
-  if (!limiter) return;
+  const { requiredInProduction = true, ...limiterOptions } = options;
+  const limiter = getLimiter(limiterOptions);
+
+  if (!limiter) {
+    if (requiredInProduction && isProductionEnv()) {
+      throw new RateLimitUnavailableError();
+    }
+    return;
+  }
 
   const key = `${scope}:${identifier}`;
   const { success } = await limiter.limit(key);

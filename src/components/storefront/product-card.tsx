@@ -60,9 +60,18 @@ export function ProductCard({
           />
         </Link>
 
-        {product.isFeatured && (
+        {product.isFeatured && !product.isMock && (
           <Badge className="absolute top-2 left-2 bg-accent text-white hover:bg-accent">
             แนะนำ
+          </Badge>
+        )}
+
+        {product.isMock && (
+          <Badge
+            variant="outline"
+            className="absolute top-2 left-2 border-amber-500/60 bg-amber-50 text-amber-900 hover:bg-amber-50"
+          >
+            ทดสอบระบบ
           </Badge>
         )}
 
@@ -128,14 +137,7 @@ export function ProductCard({
           <p className="text-[11px] font-medium text-primary">ราคาสมาชิก</p>
         )}
 
-        <div className="flex items-center justify-between gap-2 pt-0.5">
-          {product.stock > 0 ? (
-            <p className="text-[11px] text-muted-foreground">
-              ขายแล้ว {Math.floor(product.stock * 0.3)}+
-            </p>
-          ) : (
-            <span />
-          )}
+        <div className="flex items-center justify-end gap-2 pt-0.5">
           <div className="ml-auto flex shrink-0 items-center">
             <WishlistButton productId={product.id} variant="ghost" />
             <ProductShareButton slug={product.slug} name={product.name} />

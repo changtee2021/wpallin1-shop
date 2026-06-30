@@ -66,19 +66,21 @@ export function DocumentsPanel({ customerType }: DocumentsPanelProps) {
       });
       const json = (await res.json()) as {
         ok?: boolean;
+        storagePath?: string;
         fileUrl?: string;
         fileName?: string;
         mimeType?: string;
         fileSize?: number;
         error?: string;
       };
-      if (!res.ok || !json.fileUrl) {
+      const storagePath = json.storagePath ?? json.fileUrl;
+      if (!res.ok || !storagePath) {
         throw new Error(json.error ?? "อัปโหลดไม่สำเร็จ");
       }
       await saveCustomerDocumentFn({
         data: {
           docType,
-          fileUrl: json.fileUrl,
+          fileUrl: storagePath,
           fileName: json.fileName,
           mimeType: json.mimeType,
           fileSize: json.fileSize,

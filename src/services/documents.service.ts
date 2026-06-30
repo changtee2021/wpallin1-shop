@@ -71,6 +71,25 @@ export function requiredDocsForCustomerType(
   return customerType === "juristic" ? JURISTIC_REQUIRED : INDIVIDUAL_REQUIRED;
 }
 
+const CUSTOMER_DOCS_BUCKET = "wpall-retail-customer-docs";
+const SIGNED_URL_TTL_SEC = 3600;
+
+function isHttpUrl(value: string): boolean {
+  return value.startsWith("http://") || value.startsWith("https://");
+}
+
+async function resolveCustomerDocFileUrl(
+  supabase: SupabaseClient,
+  stored: string,
+): Promise<string> {
+  if (isHttpUrl(stored)) return stored;
+  const { data, error } = await supabase.storage
+    .from(CUSTOMER_DOCS_BUCKET)
+    .createSignedUrl(stored, SIGNED_URL_TTL_SEC);
+  if (error || !data?.signedUrl) return stored;
+  return data.signedUrl;
+}
+
 function mapDoc(row: {
   id: string;
   doc_type: string;
@@ -95,6 +114,17 @@ function mapDoc(row: {
   };
 }
 
+async function mapDocWithSignedUrl(
+  supabase: SupabaseClient,
+  row: Parameters<typeof mapDoc>[0],
+): Promise<CustomerDocumentDto> {
+  const doc = mapDoc(row);
+  return {
+    ...doc,
+    fileUrl: await resolveCustomerDocFileUrl(supabase, doc.fileUrl),
+  };
+}
+
 export async function listCustomerDocuments(
   supabase: SupabaseClient,
   userId: string,
@@ -108,7 +138,7 @@ export async function listCustomerDocuments(
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
-  return (data ?? []).map(mapDoc);
+  return Promise.all((data ?? []).map((row) => mapDocWithSignedUrl(supabase, row)));
 }
 
 export async function saveCustomerDocument(
@@ -139,7 +169,7 @@ export async function saveCustomerDocument(
     .single();
 
   if (error) throw new Error(error.message);
-  return mapDoc(data);
+  return mapDocWithSignedUrl(supabase, data);
 }
 
 export async function reviewCustomerDocument(

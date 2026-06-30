@@ -139,6 +139,16 @@ function AdminMemberDetailPage() {
                   <div>
                     <p className="font-medium">{docTypeLabel(d.docType)}</p>
                     <Badge>{d.status}</Badge>
+                    {d.fileUrl ? (
+                      <a
+                        href={d.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 block text-xs text-primary underline-offset-2 hover:underline"
+                      >
+                        เปิดเอกสาร
+                      </a>
+                    ) : null}
                   </div>
                   {d.status === "pending" && (
                     <div className="flex gap-2">

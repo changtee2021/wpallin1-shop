@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -22,7 +23,12 @@ import {
   getShopFilterFacets,
 } from "@/services/catalog.service";
 import { smartSearchProducts } from "@/services/smart-search.service";
-import { enforceRateLimit } from "@/lib/rate-limit";
+import {
+  enforceRateLimit,
+  getClientIp,
+  RateLimitError,
+  RateLimitUnavailableError,
+} from "@/lib/rate-limit";
 import { listProductOptionGroups } from "@/services/product-options.service";
 import { getProductReviewSummary } from "@/services/review.service";
 import {
@@ -677,13 +683,37 @@ export const submitContactForm = createServerFn({ method: "POST" })
         errorCode: z.string().optional(),
         sourceUrl: z.string().optional(),
         category: z.enum(["contact", "error", "404", "403", "500"]).optional(),
+        /** Honeypot — must stay empty */
+        companyWebsite: z.string().optional(),
       })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
+    if (data.companyWebsite?.trim()) {
+      throw new Error("Invalid submission");
+    }
+
+    const request = getRequest();
+    const rateKey = context.userId ?? getClientIp(request);
+    try {
+      await enforceRateLimit("contact-form", rateKey, {
+        requests: 5,
+        window: "10 m",
+      });
+    } catch (err) {
+      if (err instanceof RateLimitError) {
+        throw new Error("ส่งบ่อยเกินไป กรุณารอสักครู่แล้วลองใหม่");
+      }
+      if (err instanceof RateLimitUnavailableError) {
+        throw new Error("ระบบไม่พร้อมรับคำขอชั่วคราว กรุณาลองใหม่ภายหลัง");
+      }
+      throw err;
+    }
+
+    const { companyWebsite: _honeypot, ...payload } = data;
     const supabase = await getAdminClient();
     return submitFeedbackReportService(supabase, {
-      ...data,
+      ...payload,
       userId: context.userId,
     });
   });
@@ -1431,6 +1461,8 @@ export {
   reorderFromOrder,
   fetchPriceList,
   lookupProductBySku,
+  resolveProductsBySkus,
+  fetchFrequentOrderSkus,
   searchOrderProducts,
 } from "@/lib/server-fns/wholesale";
 

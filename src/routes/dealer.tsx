@@ -5,6 +5,7 @@ import { AppBottomNav } from "@/components/layout/app-bottom-nav";
 import { DealerSidebar } from "@/components/layout/dealer-sidebar";
 import { StorefrontFooter } from "@/components/layout/storefront-footer";
 import { StorefrontHeader } from "@/components/layout/storefront-header";
+import { storeSectionClasses } from "@/components/layout/store-page";
 import { PageLoading } from "@/components/loading";
 
 export const Route = createFileRoute("/dealer")({
@@ -16,8 +17,8 @@ function DealerLoadingShell() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <StorefrontHeader />
-      <div className="flex-1 bg-muted/20 pb-20 md:pb-0">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div className="flex-1 bg-muted/20 pb-20 lg:pb-0">
+        <div className={storeSectionClasses()}>
           <PageLoading variant="dashboard" />
         </div>
       </div>
@@ -32,8 +33,12 @@ function DealerLayout() {
     <RequireAuthGate requireDealer loadingShell={<DealerLoadingShell />}>
       <div className="flex min-h-screen flex-col bg-background">
         <StorefrontHeader />
-        <div className="flex-1 bg-muted/20 pb-20 md:pb-0">
-          <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 md:grid-cols-[260px_1fr]">
+        <div className="flex-1 bg-muted/20 pb-20 lg:pb-0">
+          <div
+            className={storeSectionClasses(
+              "grid gap-6 md:grid-cols-[minmax(0,16rem)_1fr] md:gap-8 lg:gap-10",
+            )}
+          >
             <div className="hidden md:block">
               <DealerSidebar />
             </div>

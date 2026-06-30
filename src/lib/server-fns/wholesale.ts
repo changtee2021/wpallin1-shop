@@ -77,9 +77,19 @@ export const reorderFromOrder = createServerFn({ method: "POST" })
     const ctx = cartContext(context.userId, data.sessionId);
 
     for (const item of order.items) {
-      if (!item.productId) continue;
+      let productId = item.productId;
+      if (!productId && item.sku) {
+        const { data: product } = await supabase
+          .from("products")
+          .select("id")
+          .eq("sku", item.sku.trim())
+          .eq("is_active", true)
+          .maybeSingle();
+        productId = product?.id ?? null;
+      }
+      if (!productId) continue;
       try {
-        await addToCart(supabase, ctx, item.productId, item.qty);
+        await addToCart(supabase, ctx, productId, item.qty);
       } catch {
         // skip failed lines
       }
@@ -177,6 +187,160 @@ export const searchOrderProducts = createServerFn({ method: "GET" })
     );
   });
 
+const productLookupSelect =
+  "id, slug, sku, name, retail_price, min_order_qty, stock_qty, image_url";
+
+async function mapProductRow(
+  supabase: Awaited<ReturnType<typeof getAdminClient>>,
+  context: { userId?: string | null },
+  row: {
+    id: string;
+    slug: string;
+    sku: string | null;
+    name: string;
+    retail_price: number | string;
+    min_order_qty: number | string;
+    stock_qty: number | string;
+    image_url: string | null;
+  },
+) {
+  const price = context.userId
+    ? await resolveProductUnitPrice(supabase, context.userId, row.id, 1)
+    : Number(row.retail_price);
+
+  return {
+    id: row.id,
+    slug: row.slug,
+    sku: row.sku ?? "",
+    name: row.name,
+    price,
+    retailPrice: Number(row.retail_price),
+    moq: Number(row.min_order_qty),
+    stock: Number(row.stock_qty),
+    imageUrl: row.image_url,
+  };
+}
+
+export const resolveProductsBySkus = createServerFn({ method: "POST" })
+  .middleware([optionalSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        lines: z
+          .array(
+            z.object({
+              sku: z.string().min(1),
+              qty: z.number().positive().optional(),
+            }),
+          )
+          .max(50),
+      })
+      .parse(input),
+  )
+  .handler(async ({ context, data }) => {
+    const supabase = await getAdminClient();
+    const uniqueSkus = [
+      ...new Set(data.lines.map((l) => l.sku.trim()).filter(Boolean)),
+    ];
+    if (!uniqueSkus.length) return { results: [] as const };
+
+    const { data: rows } = await supabase
+      .from("products")
+      .select(productLookupSelect)
+      .in("sku", uniqueSkus)
+      .eq("is_active", true);
+
+    const bySku = new Map(
+      await Promise.all(
+        (rows ?? []).map(
+          async (row) =>
+            [
+              row.sku ?? "",
+              await mapProductRow(supabase, context, row),
+            ] as const,
+        ),
+      ),
+    );
+
+    const results = data.lines.map((line) => ({
+      sku: line.sku.trim(),
+      qty: line.qty ?? 1,
+      product: bySku.get(line.sku.trim()) ?? null,
+    }));
+
+    return { results };
+  });
+
+export const fetchFrequentOrderSkus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({ limit: z.number().int().min(1).max(12).optional() })
+      .parse(input ?? {}),
+  )
+  .handler(async ({ context, data }) => {
+    const supabase = await getAdminClient();
+    const since = new Date();
+    since.setDate(since.getDate() - 90);
+
+    const { data: orders } = await supabase
+      .from("orders")
+      .select("id")
+      .eq("user_id", context.userId)
+      .gte("created_at", since.toISOString());
+
+    if (!orders?.length) return [];
+
+    const orderIds = orders.map((o) => o.id);
+    const { data: items } = await supabase
+      .from("order_items")
+      .select("sku, qty, product_name")
+      .in("order_id", orderIds)
+      .not("sku", "is", null);
+
+    const aggregated = new Map<
+      string,
+      {
+        orderCount: number;
+        totalQty: number;
+        lastQty: number;
+        productName: string;
+      }
+    >();
+
+    for (const item of items ?? []) {
+      const sku = (item.sku as string | null)?.trim();
+      if (!sku) continue;
+      const qty = Number(item.qty);
+      const existing = aggregated.get(sku);
+      if (existing) {
+        existing.orderCount += 1;
+        existing.totalQty += qty;
+        existing.lastQty = qty;
+      } else {
+        aggregated.set(sku, {
+          orderCount: 1,
+          totalQty: qty,
+          lastQty: qty,
+          productName: item.product_name as string,
+        });
+      }
+    }
+
+    return [...aggregated.entries()]
+      .sort(
+        (a, b) =>
+          b[1].orderCount - a[1].orderCount || b[1].totalQty - a[1].totalQty,
+      )
+      .slice(0, data.limit ?? 8)
+      .map(([sku, stats]) => ({
+        sku,
+        productName: stats.productName,
+        lastQty: stats.lastQty,
+        orderCount: stats.orderCount,
+      }));
+  });
+
 export const lookupProductBySku = createServerFn({ method: "GET" })
   .middleware([optionalSupabaseAuth])
   .inputValidator((input: unknown) =>
@@ -186,28 +350,12 @@ export const lookupProductBySku = createServerFn({ method: "GET" })
     const supabase = await getAdminClient();
     const { data: row } = await supabase
       .from("products")
-      .select(
-        "id, slug, sku, name, retail_price, min_order_qty, stock_qty, image_url",
-      )
+      .select(productLookupSelect)
       .eq("sku", data.sku.trim())
       .eq("is_active", true)
       .maybeSingle();
 
     if (!row) return null;
 
-    const price = context.userId
-      ? await resolveProductUnitPrice(supabase, context.userId, row.id, 1)
-      : Number(row.retail_price);
-
-    return {
-      id: row.id,
-      slug: row.slug,
-      sku: row.sku,
-      name: row.name,
-      price,
-      retailPrice: Number(row.retail_price),
-      moq: Number(row.min_order_qty),
-      stock: Number(row.stock_qty),
-      imageUrl: row.image_url,
-    };
+    return mapProductRow(supabase, context, row);
   });

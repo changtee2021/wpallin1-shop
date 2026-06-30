@@ -21,7 +21,7 @@ function StoreLayout() {
     <CompareProvider>
       <div className="flex min-h-screen flex-col bg-background">
         <StorefrontHeader />
-        <main className="flex-1 pb-20 md:pb-0">
+        <main className="flex-1 pb-20 lg:pb-0">
           <Outlet />
         </main>
         <StorefrontFooter />

@@ -2,6 +2,17 @@ import { useEffect, useRef } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 
+function removeChannelSafe(
+  channel: ReturnType<typeof supabase.channel>,
+) {
+  try {
+    void channel.unsubscribe();
+  } catch {
+    // ignore
+  }
+  void supabase.removeChannel(channel);
+}
+
 export function useChatRealtime(
   conversationId: string | undefined,
   userId: string | undefined,
@@ -13,32 +24,44 @@ export function useChatRealtime(
   useEffect(() => {
     if (!conversationId || !userId) return;
 
-    const channel = supabase
-      .channel(`chat:${conversationId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "wpall_retail",
-          table: "chat_messages",
-          filter: `conversation_id=eq.${conversationId}`,
-        },
-        () => onChangeRef.current(),
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "wpall_retail",
-          table: "chat_conversations",
-          filter: `id=eq.${conversationId}`,
-        },
-        () => onChangeRef.current(),
-      )
-      .subscribe();
+    const topic = `chat:${conversationId}:${crypto.randomUUID()}`;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    try {
+      channel = supabase
+        .channel(topic)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "wpall_retail",
+            table: "chat_messages",
+            filter: `conversation_id=eq.${conversationId}`,
+          },
+          () => {
+            void onChangeRef.current();
+          },
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "wpall_retail",
+            table: "chat_conversations",
+            filter: `id=eq.${conversationId}`,
+          },
+          () => {
+            void onChangeRef.current();
+          },
+        )
+        .subscribe();
+    } catch (err) {
+      console.warn("[chat-realtime] subscribe failed:", err);
+      return;
+    }
 
     return () => {
-      void supabase.removeChannel(channel);
+      if (channel) removeChannelSafe(channel);
     };
   }, [conversationId, userId]);
 }

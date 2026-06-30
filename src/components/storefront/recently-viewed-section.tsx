@@ -37,6 +37,7 @@ function toProductCardDto(item: RecentlyViewedItem): ProductPublicDto {
     weightKg: null,
     attributes: null,
     optionGroups: [],
+    isMock: item.slug.startsWith("mock-"),
   };
 }
 

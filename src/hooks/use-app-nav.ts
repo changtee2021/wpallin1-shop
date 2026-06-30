@@ -130,21 +130,26 @@ export function useAppNavItems(cartCount = 0): AppNavItem[] {
   }
 
   return [
-    { id: "order", to: "/order", label: "สั่งเลย", icon: Zap },
-    { id: "shop", to: "/shop", label: "ร้านค้า", icon: Store },
-    {
-      id: "cart",
-      to: "/cart",
-      label: "ตะกร้า",
-      icon: ShoppingCart,
-      badge: cartCount,
-    },
     {
       id: "home",
       to: "/",
       label: "หน้าแรก",
       icon: Home,
       exact: true,
+    },
+    { id: "shop", to: "/shop", label: "ร้านค้า", icon: Store },
+    {
+      id: "order",
+      to: "/order",
+      label: "สั่งเลย",
+      icon: Zap,
+    },
+    {
+      id: "cart",
+      to: "/cart",
+      label: "ตะกร้า",
+      icon: ShoppingCart,
+      badge: cartCount,
     },
     {
       id: "account",

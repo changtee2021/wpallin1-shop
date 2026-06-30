@@ -1,7 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { logUploadFailure, validateUploadFile } from "@/lib/upload-validation";
-import { enforceRateLimit, RateLimitError } from "@/lib/rate-limit";
+import {
+  enforceRateLimit,
+  RateLimitError,
+  RateLimitUnavailableError,
+} from "@/lib/rate-limit";
+
+const BUCKET = "wpall-retail-customer-docs";
+const SIGNED_URL_TTL_SEC = 3600;
 
 export const Route = createFileRoute("/api/v1/customer-document")({
   server: {
@@ -15,6 +22,7 @@ export const Route = createFileRoute("/api/v1/customer-document")({
         const token = authHeader.replace("Bearer ", "");
         const SUPABASE_URL = process.env.SUPABASE_URL;
         const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+        const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
         if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
           return Response.json(
             { error: "Server misconfigured" },
@@ -48,6 +56,9 @@ export const Route = createFileRoute("/api/v1/customer-document")({
           if (err instanceof RateLimitError) {
             return Response.json({ error: err.message }, { status: 429 });
           }
+          if (err instanceof RateLimitUnavailableError) {
+            return Response.json({ error: err.message }, { status: 503 });
+          }
           throw err;
         }
 
@@ -72,18 +83,27 @@ export const Route = createFileRoute("/api/v1/customer-document")({
 
         try {
           const { error: uploadErr } = await supabase.storage
-            .from("wpall-retail-customer-docs")
+            .from(BUCKET)
             .upload(path, file, { upsert: false });
 
           if (uploadErr) throw uploadErr;
 
-          const { data: urlData } = supabase.storage
-            .from("wpall-retail-customer-docs")
-            .getPublicUrl(path);
+          let previewUrl: string | null = null;
+          if (SUPABASE_SERVICE_ROLE_KEY) {
+            const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+              auth: { persistSession: false, autoRefreshToken: false },
+              db: { schema: SUPABASE_SCHEMA },
+            });
+            const { data: signed } = await admin.storage
+              .from(BUCKET)
+              .createSignedUrl(path, SIGNED_URL_TTL_SEC);
+            previewUrl = signed?.signedUrl ?? null;
+          }
 
           return Response.json({
             ok: true,
-            fileUrl: urlData.publicUrl,
+            storagePath: path,
+            fileUrl: previewUrl,
             fileName: file.name,
             mimeType: file.type,
             fileSize: file.size,

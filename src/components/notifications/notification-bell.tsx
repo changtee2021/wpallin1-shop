@@ -34,8 +34,12 @@ export function NotificationBell({
 
   const loadUnread = useCallback(async () => {
     if (!user) return;
-    const count = await fetchUnreadNotificationCount(authOpts);
-    setUnread(count);
+    try {
+      const count = await fetchUnreadNotificationCount(authOpts);
+      setUnread(count);
+    } catch {
+      // ignore
+    }
   }, [authOpts, user]);
 
   const loadList = useCallback(async () => {
@@ -46,12 +50,16 @@ export function NotificationBell({
 
   const load = useCallback(async () => {
     if (!user) return;
-    const [count, list] = await Promise.all([
-      fetchUnreadNotificationCount(authOpts),
-      fetchNotifications(authOpts),
-    ]);
-    setUnread(count);
-    setItems(list);
+    try {
+      const [count, list] = await Promise.all([
+        fetchUnreadNotificationCount(authOpts),
+        fetchNotifications(authOpts),
+      ]);
+      setUnread(count);
+      setItems(list);
+    } catch {
+      // Realtime / network hiccup — keep bell usable
+    }
   }, [authOpts, user]);
 
   useEffect(() => {

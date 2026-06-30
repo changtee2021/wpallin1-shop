@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { ProductPublicDto } from "@/types/api/products";
+import { isMockProductSource } from "@/domain/mock-product";
 
 export async function listWishlistProducts(
   supabase: SupabaseClient,
@@ -9,7 +10,7 @@ export async function listWishlistProducts(
   const { data, error } = await supabase
     .from("wishlist_items")
     .select(
-      "created_at, products:product_id(id, slug, name, description, sku, product_type, retail_price, compare_at_price, image_url, is_featured, is_active, stock_qty, min_order_qty, unit, weight_kg, attributes, category_id, created_at)",
+      "created_at, products:product_id(id, slug, name, description, sku, product_type, retail_price, compare_at_price, image_url, is_featured, is_active, stock_qty, min_order_qty, unit, weight_kg, attributes, tags, metadata, category_id, created_at)",
     )
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
@@ -44,6 +45,14 @@ export async function listWishlistProducts(
             ? (p.attributes as Record<string, unknown>)
             : null,
         optionGroups: [],
+        isMock: isMockProductSource({
+          slug: String(p.slug),
+          tags: Array.isArray(p.tags) ? (p.tags as string[]) : null,
+          metadata:
+            p.metadata && typeof p.metadata === "object"
+              ? (p.metadata as Record<string, unknown>)
+              : null,
+        }),
       } satisfies ProductPublicDto;
     })
     .filter(Boolean) as ProductPublicDto[];

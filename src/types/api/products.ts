@@ -35,6 +35,8 @@ export type ProductPublicDto = {
   attributes: Record<string, unknown> | null;
   optionGroups: ProductOptionGroupDto[];
   createdAt?: string | null;
+  /** QA seed product (slug mock-*, tag mock, metadata.is_mock) — not indexed for SEO */
+  isMock: boolean;
 };
 
 export type ProductListQuery = {

@@ -191,7 +191,7 @@ function ShopPage() {
     <>
       {shopBanners.length > 0 ? <ShopHeroSlider banners={shopBanners} /> : null}
 
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         {categories.length > 0 ? (
           <div className="mb-6">
             <CategoryRail

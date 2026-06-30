@@ -41,7 +41,7 @@ export async function getOrderDetail(
 
   const { data: items } = await supabase
     .from("order_items")
-    .select("id, product_name, sku, qty, unit_price, line_total")
+    .select("id, product_id, product_name, sku, qty, unit_price, line_total")
     .eq("order_id", orderId);
 
   const { data: payment } = await supabase
@@ -104,6 +104,7 @@ export async function getOrderDetail(
     shippingAddress: order.shipping_address as Record<string, unknown> | null,
     items: (items ?? []).map((i) => ({
       id: i.id,
+      productId: (i.product_id as string | null) ?? null,
       productName: i.product_name,
       sku: i.sku,
       qty: Number(i.qty),
