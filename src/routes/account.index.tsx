@@ -13,10 +13,14 @@ import { PageLoading } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import {
+  clearAccountProfileCache,
+  fetchAccountProfileCached,
+  getCachedAccountProfile,
+} from "@/lib/account-profile-cache";
+import {
   deleteAccountAddress,
   deleteTaxInvoiceProfileFn,
   fetchAccountAddresses,
-  fetchAccountProfile,
   fetchCreditSummary,
   fetchMyOrders,
   fetchTaxInvoiceProfiles,
@@ -95,6 +99,8 @@ function AccountPage() {
   const { tab, section } = Route.useSearch();
 
   const [profile, setProfile] = useState<AccountProfileDto | null>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [profileReloadKey, setProfileReloadKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
@@ -142,8 +148,7 @@ function AccountPage() {
 
   const authOpts = useAuthServerFnOptions(session);
 
-  const loadProfile = useCallback(async () => {
-    const data = await fetchAccountProfile(authOpts);
+  const applyProfile = useCallback((data: AccountProfileDto) => {
     setProfile(data);
     setFullName(data.fullName ?? "");
     setPhone(data.phone ?? "");
@@ -152,13 +157,12 @@ function AccountPage() {
     setNationalId(data.nationalId ?? "");
     setCompanyTaxId(data.companyTaxId ?? "");
     setCompanyBranch(data.companyBranch ?? "");
-    try {
-      const credit = await fetchCreditAccount(authOpts);
-      setHasCreditAccount(Boolean(credit && credit.status === "active"));
-    } catch {
-      setHasCreditAccount(false);
-    }
-  }, [authOpts]);
+  }, []);
+
+  const loadProfile = useCallback(async () => {
+    const data = await fetchAccountProfileCached(session);
+    applyProfile(data);
+  }, [applyProfile, session]);
 
   const loadWallet = useCallback(async () => {
     const [summary, txs, progress, topups] = await Promise.all([
@@ -194,14 +198,26 @@ function AccountPage() {
   useEffect(() => {
     if (authLoading || !session?.access_token) return;
 
+    const cached = getCachedAccountProfile(session);
+    if (cached) {
+      applyProfile(cached);
+      setLoading(false);
+    }
+
     let cancelled = false;
 
     void (async () => {
-      setLoading(true);
+      if (!cached) setLoading(true);
+      setProfileError(null);
       try {
         await loadProfile();
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "โหลดข้อมูลไม่สำเร็จ");
+        const message =
+          err instanceof Error ? err.message : "โหลดข้อมูลไม่สำเร็จ";
+        if (!cancelled) {
+          setProfileError(message);
+          toast.error(message);
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -210,7 +226,35 @@ function AccountPage() {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, loadProfile, session?.access_token]);
+  }, [
+    applyProfile,
+    authLoading,
+    loadProfile,
+    profileReloadKey,
+    session,
+    session?.access_token,
+  ]);
+
+  useEffect(() => {
+    if (!profile || !session?.access_token) return;
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const credit = await fetchCreditAccount(authOpts);
+        if (!cancelled) {
+          setHasCreditAccount(Boolean(credit && credit.status === "active"));
+        }
+      } catch {
+        if (!cancelled) setHasCreditAccount(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authOpts, profile, session?.access_token]);
 
   useEffect(() => {
     if (!profile) return;
@@ -231,8 +275,6 @@ function AccountPage() {
     }
 
     if (tab === "settings") {
-      let cancelled = false;
-      setSettingsLoading(true);
       const loaders: Promise<unknown>[] = [];
       if (section === "finance") {
         loaders.push(loadWallet());
@@ -240,6 +282,10 @@ function AccountPage() {
       if (section === "address-tax") {
         loaders.push(loadAddresses(), loadTaxProfiles());
       }
+      if (loaders.length === 0) return;
+
+      let cancelled = false;
+      setSettingsLoading(true);
       void Promise.all(loaders)
         .catch((err) =>
           toast.error(err instanceof Error ? err.message : "โหลดไม่สำเร็จ"),
@@ -435,8 +481,27 @@ function AccountPage() {
     }
   }
 
-  if (authLoading || loading || !profile) {
+  if (authLoading || loading) {
     return <PageLoading variant="dashboard" />;
+  }
+
+  if (!profile) {
+    return (
+      <div className="flex flex-col items-center gap-4 py-16 text-center">
+        <p className="text-sm text-muted-foreground">
+          {profileError ?? "โหลดข้อมูลโปรไฟล์ไม่สำเร็จ"}
+        </p>
+        <Button
+          type="button"
+          onClick={() => {
+            clearAccountProfileCache();
+            setProfileReloadKey((key) => key + 1);
+          }}
+        >
+          ลองอีกครั้ง
+        </Button>
+      </div>
+    );
   }
 
   const settingsSectionTitles: Record<SettingsSectionId, string> = {

@@ -13,6 +13,14 @@ export function clearAccountProfileCache() {
   inflight = null;
 }
 
+export function getCachedAccountProfile(
+  session: Session | null,
+): AccountProfileDto | null {
+  const token = session?.access_token ?? "";
+  if (!token || cachedToken !== token || !cachedProfile) return null;
+  return cachedProfile;
+}
+
 export function fetchAccountProfileCached(
   session: Session | null,
 ): Promise<AccountProfileDto> {
