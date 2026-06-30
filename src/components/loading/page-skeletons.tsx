@@ -242,7 +242,11 @@ export function PageLoading({
   return <Component className={className} />;
 }
 
-/** TanStack Router `pendingComponent` — shown while route loaders / beforeLoad run */
+/** TanStack Router `pendingComponent` — inline skeleton only (layout stays mounted). */
 export function RoutePendingFallback() {
-  return <PageLoading variant="default" />;
+  return (
+    <div className="py-6">
+      <PageLoading variant="default" />
+    </div>
+  );
 }

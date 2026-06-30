@@ -32,7 +32,7 @@ const statusLabels: Record<string, string> = {
 
 function AccountOrdersPage() {
   const { t } = useT();
-  const { session } = useAuth();
+  const { session, loading: authLoading } = useAuth();
   const { refresh } = useCart();
   const authOpts = useAuthServerFnOptions(session);
   const [orders, setOrders] = useState<OrderSummaryDto[]>([]);
@@ -56,6 +56,8 @@ function AccountOrdersPage() {
   }
 
   useEffect(() => {
+    if (authLoading || !session?.access_token) return;
+
     let cancelled = false;
     setLoading(true);
     void fetchMyOrders(authOpts)
@@ -68,7 +70,7 @@ function AccountOrdersPage() {
     return () => {
       cancelled = true;
     };
-  }, [authOpts]);
+  }, [authLoading, authOpts, session?.access_token]);
 
   return (
     <div>
@@ -76,7 +78,7 @@ function AccountOrdersPage() {
         title={t("account.orders")}
         description="ประวัติคำสั่งซื้อของคุณ"
       />
-      {loading ? (
+      {authLoading || loading || !session?.access_token ? (
         <PageLoading variant="list" />
       ) : orders.length === 0 ? (
         <Card>

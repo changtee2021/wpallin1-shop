@@ -43,6 +43,8 @@ const PUBLIC_ROUTES = [
 const AUTH_ROUTES = [
   "/shop",
   "/account",
+  "/account?tab=settings&section=personal",
+  "/account/wishlist",
   "/account/orders",
   "/dealer",
   "/dealer/catalog",

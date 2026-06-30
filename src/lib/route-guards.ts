@@ -14,7 +14,12 @@ export async function requireAuth() {
 
 async function loadRolesSafe(userId: string): Promise<string[]> {
   try {
-    return await listUserRoles(supabase, userId);
+    return await Promise.race([
+      listUserRoles(supabase, userId),
+      new Promise<string[]>((resolve) => {
+        setTimeout(() => resolve(["retail_customer"]), 5_000);
+      }),
+    ]);
   } catch {
     return ["retail_customer"];
   }

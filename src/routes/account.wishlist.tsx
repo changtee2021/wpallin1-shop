@@ -20,12 +20,14 @@ export const Route = createFileRoute("/account/wishlist")({
 });
 
 function AccountWishlistPage() {
-  const { session } = useAuth();
+  const { session, loading: authLoading } = useAuth();
   const authOpts = useAuthServerFnOptions(session);
   const [products, setProducts] = useState<ProductPublicDto[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (authLoading || !session?.access_token) return;
+
     let cancelled = false;
     setLoading(true);
     void fetchWishlist(authOpts)
@@ -41,12 +43,14 @@ function AccountWishlistPage() {
     return () => {
       cancelled = true;
     };
-  }, [authOpts]);
+  }, [authLoading, authOpts, session?.access_token]);
+
+  const showLoading = authLoading || loading || !session?.access_token;
 
   return (
     <div>
       <PageHeader title="รายการโปรด" description="สินค้าที่บันทึกไว้" />
-      {loading ? (
+      {showLoading ? (
         <PageLoading variant="grid" />
       ) : products.length === 0 ? (
         <Card>
