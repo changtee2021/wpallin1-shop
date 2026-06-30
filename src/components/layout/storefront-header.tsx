@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MessageCircle, ShoppingCart } from "lucide-react";
+import { MessageCircle, ShoppingCart, Zap } from "lucide-react";
 
 import { AccountMenuButton } from "@/components/account/account-menu-button";
 import { NotificationBell } from "@/components/notifications/notification-bell";
@@ -12,10 +12,8 @@ import { useChatUiSafe } from "@/hooks/use-chat-ui";
 import { useT } from "@/i18n";
 
 const navLinks = [
-  { to: "/" as const, key: "nav.home" as const, exact: true },
-  { to: "/inspiration" as const, key: "nav.inspiration" as const },
+  { to: "/order" as const, key: "nav.order" as const },
   { to: "/shop" as const, key: "nav.shop" as const },
-  { to: "/configurator" as const, key: "nav.configurator" as const },
   { to: "/catalogs" as const, key: "nav.catalogs" as const },
   { to: "/dealer/register" as const, key: "nav.dealerRegister" as const },
   { to: "/about" as const, key: "nav.about" as const },
@@ -50,6 +48,16 @@ export function StorefrontHeader() {
           </div>
 
           <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+            <Button
+              size="sm"
+              className="hidden bg-accent hover:bg-accent/90 sm:inline-flex"
+              asChild
+            >
+              <Link to="/order">
+                <Zap className="mr-1.5 size-4" />
+                {t("nav.order")}
+              </Link>
+            </Button>
             {user ? (
               <NotificationBell triggerClassName={headerIconClass} />
             ) : null}
@@ -100,7 +108,6 @@ export function StorefrontHeader() {
               to={item.to}
               className="text-sm font-medium text-white/80 transition-colors hover:text-white"
               activeProps={{ className: "text-white font-semibold" }}
-              activeOptions={item.exact ? { exact: true } : undefined}
             >
               {t(item.key)}
             </Link>

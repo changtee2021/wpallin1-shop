@@ -34,7 +34,7 @@ export function HomeDealerCta() {
             <Link to="/dealer/register">{t("home.dealer.ctaRegister")}</Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link to="/quick-order">{t("home.dealer.ctaQuickOrder")}</Link>
+            <Link to="/order">{t("home.dealer.ctaQuickOrder")}</Link>
           </Button>
         </div>
       </CardContent>

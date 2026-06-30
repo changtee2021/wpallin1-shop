@@ -16,7 +16,9 @@ const GUEST_ROUTES = [
   "/cart",
   "/compare",
   "/configurator",
-  "/quick-order",
+  "/room-advisor",
+  "/order",
+  "/o/mock-token",
   "/contact",
   "/about",
 ] as const;
@@ -30,6 +32,7 @@ const AUTH_ROUTES = [
   "/admin",
   "/admin/products",
   "/admin/orders",
+  "/admin/room-advisor",
 ] as const;
 
 test.describe("wpallin1-shop smoke", () => {

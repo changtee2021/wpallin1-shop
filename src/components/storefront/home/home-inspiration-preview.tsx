@@ -24,9 +24,14 @@ export function HomeInspirationPreview({ rooms }: Props) {
             {t("inspiration.home.body")}
           </p>
         </div>
-        <Button variant="outline" className="border-accent text-accent" asChild>
-          <Link to="/inspiration">{t("inspiration.home.cta")}</Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" className="border-accent text-accent" asChild>
+            <Link to="/inspiration">{t("inspiration.home.cta")}</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/room-advisor">AI ที่ปรึกษาห้อง</Link>
+          </Button>
+        </div>
       </div>
 
       {preview.length > 0 ? (

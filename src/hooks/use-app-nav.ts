@@ -1,9 +1,7 @@
 import { useLocation, useMatchRoute } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 import {
-  Heart,
   Home,
-  LayoutDashboard,
   MoreHorizontal,
   Package,
   ShoppingBag,
@@ -13,6 +11,7 @@ import {
   Wallet,
   FileText,
   Users,
+  Zap,
 } from "lucide-react";
 
 export type AppNavZone = "store" | "account" | "dealer" | "admin";
@@ -74,11 +73,16 @@ export function useAppNavItems(cartCount = 0): AppNavItem[] {
   if (zone === "dealer") {
     return [
       {
-        id: "dash",
-        to: "/dealer",
-        label: "หน้าหลัก",
-        icon: LayoutDashboard,
-        exact: true,
+        id: "order",
+        to: "/order",
+        label: "สั่งเลย",
+        icon: Zap,
+      },
+      {
+        id: "orders",
+        to: "/account/orders",
+        label: "ออเดอร์",
+        icon: Package,
       },
       { id: "catalog", to: "/dealer/catalog", label: "แคตตาล็อก", icon: Store },
       {
@@ -87,7 +91,6 @@ export function useAppNavItems(cartCount = 0): AppNavItem[] {
         label: "ใบเสนอ",
         icon: FileText,
       },
-      { id: "wallet", to: "/dealer/wallet", label: "กระเป๋า", icon: Wallet },
       {
         id: "more",
         to: "#",
@@ -126,7 +129,7 @@ export function useAppNavItems(cartCount = 0): AppNavItem[] {
   }
 
   return [
-    { id: "home", to: "/", label: "หน้าแรก", icon: Home, exact: true },
+    { id: "order", to: "/order", label: "สั่งเลย", icon: Zap },
     { id: "shop", to: "/shop", label: "ร้านค้า", icon: Store },
     {
       id: "cart",
@@ -136,10 +139,11 @@ export function useAppNavItems(cartCount = 0): AppNavItem[] {
       badge: cartCount,
     },
     {
-      id: "wishlist",
-      to: "/account/wishlist",
-      label: "โปรด",
-      icon: Heart,
+      id: "home",
+      to: "/",
+      label: "หน้าแรก",
+      icon: Home,
+      exact: true,
     },
     {
       id: "account",

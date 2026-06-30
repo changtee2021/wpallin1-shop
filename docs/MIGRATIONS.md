@@ -56,7 +56,8 @@ Apply in timestamp order. All paths relative to `wp-group-erp/supabase/migration
 | `20260629180000_wpall_retail_inspiration_materials.sql` | Admin-managed `inspiration_materials` + room links |
 | `20260629181000_wpall_retail_admin_media_assets.sql` | Central admin media library table |
 | `20260629140000_wpall_retail_chat.sql` | Web chat conversations, messages, AI usage + settings |
-| `20260629160000_wpall_retail_chat_attachments.sql` | Storage bucket `wpall-retail-chat` for chat attachments |
+| `20260630100000_wpall_retail_order_links.sql` | B2B shareable order links (`/o/$token`) |
+| `20260630120000_wpall_retail_room_advisor.sql` | AI Room Advisor sessions, photos, storage bucket `wpall-retail-room-advisor` |
 
 See also `docs/BUSINESS-ROADMAP.md` for product priorities.
 

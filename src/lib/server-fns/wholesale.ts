@@ -134,6 +134,49 @@ export const fetchPriceList = createServerFn({ method: "GET" })
     };
   });
 
+export const searchOrderProducts = createServerFn({ method: "GET" })
+  .middleware([optionalSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        q: z.string().min(1).max(100),
+        limit: z.number().int().min(1).max(20).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ context, data }) => {
+    const supabase = await getAdminClient();
+    const q = data.q.trim().replace(/[%_]/g, "");
+    const { data: rows } = await supabase
+      .from("products")
+      .select(
+        "id, slug, sku, name, retail_price, min_order_qty, stock_qty, image_url",
+      )
+      .eq("is_active", true)
+      .or(`sku.ilike.%${q}%,name.ilike.%${q}%`)
+      .order("sku")
+      .limit(data.limit ?? 8);
+
+    if (!rows?.length) return [];
+
+    return Promise.all(
+      rows.map(async (row) => {
+        const price = context.userId
+          ? await resolveProductUnitPrice(supabase, context.userId, row.id, 1)
+          : Number(row.retail_price);
+        return {
+          id: row.id,
+          sku: row.sku ?? "",
+          name: row.name,
+          price,
+          moq: Number(row.min_order_qty),
+          stock: Number(row.stock_qty),
+          imageUrl: row.image_url,
+        };
+      }),
+    );
+  });
+
 export const lookupProductBySku = createServerFn({ method: "GET" })
   .middleware([optionalSupabaseAuth])
   .inputValidator((input: unknown) =>

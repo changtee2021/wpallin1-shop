@@ -1431,7 +1431,14 @@ export {
   reorderFromOrder,
   fetchPriceList,
   lookupProductBySku,
+  searchOrderProducts,
 } from "@/lib/server-fns/wholesale";
+
+export {
+  createShareableOrderLink,
+  fetchPublicOrderLink,
+  acceptPublicOrderLink,
+} from "@/lib/server-fns/order-links";
 
 export { fetchAdminMemberProfile } from "@/lib/server-fns/member-admin";
 
@@ -1477,6 +1484,18 @@ export {
 } from "@/lib/server-fns/inspiration-materials";
 
 export { fetchAdminMediaAssets } from "@/lib/server-fns/admin-media";
+
+export {
+  createRoomAdvisorSessionFn,
+  analyzeRoomAdvisorSessionFn,
+  fetchRoomAdvisorSessionFn,
+  fetchRoomAdvisorByTokenFn,
+  enableRoomAdvisorShareFn,
+  submitRoomAdvisorResponseFn,
+  updateRoomAdvisorMetaFn,
+  listMyRoomAdvisorSessionsFn,
+  listAdminRoomAdvisorSessionsFn,
+} from "@/lib/server-fns/room-advisor";
 
 export { searchAdminQuickNavFn } from "@/lib/server-fns/admin-nav";
 

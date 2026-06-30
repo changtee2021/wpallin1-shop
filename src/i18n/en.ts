@@ -6,6 +6,7 @@ export const en: Translations = {
   ...th,
   "app.tagline": "WP all in one – Home Decoration",
   "nav.home": "Home",
+  "nav.order": "Order now",
   "nav.shop": "Shop",
   "nav.catalogs": "Catalogs",
   "nav.configurator": "Custom",
@@ -194,6 +195,19 @@ export const en: Translations = {
   "home.dealer.point3": "Dealer-only PDF catalogs",
   "home.dealer.ctaRegister": "Become a dealer",
   "home.dealer.ctaQuickOrder": "Quick order",
+  "home.entry.b2b.title": "Order from factory",
+  "home.entry.b2b.desc":
+    "Curtain shops & installers — enter SKU, download wholesale price list",
+  "home.entry.b2b.cta": "Order now",
+  "home.entry.retail.title": "Retail",
+  "home.entry.retail.desc":
+    "Browse inspiration, custom curtains, ready-to-ship",
+  "home.entry.retail.cta": "Browse shop",
+  "home.entry.loginOrder": "Logged in? Order now",
+  "home.entry.hasAccount": "Have an account?",
+  "order.title": "Factory order",
+  "order.description":
+    "Enter SKU or paste from LINE — confirm and pay in minutes",
   "inspiration.title": "Inspiration — dream rooms",
   "inspiration.subtitle":
     "Browse by room or material — tap tags on photos to shop or customize",

@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   LogOut,
   MessageCircle,
+  ScanLine,
   Settings,
   Share2,
   Shield,
@@ -50,7 +51,10 @@ function linksForZone(
 ): MoreLink[] {
   if (zone === "store") {
     const links: MoreLink[] = [
+      { to: "/inspiration", label: "แรงบันดาลใจ", icon: ImageIcon },
+      { to: "/room-advisor", label: "AI ที่ปรึกษาห้อง", icon: ScanLine },
       { to: "/configurator", label: "Custom", icon: SlidersHorizontal },
+      { to: "/account/wishlist", label: "รายการโปรด", icon: Heart },
       { to: "/about", label: "เกี่ยวกับเรา", icon: Store },
     ];
     if (user) {
@@ -128,6 +132,7 @@ function linksForZone(
     { to: "/admin/coupons", label: "คูปอง", icon: Tag },
     { to: "/admin/inventory", label: "สต็อก", icon: Boxes },
     { to: "/admin/inspiration", label: "Inspiration", icon: ImageIcon },
+    { to: "/admin/room-advisor", label: "Room Advisor", icon: ScanLine },
     { to: "/admin/banners", label: "แบนเนอร์", icon: ImageIcon },
     { to: "/admin/catalogs", label: "แคตตาล็อก", icon: FileText },
     { to: "/admin/custom", label: "Custom", icon: SlidersHorizontal },

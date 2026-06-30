@@ -22,6 +22,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as StoreIndexRouteImport } from './routes/_store.index'
 import { Route as QuoteTokenRouteImport } from './routes/quote.$token'
+import { Route as OTokenRouteImport } from './routes/o.$token'
 import { Route as DealerWalletRouteImport } from './routes/dealer.wallet'
 import { Route as DealerQuotationsRouteImport } from './routes/dealer.quotations'
 import { Route as DealerCatalogRouteImport } from './routes/dealer.catalog'
@@ -31,6 +32,7 @@ import { Route as AdminTiersRouteImport } from './routes/admin.tiers'
 import { Route as AdminSupportRouteImport } from './routes/admin.support'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSalesOrderRouteImport } from './routes/admin.sales-order'
+import { Route as AdminRoomAdvisorRouteImport } from './routes/admin.room-advisor'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminQuotationsRouteImport } from './routes/admin.quotations'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
@@ -55,8 +57,10 @@ import { Route as AccountNotificationsRouteImport } from './routes/account.notif
 import { Route as AccountAffiliateRouteImport } from './routes/account.affiliate'
 import { Route as StoreTermsRouteImport } from './routes/_store.terms'
 import { Route as StoreShopRouteImport } from './routes/_store.shop'
+import { Route as StoreRoomAdvisorRouteImport } from './routes/_store.room-advisor'
 import { Route as StoreQuickOrderRouteImport } from './routes/_store.quick-order'
 import { Route as StorePrivacyRouteImport } from './routes/_store.privacy'
+import { Route as StoreOrderRouteImport } from './routes/_store.order'
 import { Route as StoreInspirationRouteImport } from './routes/_store.inspiration'
 import { Route as StoreErrorRouteImport } from './routes/_store.error'
 import { Route as StoreCookiesRouteImport } from './routes/_store.cookies'
@@ -71,10 +75,12 @@ import { Route as AdminQuotationsIndexRouteImport } from './routes/admin.quotati
 import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
 import { Route as AdminInspirationIndexRouteImport } from './routes/admin.inspiration.index'
 import { Route as AdminCustomIndexRouteImport } from './routes/admin.custom.index'
+import { Route as StoreRoomAdvisorIndexRouteImport } from './routes/_store.room-advisor.index'
 import { Route as StoreInspirationIndexRouteImport } from './routes/_store.inspiration.index'
 import { Route as StoreCatalogsIndexRouteImport } from './routes/_store.catalogs.index'
 import { Route as StoreCartIndexRouteImport } from './routes/_store.cart.index'
 import { Route as ApiV1WalletTopupSlipRouteImport } from './routes/api/v1/wallet-topup-slip'
+import { Route as ApiV1RoomAdvisorPhotoRouteImport } from './routes/api/v1/room-advisor-photo'
 import { Route as ApiV1ProfileAvatarRouteImport } from './routes/api/v1/profile-avatar'
 import { Route as ApiV1ProductsRouteImport } from './routes/api/v1/products'
 import { Route as ApiV1ProductImageRouteImport } from './routes/api/v1/product-image'
@@ -105,6 +111,8 @@ import { Route as StoreCatalogsIdRouteImport } from './routes/_store.catalogs.$i
 import { Route as StoreCartSummaryRouteImport } from './routes/_store.cart.summary'
 import { Route as AdminInspirationRoomsIdRouteImport } from './routes/admin.inspiration.rooms.$id'
 import { Route as AdminInspirationMaterialsIdRouteImport } from './routes/admin.inspiration.materials.$id'
+import { Route as StoreRoomAdvisorShareTokenRouteImport } from './routes/_store.room-advisor.share.$token'
+import { Route as StoreRoomAdvisorResultIdRouteImport } from './routes/_store.room-advisor.result.$id'
 import { Route as StoreInspirationMaterialsSlugRouteImport } from './routes/_store.inspiration.materials.$slug'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -171,6 +179,11 @@ const QuoteTokenRoute = QuoteTokenRouteImport.update({
   path: '/quote/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OTokenRoute = OTokenRouteImport.update({
+  id: '/o/$token',
+  path: '/o/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DealerWalletRoute = DealerWalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -214,6 +227,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
 const AdminSalesOrderRoute = AdminSalesOrderRouteImport.update({
   id: '/sales-order',
   path: '/sales-order',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRoomAdvisorRoute = AdminRoomAdvisorRouteImport.update({
+  id: '/room-advisor',
+  path: '/room-advisor',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
@@ -336,6 +354,11 @@ const StoreShopRoute = StoreShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => StoreRoute,
 } as any)
+const StoreRoomAdvisorRoute = StoreRoomAdvisorRouteImport.update({
+  id: '/room-advisor',
+  path: '/room-advisor',
+  getParentRoute: () => StoreRoute,
+} as any)
 const StoreQuickOrderRoute = StoreQuickOrderRouteImport.update({
   id: '/quick-order',
   path: '/quick-order',
@@ -344,6 +367,11 @@ const StoreQuickOrderRoute = StoreQuickOrderRouteImport.update({
 const StorePrivacyRoute = StorePrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => StoreRoute,
+} as any)
+const StoreOrderRoute = StoreOrderRouteImport.update({
+  id: '/order',
+  path: '/order',
   getParentRoute: () => StoreRoute,
 } as any)
 const StoreInspirationRoute = StoreInspirationRouteImport.update({
@@ -416,6 +444,11 @@ const AdminCustomIndexRoute = AdminCustomIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminCustomRoute,
 } as any)
+const StoreRoomAdvisorIndexRoute = StoreRoomAdvisorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StoreRoomAdvisorRoute,
+} as any)
 const StoreInspirationIndexRoute = StoreInspirationIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -434,6 +467,11 @@ const StoreCartIndexRoute = StoreCartIndexRouteImport.update({
 const ApiV1WalletTopupSlipRoute = ApiV1WalletTopupSlipRouteImport.update({
   id: '/api/v1/wallet-topup-slip',
   path: '/api/v1/wallet-topup-slip',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1RoomAdvisorPhotoRoute = ApiV1RoomAdvisorPhotoRouteImport.update({
+  id: '/api/v1/room-advisor-photo',
+  path: '/api/v1/room-advisor-photo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiV1ProfileAvatarRoute = ApiV1ProfileAvatarRouteImport.update({
@@ -589,6 +627,18 @@ const AdminInspirationMaterialsIdRoute =
     path: '/$id',
     getParentRoute: () => AdminInspirationMaterialsRoute,
   } as any)
+const StoreRoomAdvisorShareTokenRoute =
+  StoreRoomAdvisorShareTokenRouteImport.update({
+    id: '/share/$token',
+    path: '/share/$token',
+    getParentRoute: () => StoreRoomAdvisorRoute,
+  } as any)
+const StoreRoomAdvisorResultIdRoute =
+  StoreRoomAdvisorResultIdRouteImport.update({
+    id: '/result/$id',
+    path: '/result/$id',
+    getParentRoute: () => StoreRoomAdvisorRoute,
+  } as any)
 const StoreInspirationMaterialsSlugRoute =
   StoreInspirationMaterialsSlugRouteImport.update({
     id: '/materials/$slug',
@@ -615,8 +665,10 @@ export interface FileRoutesByFullPath {
   '/cookies': typeof StoreCookiesRoute
   '/error': typeof StoreErrorRoute
   '/inspiration': typeof StoreInspirationRouteWithChildren
+  '/order': typeof StoreOrderRoute
   '/privacy': typeof StorePrivacyRoute
   '/quick-order': typeof StoreQuickOrderRoute
+  '/room-advisor': typeof StoreRoomAdvisorRouteWithChildren
   '/shop': typeof StoreShopRoute
   '/terms': typeof StoreTermsRoute
   '/account/affiliate': typeof AccountAffiliateRoute
@@ -641,6 +693,7 @@ export interface FileRoutesByFullPath {
   '/admin/products': typeof AdminProductsRouteWithChildren
   '/admin/quotations': typeof AdminQuotationsRouteWithChildren
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/room-advisor': typeof AdminRoomAdvisorRoute
   '/admin/sales-order': typeof AdminSalesOrderRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/support': typeof AdminSupportRoute
@@ -650,6 +703,7 @@ export interface FileRoutesByFullPath {
   '/dealer/catalog': typeof DealerCatalogRoute
   '/dealer/quotations': typeof DealerQuotationsRoute
   '/dealer/wallet': typeof DealerWalletRoute
+  '/o/$token': typeof OTokenRoute
   '/quote/$token': typeof QuoteTokenRoute
   '/account/': typeof AccountIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -682,15 +736,19 @@ export interface FileRoutesByFullPath {
   '/api/v1/product-image': typeof ApiV1ProductImageRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
   '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
+  '/api/v1/room-advisor-photo': typeof ApiV1RoomAdvisorPhotoRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
   '/cart/': typeof StoreCartIndexRoute
   '/catalogs/': typeof StoreCatalogsIndexRoute
   '/inspiration/': typeof StoreInspirationIndexRoute
+  '/room-advisor/': typeof StoreRoomAdvisorIndexRoute
   '/admin/custom/': typeof AdminCustomIndexRoute
   '/admin/inspiration/': typeof AdminInspirationIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/quotations/': typeof AdminQuotationsIndexRoute
   '/inspiration/materials/$slug': typeof StoreInspirationMaterialsSlugRoute
+  '/room-advisor/result/$id': typeof StoreRoomAdvisorResultIdRoute
+  '/room-advisor/share/$token': typeof StoreRoomAdvisorShareTokenRoute
   '/admin/inspiration/materials/$id': typeof AdminInspirationMaterialsIdRoute
   '/admin/inspiration/rooms/$id': typeof AdminInspirationRoomsIdRoute
 }
@@ -706,6 +764,7 @@ export interface FileRoutesByTo {
   '/contact': typeof StoreContactRoute
   '/cookies': typeof StoreCookiesRoute
   '/error': typeof StoreErrorRoute
+  '/order': typeof StoreOrderRoute
   '/privacy': typeof StorePrivacyRoute
   '/quick-order': typeof StoreQuickOrderRoute
   '/shop': typeof StoreShopRoute
@@ -728,6 +787,7 @@ export interface FileRoutesByTo {
   '/admin/members': typeof AdminMembersRouteWithChildren
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/room-advisor': typeof AdminRoomAdvisorRoute
   '/admin/sales-order': typeof AdminSalesOrderRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/support': typeof AdminSupportRoute
@@ -737,6 +797,7 @@ export interface FileRoutesByTo {
   '/dealer/catalog': typeof DealerCatalogRoute
   '/dealer/quotations': typeof DealerQuotationsRoute
   '/dealer/wallet': typeof DealerWalletRoute
+  '/o/$token': typeof OTokenRoute
   '/quote/$token': typeof QuoteTokenRoute
   '/': typeof StoreIndexRoute
   '/account': typeof AccountIndexRoute
@@ -770,15 +831,19 @@ export interface FileRoutesByTo {
   '/api/v1/product-image': typeof ApiV1ProductImageRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
   '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
+  '/api/v1/room-advisor-photo': typeof ApiV1RoomAdvisorPhotoRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
   '/cart': typeof StoreCartIndexRoute
   '/catalogs': typeof StoreCatalogsIndexRoute
   '/inspiration': typeof StoreInspirationIndexRoute
+  '/room-advisor': typeof StoreRoomAdvisorIndexRoute
   '/admin/custom': typeof AdminCustomIndexRoute
   '/admin/inspiration': typeof AdminInspirationIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
   '/admin/quotations': typeof AdminQuotationsIndexRoute
   '/inspiration/materials/$slug': typeof StoreInspirationMaterialsSlugRoute
+  '/room-advisor/result/$id': typeof StoreRoomAdvisorResultIdRoute
+  '/room-advisor/share/$token': typeof StoreRoomAdvisorShareTokenRoute
   '/admin/inspiration/materials/$id': typeof AdminInspirationMaterialsIdRoute
   '/admin/inspiration/rooms/$id': typeof AdminInspirationRoomsIdRoute
 }
@@ -802,8 +867,10 @@ export interface FileRoutesById {
   '/_store/cookies': typeof StoreCookiesRoute
   '/_store/error': typeof StoreErrorRoute
   '/_store/inspiration': typeof StoreInspirationRouteWithChildren
+  '/_store/order': typeof StoreOrderRoute
   '/_store/privacy': typeof StorePrivacyRoute
   '/_store/quick-order': typeof StoreQuickOrderRoute
+  '/_store/room-advisor': typeof StoreRoomAdvisorRouteWithChildren
   '/_store/shop': typeof StoreShopRoute
   '/_store/terms': typeof StoreTermsRoute
   '/account/affiliate': typeof AccountAffiliateRoute
@@ -828,6 +895,7 @@ export interface FileRoutesById {
   '/admin/products': typeof AdminProductsRouteWithChildren
   '/admin/quotations': typeof AdminQuotationsRouteWithChildren
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/room-advisor': typeof AdminRoomAdvisorRoute
   '/admin/sales-order': typeof AdminSalesOrderRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/support': typeof AdminSupportRoute
@@ -837,6 +905,7 @@ export interface FileRoutesById {
   '/dealer/catalog': typeof DealerCatalogRoute
   '/dealer/quotations': typeof DealerQuotationsRoute
   '/dealer/wallet': typeof DealerWalletRoute
+  '/o/$token': typeof OTokenRoute
   '/quote/$token': typeof QuoteTokenRoute
   '/_store/': typeof StoreIndexRoute
   '/account/': typeof AccountIndexRoute
@@ -870,15 +939,19 @@ export interface FileRoutesById {
   '/api/v1/product-image': typeof ApiV1ProductImageRoute
   '/api/v1/products': typeof ApiV1ProductsRoute
   '/api/v1/profile-avatar': typeof ApiV1ProfileAvatarRoute
+  '/api/v1/room-advisor-photo': typeof ApiV1RoomAdvisorPhotoRoute
   '/api/v1/wallet-topup-slip': typeof ApiV1WalletTopupSlipRoute
   '/_store/cart/': typeof StoreCartIndexRoute
   '/_store/catalogs/': typeof StoreCatalogsIndexRoute
   '/_store/inspiration/': typeof StoreInspirationIndexRoute
+  '/_store/room-advisor/': typeof StoreRoomAdvisorIndexRoute
   '/admin/custom/': typeof AdminCustomIndexRoute
   '/admin/inspiration/': typeof AdminInspirationIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/quotations/': typeof AdminQuotationsIndexRoute
   '/_store/inspiration/materials/$slug': typeof StoreInspirationMaterialsSlugRoute
+  '/_store/room-advisor/result/$id': typeof StoreRoomAdvisorResultIdRoute
+  '/_store/room-advisor/share/$token': typeof StoreRoomAdvisorShareTokenRoute
   '/admin/inspiration/materials/$id': typeof AdminInspirationMaterialsIdRoute
   '/admin/inspiration/rooms/$id': typeof AdminInspirationRoomsIdRoute
 }
@@ -903,8 +976,10 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/error'
     | '/inspiration'
+    | '/order'
     | '/privacy'
     | '/quick-order'
+    | '/room-advisor'
     | '/shop'
     | '/terms'
     | '/account/affiliate'
@@ -929,6 +1004,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/quotations'
     | '/admin/reports'
+    | '/admin/room-advisor'
     | '/admin/sales-order'
     | '/admin/settings'
     | '/admin/support'
@@ -938,6 +1014,7 @@ export interface FileRouteTypes {
     | '/dealer/catalog'
     | '/dealer/quotations'
     | '/dealer/wallet'
+    | '/o/$token'
     | '/quote/$token'
     | '/account/'
     | '/admin/'
@@ -970,15 +1047,19 @@ export interface FileRouteTypes {
     | '/api/v1/product-image'
     | '/api/v1/products'
     | '/api/v1/profile-avatar'
+    | '/api/v1/room-advisor-photo'
     | '/api/v1/wallet-topup-slip'
     | '/cart/'
     | '/catalogs/'
     | '/inspiration/'
+    | '/room-advisor/'
     | '/admin/custom/'
     | '/admin/inspiration/'
     | '/admin/products/'
     | '/admin/quotations/'
     | '/inspiration/materials/$slug'
+    | '/room-advisor/result/$id'
+    | '/room-advisor/share/$token'
     | '/admin/inspiration/materials/$id'
     | '/admin/inspiration/rooms/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -994,6 +1075,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookies'
     | '/error'
+    | '/order'
     | '/privacy'
     | '/quick-order'
     | '/shop'
@@ -1016,6 +1098,7 @@ export interface FileRouteTypes {
     | '/admin/members'
     | '/admin/orders'
     | '/admin/reports'
+    | '/admin/room-advisor'
     | '/admin/sales-order'
     | '/admin/settings'
     | '/admin/support'
@@ -1025,6 +1108,7 @@ export interface FileRouteTypes {
     | '/dealer/catalog'
     | '/dealer/quotations'
     | '/dealer/wallet'
+    | '/o/$token'
     | '/quote/$token'
     | '/'
     | '/account'
@@ -1058,15 +1142,19 @@ export interface FileRouteTypes {
     | '/api/v1/product-image'
     | '/api/v1/products'
     | '/api/v1/profile-avatar'
+    | '/api/v1/room-advisor-photo'
     | '/api/v1/wallet-topup-slip'
     | '/cart'
     | '/catalogs'
     | '/inspiration'
+    | '/room-advisor'
     | '/admin/custom'
     | '/admin/inspiration'
     | '/admin/products'
     | '/admin/quotations'
     | '/inspiration/materials/$slug'
+    | '/room-advisor/result/$id'
+    | '/room-advisor/share/$token'
     | '/admin/inspiration/materials/$id'
     | '/admin/inspiration/rooms/$id'
   id:
@@ -1089,8 +1177,10 @@ export interface FileRouteTypes {
     | '/_store/cookies'
     | '/_store/error'
     | '/_store/inspiration'
+    | '/_store/order'
     | '/_store/privacy'
     | '/_store/quick-order'
+    | '/_store/room-advisor'
     | '/_store/shop'
     | '/_store/terms'
     | '/account/affiliate'
@@ -1115,6 +1205,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/quotations'
     | '/admin/reports'
+    | '/admin/room-advisor'
     | '/admin/sales-order'
     | '/admin/settings'
     | '/admin/support'
@@ -1124,6 +1215,7 @@ export interface FileRouteTypes {
     | '/dealer/catalog'
     | '/dealer/quotations'
     | '/dealer/wallet'
+    | '/o/$token'
     | '/quote/$token'
     | '/_store/'
     | '/account/'
@@ -1157,15 +1249,19 @@ export interface FileRouteTypes {
     | '/api/v1/product-image'
     | '/api/v1/products'
     | '/api/v1/profile-avatar'
+    | '/api/v1/room-advisor-photo'
     | '/api/v1/wallet-topup-slip'
     | '/_store/cart/'
     | '/_store/catalogs/'
     | '/_store/inspiration/'
+    | '/_store/room-advisor/'
     | '/admin/custom/'
     | '/admin/inspiration/'
     | '/admin/products/'
     | '/admin/quotations/'
     | '/_store/inspiration/materials/$slug'
+    | '/_store/room-advisor/result/$id'
+    | '/_store/room-advisor/share/$token'
     | '/admin/inspiration/materials/$id'
     | '/admin/inspiration/rooms/$id'
   fileRoutesById: FileRoutesById
@@ -1180,6 +1276,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  OTokenRoute: typeof OTokenRoute
   QuoteTokenRoute: typeof QuoteTokenRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiV1AdminMediaRoute: typeof ApiV1AdminMediaRoute
@@ -1194,6 +1291,7 @@ export interface RootRouteChildren {
   ApiV1ProductImageRoute: typeof ApiV1ProductImageRoute
   ApiV1ProductsRoute: typeof ApiV1ProductsRoute
   ApiV1ProfileAvatarRoute: typeof ApiV1ProfileAvatarRoute
+  ApiV1RoomAdvisorPhotoRoute: typeof ApiV1RoomAdvisorPhotoRoute
   ApiV1WalletTopupSlipRoute: typeof ApiV1WalletTopupSlipRoute
 }
 
@@ -1290,6 +1388,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuoteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/o/$token': {
+      id: '/o/$token'
+      path: '/o/$token'
+      fullPath: '/o/$token'
+      preLoaderRoute: typeof OTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dealer/wallet': {
       id: '/dealer/wallet'
       path: '/wallet'
@@ -1351,6 +1456,13 @@ declare module '@tanstack/react-router' {
       path: '/sales-order'
       fullPath: '/admin/sales-order'
       preLoaderRoute: typeof AdminSalesOrderRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/room-advisor': {
+      id: '/admin/room-advisor'
+      path: '/room-advisor'
+      fullPath: '/admin/room-advisor'
+      preLoaderRoute: typeof AdminRoomAdvisorRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/reports': {
@@ -1521,6 +1633,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoreShopRouteImport
       parentRoute: typeof StoreRoute
     }
+    '/_store/room-advisor': {
+      id: '/_store/room-advisor'
+      path: '/room-advisor'
+      fullPath: '/room-advisor'
+      preLoaderRoute: typeof StoreRoomAdvisorRouteImport
+      parentRoute: typeof StoreRoute
+    }
     '/_store/quick-order': {
       id: '/_store/quick-order'
       path: '/quick-order'
@@ -1533,6 +1652,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof StorePrivacyRouteImport
+      parentRoute: typeof StoreRoute
+    }
+    '/_store/order': {
+      id: '/_store/order'
+      path: '/order'
+      fullPath: '/order'
+      preLoaderRoute: typeof StoreOrderRouteImport
       parentRoute: typeof StoreRoute
     }
     '/_store/inspiration': {
@@ -1633,6 +1759,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCustomIndexRouteImport
       parentRoute: typeof AdminCustomRoute
     }
+    '/_store/room-advisor/': {
+      id: '/_store/room-advisor/'
+      path: '/'
+      fullPath: '/room-advisor/'
+      preLoaderRoute: typeof StoreRoomAdvisorIndexRouteImport
+      parentRoute: typeof StoreRoomAdvisorRoute
+    }
     '/_store/inspiration/': {
       id: '/_store/inspiration/'
       path: '/'
@@ -1659,6 +1792,13 @@ declare module '@tanstack/react-router' {
       path: '/api/v1/wallet-topup-slip'
       fullPath: '/api/v1/wallet-topup-slip'
       preLoaderRoute: typeof ApiV1WalletTopupSlipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/room-advisor-photo': {
+      id: '/api/v1/room-advisor-photo'
+      path: '/api/v1/room-advisor-photo'
+      fullPath: '/api/v1/room-advisor-photo'
+      preLoaderRoute: typeof ApiV1RoomAdvisorPhotoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/v1/profile-avatar': {
@@ -1871,6 +2011,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminInspirationMaterialsIdRouteImport
       parentRoute: typeof AdminInspirationMaterialsRoute
     }
+    '/_store/room-advisor/share/$token': {
+      id: '/_store/room-advisor/share/$token'
+      path: '/share/$token'
+      fullPath: '/room-advisor/share/$token'
+      preLoaderRoute: typeof StoreRoomAdvisorShareTokenRouteImport
+      parentRoute: typeof StoreRoomAdvisorRoute
+    }
+    '/_store/room-advisor/result/$id': {
+      id: '/_store/room-advisor/result/$id'
+      path: '/result/$id'
+      fullPath: '/room-advisor/result/$id'
+      preLoaderRoute: typeof StoreRoomAdvisorResultIdRouteImport
+      parentRoute: typeof StoreRoomAdvisorRoute
+    }
     '/_store/inspiration/materials/$slug': {
       id: '/_store/inspiration/materials/$slug'
       path: '/materials/$slug'
@@ -1924,6 +2078,21 @@ const StoreInspirationRouteChildren: StoreInspirationRouteChildren = {
 const StoreInspirationRouteWithChildren =
   StoreInspirationRoute._addFileChildren(StoreInspirationRouteChildren)
 
+interface StoreRoomAdvisorRouteChildren {
+  StoreRoomAdvisorIndexRoute: typeof StoreRoomAdvisorIndexRoute
+  StoreRoomAdvisorResultIdRoute: typeof StoreRoomAdvisorResultIdRoute
+  StoreRoomAdvisorShareTokenRoute: typeof StoreRoomAdvisorShareTokenRoute
+}
+
+const StoreRoomAdvisorRouteChildren: StoreRoomAdvisorRouteChildren = {
+  StoreRoomAdvisorIndexRoute: StoreRoomAdvisorIndexRoute,
+  StoreRoomAdvisorResultIdRoute: StoreRoomAdvisorResultIdRoute,
+  StoreRoomAdvisorShareTokenRoute: StoreRoomAdvisorShareTokenRoute,
+}
+
+const StoreRoomAdvisorRouteWithChildren =
+  StoreRoomAdvisorRoute._addFileChildren(StoreRoomAdvisorRouteChildren)
+
 interface StoreRouteChildren {
   StoreAboutRoute: typeof StoreAboutRoute
   StoreCartRoute: typeof StoreCartRouteWithChildren
@@ -1935,8 +2104,10 @@ interface StoreRouteChildren {
   StoreCookiesRoute: typeof StoreCookiesRoute
   StoreErrorRoute: typeof StoreErrorRoute
   StoreInspirationRoute: typeof StoreInspirationRouteWithChildren
+  StoreOrderRoute: typeof StoreOrderRoute
   StorePrivacyRoute: typeof StorePrivacyRoute
   StoreQuickOrderRoute: typeof StoreQuickOrderRoute
+  StoreRoomAdvisorRoute: typeof StoreRoomAdvisorRouteWithChildren
   StoreShopRoute: typeof StoreShopRoute
   StoreTermsRoute: typeof StoreTermsRoute
   StoreIndexRoute: typeof StoreIndexRoute
@@ -1955,8 +2126,10 @@ const StoreRouteChildren: StoreRouteChildren = {
   StoreCookiesRoute: StoreCookiesRoute,
   StoreErrorRoute: StoreErrorRoute,
   StoreInspirationRoute: StoreInspirationRouteWithChildren,
+  StoreOrderRoute: StoreOrderRoute,
   StorePrivacyRoute: StorePrivacyRoute,
   StoreQuickOrderRoute: StoreQuickOrderRoute,
+  StoreRoomAdvisorRoute: StoreRoomAdvisorRouteWithChildren,
   StoreShopRoute: StoreShopRoute,
   StoreTermsRoute: StoreTermsRoute,
   StoreIndexRoute: StoreIndexRoute,
@@ -2119,6 +2292,7 @@ interface AdminRouteChildren {
   AdminProductsRoute: typeof AdminProductsRouteWithChildren
   AdminQuotationsRoute: typeof AdminQuotationsRouteWithChildren
   AdminReportsRoute: typeof AdminReportsRoute
+  AdminRoomAdvisorRoute: typeof AdminRoomAdvisorRoute
   AdminSalesOrderRoute: typeof AdminSalesOrderRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminSupportRoute: typeof AdminSupportRoute
@@ -2144,6 +2318,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminProductsRoute: AdminProductsRouteWithChildren,
   AdminQuotationsRoute: AdminQuotationsRouteWithChildren,
   AdminReportsRoute: AdminReportsRoute,
+  AdminRoomAdvisorRoute: AdminRoomAdvisorRoute,
   AdminSalesOrderRoute: AdminSalesOrderRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminSupportRoute: AdminSupportRoute,
@@ -2181,6 +2356,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  OTokenRoute: OTokenRoute,
   QuoteTokenRoute: QuoteTokenRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiV1AdminMediaRoute: ApiV1AdminMediaRoute,
@@ -2195,6 +2371,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1ProductImageRoute: ApiV1ProductImageRoute,
   ApiV1ProductsRoute: ApiV1ProductsRoute,
   ApiV1ProfileAvatarRoute: ApiV1ProfileAvatarRoute,
+  ApiV1RoomAdvisorPhotoRoute: ApiV1RoomAdvisorPhotoRoute,
   ApiV1WalletTopupSlipRoute: ApiV1WalletTopupSlipRoute,
 }
 export const routeTree = rootRouteImport

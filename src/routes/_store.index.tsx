@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 import { PageLoading } from "@/components/loading";
 import { CategoryImageGrid } from "@/components/storefront/category-image-grid";
@@ -6,6 +6,7 @@ import { HomeCatalogCta } from "@/components/storefront/catalog-category-hero";
 import { HomeCapabilities } from "@/components/storefront/home/home-capabilities";
 import { HomeCta } from "@/components/storefront/home/home-cta";
 import { HomeDealerCta } from "@/components/storefront/home/home-dealer-cta";
+import { HomeEntryChoice } from "@/components/storefront/home/home-entry-choice";
 import { HomeHero } from "@/components/storefront/home/home-hero";
 import { HomeInspirationPreview } from "@/components/storefront/home/home-inspiration-preview";
 import { HomeProcess } from "@/components/storefront/home/home-process";
@@ -13,6 +14,7 @@ import { HomeSolutions } from "@/components/storefront/home/home-solutions";
 import { HomeValuePillars } from "@/components/storefront/home/home-value-pillars";
 import { ProductFeed } from "@/components/storefront/product-feed";
 import { resolveInspirationRooms } from "@/data/inspiration-fallback";
+import { useAuth } from "@/hooks/use-auth";
 import { useMemberProductPrices } from "@/hooks/use-member-product-prices";
 import { useT } from "@/i18n";
 import {
@@ -60,12 +62,18 @@ export const Route = createFileRoute("/_store/")({
 
 function HomePage() {
   const { t } = useT();
+  const { isDealer, loading: authLoading } = useAuth();
   const { featuredProducts, categories, heroBanners, inspirationRooms } =
     Route.useLoaderData();
   const memberPrices = useMemberProductPrices(featuredProducts);
 
+  if (!authLoading && isDealer) {
+    return <Navigate to="/order" />;
+  }
+
   return (
     <div className="mx-auto max-w-7xl space-y-10 px-4 py-6 sm:px-6 sm:py-8 md:space-y-14">
+      <HomeEntryChoice />
       <HomeHero banners={heroBanners} />
       <HomeValuePillars />
       <HomeInspirationPreview rooms={inspirationRooms} />

@@ -41,6 +41,14 @@ export function InspirationHero() {
             className="border-white/40 bg-transparent text-white hover:bg-white/10"
             asChild
           >
+            <Link to="/room-advisor">อัปโหลดรูปห้อง</Link>
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-white/40 bg-transparent text-white hover:bg-white/10"
+            asChild
+          >
             <Link to="/shop">{t("home.hero.ctaShop")}</Link>
           </Button>
         </div>

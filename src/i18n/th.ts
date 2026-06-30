@@ -4,6 +4,7 @@ export const th: Translations = {
   "app.name": "WP ALL",
   "app.tagline": "ศูนย์กลางผ้าม่าน — ครบวงจร",
   "nav.home": "หน้าแรก",
+  "nav.order": "สั่งเลย",
   "nav.shop": "ร้านค้า",
   "nav.catalogs": "แคตตาล็อก",
   "nav.configurator": "Custom",
@@ -197,6 +198,18 @@ export const th: Translations = {
   "home.dealer.point3": "แคตตาล็อก PDF เฉพาะตัวแทน",
   "home.dealer.ctaRegister": "สมัครตัวแทน",
   "home.dealer.ctaQuickOrder": "สั่งด่วน SKU",
+  "home.entry.b2b.title": "สั่งจากโรงงาน",
+  "home.entry.b2b.desc":
+    "ร้านม่าน/ช่าง — พิมพ์ SKU สั่งได้ทันที ดาวน์โหลด price list ราคาส่ง",
+  "home.entry.b2b.cta": "สั่งเลย",
+  "home.entry.retail.title": "สินค้าปลีก",
+  "home.entry.retail.desc": "ดูแบบ แรงบันดาลใจ Custom และสินค้าพร้อมส่ง",
+  "home.entry.retail.cta": "ดูสินค้า",
+  "home.entry.loginOrder": "เข้าสู่ระบบแล้ว? สั่งเลย",
+  "home.entry.hasAccount": "มีบัญชีแล้ว?",
+  "order.title": "สั่งจากโรงงาน",
+  "order.description":
+    "พิมพ์ SKU หรือวางรายการจาก LINE — ยืนยันแล้วชำระเงินได้ทันที",
   "inspiration.title": "แรงบันดาลใจ — ห้องในฝัน",
   "inspiration.subtitle":
     "เลือกดูตามห้องหรือวัสดุ แตะจุดบนภาพเพื่อดูสินค้าและสั่งทำแบบเดียวกัน",

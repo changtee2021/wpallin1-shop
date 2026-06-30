@@ -14,13 +14,12 @@ import { useAuth } from "@/hooks/use-auth";
 import { useT } from "@/i18n";
 
 const storeLinks = [
-  { to: "/", key: "nav.home" as const },
-  { to: "/inspiration", key: "nav.inspiration" as const },
+  { to: "/order", key: "nav.order" as const },
   { to: "/shop", key: "nav.shop" as const },
+  { to: "/inspiration", key: "nav.inspiration" as const },
   { to: "/configurator", key: "nav.configurator" as const },
   { to: "/catalogs", key: "nav.catalogs" as const },
   { to: "/dealer/register", key: "nav.dealerRegister" as const },
-  { to: "/quick-order", key: "home.dealer.ctaQuickOrder" as const },
   { to: "/about", key: "nav.about" as const },
   { to: "/contact", key: "nav.contact" as const },
 ];

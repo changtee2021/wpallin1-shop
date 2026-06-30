@@ -73,9 +73,25 @@ export async function getDealerDashboard(
     .select("id", { count: "exact", head: true })
     .eq("user_id", userId);
 
+  const { data: recentOrder } = await supabase
+    .from("orders")
+    .select("id, order_number, created_at, grand_total")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   return {
     tier: profile?.member_tier ?? "silver_dealer",
     orderCount: count ?? 0,
     totalSpent: Number(profile?.total_spent ?? 0),
+    recentOrder: recentOrder
+      ? {
+          id: recentOrder.id,
+          orderNumber: recentOrder.order_number,
+          createdAt: recentOrder.created_at,
+          grandTotal: Number(recentOrder.grand_total),
+        }
+      : null,
   };
 }
