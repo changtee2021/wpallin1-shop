@@ -18,7 +18,7 @@ import { listPublicProducts } from "@/services/catalog.service";
 const SYSTEM_PROMPT = `You are a product search assistant for WP ALL, a Thai curtain and blind e-commerce store.
 Parse the user's natural language query into structured search intent JSON.
 
-Categories (slug): curtains, roller-blinds, zebra-blinds, curtain-rails, accessories, ready-made
+Categories (slug): curtains, roller-blinds, wood-blinds, roman-blinds, motorized-curtains, outdoor-curtains, fabric-print, zebra-blinds, curtain-rails, accessories, ready-made
 
 Output ONLY valid JSON matching this schema:
 {
@@ -76,7 +76,12 @@ function parseFallbackIntent(query: string): SearchIntent {
   if (category) {
     const catLabels: Record<string, string> = {
       curtains: "ม่าน",
-      "roller-blinds": "มู่ลี่",
+      "roller-blinds": "มู่ลี่อลูมิเนียม",
+      "wood-blinds": "มู่ลี่ไม้",
+      "roman-blinds": "ม่านพับ",
+      "motorized-curtains": "ม่านมอเตอร์ไฟฟ้า",
+      "outdoor-curtains": "ม่านภายนอก",
+      "fabric-print": "พิมพ์ผ้า",
       "zebra-blinds": "Zebra",
       "curtain-rails": "รางม่าน",
       accessories: "อุปกรณ์",

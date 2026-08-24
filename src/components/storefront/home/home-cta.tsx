@@ -18,7 +18,9 @@ export function HomeCta() {
           className="bg-accent text-accent-foreground hover:bg-accent/90"
           asChild
         >
-          <Link to="/contact">{t("home.cta.primary")}</Link>
+          <Link to="/contact" search={{ topic: "quote" }}>
+            {t("home.cta.primary")}
+          </Link>
         </Button>
         <Button
           size="lg"

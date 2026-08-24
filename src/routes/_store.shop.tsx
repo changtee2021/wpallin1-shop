@@ -1,4 +1,4 @@
-import { createFileRoute, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -12,6 +12,8 @@ import { ShopFilterSheet } from "@/components/storefront/shop/shop-filter-sheet"
 import { ShopFilterSidebar } from "@/components/storefront/shop/shop-filter-sidebar";
 import { ShopFilterToggle } from "@/components/storefront/shop/shop-filter-toggle";
 import { SmartProductSearch } from "@/components/storefront/shop/smart-product-search";
+import { Button } from "@/components/ui/button";
+import { ListEmptyState, ListErrorState, ListNoResultsState } from "@/components/ui/list-query-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { SearchIntent } from "@/domain/search-intent";
 import { useMemberProductPrices } from "@/hooks/use-member-product-prices";
@@ -25,6 +27,7 @@ import {
 } from "@/lib/api.functions";
 import {
   buildShopListOptions,
+  clearAllFilters,
   countActiveFilters,
   type ShopSearchState,
 } from "@/lib/shop-search";
@@ -109,8 +112,24 @@ export const Route = createFileRoute("/_store/shop")({
     };
   },
   pendingComponent: () => <PageLoading variant="grid" />,
+  errorComponent: ShopError,
   component: ShopPage,
 });
+
+function ShopError({ error, reset }: { error: Error; reset: () => void }) {
+  const router = useRouter();
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+      <ListErrorState
+        message={error.message || "โหลดไม่สำเร็จ"}
+        onRetry={() => {
+          void router.invalidate();
+          reset();
+        }}
+      />
+    </div>
+  );
+}
 
 function ShopPage() {
   const search = Route.useSearch() as ShopSearchState;
@@ -220,17 +239,17 @@ function ShopPage() {
                   activeCount={activeCount}
                   onToggle={() => setMobileFiltersOpen(true)}
                   variant="bar"
-                  className="h-9 shrink-0 px-3"
+                  className="shrink-0 px-3"
                 />
                 <SmartProductSearch
                   defaultValue={search.smartQuery ?? ""}
                   isPending={isPending && Boolean(search.smartQuery)}
                   onSearch={handleSmartSearch}
                   compact
-                  className="h-9 shrink-0"
+                  className="shrink-0"
                 />
               </div>
-              <p className="mt-1.5 text-xs text-muted-foreground">
+              <p className="mt-1.5 text-xs text-muted-foreground tabular-nums">
                 แสดง {items.length} จาก {total} รายการ
               </p>
             </div>
@@ -242,7 +261,7 @@ function ShopPage() {
                 isPending={isPending && Boolean(search.smartQuery)}
                 onSearch={handleSmartSearch}
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground tabular-nums">
                 แสดง {items.length} จาก {total} รายการ
               </p>
             </div>
@@ -255,16 +274,33 @@ function ShopPage() {
               onChange={applySearch}
             />
 
-            <ProductFeed
-              products={items}
-              title="สินค้าทั้งหมด"
-              memberPrices={memberPrices}
-              emptyMessage={
-                search.smartQuery
-                  ? "ไม่พบสินค้าที่ตรงกับคำค้นหา — ลองปรับคำอธิบายหรือใช้ตัวกรอง"
-                  : "ยังไม่มีสินค้า"
-              }
-            />
+            {items.length === 0 ? (
+              activeCount > 0 ? (
+                <ListNoResultsState
+                  message={
+                    search.smartQuery
+                      ? "ไม่พบสินค้าที่ตรงกับคำค้นหา — ลองปรับคำอธิบายหรือใช้ตัวกรอง"
+                      : "ไม่พบรายการที่ตรงกับตัวกรอง"
+                  }
+                  onClear={() => applySearch(clearAllFilters())}
+                />
+              ) : (
+                <ListEmptyState
+                  message="ยังไม่มีสินค้า"
+                  action={
+                    <Button asChild variant="outline">
+                      <Link to="/contact">ติดต่อเรา</Link>
+                    </Button>
+                  }
+                />
+              )
+            ) : (
+              <ProductFeed
+                products={items}
+                title="สินค้าทั้งหมด"
+                memberPrices={memberPrices}
+              />
+            )}
 
             {loadingMore ? (
               <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">

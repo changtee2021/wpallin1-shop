@@ -95,10 +95,14 @@ Current oklch values (light mode):
 
 ### Web fallback (ปัจจุบันใน `src/styles.css`)
 
+ใช้ **Prompt** เป็นฟอนต์หลักของทั้งเว็บ — ให้ตรงกับเว็บ WSC (`wp-enterprise`) ในเครือเดียวกัน:
+
 ```css
---font-sans: "Inter", "IBM Plex Sans Thai", "Noto Sans Thai", system-ui, sans-serif;
+--font-sans: "Prompt", ui-sans-serif, system-ui, sans-serif;
 --font-document: "Sarabun", "TH Sarabun New", "Noto Sans Thai", sans-serif;
 ```
+
+`font-document` (Sarabun) ใช้เฉพาะหน้าเอกสาร/ใบเสนอราคาที่ต้องพิมพ์ ไม่เปลี่ยนตาม Prompt
 
 ### Type scale (mobile-first)
 
@@ -237,7 +241,7 @@ Implementation: `src/components/storefront/product-card.tsx`
 |--------|-----------|--------------|
 | สีหลัก | Teal `#188F8B` | `--primary` teal ใน `styles.css` ✅ |
 | สี accent | Orange `#E7847E` | `--accent` orange ใน `styles.css` ✅ |
-| ฟอนต์ | DB Heavent | Inter + IBM Plex Sans Thai ⚠️ |
+| ฟอนต์ | DB Heavent | Prompt (ตรงกับเว็บ WSC) ✅ |
 | Layout home | category grid + carousel | `CategoryRail` + `ProductFeed` — ยังไม่เหมือน mockup 100% |
 | Header | teal bar | header เป็น white ⚠️ |
 

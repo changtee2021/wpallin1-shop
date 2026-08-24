@@ -22,6 +22,7 @@ import {
 import { useState } from "react";
 
 import { AccountHelpDialog } from "@/components/account/account-help-dialog";
+import { useSignOutConfirm } from "@/components/auth/sign-out-confirm";
 
 import {
   Sheet,
@@ -242,7 +243,8 @@ export function AppMoreSheet({
   leadingLinks?: MoreLink[];
 }) {
   const { t } = useT();
-  const { user, isAdmin, isDealer, signOut } = useAuth();
+  const { user, isAdmin, isDealer } = useAuth();
+  const { requestSignOut, SignOutDialog } = useSignOutConfirm(() => onOpenChange(false));
   const { openChat } = useChatUiSafe();
   const [helpOpen, setHelpOpen] = useState(false);
   const flatLinks = linksForZone(zone, isAdmin, isDealer, !!user);
@@ -305,10 +307,7 @@ export function AppMoreSheet({
                 <button
                   type="button"
                   className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-destructive hover:bg-muted"
-                  onClick={() => {
-                    void signOut();
-                    close();
-                  }}
+                  onClick={requestSignOut}
                 >
                   <LogOut className="size-5" />
                   {t("nav.logout") ?? "ออกจากระบบ"}
@@ -327,6 +326,7 @@ export function AppMoreSheet({
           </nav>
         </SheetContent>
       </Sheet>
+      <SignOutDialog />
       <AccountHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
     </>
   );

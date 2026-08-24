@@ -6,10 +6,12 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ListEmptyState, ListErrorState, ListNoResultsState } from "@/components/ui/list-query-state";
+import { Price } from "@/components/ui/price";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchAdminOrders } from "@/lib/api.functions";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import type { AdminOrderSummaryDto } from "@/types/api/orders";
 
 export const Route = createFileRoute("/admin/orders")({
@@ -31,16 +33,23 @@ function AdminOrdersPage() {
   const [orders, setOrders] = useState<AdminOrderSummaryDto[]>([]);
   const [filter, setFilter] = useState<string>("awaiting_payment_verification");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
     void fetchAdminOrders({
       data: { status: filter || undefined },
       ...authServerFnOptions(session),
     })
       .then(setOrders)
+      .catch((err) => {
+        setOrders([]);
+        setError(err instanceof Error ? err.message : "โหลดไม่สำเร็จ");
+      })
       .finally(() => setLoading(false));
-  }, [session, filter]);
+  }, [session, filter, reloadKey]);
 
   return (
     <div>
@@ -69,12 +78,21 @@ function AdminOrdersPage() {
 
       {loading ? (
         <PageLoading variant="table" />
+      ) : error ? (
+        <ListErrorState
+          message={error}
+          onRetry={() => setReloadKey((key) => key + 1)}
+        />
       ) : orders.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center text-muted-foreground">
-            ไม่มีคำสั่งซื้อ
-          </CardContent>
-        </Card>
+        filter ? (
+          <ListNoResultsState
+            message="ไม่พบรายการที่ตรงกับตัวกรอง"
+            onClear={() => setFilter("")}
+            clearLabel="ดูทั้งหมด"
+          />
+        ) : (
+          <ListEmptyState message="ยังไม่มีคำสั่งซื้อ" />
+        )
       ) : (
         <div className="space-y-3">
           {orders.map((order) => (
@@ -95,7 +113,9 @@ function AdminOrdersPage() {
                 <Badge variant="secondary">
                   {statusLabels[order.status] ?? order.status}
                 </Badge>
-                <p className="font-bold">{formatPrice(order.grandTotal)}</p>
+                <p className="font-bold">
+                  <Price amount={order.grandTotal} />
+                </p>
                 <Button asChild size="sm" variant="outline">
                   <Link
                     to="/admin/orders/$orderId"

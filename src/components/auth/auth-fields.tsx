@@ -15,6 +15,8 @@ type PasswordInputProps = {
   className?: string;
   showLabel?: string;
   hideLabel?: string;
+  invalid?: boolean;
+  describedBy?: string;
 };
 
 export function PasswordInput({
@@ -27,6 +29,8 @@ export function PasswordInput({
   className,
   showLabel = "แสดงรหัสผ่าน",
   hideLabel = "ซ่อนรหัสผ่าน",
+  invalid,
+  describedBy,
 }: PasswordInputProps) {
   const [visible, setVisible] = useState(false);
 
@@ -40,6 +44,8 @@ export function PasswordInput({
         autoComplete={autoComplete}
         minLength={minLength}
         required={required}
+        aria-invalid={invalid || undefined}
+        aria-describedby={describedBy}
         className="pr-10"
       />
       <Button

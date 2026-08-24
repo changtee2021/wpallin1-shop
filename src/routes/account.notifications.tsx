@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ListEmptyState, ListErrorState } from "@/components/ui/list-query-state";
 import { useAuth } from "@/hooks/use-auth";
 import {
   fetchNotifications,
@@ -26,13 +27,21 @@ function AccountNotificationsPage() {
   const authOpts = useAuthServerFnOptions(session);
   const [items, setItems] = useState<NotificationDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setError(null);
     void fetchNotifications(authOpts)
       .then((data) => {
         if (!cancelled) setItems(data);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "โหลดไม่สำเร็จ");
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -40,7 +49,7 @@ function AccountNotificationsPage() {
     return () => {
       cancelled = true;
     };
-  }, [authOpts]);
+  }, [authOpts, reloadKey]);
 
   async function markRead(id: string) {
     await markNotificationReadFn({ data: { id }, ...authOpts });
@@ -70,12 +79,13 @@ function AccountNotificationsPage() {
       <div className="space-y-2">
         {loading ? (
           <PageLoading variant="list" />
+        ) : error ? (
+          <ListErrorState
+            message={error}
+            onRetry={() => setReloadKey((key) => key + 1)}
+          />
         ) : items.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center text-muted-foreground">
-              ไม่มีแจ้งเตือน
-            </CardContent>
-          </Card>
+          <ListEmptyState message="ยังไม่มีแจ้งเตือน" />
         ) : (
           items.map((n) => {
             const href =

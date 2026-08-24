@@ -32,11 +32,12 @@ export function CompareBar() {
                 ) : null}
                 <button
                   type="button"
-                  className="absolute -top-1 -right-1 rounded-full bg-destructive p-0.5 text-white"
+                  className="absolute -top-1 -right-1 inline-flex min-h-7 min-w-7 items-center justify-center rounded-full bg-destructive text-white"
                   onClick={() => remove(item.id)}
-                  aria-label="ลบ"
+                  aria-label={`ลบ ${item.name}`}
                 >
-                  <X className="size-3" />
+                  <X className="size-3" aria-hidden />
+                  <span className="sr-only">ลบ</span>
                 </button>
               </div>
             ))}

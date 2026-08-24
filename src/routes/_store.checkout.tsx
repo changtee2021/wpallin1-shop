@@ -6,8 +6,10 @@ import { z } from "zod";
 import { InlineRowsSkeleton } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { FieldError } from "@/components/ui/field-error";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Price } from "@/components/ui/price";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -82,6 +84,8 @@ function CheckoutPage() {
   const [hasCredit, setHasCredit] = useState(false);
   const [savedAddresses, setSavedAddresses] = useState<AddressDto[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("manual");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [form, setForm] = useState({
     recipientName: user?.user_metadata?.full_name ?? "",
     phone: "",
@@ -161,6 +165,13 @@ function CheckoutPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const nextErrors: Record<string, string> = {};
+    if (!form.recipientName.trim()) nextErrors.recipientName = "กรอกชื่อผู้รับ";
+    if (!form.phone.trim()) nextErrors.phone = "กรอกเบอร์โทร";
+    if (!form.line1.trim()) nextErrors.line1 = "กรอกที่อยู่";
+    setFieldErrors(nextErrors);
+    setSubmitError(null);
+    if (Object.keys(nextErrors).length) return;
     setSubmitting(true);
     try {
       const result = await checkoutOrder({
@@ -198,7 +209,10 @@ function CheckoutPage() {
         });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "สั่งซื้อไม่สำเร็จ");
+      const message =
+        err instanceof Error ? err.message : "สั่งซื้อไม่สำเร็จ";
+      setSubmitError(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -217,7 +231,7 @@ function CheckoutPage() {
                   {item.productName} x{item.qty}
                 </span>
                 <span className="shrink-0 font-medium">
-                  {formatPrice(item.lineTotal)}
+                  <Price amount={item.lineTotal} />
                 </span>
               </div>
             ))}
@@ -262,11 +276,17 @@ function CheckoutPage() {
                   id="name"
                   required
                   value={form.recipientName}
+                  aria-invalid={Boolean(fieldErrors.recipientName) || undefined}
+                  aria-describedby={
+                    fieldErrors.recipientName ? "name-error" : undefined
+                  }
                   onChange={(e) => {
                     setSelectedAddressId("manual");
+                    setFieldErrors((prev) => ({ ...prev, recipientName: "" }));
                     setForm({ ...form, recipientName: e.target.value });
                   }}
                 />
+                <FieldError id="name-error">{fieldErrors.recipientName}</FieldError>
               </div>
               <div>
                 <Label htmlFor="phone">เบอร์โทร</Label>
@@ -274,11 +294,17 @@ function CheckoutPage() {
                   id="phone"
                   required
                   value={form.phone}
+                  aria-invalid={Boolean(fieldErrors.phone) || undefined}
+                  aria-describedby={
+                    fieldErrors.phone ? "phone-error" : undefined
+                  }
                   onChange={(e) => {
                     setSelectedAddressId("manual");
+                    setFieldErrors((prev) => ({ ...prev, phone: "" }));
                     setForm({ ...form, phone: e.target.value });
                   }}
                 />
+                <FieldError id="phone-error">{fieldErrors.phone}</FieldError>
               </div>
               <div>
                 <Label htmlFor="postal">รหัสไปรษณีย์</Label>
@@ -297,11 +323,17 @@ function CheckoutPage() {
                   id="line1"
                   required
                   value={form.line1}
+                  aria-invalid={Boolean(fieldErrors.line1) || undefined}
+                  aria-describedby={
+                    fieldErrors.line1 ? "line1-error" : undefined
+                  }
                   onChange={(e) => {
                     setSelectedAddressId("manual");
+                    setFieldErrors((prev) => ({ ...prev, line1: "" }));
                     setForm({ ...form, line1: e.target.value });
                   }}
                 />
+                <FieldError id="line1-error">{fieldErrors.line1}</FieldError>
               </div>
               <div>
                 <Label htmlFor="district">เขต/อำเภอ</Label>
@@ -368,10 +400,14 @@ function CheckoutPage() {
             )}
             <div className="flex justify-between text-lg font-bold">
               <span>ยอดชำระ</span>
-              <span className="text-accent">{formatPrice(checkoutTotal)}</span>
+              <span className="text-accent">
+                <Price amount={checkoutTotal} />
+              </span>
             </div>
           </CardContent>
         </Card>
+
+        <FieldError>{submitError}</FieldError>
 
         <Button
           type="submit"

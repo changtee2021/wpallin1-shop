@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useCompare } from "@/hooks/use-compare";
-import { formatPrice } from "@/lib/format";
+import { Price } from "@/components/ui/price";
 import type { ProductPublicDto } from "@/types/api/products";
 
 type ProductCardProps = {
@@ -119,16 +119,16 @@ export function ProductCard({
 
         <div className="flex flex-wrap items-baseline gap-2">
           <span className="text-base font-semibold text-accent">
-            {formatPrice(displayPrice)}
+            <Price amount={displayPrice} />
           </span>
           {hasMemberDiscount && (
             <span className="text-xs text-muted-foreground line-through">
-              {formatPrice(product.retailPrice)}
+              <Price amount={product.retailPrice} />
             </span>
           )}
           {hasCompareDiscount && (
             <span className="text-xs text-muted-foreground line-through">
-              {formatPrice(product.compareAtPrice!)}
+              <Price amount={product.compareAtPrice!} />
             </span>
           )}
         </div>

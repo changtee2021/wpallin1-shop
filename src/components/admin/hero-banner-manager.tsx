@@ -9,6 +9,7 @@ import {
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { useAdminConfirm } from "@/components/admin/shared/admin-confirm-dialog";
 import { AdminPreviewLink } from "@/components/admin/shared/admin-preview-link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -44,6 +45,7 @@ export function HeroBannerManager({
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const { confirm, AdminConfirmDialog } = useAdminConfirm();
 
   function updateBanner(id: string, patch: Partial<HeroBannerDto>) {
     onChange(banners.map((b) => (b.id === id ? { ...b, ...patch } : b)));
@@ -193,12 +195,20 @@ export function HeroBannerManager({
                     </Button>
                     <Button
                       type="button"
-                      size="icon"
                       variant="outline"
-                      onClick={() => removeBanner(banner.id)}
-                      aria-label="ลบ"
+                      onClick={() => {
+                        void confirm({
+                          title: "ลบแบนเนอร์?",
+                          description: "แบนเนอร์นี้จะถูกลบออกจากรายการ",
+                          confirmLabel: "ลบ",
+                          destructive: true,
+                        }).then((ok) => {
+                          if (ok) removeBanner(banner.id);
+                        });
+                      }}
                     >
                       <Trash2 className="size-4" />
+                      ลบ
                     </Button>
                   </div>
                 </div>
@@ -244,6 +254,7 @@ export function HeroBannerManager({
           ))}
         </div>
       )}
+      <AdminConfirmDialog />
     </div>
   );
 }

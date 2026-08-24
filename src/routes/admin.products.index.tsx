@@ -8,6 +8,12 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  ListEmptyState,
+  ListErrorState,
+  ListNoResultsState,
+} from "@/components/ui/list-query-state";
+import { Price } from "@/components/ui/price";
+import {
   Table,
   TableBody,
   TableCell,
@@ -18,7 +24,6 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { fetchAdminProducts } from "@/lib/api.functions";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
-import { formatPrice } from "@/lib/format";
 import { useT } from "@/i18n";
 import type { AdminProductRow } from "@/services/admin-catalog.service";
 
@@ -31,14 +36,21 @@ function AdminProductsPage() {
   const { session } = useAuth();
   const [products, setProducts] = useState<AdminProductRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     void fetchAdminProducts(authServerFnOptions(session))
       .then(setProducts)
-      .catch(() => setProducts([]))
+      .catch((err) => {
+        setProducts([]);
+        setError(err instanceof Error ? err.message : "โหลดไม่สำเร็จ");
+      })
       .finally(() => setLoading(false));
-  }, [session]);
+  }, [session, reloadKey]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -77,6 +89,28 @@ function AdminProductsPage() {
 
       {loading ? (
         <PageLoading variant="table" />
+      ) : error ? (
+        <ListErrorState
+          message={error}
+          onRetry={() => setReloadKey((key) => key + 1)}
+        />
+      ) : products.length === 0 ? (
+        <ListEmptyState
+          message="ยังไม่มีสินค้า"
+          action={
+            <Button asChild>
+              <Link to="/admin/products/new">
+                <Plus className="mr-2 size-4" />
+                เพิ่มสินค้า
+              </Link>
+            </Button>
+          }
+        />
+      ) : filtered.length === 0 ? (
+        <ListNoResultsState
+          onClear={() => setQuery("")}
+          clearLabel="ล้างการค้นหา"
+        />
       ) : (
         <div className="rounded-xl border bg-card">
           <Table>
@@ -93,51 +127,42 @@ function AdminProductsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={8}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    {products.length === 0 ? "ยังไม่มีสินค้า" : "ไม่พบสินค้า"}
+              {filtered.map((p) => (
+                <TableRow key={p.id}>
+                  <TableCell>
+                    {p.imageUrl ? (
+                      <img
+                        src={p.imageUrl}
+                        alt=""
+                        className="size-10 rounded-md border object-cover"
+                      />
+                    ) : (
+                      <div className="flex size-10 items-center justify-center rounded-md border bg-muted">
+                        <ImageIcon className="size-4 text-muted-foreground" />
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>{p.sku ?? "—"}</TableCell>
+                  <TableCell className="font-medium">{p.name}</TableCell>
+                  <TableCell>{p.categoryName ?? "—"}</TableCell>
+                  <TableCell>
+                    <Price amount={p.retailPrice} />
+                  </TableCell>
+                  <TableCell className="tabular-nums">{p.stockQty}</TableCell>
+                  <TableCell>
+                    <Badge variant={p.isActive ? "default" : "secondary"}>
+                      {p.isActive ? "เปิด" : "ปิด"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link to="/admin/products/$id" params={{ id: p.id }}>
+                        แก้ไข
+                      </Link>
+                    </Button>
                   </TableCell>
                 </TableRow>
-              ) : (
-                filtered.map((p) => (
-                  <TableRow key={p.id}>
-                    <TableCell>
-                      {p.imageUrl ? (
-                        <img
-                          src={p.imageUrl}
-                          alt=""
-                          className="size-10 rounded-md border object-cover"
-                        />
-                      ) : (
-                        <div className="flex size-10 items-center justify-center rounded-md border bg-muted">
-                          <ImageIcon className="size-4 text-muted-foreground" />
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>{p.sku ?? "—"}</TableCell>
-                    <TableCell className="font-medium">{p.name}</TableCell>
-                    <TableCell>{p.categoryName ?? "—"}</TableCell>
-                    <TableCell>{formatPrice(p.retailPrice)}</TableCell>
-                    <TableCell>{p.stockQty}</TableCell>
-                    <TableCell>
-                      <Badge variant={p.isActive ? "default" : "secondary"}>
-                        {p.isActive ? "เปิด" : "ปิด"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link to="/admin/products/$id" params={{ id: p.id }}>
-                          แก้ไข
-                        </Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
+              ))}
             </TableBody>
           </Table>
         </div>

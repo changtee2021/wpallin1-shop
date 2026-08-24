@@ -1,15 +1,17 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useMatchRoute } from "@tanstack/react-router";
 import { MessageCircle, ShoppingCart, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { AccountMenuButton } from "@/components/account/account-menu-button";
 import { NotificationBell } from "@/components/notifications/notification-bell";
-import { SearchBar } from "@/components/storefront/search-bar";
+import { HeaderSearch } from "@/components/storefront/search-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
 import { useChatUiSafe } from "@/hooks/use-chat-ui";
 import { useT } from "@/i18n";
+import { cn } from "@/lib/utils";
 
 const navLinks = [
   { to: "/" as const, key: "nav.home" as const, exact: true },
@@ -27,48 +29,87 @@ export function StorefrontHeader() {
   const { user } = useAuth();
   const { openChat } = useChatUiSafe();
   const { cart } = useCart();
+  const matchRoute = useMatchRoute();
+  const isHome = Boolean(matchRoute({ to: "/", fuzzy: false }));
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    if (!isHome) {
+      setScrolled(false);
+      return;
+    }
+
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isHome]);
+
+  const overlayHero = isHome && !scrolled;
 
   return (
-    <header className="sticky top-0 z-40 bg-gradient-to-r from-primary to-[#126B68] text-white shadow-md">
+    <header
+      className={cn(
+        "z-40 text-white transition-colors duration-200",
+        overlayHero
+          ? "fixed inset-x-0 top-0 bg-transparent shadow-none"
+          : isHome
+            ? "fixed inset-x-0 top-0 bg-gradient-to-r from-primary to-primary/80 shadow-md"
+            : "sticky top-0 bg-gradient-to-r from-primary to-primary/80 shadow-md",
+      )}
+    >
       <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
         {/* Mobile: logo · search · bell */}
-        <div className="flex h-14 items-center gap-2 py-1 md:hidden">
+        <div className="flex h-14 items-center gap-1 py-1 md:hidden">
           <Link to="/" className="flex shrink-0 items-center" aria-label={t("nav.home")}>
             <img
-              src="/brand/logo-mono-dark.png"
+              src="/brand/logo-white.png"
               alt="WP ALL"
               className="h-8 w-auto object-contain mix-blend-screen"
             />
           </Link>
-          <SearchBar compact className="min-w-0" />
-          {user ? (
-            <NotificationBell triggerClassName={headerIconClass} />
-          ) : null}
+          <div className="ml-auto flex items-center gap-0.5">
+            <HeaderSearch triggerClassName={headerIconClass} />
+            {user ? (
+              <NotificationBell triggerClassName={headerIconClass} />
+            ) : null}
+          </div>
         </div>
 
-        {/* Desktop: logo · search · actions */}
-        <div className="hidden h-16 items-center gap-4 md:flex lg:gap-6">
+        {/* Desktop: logo · nav · search · actions */}
+        <div className="hidden h-16 items-center gap-3 md:flex lg:gap-8">
           <Link to="/" className="flex shrink-0 items-center" aria-label={t("nav.home")}>
             <img
-              src="/brand/logo-mono-dark.png"
+              src="/brand/logo-white.png"
               alt="WP ALL"
               className="h-10 w-auto object-contain mix-blend-screen"
             />
           </Link>
-          <div className="min-w-0 flex-1">
-            <SearchBar />
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
+          <nav className="flex min-w-0 shrink items-center gap-2.5 overflow-x-auto lg:gap-6">
+            {navLinks.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="text-[13px] font-normal whitespace-nowrap text-white/80 transition-colors hover:text-white lg:text-sm"
+                activeProps={{ className: "text-white font-medium" }}
+                activeOptions={item.exact ? { exact: true } : undefined}
+              >
+                {t(item.key)}
+              </Link>
+            ))}
+          </nav>
+          <div className="ml-auto flex shrink-0 items-center gap-1 lg:gap-2">
             <Button
               size="sm"
-              className="bg-accent hover:bg-accent/90"
+              className="btn-shimmer rounded-full bg-accent px-4 hover:bg-accent/90 lg:px-5"
               asChild
             >
               <Link to="/order">
-                <Zap className="mr-1.5 size-4" />
-                {t("nav.order")}
+                <Zap className="size-4 lg:mr-1.5" />
+                <span className="hidden lg:inline">{t("nav.order")}</span>
               </Link>
             </Button>
+            <HeaderSearch triggerClassName={headerIconClass} />
             {user ? (
               <NotificationBell triggerClassName={headerIconClass} />
             ) : null}
@@ -111,20 +152,6 @@ export function StorefrontHeader() {
             )}
           </div>
         </div>
-
-        <nav className="hidden border-t border-white/15 py-2.5 md:flex md:items-center md:justify-center md:gap-8 lg:gap-10">
-          {navLinks.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="text-sm font-medium text-white/80 transition-colors hover:text-white"
-              activeProps={{ className: "text-white font-semibold" }}
-              activeOptions={item.exact ? { exact: true } : undefined}
-            >
-              {t(item.key)}
-            </Link>
-          ))}
-        </nav>
       </div>
     </header>
   );

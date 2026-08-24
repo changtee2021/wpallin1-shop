@@ -43,7 +43,7 @@ function AccountLayout() {
             <div className="hidden md:block">
               <AccountSidebar />
             </div>
-            <div className="min-w-0">
+            <div id="main-content" className="min-w-0" tabIndex={-1}>
               <div className="mb-6 md:hidden">
                 <AccountProfileSummary showNav={false} />
               </div>

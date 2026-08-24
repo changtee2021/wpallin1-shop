@@ -10,6 +10,8 @@ import {
   type FieldValues,
 } from "react-hook-form";
 
+import { CircleAlert } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 
@@ -158,10 +160,14 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("text-[0.8rem] font-medium text-destructive", className)}
+      className={cn(
+        "flex items-start gap-1.5 text-[0.8rem] font-medium text-destructive",
+        className,
+      )}
       {...props}
     >
-      {body}
+      <CircleAlert className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+      <span>{body}</span>
     </p>
   );
 });

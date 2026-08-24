@@ -3,6 +3,7 @@ import { Bell, ExternalLink, Loader2, Shield } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
+import { useSignOutConfirm } from "@/components/auth/sign-out-confirm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -34,9 +35,9 @@ export function SystemSettingsPanel({
   setLocale,
   savingProfile,
   onSaveSettings,
-  onSignOut,
   t,
 }: SystemSettingsPanelProps) {
+  const { requestSignOut, SignOutDialog } = useSignOutConfirm();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
@@ -214,12 +215,13 @@ export function SystemSettingsPanel({
             <p className="mb-2 text-sm text-muted-foreground">
               ออกจากระบบจากอุปกรณ์นี้
             </p>
-            <Button variant="outline" onClick={onSignOut}>
+            <Button variant="outline" onClick={requestSignOut}>
               {t("nav.logout")}
             </Button>
           </div>
         </CardContent>
       </Card>
+      <SignOutDialog />
     </div>
   );
 }

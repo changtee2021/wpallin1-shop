@@ -40,7 +40,7 @@ export function StorefrontMobileMenu({
         size="icon"
         className={`rounded-full md:hidden ${triggerClassName ?? ""}`}
         onClick={() => setOpen(true)}
-        aria-label="Menu"
+        aria-label="เปิดเมนู"
       >
         <Menu className="size-5" />
       </Button>

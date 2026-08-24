@@ -192,7 +192,7 @@ function RemovableChip({
         type="button"
         onClick={onRemove}
         className="rounded-full px-1 text-muted-foreground hover:text-foreground"
-        aria-label="Remove"
+        aria-label="ลบ"
       >
         ×
       </button>

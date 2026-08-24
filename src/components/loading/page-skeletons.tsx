@@ -14,7 +14,7 @@ function PageShell({
     <div
       className={cn("animate-in fade-in-0 duration-300", className)}
       aria-busy="true"
-      aria-label="Loading page"
+      aria-label="กำลังโหลดหน้า"
     >
       {children}
     </div>

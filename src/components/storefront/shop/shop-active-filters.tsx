@@ -72,7 +72,7 @@ export function ShopActiveFilters({
             type="button"
             variant="ghost"
             size="sm"
-            className="h-7 text-xs text-muted-foreground"
+            className="text-xs text-muted-foreground"
             onClick={() => onChange(clearAllFilters())}
           >
             {t("shop.filters.clearAll")}

@@ -685,6 +685,28 @@ export const submitContactForm = createServerFn({ method: "POST" })
         category: z.enum(["contact", "error", "404", "403", "500"]).optional(),
         /** Honeypot — must stay empty */
         companyWebsite: z.string().optional(),
+        companyName: z.string().optional(),
+        jobTitle: z.string().optional(),
+        lineId: z.string().optional(),
+        taxId: z.string().optional(),
+        inquiryType: z
+          .enum([
+            "project",
+            "quote",
+            "factory-visit",
+            "dealer",
+            "profile",
+            "other",
+          ])
+          .optional(),
+        visitDate: z.string().optional(),
+        visitSession: z.enum(["morning", "evening"]).optional(),
+        visitorCount: z.number().int().min(1).max(100).optional(),
+        visitSites: z
+          .array(z.enum(["blinds", "curtain", "partition"]))
+          .optional(),
+        purpose: z.string().optional(),
+        productInterest: z.string().optional(),
       })
       .parse(input),
   )

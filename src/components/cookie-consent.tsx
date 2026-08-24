@@ -5,8 +5,14 @@ import { Button } from "@/components/ui/button";
 import { useT } from "@/i18n";
 
 const CONSENT_KEY = "cookie-consent";
+const OPEN_SETTINGS_EVENT = "wpall-open-cookie-settings";
 
 export type CookieConsentValue = "all" | "essential";
+
+export function openCookieSettings() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(OPEN_SETTINGS_EVENT));
+}
 
 function readConsent(): CookieConsentValue | null {
   if (typeof window === "undefined") return null;
@@ -28,6 +34,9 @@ export function CookieConsent() {
 
   useEffect(() => {
     setVisible(readConsent() === null);
+    const onOpen = () => setVisible(true);
+    window.addEventListener(OPEN_SETTINGS_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_SETTINGS_EVENT, onOpen);
   }, []);
 
   if (!visible) return null;

@@ -40,6 +40,13 @@ export const SEARCH_SYNONYMS: Record<string, string[]> = {
 
 /** Category keyword → slug mapping for fallback intent parsing. */
 export const CATEGORY_KEYWORDS: Record<string, string> = {
+  มู่ลี่ไม้: "wood-blinds",
+  มู่ลี่อลูมิเนียม: "roller-blinds",
+  ม่านพับ: "roman-blinds",
+  ม่านมอเตอร์: "motorized-curtains",
+  มอเตอร์ไฟฟ้า: "motorized-curtains",
+  ม่านภายนอก: "outdoor-curtains",
+  พิมพ์ผ้า: "fabric-print",
   ม่าน: "curtains",
   ผ้าม่าน: "curtains",
   curtain: "curtains",

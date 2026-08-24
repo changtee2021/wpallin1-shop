@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { AccountHelpDialog } from "@/components/account/account-help-dialog";
+import { useSignOutConfirm } from "@/components/auth/sign-out-confirm";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -50,7 +51,8 @@ export function AccountMenuButton({
 }: AccountMenuButtonProps) {
   const { t } = useT();
   const { locale, setLocale } = useLocaleControl();
-  const { user, session, signOut } = useAuth();
+  const { user, session } = useAuth();
+  const { requestSignOut, SignOutDialog } = useSignOutConfirm();
   const { openChat } = useChatUiSafe();
   const [profile, setProfile] = useState<AccountProfileDto | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -203,12 +205,13 @@ export function AccountMenuButton({
         </DropdownMenuSub>
         <DropdownMenuItem
           className="text-destructive focus:text-destructive"
-          onClick={() => void signOut()}
+          onClick={requestSignOut}
         >
           <LogOut />
           {t("nav.logout")}
         </DropdownMenuItem>
       </DropdownMenuContent>
+      <SignOutDialog />
       <AccountHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
     </DropdownMenu>
   );

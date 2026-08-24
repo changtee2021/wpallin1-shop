@@ -9,7 +9,7 @@ type SolutionItem = {
   titleKey: TranslationKey;
   descKey: TranslationKey;
   to: "/shop" | "/configurator" | "/contact";
-  search?: { category: string };
+  search?: { category: string } | { topic: "project" };
 };
 
 const items: SolutionItem[] = [
@@ -38,6 +38,7 @@ const items: SolutionItem[] = [
     titleKey: "home.solutions.commercial.title",
     descKey: "home.solutions.commercial.desc",
     to: "/contact",
+    search: { topic: "project" },
   },
 ];
 

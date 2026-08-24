@@ -12,6 +12,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ListEmptyState, ListErrorState } from "@/components/ui/list-query-state";
+import { Price } from "@/components/ui/price";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +26,7 @@ import {
   fetchUserQuotations,
   respondQuotation,
 } from "@/lib/api.functions";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import type { QuotationDto } from "@/types/api/quotations";
 
@@ -36,14 +38,18 @@ function AccountQuotationsPage() {
   const { session } = useAuth();
   const [quotes, setQuotes] = useState<QuotationDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [viewQuote, setViewQuote] = useState<QuotationDto | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const authOpts = authServerFnOptions(session);
 
   async function loadList() {
     setLoading(true);
+    setError(null);
     try {
       setQuotes(await fetchUserQuotations(authOpts));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "โหลดไม่สำเร็จ");
     } finally {
       setLoading(false);
     }
@@ -94,12 +100,10 @@ function AccountQuotationsPage() {
       <div className="space-y-3">
         {loading ? (
           <PageLoading variant="list" />
+        ) : error ? (
+          <ListErrorState message={error} onRetry={() => void loadList()} />
         ) : quotes.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center text-muted-foreground">
-              ยังไม่มีใบเสนอราคา
-            </CardContent>
-          </Card>
+          <ListEmptyState message="ยังไม่มีใบเสนอราคา" />
         ) : (
           quotes.map((q) => (
             <Card key={q.id}>
@@ -107,7 +111,7 @@ function AccountQuotationsPage() {
                 <div>
                   <p className="font-semibold">{q.quotationNumber}</p>
                   <p className="text-2xl font-bold">
-                    {formatPrice(q.grandTotal)}
+                    <Price amount={q.grandTotal} />
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {formatDate(q.createdAt)}

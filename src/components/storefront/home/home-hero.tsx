@@ -1,91 +1,83 @@
-import { Link } from "@tanstack/react-router";
-
 import { HomeHeroSlider } from "@/components/storefront/home/home-hero-slider";
+import { SlideLeftLink } from "@/components/storefront/slide-left-link";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/i18n";
 import type { HeroBannerDto } from "@/types/api/hero-banners";
 
-type HomeHeroProps = {
-  banners?: HeroBannerDto[];
-};
+const HOME_HERO_SLIDES: HeroBannerDto[] = [
+  {
+    id: "local-living",
+    imageUrl: "/home/hero-living-curtains.png",
+    alt: "ห้องนั่งเล่นผ้าม่านจีบเต็มบาน",
+    linkUrl: null,
+    sortOrder: 0,
+    isActive: true,
+  },
+  {
+    id: "local-bedroom",
+    imageUrl: "/home/hero-bedroom-sheer.png",
+    alt: "ห้องนอนผ้าม่านโปร่งและผ้าม่านทึบ",
+    linkUrl: null,
+    sortOrder: 1,
+    isActive: true,
+  },
+  {
+    id: "local-roller",
+    imageUrl: "/home/hero-roller-blinds.png",
+    alt: "มู่ลี่ม้วนสำหรับบ้านและออฟฟิศ",
+    linkUrl: null,
+    sortOrder: 2,
+    isActive: true,
+  },
+];
 
-export function HomeHero({ banners = [] }: HomeHeroProps) {
-  if (banners.length > 0) {
-    return <HomeHeroSlider banners={banners} />;
-  }
-
-  return <HomeHeroFallback />;
+export function HomeHero() {
+  return (
+    <div className="relative">
+      <HomeHeroSlider banners={HOME_HERO_SLIDES} />
+      <HomeHeroOverlay />
+    </div>
+  );
 }
 
-function HomeHeroFallback() {
+function HomeHeroOverlay() {
   const { t } = useT();
 
   return (
-    <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-white">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-20"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(-45deg, transparent, transparent 12px, rgba(255,255,255,0.15) 12px, rgba(255,255,255,0.15) 24px)",
-        }}
-      />
-      <div className="relative grid gap-8 px-6 py-10 sm:px-10 sm:py-14 md:grid-cols-2 md:items-center md:gap-12">
-        <div className="max-w-xl space-y-4">
+    <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.55)_0%,rgba(0,0,0,0.35)_45%,rgba(0,0,0,0.15)_100%)]">
+      <div className="mx-auto flex h-full max-w-7xl items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="pointer-events-auto flex max-w-xl flex-col items-center space-y-4 text-center text-white">
           <p className="text-xs font-semibold uppercase tracking-widest text-white/80">
             {t("app.tagline")}
           </p>
-          <h1 className="text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">
+          <h1 className="text-3xl font-bold leading-tight text-balance sm:text-4xl md:text-5xl">
             {t("home.hero.title")}
           </h1>
           <p className="text-sm leading-relaxed text-white/90 sm:text-base">
             {t("home.hero.subtitle")}
           </p>
-          <p className="text-sm leading-relaxed text-white/80">
-            {t("home.hero.body")}
-          </p>
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Button
-              size="lg"
-              className="bg-accent text-accent-foreground hover:bg-accent/90"
-              asChild
-            >
-              <Link to="/inspiration">{t("home.hero.ctaInspiration")}</Link>
-            </Button>
+          <div className="flex flex-wrap justify-center gap-3 pt-1">
             <Button
               size="lg"
               variant="secondary"
-              className="bg-white text-primary hover:bg-white/90"
+              className="min-h-11 bg-white px-5 text-primary hover:bg-white/90 sm:min-h-10"
               asChild
             >
-              <Link to="/configurator">{t("home.hero.ctaConfigurator")}</Link>
+              <SlideLeftLink to="/configurator">
+                {t("home.hero.ctaConfigurator")}
+              </SlideLeftLink>
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              className="min-h-11 border-white/50 bg-transparent px-5 text-white hover:bg-white/10 hover:text-white sm:min-h-10"
               asChild
             >
-              <Link to="/shop">{t("home.hero.ctaShop")}</Link>
+              <SlideLeftLink to="/shop">{t("home.hero.ctaShop")}</SlideLeftLink>
             </Button>
           </div>
         </div>
-
-        <div className="relative hidden md:block">
-          <div className="aspect-[4/3] overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm">
-            <div className="flex h-full flex-col items-center justify-center gap-4 p-8">
-              <img
-                src="/brand/logo-color.png"
-                alt="WP ALL"
-                className="h-24 w-auto object-contain drop-shadow-lg"
-              />
-              <p className="text-center text-sm font-medium text-white/90">
-                CENTER OF CURTAIN
-              </p>
-            </div>
-          </div>
-          <div className="absolute -right-6 -bottom-6 size-32 rounded-full bg-accent/30 blur-2xl" />
-        </div>
       </div>
-    </section>
+    </div>
   );
 }

@@ -6,7 +6,7 @@ import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { ProductFeed } from "@/components/storefront/product-feed";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { ListEmptyState, ListErrorState } from "@/components/ui/list-query-state";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchWishlist } from "@/lib/api.functions";
 import {
@@ -24,26 +24,31 @@ function AccountWishlistPage() {
   const authOpts = useAuthServerFnOptions(session);
   const [products, setProducts] = useState<ProductPublicDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     if (authLoading || !session?.access_token) return;
 
     let cancelled = false;
     setLoading(true);
+    setError(null);
     void fetchWishlist(authOpts)
       .then((data) => {
         if (!cancelled) setProducts(data);
       })
-      .catch((err) =>
-        toast.error(err instanceof Error ? err.message : "โหลดไม่สำเร็จ"),
-      )
+      .catch((err) => {
+        const message = err instanceof Error ? err.message : "โหลดไม่สำเร็จ";
+        if (!cancelled) setError(message);
+        toast.error(message);
+      })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
     return () => {
       cancelled = true;
     };
-  }, [authLoading, authOpts, session?.access_token]);
+  }, [authLoading, authOpts, session?.access_token, reloadKey]);
 
   const showLoading = authLoading || loading || !session?.access_token;
 
@@ -52,15 +57,20 @@ function AccountWishlistPage() {
       <PageHeader title="รายการโปรด" description="สินค้าที่บันทึกไว้" />
       {showLoading ? (
         <PageLoading variant="grid" />
+      ) : error ? (
+        <ListErrorState
+          message={error}
+          onRetry={() => setReloadKey((key) => key + 1)}
+        />
       ) : products.length === 0 ? (
-        <Card>
-          <CardContent className="space-y-4 p-8 text-center">
-            <p className="text-muted-foreground">ยังไม่มีรายการโปรด</p>
+        <ListEmptyState
+          message="ยังไม่มีรายการโปรด"
+          action={
             <Button asChild>
               <Link to="/shop">ไปช้อปปิ้ง</Link>
             </Button>
-          </CardContent>
-        </Card>
+          }
+        />
       ) : (
         <ProductFeed products={products} title="รายการโปรด" />
       )}

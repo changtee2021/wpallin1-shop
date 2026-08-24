@@ -50,6 +50,17 @@ export async function submitFeedbackReport(
     errorCode?: string;
     sourceUrl?: string;
     category?: FeedbackCategory;
+    companyName?: string;
+    jobTitle?: string;
+    lineId?: string;
+    taxId?: string;
+    inquiryType?: string;
+    visitDate?: string;
+    visitSession?: string;
+    visitorCount?: number;
+    visitSites?: string[];
+    purpose?: string;
+    productInterest?: string;
   },
 ): Promise<{ ticketId?: string; referenceId: string }> {
   const contextLines = [
@@ -86,6 +97,17 @@ export async function submitFeedbackReport(
         errorCode: input.errorCode ?? null,
         sourceUrl: input.sourceUrl ?? null,
         category: input.category ?? "contact",
+        companyName: input.companyName ?? null,
+        jobTitle: input.jobTitle ?? null,
+        lineId: input.lineId ?? null,
+        taxId: input.taxId ?? null,
+        inquiryType: input.inquiryType ?? null,
+        visitDate: input.visitDate ?? null,
+        visitSession: input.visitSession ?? null,
+        visitorCount: input.visitorCount ?? null,
+        visitSites: input.visitSites ?? null,
+        purpose: input.purpose ?? null,
+        productInterest: input.productInterest ?? null,
       },
     })
     .select("id")

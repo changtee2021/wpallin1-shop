@@ -6,6 +6,7 @@ import { PageLoading } from "@/components/loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ListEmptyState, ListErrorState } from "@/components/ui/list-query-state";
 import { listAdminRoomAdvisorSessionsFn } from "@/lib/server-fns/room-advisor";
 import { buildRoomAdvisorShareUrl } from "@/lib/room-advisor-session";
 import { formatDate } from "@/lib/format";
@@ -27,9 +28,12 @@ function AdminRoomAdvisorPage() {
   const [rows, setRows] = useState<RoomAdvisorSessionSummaryDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
     void listAdminRoomAdvisorSessionsFn()
       .then((data) => {
         if (!cancelled) setRows(data);
@@ -45,7 +49,7 @@ function AdminRoomAdvisorPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [reloadKey]);
 
   if (loading) return <PageLoading variant="list" />;
 
@@ -62,14 +66,15 @@ function AdminRoomAdvisorPage() {
       />
 
       {error ? (
-        <p className="text-sm text-destructive">{error}</p>
-      ) : null}
-
-      <div className="space-y-3">
-        {rows.length === 0 ? (
-          <p className="text-sm text-muted-foreground">ยังไม่มีเซสชัน</p>
-        ) : (
-          rows.map((row) => (
+        <ListErrorState
+          message={error}
+          onRetry={() => setReloadKey((key) => key + 1)}
+        />
+      ) : rows.length === 0 ? (
+        <ListEmptyState message="ยังไม่มีเซสชัน" />
+      ) : (
+        <div className="space-y-3">
+          {rows.map((row) => (
             <Card key={row.id}>
               <CardContent className="flex flex-wrap items-center gap-4 p-4">
                 {row.heroPhotoUrl ? (
@@ -120,9 +125,9 @@ function AdminRoomAdvisorPage() {
                 </div>
               </CardContent>
             </Card>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

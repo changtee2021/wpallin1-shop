@@ -1,43 +1,51 @@
 import { Link } from "@tanstack/react-router";
-import { Store } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { useT } from "@/i18n";
+
+const DEALER_BANNER = "/home/dealer-business-talk.png";
 
 export function HomeDealerCta() {
   const { t } = useT();
 
   return (
-    <Card className="overflow-hidden border-primary/20 bg-gradient-to-r from-primary/5 via-white to-accent/5">
-      <CardContent className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-4">
-          <div className="rounded-xl bg-primary/10 p-3 text-primary">
-            <Store className="size-6" />
-          </div>
-          <div>
-            <h2 className="text-lg font-bold text-foreground">
-              {t("home.dealer.title")}
-            </h2>
-            <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              {t("home.dealer.body")}
-            </p>
-            <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
-              <li>• {t("home.dealer.point1")}</li>
-              <li>• {t("home.dealer.point2")}</li>
-              <li>• {t("home.dealer.point3")}</li>
-            </ul>
-          </div>
+    <section className="relative overflow-hidden rounded-2xl bg-primary shadow-sm ring-1 ring-black/5">
+      <img
+        src={DEALER_BANNER}
+        alt={t("home.dealer.title")}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 size-full object-cover object-[72%_center]"
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-black/15 sm:via-black/45 sm:to-transparent" />
+
+      <div className="relative flex min-h-[220px] flex-col justify-center gap-4 px-5 py-8 sm:min-h-[260px] sm:px-8 sm:py-10 md:min-h-[300px] md:px-10 lg:max-w-[58%]">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/80">
+          {t("home.dealer.kicker")}
+        </p>
+        <div>
+          <h2 className="text-xl font-bold text-white sm:text-2xl md:text-[1.75rem] md:leading-tight">
+            {t("home.dealer.title")}
+          </h2>
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/90 sm:text-base">
+            {t("home.dealer.body")}
+          </p>
         </div>
-        <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-          <Button asChild className="bg-primary hover:bg-primary/90">
+        <ul className="space-y-1 text-sm text-white/85">
+          <li>• {t("home.dealer.point1")}</li>
+          <li>• {t("home.dealer.point2")}</li>
+          <li>• {t("home.dealer.point3")}</li>
+        </ul>
+        <div>
+          <Button
+            size="lg"
+            className="bg-accent text-accent-foreground hover:bg-accent/90"
+            asChild
+          >
             <Link to="/dealer/register">{t("home.dealer.ctaRegister")}</Link>
           </Button>
-          <Button variant="outline" asChild>
-            <Link to="/order">{t("home.dealer.ctaQuickOrder")}</Link>
-          </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

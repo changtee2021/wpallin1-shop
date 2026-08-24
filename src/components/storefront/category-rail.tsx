@@ -4,9 +4,11 @@ import {
   Grid3X3,
   Layers,
   Package,
+  Palette,
   PanelTop,
   Sparkles,
   Sun,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -16,10 +18,16 @@ import type { CategoryDto } from "@/types/api/categories";
 const iconMap: Record<string, LucideIcon> = {
   curtains: Layers,
   "roller-blinds": Blinds,
+  "aluminum-blinds": Blinds,
+  "wood-blinds": Blinds,
   "zebra-blinds": Sun,
+  "roman-blinds": Layers,
   "curtain-rails": PanelTop,
   accessories: Package,
   "ready-made": Sparkles,
+  "motorized-curtains": Zap,
+  "outdoor-curtains": Sun,
+  "fabric-print": Palette,
 };
 
 type CategoryRailProps = {

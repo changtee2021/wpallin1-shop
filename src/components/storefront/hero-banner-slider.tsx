@@ -5,8 +5,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
@@ -19,17 +17,21 @@ type HeroBannerSliderProps = {
   variant?: HeroBannerSliderVariant;
 };
 
+const HOME_HERO_HEIGHT = "h-svh";
+
 const variantConfig = {
   home: {
-    section:
-      "relative overflow-hidden rounded-2xl bg-muted shadow-sm ring-1 ring-black/5",
-    image:
-      "aspect-[2.4/1] w-full object-cover sm:aspect-[2.8/1] md:aspect-[3/1]",
+    section: cn("relative w-full overflow-hidden bg-muted", HOME_HERO_HEIGHT),
+    carousel: "h-full",
+    item: "h-full pl-0",
+    image: "size-full object-cover",
     dotActive: "bg-white",
     dotInactive: "bg-white/50",
   },
   shop: {
     section: "relative w-full overflow-hidden bg-muted",
+    carousel: "w-full",
+    item: "pl-0",
     image:
       "aspect-[2.2/1] w-full object-cover sm:aspect-[2.6/1] md:aspect-[3.2/1] lg:aspect-[3.5/1]",
     dotActive: "bg-accent",
@@ -57,7 +59,7 @@ function BannerSlide({
   );
 
   if (!banner.linkUrl) {
-    return image;
+    return <div className="size-full">{image}</div>;
   }
 
   if (/^https?:\/\//i.test(banner.linkUrl)) {
@@ -66,7 +68,7 @@ function BannerSlide({
         href={banner.linkUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="block"
+        className="block size-full"
       >
         {image}
       </a>
@@ -74,7 +76,7 @@ function BannerSlide({
   }
 
   return (
-    <Link to={banner.linkUrl} className="block">
+    <Link to={banner.linkUrl} className="block size-full">
       {image}
     </Link>
   );
@@ -110,10 +112,14 @@ export function HeroBannerSlider({
 
   return (
     <section className={config.section}>
-      <Carousel setApi={setApi} className="w-full" opts={{ loop: true }}>
-        <CarouselContent className="-ml-0">
+      <Carousel
+        setApi={setApi}
+        className={cn("w-full", config.carousel)}
+        opts={{ loop: true, duration: 38 }}
+      >
+        <CarouselContent className="-ml-0 h-full">
           {banners.map((banner, index) => (
-            <CarouselItem key={banner.id} className="pl-0">
+            <CarouselItem key={banner.id} className={config.item}>
               <BannerSlide
                 banner={banner}
                 priority={index === 0}
@@ -123,24 +129,20 @@ export function HeroBannerSlider({
           ))}
         </CarouselContent>
         {banners.length > 1 ? (
-          <>
-            <CarouselPrevious className="left-3 hidden border-none bg-white/90 shadow sm:inline-flex" />
-            <CarouselNext className="right-3 hidden border-none bg-white/90 shadow sm:inline-flex" />
-            <div className="absolute inset-x-0 bottom-3 flex justify-center gap-2">
-              {banners.map((banner, index) => (
-                <button
-                  key={banner.id}
-                  type="button"
-                  aria-label={`สไลด์ ${index + 1}`}
-                  onClick={() => api?.scrollTo(index)}
-                  className={cn(
-                    "size-2 rounded-full transition-colors",
-                    current === index ? config.dotActive : config.dotInactive,
-                  )}
-                />
-              ))}
-            </div>
-          </>
+          <div className="absolute inset-x-0 bottom-3 z-20 flex justify-center gap-2">
+            {banners.map((banner, index) => (
+              <button
+                key={banner.id}
+                type="button"
+                aria-label={`สไลด์ ${index + 1}`}
+                onClick={() => api?.scrollTo(index)}
+                className={cn(
+                  "size-2.5 rounded-full transition-colors",
+                  current === index ? config.dotActive : config.dotInactive,
+                )}
+              />
+            ))}
+          </div>
         ) : null}
       </Carousel>
     </section>

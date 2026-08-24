@@ -13,6 +13,7 @@ import { z } from "zod";
 import { GoogleAuthButton, PasswordInput } from "@/components/auth/auth-fields";
 import { PageLoading } from "@/components/loading";
 import { Button } from "@/components/ui/button";
+import { FieldError } from "@/components/ui/field-error";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -66,7 +67,7 @@ function LoginPage() {
   const [fullName, setFullName] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const activeTab = tab ?? "login";
 
@@ -79,7 +80,7 @@ function LoginPage() {
   }
 
   function setTab(next: "login" | "signup") {
-    setFormError(null);
+    setFieldErrors({});
     setView("tabs");
     void navigate({
       to: "/login",
@@ -90,7 +91,11 @@ function LoginPage() {
 
   async function handleLogin(e: FormEvent) {
     e.preventDefault();
-    setFormError(null);
+    const nextErrors: Record<string, string> = {};
+    if (!email.trim()) nextErrors.email = "กรอกอีเมล";
+    if (!password) nextErrors.password = "กรอกรหัสผ่าน";
+    setFieldErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
     setLoading(true);
     try {
       await signIn(email.trim(), password);
@@ -101,7 +106,7 @@ function LoginPage() {
         err instanceof Error ? err.message : "",
         "เข้าสู่ระบบไม่สำเร็จ",
       );
-      setFormError(message);
+      setFieldErrors({ password: message });
       toast.error(message);
     } finally {
       setLoading(false);
@@ -110,17 +115,20 @@ function LoginPage() {
 
   async function handleSignup(e: FormEvent) {
     e.preventDefault();
-    setFormError(null);
+    const nextErrors: Record<string, string> = {};
+    if (!fullName.trim()) nextErrors.fullName = "กรอกชื่อ-นามสกุล";
+    if (!email.trim()) nextErrors.email = "กรอกอีเมล";
+    if (!password) nextErrors.password = "กรอกรหัสผ่าน";
     if (password !== confirmPassword) {
-      const message = "รหัสผ่านไม่ตรงกัน";
-      setFormError(message);
-      toast.error(message);
-      return;
+      nextErrors.confirmPassword = "รหัสผ่านไม่ตรงกัน";
     }
     if (!acceptedTerms) {
-      const message = "กรุณายอมรับข้อกำหนดและนโยบายความเป็นส่วนตัว";
-      setFormError(message);
-      toast.error(message);
+      nextErrors.terms = "กรุณายอมรับข้อกำหนดและนโยบายความเป็นส่วนตัว";
+    }
+    setFieldErrors(nextErrors);
+    if (Object.keys(nextErrors).length) {
+      const first = Object.values(nextErrors)[0];
+      toast.error(first);
       return;
     }
     setLoading(true);
@@ -138,7 +146,7 @@ function LoginPage() {
         err instanceof Error ? err.message : "",
         "สมัครไม่สำเร็จ",
       );
-      setFormError(message);
+      setFieldErrors({ email: message });
       toast.error(message);
     } finally {
       setLoading(false);
@@ -147,7 +155,11 @@ function LoginPage() {
 
   async function handleForgotPassword(e: FormEvent) {
     e.preventDefault();
-    setFormError(null);
+    if (!email.trim()) {
+      setFieldErrors({ email: "กรอกอีเมล" });
+      return;
+    }
+    setFieldErrors({});
     setLoading(true);
     try {
       await resetPassword(email.trim());
@@ -159,7 +171,7 @@ function LoginPage() {
         err instanceof Error ? err.message : "",
         "ส่งลิงก์ไม่สำเร็จ",
       );
-      setFormError(message);
+      setFieldErrors({ email: message });
       toast.error(message);
     } finally {
       setLoading(false);
@@ -172,8 +184,8 @@ function LoginPage() {
       : t("auth.login.subtitle");
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      <div className="hidden bg-gradient-to-br from-primary to-[#126B68] p-12 text-white lg:flex lg:flex-col lg:justify-end">
+    <main id="main-content" className="grid min-h-screen lg:grid-cols-2">
+      <div className="hidden bg-gradient-to-br from-primary to-primary/80 p-12 text-white lg:flex lg:flex-col lg:justify-end">
         <p className="text-3xl font-semibold leading-snug">
           {activeTab === "signup" ? (
             <>
@@ -252,15 +264,20 @@ function LoginPage() {
                     type="email"
                     autoComplete="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setFieldErrors((prev) => ({ ...prev, email: "" }));
+                    }}
                     required
+                    aria-invalid={Boolean(fieldErrors.email) || undefined}
+                    aria-describedby={
+                      fieldErrors.email ? "forgot-email-error" : undefined
+                    }
                   />
+                  <FieldError id="forgot-email-error">
+                    {fieldErrors.email}
+                  </FieldError>
                 </div>
-                {formError ? (
-                  <p className="text-sm text-destructive" role="alert">
-                    {formError}
-                  </p>
-                ) : null}
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? (
                     <Loader2 className="size-4 animate-spin" />
@@ -273,7 +290,7 @@ function LoginPage() {
                   variant="ghost"
                   className="w-full"
                   onClick={() => {
-                    setFormError(null);
+                    setFieldErrors({});
                     setView("tabs");
                   }}
                 >
@@ -307,9 +324,19 @@ function LoginPage() {
                         type="email"
                         autoComplete="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          setFieldErrors((prev) => ({ ...prev, email: "" }));
+                        }}
                         required
+                        aria-invalid={Boolean(fieldErrors.email) || undefined}
+                        aria-describedby={
+                          fieldErrors.email ? "login-email-error" : undefined
+                        }
                       />
+                      <FieldError id="login-email-error">
+                        {fieldErrors.email}
+                      </FieldError>
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
@@ -320,7 +347,7 @@ function LoginPage() {
                           type="button"
                           className="text-xs text-primary hover:underline"
                           onClick={() => {
-                            setFormError(null);
+                            setFieldErrors({});
                             setView("forgot");
                           }}
                         >
@@ -330,16 +357,23 @@ function LoginPage() {
                       <PasswordInput
                         id="login-password"
                         value={password}
-                        onChange={setPassword}
+                        onChange={(value) => {
+                          setPassword(value);
+                          setFieldErrors((prev) => ({ ...prev, password: "" }));
+                        }}
                         autoComplete="current-password"
                         required
+                        invalid={Boolean(fieldErrors.password)}
+                        describedBy={
+                          fieldErrors.password
+                            ? "login-password-error"
+                            : undefined
+                        }
                       />
+                      <FieldError id="login-password-error">
+                        {fieldErrors.password}
+                      </FieldError>
                     </div>
-                    {formError && activeTab === "login" ? (
-                      <p className="text-sm text-destructive" role="alert">
-                        {formError}
-                      </p>
-                    ) : null}
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading ? (
                         <Loader2 className="size-4 animate-spin" />
@@ -360,9 +394,21 @@ function LoginPage() {
                         id="signup-fullName"
                         autoComplete="name"
                         value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
+                        onChange={(e) => {
+                          setFullName(e.target.value);
+                          setFieldErrors((prev) => ({ ...prev, fullName: "" }));
+                        }}
                         required
+                        aria-invalid={Boolean(fieldErrors.fullName) || undefined}
+                        aria-describedby={
+                          fieldErrors.fullName
+                            ? "signup-fullName-error"
+                            : undefined
+                        }
                       />
+                      <FieldError id="signup-fullName-error">
+                        {fieldErrors.fullName}
+                      </FieldError>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="signup-email">{t("auth.email")}</Label>
@@ -371,9 +417,19 @@ function LoginPage() {
                         type="email"
                         autoComplete="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          setFieldErrors((prev) => ({ ...prev, email: "" }));
+                        }}
                         required
+                        aria-invalid={Boolean(fieldErrors.email) || undefined}
+                        aria-describedby={
+                          fieldErrors.email ? "signup-email-error" : undefined
+                        }
                       />
+                      <FieldError id="signup-email-error">
+                        {fieldErrors.email}
+                      </FieldError>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="signup-password">
@@ -382,11 +438,23 @@ function LoginPage() {
                       <PasswordInput
                         id="signup-password"
                         value={password}
-                        onChange={setPassword}
+                        onChange={(value) => {
+                          setPassword(value);
+                          setFieldErrors((prev) => ({ ...prev, password: "" }));
+                        }}
                         autoComplete="new-password"
                         minLength={8}
                         required
+                        invalid={Boolean(fieldErrors.password)}
+                        describedBy={
+                          fieldErrors.password
+                            ? "signup-password-error"
+                            : undefined
+                        }
                       />
+                      <FieldError id="signup-password-error">
+                        {fieldErrors.password}
+                      </FieldError>
                       <p className="text-xs text-muted-foreground">
                         {t("auth.passwordHint")}
                       </p>
@@ -398,19 +466,39 @@ function LoginPage() {
                       <PasswordInput
                         id="signup-confirm"
                         value={confirmPassword}
-                        onChange={setConfirmPassword}
+                        onChange={(value) => {
+                          setConfirmPassword(value);
+                          setFieldErrors((prev) => ({
+                            ...prev,
+                            confirmPassword: "",
+                          }));
+                        }}
                         autoComplete="new-password"
                         minLength={8}
                         required
+                        invalid={Boolean(fieldErrors.confirmPassword)}
+                        describedBy={
+                          fieldErrors.confirmPassword
+                            ? "signup-confirm-error"
+                            : undefined
+                        }
                       />
+                      <FieldError id="signup-confirm-error">
+                        {fieldErrors.confirmPassword}
+                      </FieldError>
                     </div>
                     <label className="flex cursor-pointer items-start gap-2 text-sm">
                       <Checkbox
                         checked={acceptedTerms}
-                        onCheckedChange={(checked) =>
-                          setAcceptedTerms(checked === true)
-                        }
+                        onCheckedChange={(checked) => {
+                          setAcceptedTerms(checked === true);
+                          setFieldErrors((prev) => ({ ...prev, terms: "" }));
+                        }}
                         className="mt-0.5"
+                        aria-invalid={Boolean(fieldErrors.terms) || undefined}
+                        aria-describedby={
+                          fieldErrors.terms ? "signup-terms-error" : undefined
+                        }
                       />
                       <span className="text-muted-foreground">
                         {t("auth.acceptTerms")}{" "}
@@ -429,11 +517,9 @@ function LoginPage() {
                         </Link>
                       </span>
                     </label>
-                    {formError && activeTab === "signup" ? (
-                      <p className="text-sm text-destructive" role="alert">
-                        {formError}
-                      </p>
-                    ) : null}
+                    <FieldError id="signup-terms-error">
+                      {fieldErrors.terms}
+                    </FieldError>
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading ? (
                         <Loader2 className="size-4 animate-spin" />
@@ -463,6 +549,6 @@ function LoginPage() {
           )}
         </div>
       </div>
-    </div>
+    </main>
   );
 }

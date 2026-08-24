@@ -6,12 +6,14 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ListEmptyState, ListErrorState } from "@/components/ui/list-query-state";
+import { Price } from "@/components/ui/price";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
 import { fetchMyOrders, reorderFromOrder } from "@/lib/api.functions";
 import { getOrCreateCartSessionId } from "@/lib/cart-session";
 import { useAuthServerFnOptions } from "@/lib/server-fn-auth";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { useT } from "@/i18n";
 import type { OrderSummaryDto } from "@/types/api/orders";
 import { toast } from "sonner";
@@ -37,7 +39,9 @@ function AccountOrdersPage() {
   const authOpts = useAuthServerFnOptions(session);
   const [orders, setOrders] = useState<OrderSummaryDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [reordering, setReordering] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   async function handleReorder(orderId: string) {
     setReordering(orderId);
@@ -60,9 +64,15 @@ function AccountOrdersPage() {
 
     let cancelled = false;
     setLoading(true);
+    setError(null);
     void fetchMyOrders(authOpts)
       .then((data) => {
         if (!cancelled) setOrders(data);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "โหลดไม่สำเร็จ");
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -70,7 +80,7 @@ function AccountOrdersPage() {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, authOpts, session?.access_token]);
+  }, [authLoading, authOpts, session?.access_token, reloadKey]);
 
   return (
     <div>
@@ -80,15 +90,20 @@ function AccountOrdersPage() {
       />
       {authLoading || loading || !session?.access_token ? (
         <PageLoading variant="list" />
+      ) : error ? (
+        <ListErrorState
+          message={error}
+          onRetry={() => setReloadKey((key) => key + 1)}
+        />
       ) : orders.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center text-muted-foreground">
-            ยังไม่มีคำสั่งซื้อ —{" "}
-            <Link to="/shop" className="text-primary underline">
-              เริ่มช้อปเลย
-            </Link>
-          </CardContent>
-        </Card>
+        <ListEmptyState
+          message="ยังไม่มีคำสั่งซื้อ"
+          action={
+            <Button asChild>
+              <Link to="/shop">เริ่มช้อปเลย</Link>
+            </Button>
+          }
+        />
       ) : (
         <div className="space-y-3">
           {orders.map((order) => (
@@ -110,7 +125,7 @@ function AccountOrdersPage() {
                   {statusLabels[order.status] ?? order.status}
                 </Badge>
                 <p className="font-bold text-accent">
-                  {formatPrice(order.grandTotal)}
+                  <Price amount={order.grandTotal} />
                 </p>
                 <Button
                   size="sm"

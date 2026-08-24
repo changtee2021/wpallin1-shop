@@ -39,7 +39,7 @@ function AdminLayout() {
           <div className="hidden md:block">
             <AdminSidebar />
           </div>
-          <div className="min-w-0">
+          <div id="main-content" className="min-w-0" tabIndex={-1}>
             <Outlet />
           </div>
         </div>
