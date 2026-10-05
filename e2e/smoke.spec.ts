@@ -49,16 +49,24 @@ test.describe("wpallin1-shop smoke", () => {
     expect(body.service).toBeTruthy();
   });
 
-  test("product → request a quote prefills the product", async ({ page }) => {
+  test("product enquiry opens LINE and quote links prefill the product", async ({
+    page,
+  }) => {
     const issues = attachIssueCollectors(page, "quote-flow");
 
     await visitAndCheck(page, "/products/zip-blinds", issues);
-    await page
-      .getByRole("main")
-      .getByRole("link", { name: /ขอใบเสนอราคา|request a quote/i })
-      .first()
-      .click();
-    await page.waitForURL(/topic=quote/);
+    await expect(
+      page
+        .getByRole("main")
+        .getByRole("link", { name: /ติดต่อเรา|contact us/i })
+        .first(),
+    ).toHaveAttribute("href", /lin\.ee|line\.me/);
+
+    await visitAndCheck(
+      page,
+      "/contact?topic=quote&product=zip-blinds",
+      issues,
+    );
     await expect(
       page.locator('select[name="productInterest"] option:checked'),
     ).toHaveText(/ซิป|zip/i);
