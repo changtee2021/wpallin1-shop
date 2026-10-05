@@ -18,7 +18,7 @@ import { listPublicProducts } from "@/services/catalog.service";
 const SYSTEM_PROMPT = `You are a product search assistant for WP ALL, a Thai curtain and blind e-commerce store.
 Parse the user's natural language query into structured search intent JSON.
 
-Categories (slug): curtains, roller-blinds, wood-blinds, roman-blinds, motorized-curtains, outdoor-curtains, fabric-print, zebra-blinds, curtain-rails, accessories, ready-made
+Categories (slug): curtains, accessories, roller-blinds, vertical-blinds, wood-blinds, aluminum-blinds, outdoor-curtains, zip-blinds, skylight-fss, pvc-folding-doors, pvc-strip-curtains, wallpaper, window-tinting, fabric-print, printed-roller-blinds, noren
 
 Output ONLY valid JSON matching this schema:
 {
@@ -40,7 +40,7 @@ Output ONLY valid JSON matching this schema:
 Rules:
 - explanationTh: short Thai summary of what user wants (1 sentence)
 - keywords: remaining product terms not captured in filters
-- Infer category from context (e.g. ม่าน → curtains, มู่ลี่ → roller-blinds)
+- Infer category from context (e.g. ม่าน → curtains, มู่ลี่อลูมิเนียม → aluminum-blinds, ม่านม้วน → roller-blinds)
 - Extract price limits from phrases like "ไม่เกิน 3000", "งบ 5000"
 - Use null for unknown filter fields, empty arrays for none
 - style/color/material values in Thai or English as user mentioned`;
@@ -75,17 +75,22 @@ function parseFallbackIntent(query: string): SearchIntent {
   const parts: string[] = [];
   if (category) {
     const catLabels: Record<string, string> = {
-      curtains: "ม่าน",
-      "roller-blinds": "มู่ลี่อลูมิเนียม",
+      curtains: "ผ้าม่าน",
+      accessories: "อุปกรณ์ผ้าม่าน",
+      "roller-blinds": "ม่านม้วน",
+      "vertical-blinds": "ม่านปรับแสงแนวตั้ง",
       "wood-blinds": "มู่ลี่ไม้",
-      "roman-blinds": "ม่านพับ",
-      "motorized-curtains": "ม่านมอเตอร์ไฟฟ้า",
-      "outdoor-curtains": "ม่านภายนอก",
-      "fabric-print": "พิมพ์ผ้า",
-      "zebra-blinds": "Zebra",
-      "curtain-rails": "รางม่าน",
-      accessories: "อุปกรณ์",
-      "ready-made": "ม่านสำเร็จรูป",
+      "aluminum-blinds": "มู่ลี่อลูมิเนียม",
+      "outdoor-curtains": "ม่านกลางแจ้ง",
+      "zip-blinds": "ม่านซิป",
+      "skylight-fss": "Skylight FSS",
+      "pvc-folding-doors": "ประตูพับ PVC",
+      "pvc-strip-curtains": "ม่านริ้ว PVC",
+      wallpaper: "วอลเปเปอร์",
+      "window-tinting": "ฟิล์มกรองแสงอาคาร",
+      "fabric-print": "พิมพ์ผ้าตามแบบ",
+      "printed-roller-blinds": "ม่านม้วนพิมพ์ลาย",
+      noren: "ม่านโนเรนญี่ปุ่น",
     };
     parts.push(catLabels[category] ?? category);
   }

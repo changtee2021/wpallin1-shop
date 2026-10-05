@@ -399,7 +399,9 @@ function LoginPage() {
                           setFieldErrors((prev) => ({ ...prev, fullName: "" }));
                         }}
                         required
-                        aria-invalid={Boolean(fieldErrors.fullName) || undefined}
+                        aria-invalid={
+                          Boolean(fieldErrors.fullName) || undefined
+                        }
                         aria-describedby={
                           fieldErrors.fullName
                             ? "signup-fullName-error"

@@ -53,7 +53,9 @@ export function RequireAuthGate({
   }, [loading, user, isDealer, isAdmin, requireDealer, requireAdmin, navigate]);
 
   if (loading) {
-    return loadingShell ?? <PageLoading variant="default" className="min-h-screen" />;
+    return (
+      loadingShell ?? <PageLoading variant="default" className="min-h-screen" />
+    );
   }
 
   if (!user) return null;

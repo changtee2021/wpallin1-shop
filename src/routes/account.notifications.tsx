@@ -7,7 +7,10 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ListEmptyState, ListErrorState } from "@/components/ui/list-query-state";
+import {
+  ListEmptyState,
+  ListErrorState,
+} from "@/components/ui/list-query-state";
 import { useAuth } from "@/hooks/use-auth";
 import {
   fetchNotifications,

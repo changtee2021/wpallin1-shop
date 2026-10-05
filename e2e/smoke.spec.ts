@@ -10,30 +10,21 @@ import {
 
 const GUEST_ROUTES = [
   "/",
-  "/shop",
-  "/products/mock-zebra-blackout",
-  "/products/mock-roller-blackout-white",
-  "/cart",
-  "/compare",
-  "/configurator",
-  "/room-advisor",
-  "/order",
-  "/o/mock-token",
-  "/contact",
+  "/products",
+  "/products?category=tracks",
+  "/products/wood-blinds",
+  "/projects",
+  "/projects/colors-of-buriram-2025",
   "/about",
+  "/partners",
+  "/catalogs",
+  "/contact",
+  "/contact?topic=quote&product=zip-blinds",
+  "/faq",
+  "/privacy",
 ] as const;
 
-const AUTH_ROUTES = [
-  "/account?tab=dashboard",
-  "/account/orders",
-  "/account/wishlist",
-  "/dealer",
-  "/dealer/catalog",
-  "/admin",
-  "/admin/products",
-  "/admin/orders",
-  "/admin/room-advisor",
-] as const;
+const AUTH_ROUTES = ["/admin", "/admin/products", "/admin/quotations"] as const;
 
 test.describe("wpallin1-shop smoke", () => {
   test("guest storefront pages load without runtime errors", async ({
@@ -58,22 +49,27 @@ test.describe("wpallin1-shop smoke", () => {
     expect(body.service).toBeTruthy();
   });
 
-  test("shop → product → add to cart flow", async ({ page }) => {
-    const issues = attachIssueCollectors(page, "cart-flow");
+  test("product → request a quote prefills the product", async ({ page }) => {
+    const issues = attachIssueCollectors(page, "quote-flow");
 
-    await visitAndCheck(page, "/shop", issues);
-    await visitAndCheck(page, "/products/mock-zebra-blackout", issues);
-
-    const addButton = page
-      .getByRole("button", { name: /ตะกร้า|cart/i })
-      .first();
-    if (await addButton.isVisible()) {
-      await addButton.click();
-      await page.waitForTimeout(1500);
-    }
-
-    await visitAndCheck(page, "/cart", issues);
+    await visitAndCheck(page, "/products/zip-blinds", issues);
+    await page
+      .getByRole("main")
+      .getByRole("link", { name: /ขอใบเสนอราคา|request a quote/i })
+      .first()
+      .click();
+    await page.waitForURL(/topic=quote/);
+    await expect(
+      page.locator('select[name="productInterest"] option:checked'),
+    ).toHaveText(/ซิป|zip/i);
     reportIssues(issues);
+  });
+
+  test("commerce routes redirect when commerce is off", async ({ page }) => {
+    for (const route of ["/shop", "/cart", "/checkout", "/account"]) {
+      await page.goto(route);
+      await expect(page).not.toHaveURL(new RegExp(`${route}$`));
+    }
   });
 
   test("authenticated admin flows", async ({ page }) => {

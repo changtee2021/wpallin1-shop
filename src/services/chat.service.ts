@@ -113,8 +113,7 @@ export function buildMessageBodyFromMetadata(input: {
 
   const kind = input.metadata?.kind as ChatMessageKind | undefined;
   const attachments = input.metadata?.attachments as
-    | ChatAttachment[]
-    | undefined;
+    ChatAttachment[] | undefined;
   if (
     kind === "image" ||
     attachments?.some((a) => a.mime.startsWith("image/"))

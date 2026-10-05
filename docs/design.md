@@ -95,14 +95,16 @@ Current oklch values (light mode):
 
 ### Web fallback (ปัจจุบันใน `src/styles.css`)
 
-ใช้ **Prompt** เป็นฟอนต์หลักของทั้งเว็บ — ให้ตรงกับเว็บ WSC (`wp-enterprise`) ในเครือเดียวกัน:
+ใช้ **IBM Plex Sans Thai** (400 / 500 / 600) เป็นฟอนต์หลักของทั้งเว็บ — เน้นเรียบ คลีน เนื้อหาน้ำหนักปกติ หัวข้อหนาขึ้นเล็กน้อย:
 
 ```css
---font-sans: "Prompt", ui-sans-serif, system-ui, sans-serif;
+--font-sans: "IBM Plex Sans Thai", ui-sans-serif, system-ui, sans-serif;
+--font-weight-semibold: 500; /* font-semibold = medium */
+--font-weight-bold: 600;     /* font-bold = semibold */
 --font-document: "Sarabun", "TH Sarabun New", "Noto Sans Thai", sans-serif;
 ```
 
-`font-document` (Sarabun) ใช้เฉพาะหน้าเอกสาร/ใบเสนอราคาที่ต้องพิมพ์ ไม่เปลี่ยนตาม Prompt
+`font-document` (Sarabun) ใช้เฉพาะหน้าเอกสาร/ใบเสนอราคาที่ต้องพิมพ์ ไม่เปลี่ยนตามฟอนต์หลัก
 
 ### Type scale (mobile-first)
 
@@ -129,52 +131,75 @@ Current oklch values (light mode):
 
 ---
 
-## 5. Components (ตาม mockup mobile)
+## 5. Components (brand showcase, 2026)
 
-### Header
+เว็บเป็น **brand + product showcase ไม่แสดงราคา** (`VITE_COMMERCE_ENABLED=false`) ทุกปุ่มขายนำไป "ขอใบเสนอราคา" (`/contact?topic=quote`) หรือ LINE
 
-- พื้น **primary (teal)** หรือ white + border ตาม zone
-- Logo ซ้าย, search กลาง/ขวา, cart + notification ขวา
-- แถว nav ล่าง (desktop): หน้าแรก | ร้านค้า | แคตตาล็อก | สั่งทำผ้าม่าน | เกี่ยวกับเรา
+### Editorial utilities (`src/styles.css`)
 
-Implementation: `src/components/layout/storefront-header.tsx`
+| Utility | ใช้ |
+|---------|-----|
+| `brand-display` | H1 ขนาดใหญ่ (hero / หัวหน้า) |
+| `brand-heading` | H2 ของ section |
+| `brand-kicker` | ป้ายเล็กตัวพิมพ์ใหญ่เหนือหัวข้อ — ต้องใส่สีเอง เช่น `text-primary` |
+| `brand-index` | เลขลำดับ `01`–`05` แบบ tabular — ต้องใส่สีเอง |
+| `brand-section` | padding แนวตั้งมาตรฐานของ section |
+| `brand-marquee` | แถบเลื่อนวน (หยุดเมื่อ reduced motion) |
+| `scroll-rise` / `scroll-zoom` | โมชันตอนเลื่อน: ลอยขึ้น+จางเข้า / รูปซูมออกตอนเข้าจอ (CSS scroll timeline ไม่มี JS) |
+| `scroll-parallax` / `scroll-fade-away` | hero หน้าแรก: รูปเลื่อนช้ากว่า / ข้อความจางออกตอนเลื่อนลง |
+| `bg-primary-deep` / `bg-surface` | พื้น teal เข้ม (footer, CTA band) / พื้นเทาอ่อน |
 
-### Hero / Promo banner
+`SectionHeading`, `ProductCard`, `ProjectCard` มีโมชันในตัวแล้ว ไม่ต้องห่อ `RevealOnScroll` ซ้ำ
 
-- รูปโปรโมชัน + coupon/QR (เมื่อมี campaign)
-- ปุ่ม CTA ใช้ `bg-accent`
+โมชันหน้าแรกแยกตาม section (CSS ล้วน, ปิดเมื่อ reduced motion, Firefox แสดงนิ่ง):
 
-Implementation: `src/components/storefront/home/home-hero.tsx`
+**ลำดับเรื่องหน้าแรก:** Hero → 01 Why WP ALL (`BrandStatement`) → 02 Our factory (`BrandFactory`, ขอบบนโค้งเลื่อนทับบทก่อน) → 03 Our products (`BrandProductRail`, รวมหมวด + สินค้าเด่นเป็นส่วนเดียว) → 04 Projects (`BrandProjectsBento`) → ช่องทางบ้าน/ตัวแทน → footer CTA
 
-### Category card
+พื้นสลับ: ขาว → teal เข้ม → ครีม (`bg-cream`) → ขาว เพื่อให้แต่ละบทแยกกันชัด
 
-- การ์ดสี่เหลี่ยม, ไอคอน line-art ซ้าย, รูปตัวอย่างจางขวา
-- หมวดตัวอย่าง: ฉากกั้นห้อง, รางมอเตอร์, มู่ลี่, รางโชว์, ม่านม้วน, ม่านจีบ ฯลฯ
+**ระบบโมชันหน้าแรกใช้ 3 แบบเท่านั้น:** Reveal (`scroll-rise` + `--i`) สำหรับข้อความ/การ์ด · Mask (`scroll-wipe-up-soft` + `scroll-zoom` ข้างใน) สำหรับรูป · Scroll-linked เฉพาะ 3 จุด (hero, โรงงาน, rail สินค้า) อย่าเพิ่มชนิดใหม่ในหน้าแรก
 
-Implementation: `src/components/storefront/category-rail.tsx`
+| Section | คลาส | เอฟเฟกต์ |
+|---------|------|----------|
+| แถบบนสุด | `scroll-progress` | เส้นส้มบอกความคืบหน้าการเลื่อน |
+| Hero | `hero-word` / `hero-blur-in` / `scroll-hero-card` | ข้อความเบลอเข้าทีละคำตอนโหลด · เลื่อนแล้ว hero พับเป็นการ์ดมุมโค้งเว้นขอบ |
+| ประโยคเปิด + จุดเด่น 4 ข้อ | `scroll-word` · `scroll-rise` + `--i` | คำสว่างทีละคำ · ลอยขึ้นไล่ทีละข้อ |
+| โรงงาน | `BrandFactory` (IntersectionObserver) | รูปตรึง ครอสเฟดตามขั้นตอน · ตัวเลขนับขึ้น |
+| สินค้า | `pin-x` / `pin-x-stage` / `pin-x-viewport` / `pin-x-track` | desktop (≥1024px, สูง ≥680px): ตรึงส่วนนี้ เลื่อนลงแล้วการ์ดวิ่งไปซ้าย · มือถือ/Firefox: ปัดแนวนอนปกติ |
+| ผลงาน | `scroll-wipe-up-soft` + `scroll-zoom` | กริด bento 1 ใหญ่ + 4 เล็ก รูปเปิดจากล่าง |
+| บ้าน / ตัวแทน | `scroll-wipe-up-soft` + `--i` | กล่องภาพเปิดจากล่าง กล่องที่สองตามหลัง + รูปซูมออก |
+| หน้า About | `scroll-hero-shrink` · `scroll-marquee-left/right` · `scroll-line-top` · `scroll-scale-in` | แถบสโลแกนวิ่งสวนทาง · เส้นส้มวาดตัวเอง · ตัวอักษร C-P-C ซูมเข้า |
 
-### Product card
+### Header / footer
 
-- รูปใหญ่, ชื่อ 2 บรรทัด, ราคา `text-accent`
-- Badge โปร / featured ใช้ `bg-accent text-white`
-- Hover: `group-hover:text-primary`
+- ไม่มีแถบประกาศด้านบน
+- Header `fixed`: หน้าแรกตอนบนสุดพื้นใส (ทับ hero) · หน้าอื่นตอนบนสุดพื้น teal · เลื่อนลงเกิน 24px กลายเป็นแถบลอยทรงแคปซูล (teal เข้มกว่า `primary-deep` + ring ขาว 20% + blur ให้แยกจากพื้นบทโรงงาน) ตามลงมา
+- Nav: สินค้า | ผลงาน | เกี่ยวกับเรา | แคตตาล็อก | ติดต่อ (`SITE_NAV`) + dropdown ภาษา (TH ▾) + ปุ่มส้ม "Contact Us" → `/contact`
+- กระดิ่ง/ตะกร้า/บัญชี แสดงเฉพาะเมื่อเปิด commerce
+- Footer: CTA band (ribbon) → คอลัมน์หมวดสินค้า / บริษัท / ติดต่อ + LINE QR
 
-Implementation: `src/components/storefront/product-card.tsx`
+Implementation: `src/components/layout/storefront-header.tsx`, `storefront-footer.tsx`
 
-### Section header
+### Shared brand components (`src/components/brand/`)
 
-- หัวข้อซ้าย + แถบ accent สีส้มแนวตั้ง (ตาม mockup “สินค้ายอดนิยม”)
-- ปุ่ม “VIEW ALL” = `variant="outline"` + border accent
+- `SectionHeading` — "01 — KICKER" + หัวข้อใหญ่ + คำอธิบาย + action ขวา (`tone="dark"` บนพื้น teal)
+- `ProductCard` — รูป 4:5, รหัสรุ่น, ชื่อ, tagline (ไม่มีราคา)
+- `ProjectCard` — รูป 4:3, ประเภท · สถานที่ · ปี
+- `BrandGridSkeleton` / `BrandPageError` — loading / error ของหน้า
 
-### Certifications row
+### Home sections
 
-- ไอคอน + label สั้น ๆ (OEKO-TEX, Greenguard, Anti-bacterial ฯลฯ)
-- จัดเป็น 2 แถว grid บน mobile
+`src/components/storefront/home/brand-home-sections.tsx`: Hero crossfade → USP strip → Category index (hover เปลี่ยนรูป) → Story + ตัวเลข → สินค้าแนะนำ → ผลงาน (scroll-snap) → แยกทาง บ้าน / ตัวแทน
 
-### Bottom navigation (mobile)
+### Data
 
-- 4 ไอเทม: หน้าแรก | สินค้า/แคตตาล็อก | เครื่องมือ/คำนวณ | บัญชี
-- Active = `text-accent`, inactive = muted
+ข้อมูลสินค้า/ผลงานเป็น static สองภาษา (`Bi = { th, en }`, `useBi()`):
+`src/data/products-catalog.ts`, `src/data/projects.ts`, `src/data/about-content.ts`
+รูปเป็น crop จากสไลด์ WP ALL 2026 (`public/products`, `public/projects`, `public/brand/factory-*`) — **placeholder** รอรูปถ่ายจริง
+
+### Certifications
+
+ซ่อนไว้ทั้งหมดจนกว่าทีมยืนยันว่าข้อใดใช้ได้จริง (ISO, มอก., OEKO-TEX, SGS, ประกัน ฯลฯ)
 
 ### Skeleton loading
 
@@ -184,7 +209,7 @@ Implementation: `src/components/storefront/product-card.tsx`
 
 | ประเภท | Style |
 |--------|-------|
-| Primary CTA (ซื้อ/ชำระ) | `bg-accent hover:bg-accent/90` |
+| Primary CTA (ขอใบเสนอราคา) | `rounded-full bg-accent text-white hover:bg-accent/90`, สูง ≥ 44px |
 | Secondary | `variant="outline"` |
 | Nav / link | `text-primary hover:text-primary/80` |
 
@@ -241,17 +266,16 @@ Implementation: `src/components/storefront/product-card.tsx`
 |--------|-----------|--------------|
 | สีหลัก | Teal `#188F8B` | `--primary` teal ใน `styles.css` ✅ |
 | สี accent | Orange `#E7847E` | `--accent` orange ใน `styles.css` ✅ |
-| ฟอนต์ | DB Heavent | Prompt (ตรงกับเว็บ WSC) ✅ |
-| Layout home | category grid + carousel | `CategoryRail` + `ProductFeed` — ยังไม่เหมือน mockup 100% |
-| Header | teal bar | header เป็น white ⚠️ |
+| ฟอนต์ | DB Heavent | IBM Plex Sans Thai ✅ |
+| Layout home | brand showcase | `brand-home-sections.tsx` ✅ |
+| Header | teal bar | ใสบน hero → แถบลอยเมื่อเลื่อน ✅ |
 
 ### Follow-up checklist
 
-- [ ] โหลด webfont DB Heavent (ถ้ามี license) แทน/เสริม Inter
-- [ ] ปรับ home ให้ใกล้ mockup: category grid 2 คอลัมน์, best-selling carousel
-- [ ] Header mobile: teal bar + bottom nav active state สีส้ม
+- [ ] โหลด webfont DB Heavent (ถ้ามี license) แทน/เสริม IBM Plex Sans Thai
+- [ ] เปลี่ยนรูป placeholder (crop จากสไลด์) เป็นรูปถ่ายจริง
+- [ ] ยืนยัน certification ที่ใช้ได้ แล้วค่อยเปิดแสดง
 - [ ] อัปเดต `CHECKPOINT-1.md` ให้ตรง CI (เลิกอ้าง accent `#2563eb`)
-- [ ] เพิ่ม asset pattern/ribbon ใน `/public/brand/`
 
 ---
 

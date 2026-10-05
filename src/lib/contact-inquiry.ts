@@ -86,7 +86,10 @@ export const VISIT_SITES: Array<{
   {
     id: "blinds",
     no: "01",
-    title: { th: "ม่านม้วน · มู่ลี่ · ม่านปรับแสง", en: "Roller, blinds & zebra" },
+    title: {
+      th: "ม่านม้วน · มู่ลี่ · ม่านปรับแสง",
+      en: "Roller, blinds & zebra",
+    },
     desc: { th: "สายผลิตม่านม้วนและมู่ลี่", en: "Roller and blinds line" },
   },
   {
@@ -137,7 +140,9 @@ export const VISIT_PURPOSES = [
 
 export type VisitPurposeId = (typeof VISIT_PURPOSES)[number]["id"];
 
-export function isContactTopic(value: string | undefined): value is ContactTopic {
+export function isContactTopic(
+  value: string | undefined,
+): value is ContactTopic {
   return CONTACT_TOPICS.includes(value as ContactTopic);
 }
 
@@ -165,7 +170,9 @@ export function sessionLabel(session: VisitSession, locale: Locale): string {
       ? "Morning (09:00–12:00)"
       : "รอบเช้า (09:00–12:00 น.)";
   }
-  return locale === "en" ? "Afternoon (13:00–16:00)" : "รอบเย็น (13:00–16:00 น.)";
+  return locale === "en"
+    ? "Afternoon (13:00–16:00)"
+    : "รอบเย็น (13:00–16:00 น.)";
 }
 
 export function todayInputValue(): string {
@@ -185,7 +192,9 @@ export function formatVisitSites(
   if (selected.length === VISIT_SITES.length) {
     return locale === "en" ? "All 3 production lines" : "ไปทั้ง 3 สายผลิต";
   }
-  return selected.map((site) => `${site.no} ${pick(site.title, locale)}`).join(" · ");
+  return selected
+    .map((site) => `${site.no} ${pick(site.title, locale)}`)
+    .join(" · ");
 }
 
 export type BusinessContactPayload = {
@@ -211,15 +220,15 @@ export function formatBusinessContact(
   locale: Locale = "th",
 ): { subject: string; message: string } {
   const topic = topicLabel(input.inquiryType, locale);
-  const subject = `[${topic}] ${input.companyName}`.slice(0, 200);
+  const subject = `[${topic}] ${input.companyName || input.name}`.slice(0, 200);
 
   const lines = [
     `เรื่อง: ${topic}`,
-    `บริษัท: ${input.companyName}`,
+    input.companyName ? `บริษัท: ${input.companyName}` : null,
     `ผู้ติดต่อ: ${input.name}`,
     input.jobTitle ? `ตำแหน่ง: ${input.jobTitle}` : null,
     `โทร: ${input.phone}`,
-    `อีเมล: ${input.email}`,
+    input.email ? `อีเมล: ${input.email}` : null,
     input.lineId ? `LINE: ${input.lineId}` : null,
     input.taxId ? `เลขนิติบุคคล/บัตร: ${input.taxId}` : null,
   ];
@@ -232,13 +241,19 @@ export function formatBusinessContact(
       input.visitSession
         ? `รอบ: ${sessionLabel(input.visitSession, locale)}`
         : null,
-      input.visitorCount != null ? `จำนวนผู้เข้าชม: ${input.visitorCount} คน` : null,
+      input.visitorCount != null
+        ? `จำนวนผู้เข้าชม: ${input.visitorCount} คน`
+        : null,
       input.visitSites?.length
         ? `สายผลิต: ${formatVisitSites(input.visitSites, locale)}`
         : null,
-      input.purpose ? `วัตถุประสงค์: ${purposeLabel(input.purpose, locale)}` : null,
+      input.purpose
+        ? `วัตถุประสงค์: ${purposeLabel(input.purpose, locale)}`
+        : null,
       input.productInterest ? `สินค้าที่สนใจ: ${input.productInterest}` : null,
     );
+  } else if (input.productInterest) {
+    lines.push(`สินค้าที่สนใจ: ${input.productInterest}`);
   }
 
   if (input.message?.trim()) {

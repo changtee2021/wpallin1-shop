@@ -32,7 +32,10 @@ page.on("console", (msg) => {
 });
 
 await page.goto(`${baseURL}/login`, { waitUntil: "domcontentloaded" });
-await page.locator('input[type="email"], input[name="email"]').first().fill(process.env.SMOKE_TEST_EMAIL);
+await page
+  .locator('input[type="email"], input[name="email"]')
+  .first()
+  .fill(process.env.SMOKE_TEST_EMAIL);
 await page
   .locator('input[type="password"], input[name="password"]')
   .first()
@@ -46,7 +49,10 @@ await page.waitForTimeout(3000);
 const body = await page.locator("body").innerText();
 console.log("URL:", page.url());
 console.log("pageerror:", pageErrors.join(" | ") || "(none)");
-console.log("console errors:", consoleErrors.slice(0, 10).join(" | ") || "(none)");
+console.log(
+  "console errors:",
+  consoleErrors.slice(0, 10).join(" | ") || "(none)",
+);
 console.log("body:\n", body.slice(0, 1500));
 
 await browser.close();

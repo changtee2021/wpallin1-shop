@@ -33,7 +33,9 @@ export function InspirationHero() {
             className="bg-accent text-accent-foreground hover:bg-accent/90"
             asChild
           >
-            <Link to="/configurator">{t("home.hero.ctaConfigurator")}</Link>
+            <Link to="/contact" search={{ topic: "quote" }}>
+              {t("site.cta.quote")}
+            </Link>
           </Button>
           <Button
             size="sm"
@@ -41,15 +43,7 @@ export function InspirationHero() {
             className="border-white/40 bg-transparent text-white hover:bg-white/10"
             asChild
           >
-            <Link to="/room-advisor">อัปโหลดรูปห้อง</Link>
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="border-white/40 bg-transparent text-white hover:bg-white/10"
-            asChild
-          >
-            <Link to="/shop">{t("home.hero.ctaShop")}</Link>
+            <Link to="/products">{t("home.hero.ctaShop")}</Link>
           </Button>
         </div>
       </div>

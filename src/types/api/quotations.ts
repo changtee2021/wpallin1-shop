@@ -1,10 +1,5 @@
 export type QuotationStatus =
-  | "draft"
-  | "sent"
-  | "accepted"
-  | "rejected"
-  | "expired"
-  | "converted";
+  "draft" | "sent" | "accepted" | "rejected" | "expired" | "converted";
 
 export type QuotationItemDto = {
   id: string;

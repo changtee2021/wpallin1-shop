@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useInspirationEngagement } from "@/hooks/use-inspiration-engagement";
 import { InspirationSimilarRooms } from "@/components/storefront/inspiration-similar-rooms";
-import { buildConfiguratorSearchFromHotspot } from "@/lib/configurator-share";
 import { resolveRoomDetailImages } from "@/lib/inspiration-detail-images";
 import { buildMaterialSlugByHotspotId } from "@/lib/inspiration-materials";
 import { useT } from "@/i18n";
@@ -152,14 +151,7 @@ export function InspirationRoomViewer({ room, similarRooms = [] }: Props) {
           )}
 
           <Button className="w-full bg-accent hover:bg-accent/90" asChild>
-            <Link
-              to="/configurator"
-              search={buildConfiguratorSearchFromHotspot(
-                room.hotspots.find((h) => h.id === activeId) ??
-                  room.hotspots[0] ??
-                  {},
-              )}
-            >
+            <Link to="/contact" search={{ topic: "quote" }}>
               {t("inspiration.viewer.useStyle")}
             </Link>
           </Button>

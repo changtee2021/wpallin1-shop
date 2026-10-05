@@ -1,6 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { FeedbackCategory } from "@/lib/error-feedback";
+import { pushLineStaffMessage } from "@/services/line-push.service";
+import { createWebQuoteRequest } from "@/services/quotation.service";
 
 export async function submitContactTicket(
   supabase: SupabaseClient,
@@ -38,12 +40,80 @@ export async function submitContactTicket(
   return ticket.id;
 }
 
+type BusinessInquiryInput = {
+  userId?: string | null;
+  name: string;
+  email?: string;
+  phone?: string;
+  subject: string;
+  message: string;
+  sourceUrl?: string;
+  companyName?: string;
+  lineId?: string;
+  inquiryType?: string;
+  productInterest?: string;
+};
+
+function formatLineAlert(
+  input: BusinessInquiryInput,
+  reference: string,
+): string {
+  return [
+    `[WP ALL เว็บ] ${input.subject}`,
+    `อ้างอิง: ${reference}`,
+    `ชื่อ: ${input.name}`,
+    input.companyName ? `บริษัท: ${input.companyName}` : null,
+    input.phone ? `โทร: ${input.phone}` : null,
+    input.lineId ? `LINE: ${input.lineId}` : null,
+    input.email ? `อีเมล: ${input.email}` : null,
+    input.productInterest ? `สินค้า: ${input.productInterest}` : null,
+    "",
+    input.message,
+  ]
+    .filter((line) => line !== null)
+    .join("\n");
+}
+
+/**
+ * Business enquiries from the brand site. Quote requests become draft quotations so
+ * sales can work them in /admin/quotations; every enquiry also alerts the sales LINE.
+ */
+async function routeBusinessInquiry(
+  supabase: SupabaseClient,
+  input: BusinessInquiryInput,
+  fallbackReference: string,
+): Promise<string> {
+  let reference = fallbackReference;
+
+  if (input.inquiryType === "quote") {
+    try {
+      const quote = await createWebQuoteRequest(supabase, {
+        userId: input.userId,
+        name: input.name,
+        phone: input.phone,
+        email: input.email,
+        companyName: input.companyName,
+        lineId: input.lineId,
+        productInterest: input.productInterest,
+        message: input.message,
+        sourceUrl: input.sourceUrl,
+      });
+      if (quote) reference = quote.quotationNumber;
+    } catch (err) {
+      console.error("[contact] web quote insert failed", err);
+    }
+  }
+
+  await pushLineStaffMessage(formatLineAlert(input, reference));
+  return reference;
+}
+
 export async function submitFeedbackReport(
   supabase: SupabaseClient,
   input: {
     userId?: string | null;
     name: string;
-    email: string;
+    email?: string;
     phone?: string;
     subject: string;
     message: string;
@@ -70,17 +140,22 @@ export async function submitFeedbackReport(
   ].filter(Boolean);
 
   const fullMessage = [...contextLines, "", input.message].join("\n");
+  const isBusinessInquiry =
+    (input.category ?? "contact") === "contact" && Boolean(input.inquiryType);
 
   if (input.userId) {
     const ticketId = await submitContactTicket(supabase, {
       userId: input.userId,
       name: input.name,
-      email: input.email,
+      email: input.email ?? "-",
       phone: input.phone,
       subject: input.subject,
       message: fullMessage,
     });
-    return { ticketId, referenceId: ticketId };
+    const referenceId = isBusinessInquiry
+      ? await routeBusinessInquiry(supabase, input, ticketId)
+      : ticketId;
+    return { ticketId, referenceId };
   }
 
   const { data, error } = await supabase
@@ -90,7 +165,7 @@ export async function submitFeedbackReport(
       entity_type: "feedback",
       changes: {
         name: input.name,
-        email: input.email,
+        email: input.email ?? null,
         phone: input.phone ?? null,
         subject: input.subject,
         message: fullMessage,
@@ -114,5 +189,8 @@ export async function submitFeedbackReport(
     .single();
 
   if (error) throw new Error(error.message);
-  return { referenceId: data.id };
+  const referenceId = isBusinessInquiry
+    ? await routeBusinessInquiry(supabase, input, data.id)
+    : data.id;
+  return { referenceId };
 }

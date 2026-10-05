@@ -8,10 +8,7 @@ export type OrderStatus =
   | "cancelled";
 
 export type PaymentStatus =
-  | "unpaid"
-  | "awaiting_verification"
-  | "paid"
-  | "failed";
+  "unpaid" | "awaiting_verification" | "paid" | "failed";
 
 export type OrderSummaryDto = {
   id: string;

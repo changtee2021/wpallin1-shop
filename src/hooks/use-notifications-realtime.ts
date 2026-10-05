@@ -2,9 +2,7 @@ import { useEffect, useRef } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 
-function removeChannelSafe(
-  channel: ReturnType<typeof supabase.channel>,
-) {
+function removeChannelSafe(channel: ReturnType<typeof supabase.channel>) {
   try {
     void channel.unsubscribe();
   } catch {

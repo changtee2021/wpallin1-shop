@@ -6,7 +6,10 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ListEmptyState, ListErrorState } from "@/components/ui/list-query-state";
+import {
+  ListEmptyState,
+  ListErrorState,
+} from "@/components/ui/list-query-state";
 import { Price } from "@/components/ui/price";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
@@ -100,7 +103,7 @@ function AccountOrdersPage() {
           message="ยังไม่มีคำสั่งซื้อ"
           action={
             <Button asChild>
-              <Link to="/shop">เริ่มช้อปเลย</Link>
+              <Link to="/products">เริ่มช้อปเลย</Link>
             </Button>
           }
         />

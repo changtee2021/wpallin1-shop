@@ -8,6 +8,12 @@ export const Route = createFileRoute("/robots.txt")({
           process.env.VITE_APP_PUBLIC_URL ?? "https://wpallin1-shop.vercel.app";
         const body = `User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /account
+Disallow: /dealer
+Disallow: /cart
+Disallow: /checkout
+Disallow: /api/
 
 Sitemap: ${base}/sitemap.xml
 `;

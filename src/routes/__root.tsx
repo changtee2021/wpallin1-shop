@@ -50,12 +50,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       meta: [
         { charSet: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        { title: "WP ALL — ศูนย์กลางผ้าม่าน" },
+        { title: "WP ALL — ม่าน มู่ลี่ และระบบมอเตอร์ ผลิตในไทย" },
         {
           name: "description",
           content:
-            "ร้านค้าผ้าม่านและมู่ลี่ ขายปลีกและขายส่ง สั่งทำพิเศษ ใบเสนอราคา และติดตามออเดอร์",
+            "WP ALL IN 1 ผู้ผลิตผ้าม่าน มู่ลี่ ม่านม้วน ฉากกั้นห้อง PVC รางม่าน และระบบมอเตอร์อัจฉริยะ สั่งทำตามขนาด สำหรับบ้าน โครงการ และตัวแทนจำหน่าย",
         },
+        { name: "theme-color", content: "#188F8B" },
         { property: "og:type", content: "website" },
         { property: "og:site_name", content: "WP ALL" },
         {
@@ -75,7 +76,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         },
         {
           rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap",
+          href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap",
         },
         { rel: "stylesheet", href: appCss },
         { rel: "icon", href: "/brand/logo-mono-dark.png", type: "image/png" },

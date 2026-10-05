@@ -1,4 +1,9 @@
-import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  Navigate,
+  redirect,
+} from "@tanstack/react-router";
 import {
   AlertCircle,
   CheckCircle2,
@@ -37,11 +42,16 @@ import {
 } from "@/lib/dealer.constants";
 import { submitDealerApplication } from "@/lib/api.functions";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
+import { COMMERCE_ENABLED } from "@/lib/features";
 import { formatDate } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyDealerApplication } from "@/services/dealer.service";
 
 export const Route = createFileRoute("/_store/dealer/register")({
+  beforeLoad: () => {
+    // Account-based applications need login; brand mode collects dealer leads on /partners.
+    if (!COMMERCE_ENABLED) throw redirect({ to: "/partners", replace: true });
+  },
   component: DealerRegisterPage,
 });
 
@@ -166,7 +176,7 @@ function DealerRegisterPage() {
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12">
       <PageHeader
         title="สมัครตัวแทนจำหน่าย"
-        description="พาร์ทเนอร์ร้านม่าน / ช่างติดตั้ง — สั่งจากโรงงาน WP ALL โดยตรง"
+        description="พาร์ทเนอร์ร้านค้า โครงการ นักออกแบบ และช่าง — สั่งจากโรงงาน WP ALL โดยตรง"
       />
 
       <DealerRegisterSteps current={currentStep} />

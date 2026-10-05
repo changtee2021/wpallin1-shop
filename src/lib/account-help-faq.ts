@@ -98,7 +98,7 @@ export const ACCOUNT_HELP_TOPICS: HelpTopic[] = [
       },
     ],
     ctas: [
-      { to: "/shop", label: { th: "ไปหน้าร้านค้า", en: "Go to shop" } },
+      { to: "/products", label: { th: "ไปหน้าสินค้า", en: "Go to products" } },
       { to: "/cart", label: { th: "ไปตะกร้า", en: "Go to cart" } },
     ],
   },

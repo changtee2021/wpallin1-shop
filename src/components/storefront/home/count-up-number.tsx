@@ -21,7 +21,12 @@ function parseCountUpValue(value: string): ParsedCountUpValue | null {
   const target = Number(digits.replace(/,/g, ""));
   if (!Number.isFinite(target)) return null;
 
-  return { prefix, suffix, target, useThousandsSeparator: digits.includes(",") };
+  return {
+    prefix,
+    suffix,
+    target,
+    useThousandsSeparator: digits.includes(","),
+  };
 }
 
 function formatCountUpValue(parsed: ParsedCountUpValue, current: number) {

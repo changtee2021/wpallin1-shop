@@ -1,21 +1,36 @@
 import { FacebookMonoIcon } from "@/components/icons/brand/facebook-mono";
 import { LineMonoIcon } from "@/components/icons/brand/line-mono";
+import { WhatsappMonoIcon } from "@/components/icons/brand/whatsapp-mono";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
 const brandClass: Record<string, string> = {
   LINE: "bg-[#06C755] text-white hover:brightness-95",
   Facebook: "bg-[#1877F2] text-white hover:brightness-95",
+  WhatsApp: "bg-[#25D366] text-white hover:brightness-95",
   YouTube: "bg-[#FF0000] text-white hover:brightness-95",
 };
 
-function SocialIcon({ label, className }: { label: string; className?: string }) {
-  if (label === "LINE") return <LineMonoIcon className={className} aria-hidden />;
+function SocialIcon({
+  label,
+  className,
+}: {
+  label: string;
+  className?: string;
+}) {
+  if (label === "LINE")
+    return <LineMonoIcon className={className} aria-hidden />;
   if (label === "Facebook") {
     return <FacebookMonoIcon className={className} aria-hidden />;
   }
+  if (label === "WhatsApp") {
+    return <WhatsappMonoIcon className={className} aria-hidden />;
+  }
   return (
-    <span className={cn("text-[10px] font-bold leading-none", className)} aria-hidden>
+    <span
+      className={cn("text-[10px] font-bold leading-none", className)}
+      aria-hidden
+    >
       {label.slice(0, 2)}
     </span>
   );

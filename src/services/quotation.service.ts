@@ -194,6 +194,78 @@ export async function requestQuoteFromCart(
   return quote.id;
 }
 
+/**
+ * Brand-site "request a quote" form. Guests have no account, so the draft is owned by
+ * the staff inbox user (WEB_QUOTE_OWNER_USER_ID) and the customer lives in customer_*.
+ * Returns null when no owner can be resolved; the caller keeps the audit-log record.
+ */
+export async function createWebQuoteRequest(
+  supabase: SupabaseClient,
+  input: {
+    userId?: string | null;
+    name: string;
+    phone?: string;
+    email?: string;
+    companyName?: string;
+    lineId?: string;
+    productInterest?: string;
+    message?: string;
+    sourceUrl?: string;
+  },
+): Promise<{ id: string; quotationNumber: string } | null> {
+  const ownerId = input.userId ?? process.env.WEB_QUOTE_OWNER_USER_ID?.trim();
+  if (!ownerId) return null;
+
+  const metadata = {
+    source: "web_quote_request",
+    companyName: input.companyName?.trim() || null,
+    lineId: input.lineId?.trim() || null,
+    productInterest: input.productInterest?.trim() || null,
+    sourceUrl: input.sourceUrl ?? null,
+    isGuest: !input.userId,
+  };
+
+  const note = [
+    input.productInterest ? `สินค้าที่สนใจ: ${input.productInterest}` : null,
+    input.lineId ? `LINE: ${input.lineId}` : null,
+    input.message ?? null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const { data: quote, error } = await supabase
+    .from("quotations")
+    .insert({
+      user_id: ownerId,
+      status: "draft",
+      customer_name: input.name.trim(),
+      customer_email: input.email?.trim() || null,
+      customer_phone: input.phone?.trim() || null,
+      note: note || null,
+      metadata,
+    })
+    .select("id, quotation_number")
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  await appendQuotationHistory(
+    supabase,
+    quote.id,
+    null,
+    "draft",
+    "Web quote request",
+  );
+  await notifyStaff(supabase, "quote_request", {
+    quotationId: quote.id,
+    quotationNumber: quote.quotation_number,
+    customerEmail: input.email,
+    customerName: input.name,
+  });
+
+  return { id: quote.id, quotationNumber: quote.quotation_number as string };
+}
+
 export async function listUserQuotations(
   supabase: SupabaseClient,
   userId: string,

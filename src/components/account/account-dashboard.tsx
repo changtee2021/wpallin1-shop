@@ -25,12 +25,7 @@ const statusLabels: Record<string, string> = {
 };
 
 type OrderTab =
-  | "all"
-  | "pay"
-  | "processing"
-  | "shipping"
-  | "completed"
-  | "cancelled";
+  "all" | "pay" | "processing" | "shipping" | "completed" | "cancelled";
 
 const orderTabs: {
   id: OrderTab;

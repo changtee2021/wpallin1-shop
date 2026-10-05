@@ -51,8 +51,7 @@ export async function getChatSettings(
 
   const map = new Map((data ?? []).map((r) => [r.key, r.value]));
   const bh = map.get("chat.business_hours") as
-    | ChatSettings["businessHours"]
-    | undefined;
+    ChatSettings["businessHours"] | undefined;
 
   return {
     aiEnabled: map.get("chat.ai_enabled") !== false,

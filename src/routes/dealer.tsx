@@ -7,9 +7,13 @@ import { StorefrontFooter } from "@/components/layout/storefront-footer";
 import { StorefrontHeader } from "@/components/layout/storefront-header";
 import { storeSectionClasses } from "@/components/layout/store-page";
 import { PageLoading } from "@/components/loading";
+import { requireCommerce } from "@/lib/commerce-guard";
+import { COMMERCE_ENABLED } from "@/lib/features";
 
 export const Route = createFileRoute("/dealer")({
-  ssr: false,
+  // With commerce off the guard must run on the server so the redirect happens before hydration.
+  ssr: !COMMERCE_ENABLED,
+  beforeLoad: requireCommerce,
   component: DealerLayout,
 });
 

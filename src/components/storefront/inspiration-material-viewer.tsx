@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useT } from "@/i18n";
-import { buildConfiguratorSearchFromHotspot } from "@/lib/configurator-share";
+import { COMMERCE_ENABLED } from "@/lib/features";
 import {
   buildMaterialGalleryImages,
   buildMaterialSpecRows,
@@ -48,11 +48,6 @@ export function InspirationMaterialViewer({
     material.roomSlugs.includes(room.slug),
   );
   const isReady = Boolean(material.productSlug || material.productId);
-  const configuratorSearch = buildConfiguratorSearchFromHotspot({
-    fabricId: material.fabricId,
-    configuratorProductType: material.configuratorProductType,
-  });
-
   const galleryImages = useMemo(
     () => buildMaterialGalleryImages(material, rooms),
     [material, rooms],
@@ -190,7 +185,7 @@ export function InspirationMaterialViewer({
 
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <Button className="flex-1 bg-accent hover:bg-accent/90" asChild>
-              <Link to="/configurator" search={configuratorSearch}>
+              <Link to="/contact" search={{ topic: "quote" }}>
                 {t("inspiration.material.viewer.customize")}
               </Link>
             </Button>
@@ -204,7 +199,7 @@ export function InspirationMaterialViewer({
                 </Link>
               </Button>
             ) : null}
-            {material.productId ? (
+            {COMMERCE_ENABLED && material.productId ? (
               <Button
                 type="button"
                 variant="outline"

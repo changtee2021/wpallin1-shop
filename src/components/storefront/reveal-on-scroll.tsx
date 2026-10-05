@@ -11,7 +11,10 @@ type RevealOnScrollProps = {
   direction?: "up" | "left" | "right" | "none";
 };
 
-const HIDDEN_TRANSFORM: Record<RevealOnScrollProps["direction"] & string, string> = {
+const HIDDEN_TRANSFORM: Record<
+  RevealOnScrollProps["direction"] & string,
+  string
+> = {
   up: "translate-y-6",
   left: "-translate-x-6",
   right: "translate-x-6",
@@ -55,11 +58,15 @@ export function RevealOnScroll({
       ref={ref}
       className={cn(
         "transition-all duration-700 ease-out",
-        visible ? "translate-x-0 translate-y-0 opacity-100" : cn("opacity-0", HIDDEN_TRANSFORM[direction]),
+        visible
+          ? "translate-x-0 translate-y-0 opacity-100"
+          : cn("opacity-0", HIDDEN_TRANSFORM[direction]),
         className,
       )}
       style={
-        delayMs ? { transitionDelay: visible ? `${delayMs}ms` : "0ms" } : undefined
+        delayMs
+          ? { transitionDelay: visible ? `${delayMs}ms` : "0ms" }
+          : undefined
       }
     >
       {children}

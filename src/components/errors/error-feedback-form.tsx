@@ -82,16 +82,17 @@ export function ErrorFeedbackForm({
           ไม่ต้องเข้าสู่ระบบก็ส่งได้ — ทีมงานจะติดต่อกลับทางอีเมล
         </p>
       )}
-      <div className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden" aria-hidden>
+      <div
+        className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
+        aria-hidden
+      >
         <Label htmlFor="fb-company-website">Company website</Label>
         <Input
           id="fb-company-website"
           tabIndex={-1}
           autoComplete="off"
           value={form.companyWebsite}
-          onChange={(e) =>
-            setForm({ ...form, companyWebsite: e.target.value })
-          }
+          onChange={(e) => setForm({ ...form, companyWebsite: e.target.value })}
         />
       </div>
       <div className="grid gap-3 sm:grid-cols-2">

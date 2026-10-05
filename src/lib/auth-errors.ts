@@ -1,3 +1,5 @@
+import { COMMERCE_ENABLED } from "@/lib/features";
+
 const AUTH_ERROR_MAP: Record<string, string> = {
   "Invalid login credentials": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
   "Email not confirmed": "กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ",
@@ -10,7 +12,8 @@ const AUTH_ERROR_MAP: Record<string, string> = {
     "กรุณารอสักครู่แล้วลองส่งอีกครั้ง",
 };
 
-export const POST_AUTH_PATH = "/shop" as const;
+/** Showcase mode has no customer area, so only staff log in — send them to the back office. */
+export const POST_AUTH_PATH = COMMERCE_ENABLED ? "/products" : "/admin";
 
 export function translateAuthError(message: string, fallback: string): string {
   return AUTH_ERROR_MAP[message] ?? fallback;

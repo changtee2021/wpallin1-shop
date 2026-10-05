@@ -191,8 +191,7 @@ export async function generateBotReply(
     .filter((m) => m.senderType === "visitor" || m.senderType === "bot")
     .map((m) => ({
       role: (m.senderType === "visitor" ? "user" : "assistant") as
-        | "user"
-        | "assistant",
+        "user" | "assistant",
       content: m.body,
     }));
 

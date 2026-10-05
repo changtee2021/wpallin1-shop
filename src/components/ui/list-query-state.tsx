@@ -38,7 +38,10 @@ export function ListEmptyState({
   className?: string;
 }) {
   return (
-    <StateFrame icon={<Inbox className="size-5" aria-hidden />} className={className}>
+    <StateFrame
+      icon={<Inbox className="size-5" aria-hidden />}
+      className={className}
+    >
       <p className="text-sm text-muted-foreground">{message}</p>
       {action}
     </StateFrame>
@@ -57,7 +60,10 @@ export function ListNoResultsState({
   className?: string;
 }) {
   return (
-    <StateFrame icon={<SearchX className="size-5" aria-hidden />} className={className}>
+    <StateFrame
+      icon={<SearchX className="size-5" aria-hidden />}
+      className={className}
+    >
       <p className="text-sm text-muted-foreground">{message}</p>
       {onClear ? (
         <Button type="button" variant="outline" onClick={onClear}>

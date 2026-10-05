@@ -129,7 +129,7 @@ function AdminBannersPage() {
             banners={shopBanners}
             onChange={setShopBanners}
             activeLabel="แสดงบนหน้าสินค้ารวม"
-            previewHref="/shop"
+            previewHref="/products"
             previewLabel="ดูหน้าร้าน"
           />
           <Button

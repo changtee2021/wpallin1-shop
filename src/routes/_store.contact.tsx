@@ -1,25 +1,29 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Factory, Handshake, MessageCircle } from "lucide-react";
+import { ArrowUpRight, Factory, MessageCircle, Phone } from "lucide-react";
 import { z } from "zod";
 
+import { SectionHeading } from "@/components/brand/section-heading";
 import { BusinessContactForm } from "@/components/storefront/business-contact-form";
 import { ErrorFeedbackForm } from "@/components/errors/error-feedback-form";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { useT } from "@/i18n";
-import { LINE_OA_URL } from "@/lib/catalog-config";
+import { useBi } from "@/lib/bi";
 import { isContactTopic } from "@/lib/contact-inquiry";
 import {
   defaultFeedbackSubject,
   feedbackCategoryFromKind,
   type ErrorPageKind,
 } from "@/lib/error-feedback";
+import { pageHead } from "@/lib/seo";
+import { siteConfig } from "@/lib/site-config";
 
 const contactSearchSchema = z.object({
   type: z.enum(["feedback"]).optional(),
   topic: z
     .enum(["project", "quote", "factory-visit", "dealer", "profile", "other"])
     .optional(),
+  product: z.string().max(80).optional(),
   code: z.preprocess(
     (value) => (value == null || value === "" ? undefined : String(value)),
     z.enum(["404", "403", "500", "error", "generic"]).optional(),
@@ -30,11 +34,20 @@ const contactSearchSchema = z.object({
 
 export const Route = createFileRoute("/_store/contact")({
   validateSearch: (search) => contactSearchSchema.parse(search),
+  head: () =>
+    pageHead({
+      title: "ติดต่อเรา / ขอใบเสนอราคา | WP ALL",
+      description:
+        "ขอใบเสนอราคา ปรึกษางานโครงการ สมัครตัวแทน หรือนัดเยี่ยมชมโรงงาน WP ALL ที่คลองสามวา กรุงเทพฯ โทร 02-334-0235 LINE @wpfordealer",
+      path: "/contact",
+    }),
   component: ContactPage,
 });
 
 function ContactPage() {
-  const { locale } = useT();
+  const { t, locale } = useT();
+  const pick = useBi();
+  const address = locale === "en" ? siteConfig.addressEn : siteConfig.address;
   const search = Route.useSearch();
   const isFeedback = search.type === "feedback";
   const kind: ErrorPageKind =
@@ -43,14 +56,11 @@ function ContactPage() {
     search.code === "500" ||
     search.code === "generic"
       ? search.code
-      : "error";
+      : "generic";
 
-  const defaultSubject = isFeedback
-    ? defaultFeedbackSubject(kind, search.from)
-    : "";
-  const defaultMessage = search.message ?? "";
   const initialTopic = isContactTopic(search.topic) ? search.topic : undefined;
   const isVisit = initialTopic === "factory-visit";
+  const isQuote = initialTopic === "quote";
 
   if (isFeedback) {
     return (
@@ -70,8 +80,8 @@ function ContactPage() {
               category={feedbackCategoryFromKind(kind)}
               errorCode={kind}
               sourceUrl={search.from}
-              defaultSubject={defaultSubject}
-              defaultMessage={defaultMessage}
+              defaultSubject={defaultFeedbackSubject(kind, search.from)}
+              defaultMessage={search.message ?? ""}
             />
           </CardContent>
         </Card>
@@ -79,76 +89,159 @@ function ContactPage() {
     );
   }
 
-  return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12">
-      <PageHeader
-        title={
-          isVisit
-            ? locale === "en"
-              ? "Book a factory visit"
-              : "นัดเยี่ยมชมโรงงาน"
-            : locale === "en"
-              ? "Contact us"
-              : "ติดต่อเรา"
-        }
-        description={
-          isVisit
-            ? locale === "en"
-              ? "Pick a date and production line — the sales team will confirm within 1 business day."
-              : "เลือกวันและสายผลิตที่อยากดู — ทีมขายจะยืนยันภายใน 1 วันทำการ"
-            : locale === "en"
-              ? "For companies, projects, dealers, and factory visits — not a general inbox."
-              : "เน้นติดต่อธุรกิจ งานโครงการ ตัวแทน และนัดชมโรงงาน"
-        }
-      />
+  const title = isVisit
+    ? pick({ th: "นัดเยี่ยมชมโรงงาน", en: "Book a factory visit" })
+    : isQuote
+      ? pick({ th: "ขอใบเสนอราคา", en: "Request a quote" })
+      : pick({ th: "ติดต่อเรา", en: "Contact us" });
 
-      <div className="grid items-start gap-8 md:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] md:gap-10">
-        <aside className="space-y-5">
-          <p className="text-xs font-semibold tracking-[0.16em] text-accent uppercase">
-            {locale === "en" ? "For business" : "สำหรับบริษัทและองค์กร"}
-          </p>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {locale === "en"
-              ? "Tell us the topic first. If you want to see the factory, choose a date and session — we will confirm before you come."
-              : "เลือกเรื่องที่ต้องการก่อน ถ้านัดชมโรงงานให้ระบุวันและรอบ ทีมงานจะยืนยันก่อนวันเข้าชม"}
-          </p>
-          <div className="grid gap-2">
-            <a
-              href={LINE_OA_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#06C755] px-3.5 text-sm font-semibold text-white hover:brightness-95 active:opacity-90"
-            >
-              <MessageCircle className="size-4 shrink-0" aria-hidden />
-              LINE @wpfordealer
-            </a>
-            <Link
-              to="/contact"
-              search={{ topic: "factory-visit" }}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-white px-3.5 text-sm font-semibold hover:bg-muted/60"
-            >
-              <Factory className="size-4 shrink-0" aria-hidden />
-              {locale === "en" ? "Book factory visit" : "นัดเยี่ยมชมโรงงาน"}
-            </Link>
-            <Link
-              to="/dealer/register"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-white px-3.5 text-sm font-semibold hover:bg-muted/60"
-            >
-              <Handshake className="size-4 shrink-0" aria-hidden />
-              {locale === "en" ? "Dealer registration" : "สมัครตัวแทน"}
-            </Link>
+  const description = isVisit
+    ? pick({
+        th: "เลือกวันและสายผลิตที่อยากดู ทีมขายจะยืนยันภายใน 1 วันทำการ",
+        en: "Pick a date and production line — the sales team will confirm within 1 business day.",
+      })
+    : pick({
+        th: "บอกขนาดหน้าต่างหรือรายละเอียดงาน ทีมงานจะติดต่อกลับพร้อมคำแนะนำและใบเสนอราคา",
+        en: "Tell us your window sizes or project details. Our team will get back to you with advice and a quote.",
+      });
+
+  return (
+    <>
+      <section className="border-b border-border bg-surface">
+        <div className="mx-auto max-w-7xl px-4 pt-14 pb-12 sm:px-6 lg:px-8 lg:pt-20">
+          <SectionHeading
+            as="h1"
+            kicker={t("nav.contact")}
+            title={title}
+            description={description}
+          />
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl items-start gap-12 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16 lg:px-8 lg:py-16">
+        <div className="rounded-sm border border-border bg-background p-5 sm:p-8">
+          <BusinessContactForm
+            key={`${initialTopic ?? "default"}-${search.product ?? ""}`}
+            initialTopic={initialTopic}
+            initialProduct={search.product}
+          />
+        </div>
+
+        <aside className="space-y-8 lg:sticky lg:top-28">
+          <div>
+            <p className="brand-kicker text-muted-foreground">Talk to us now</p>
+            <div className="mt-4 grid gap-2">
+              <a
+                href={siteConfig.lineUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-12 items-center justify-between gap-2 rounded-full bg-[#06C755] px-5 text-sm font-semibold text-white hover:brightness-95"
+              >
+                <span className="inline-flex items-center gap-2">
+                  <MessageCircle className="size-4" aria-hidden />
+                  LINE {siteConfig.lineId}
+                </span>
+                <ArrowUpRight className="size-4" aria-hidden />
+              </a>
+              <a
+                href={`tel:${siteConfig.phoneTel}`}
+                className="inline-flex min-h-12 items-center justify-between gap-2 rounded-full border border-border px-5 text-sm font-semibold hover:border-primary hover:text-primary"
+              >
+                <span className="inline-flex items-center gap-2">
+                  <Phone className="size-4" aria-hidden />
+                  {siteConfig.phoneDisplay}
+                </span>
+                <span className="text-xs font-normal text-muted-foreground">
+                  {locale === "en"
+                    ? siteConfig.officeLabelEn
+                    : siteConfig.officeLabel}
+                </span>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <p className="brand-kicker text-muted-foreground">
+              {siteConfig.salesLabelEn}
+            </p>
+            <ul className="mt-3 grid grid-cols-2 gap-x-4">
+              {siteConfig.salesPhones.map((phone) => (
+                <li key={phone.tel}>
+                  <a
+                    href={`tel:${phone.tel}`}
+                    className="inline-flex min-h-11 items-center text-sm font-medium hover:text-primary"
+                  >
+                    {phone.display}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex items-start gap-4">
+            <img
+              src={siteConfig.lineQrSrc}
+              alt={`LINE ${siteConfig.lineId}`}
+              width={96}
+              height={96}
+              loading="lazy"
+              className="size-24 rounded-sm border border-border bg-white object-cover"
+            />
+            <p className="text-sm leading-6 text-muted-foreground">
+              {pick({
+                th: "สแกนเพื่อแอด LINE แล้วส่งรูปหน้างานหรือขนาดหน้าต่างให้เราได้เลย",
+                en: "Scan to add us on LINE, then send photos of the site or your window sizes.",
+              })}
+            </p>
+          </div>
+
+          <div className="border-t border-border pt-8">
+            <p className="brand-kicker text-muted-foreground">
+              Office & factory
+            </p>
+            <address className="mt-3 text-sm leading-6 not-italic">
+              {locale === "en" ? siteConfig.legalNameEn : siteConfig.legalName}
+              <br />
+              {address.line1} {address.line2}
+              <br />
+              {address.city}
+            </address>
+            <div className="mt-4 aspect-[4/3] overflow-hidden rounded-sm border border-border">
+              <iframe
+                title={pick({ th: "แผนที่ WP ALL", en: "WP ALL map" })}
+                src={siteConfig.mapsEmbedUrl}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="size-full"
+              />
+            </div>
+            <div className="mt-3 flex flex-wrap gap-x-5">
+              <a
+                href={siteConfig.mapsUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-primary"
+              >
+                {pick({ th: "เปิดใน Google Maps", en: "Open in Google Maps" })}
+                <ArrowUpRight className="size-4" aria-hidden />
+              </a>
+              {!isVisit ? (
+                <Link
+                  to="/contact"
+                  search={{ topic: "factory-visit" }}
+                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-primary"
+                >
+                  <Factory className="size-4" aria-hidden />
+                  {pick({
+                    th: "นัดเยี่ยมชมโรงงาน",
+                    en: "Book a factory visit",
+                  })}
+                </Link>
+              ) : null}
+            </div>
           </div>
         </aside>
-
-        <Card>
-          <CardContent className="p-4 pt-5 sm:p-6">
-            <BusinessContactForm
-              key={initialTopic ?? "default"}
-              initialTopic={initialTopic}
-            />
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+      </section>
+    </>
   );
 }

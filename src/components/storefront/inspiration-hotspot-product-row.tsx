@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useT } from "@/i18n";
-import { buildConfiguratorSearchFromHotspot } from "@/lib/configurator-share";
 import {
   getInspirationHotspotKind,
   getHotspotProductImageUrl,
@@ -144,10 +143,7 @@ export function InspirationHotspotProductRow({
                 className="w-full bg-accent hover:bg-accent/90 sm:w-auto"
                 asChild
               >
-                <Link
-                  to="/configurator"
-                  search={buildConfiguratorSearchFromHotspot(hotspot)}
-                >
+                <Link to="/contact" search={{ topic: "quote" }}>
                   {t("inspiration.hotspot.customCta")}
                 </Link>
               </Button>

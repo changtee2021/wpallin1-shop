@@ -17,6 +17,7 @@ import type {
   ProductPublicDto,
   ShopFilterFacets,
 } from "@/types/api/products";
+import { COMMERCE_ENABLED } from "@/lib/features";
 import { listProductOptionGroups } from "@/services/product-options.service";
 
 type ProductRow = {
@@ -72,10 +73,10 @@ function applyProductFilters(
   if (categoryId) {
     builder = builder.eq("category_id", categoryId);
   }
-  if (normalized.minPrice != null) {
+  if (COMMERCE_ENABLED && normalized.minPrice != null) {
     builder = builder.gte("retail_price", normalized.minPrice);
   }
-  if (normalized.maxPrice != null) {
+  if (COMMERCE_ENABLED && normalized.maxPrice != null) {
     builder = builder.lte("retail_price", normalized.maxPrice);
   }
   if (normalized.productType) {
@@ -148,6 +149,27 @@ function mapProduct(
   };
 }
 
+/** Public reads must not leak prices while the site runs without commerce. Cart/checkout keep real prices via getProductById. */
+export function withoutPrices(product: ProductPublicDto): ProductPublicDto {
+  if (COMMERCE_ENABLED) return product;
+  return {
+    ...product,
+    retailPrice: 0,
+    compareAtPrice: null,
+    optionGroups: stripOptionPrices(product.optionGroups),
+  };
+}
+
+export function stripOptionPrices(
+  groups: ProductPublicDto["optionGroups"],
+): ProductPublicDto["optionGroups"] {
+  if (COMMERCE_ENABLED) return groups;
+  return groups.map((group) => ({
+    ...group,
+    choices: group.choices.map((choice) => ({ ...choice, priceDelta: 0 })),
+  }));
+}
+
 export async function listCategories(
   supabase: SupabaseClient,
 ): Promise<CategoryDto[]> {
@@ -190,8 +212,12 @@ export async function listPublicProducts(
 
   builder = applyProductFilters(builder, normalized, categoryId);
 
-  if (normalized.sortBy) {
-    builder = builder.order(normalized.sortBy, {
+  const sortBy =
+    normalized.sortBy === "retail_price" && !COMMERCE_ENABLED
+      ? undefined
+      : normalized.sortBy;
+  if (sortBy) {
+    builder = builder.order(sortBy, {
       ascending: normalized.sortDir !== "desc",
     });
   } else {
@@ -212,10 +238,10 @@ export async function listPublicProducts(
 
   const total = count ?? 0;
   const mapped = (data ?? []).map((row) =>
-    mapProduct(row as ProductRow, categories),
+    withoutPrices(mapProduct(row as ProductRow, categories)),
   );
   return {
-    data: normalized.sortBy ? mapped : sortProductsMockLast(mapped),
+    data: sortBy ? mapped : sortProductsMockLast(mapped),
     meta: {
       page: normalized.page,
       pageSize: normalized.pageSize,
@@ -240,7 +266,7 @@ export async function getProductBySlug(
   if (!data) return null;
   const product = mapProduct(data as ProductRow, categories);
   product.optionGroups = await listProductOptionGroups(supabase, product.id);
-  return product;
+  return withoutPrices(product);
 }
 
 export async function getProductById(
@@ -278,7 +304,7 @@ export async function getPublicProductsByIds(
   const byId = new Map(
     (data ?? []).map((row) => [
       row.id as string,
-      mapProduct(row as ProductRow, categories),
+      withoutPrices(mapProduct(row as ProductRow, categories)),
     ]),
   );
 
@@ -365,10 +391,12 @@ export async function getShopFilterFacets(
     .filter((c) => c.count > 0);
 
   return {
-    priceRange: {
-      min: Number.isFinite(minPrice) ? Math.floor(minPrice) : 0,
-      max: maxPrice > 0 ? Math.ceil(maxPrice) : 10000,
-    },
+    priceRange: COMMERCE_ENABLED
+      ? {
+          min: Number.isFinite(minPrice) ? Math.floor(minPrice) : 0,
+          max: maxPrice > 0 ? Math.ceil(maxPrice) : 10000,
+        }
+      : { min: 0, max: 0 },
     categories: categoryList,
     styles: countAttributeValues(facetRows, "style"),
     colors: countAttributeValues(facetRows, "color"),

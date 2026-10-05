@@ -34,9 +34,7 @@ export function StorePage({
   className?: string;
   children: ReactNode;
 }) {
-  return (
-    <div className={storePageClasses(width, className)}>{children}</div>
-  );
+  return <div className={storePageClasses(width, className)}>{children}</div>;
 }
 
 /** Grid shell for account / dealer / admin sidebars */

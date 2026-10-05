@@ -76,11 +76,7 @@ function AdminSupportPage() {
     const data = await fetchAdminSupportTickets({
       data: {
         status: statusFilter as
-          | "all"
-          | "open"
-          | "in_progress"
-          | "resolved"
-          | "closed",
+          "all" | "open" | "in_progress" | "resolved" | "closed",
       },
       ...authServerFnOptions(session),
     });

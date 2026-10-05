@@ -59,7 +59,14 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-sans: "Prompt", ui-sans-serif, system-ui, sans-serif;
+  --color-primary-deep: var(--primary-deep);
+  --color-primary-soft: var(--primary-soft);
+  --color-surface: var(--surface);
+  --color-cream: var(--cream);
+  --font-sans: "IBM Plex Sans Thai", ui-sans-serif, system-ui, sans-serif;
+  /* Plex reads heavy at 600+, so the scale is shifted one step lighter for a quieter look. */
+  --font-weight-semibold: 500;
+  --font-weight-bold: 600;
   --font-document: "Sarabun", "TH Sarabun New", "Noto Sans Thai", sans-serif;
 }
 
@@ -73,6 +80,10 @@
   --popover-foreground: oklch(0.22 0.01 50);
   --primary: oklch(0.518 0.078 180.5);
   --primary-foreground: oklch(1 0 0);
+  --primary-deep: oklch(0.43 0.068 182);
+  --primary-soft: oklch(0.96 0.017 185);
+  --surface: oklch(0.96 0 0);
+  --cream: oklch(0.968 0.006 85);
   --secondary: oklch(0.96 0.005 185);
   --secondary-foreground: oklch(0.22 0.01 50);
   --muted: oklch(0.96 0 0);
@@ -100,6 +111,9 @@
 }
 
 .dark {
+  --primary-deep: oklch(0.43 0.068 182);
+  --primary-soft: oklch(0.279 0.041 260.031);
+  --surface: oklch(0.208 0.042 265.755);
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);
@@ -170,25 +184,6 @@
   outline-offset: 2px;
 }
 
-.home-gallery-track {
-  display: flex;
-  width: max-content;
-  animation: home-gallery-scroll 46s linear infinite;
-}
-@keyframes home-gallery-scroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .home-gallery-track {
-    animation: none;
-  }
-}
-
 @keyframes shop-slide-out-left {
   to {
     transform: translateX(-100%);
@@ -255,10 +250,627 @@
   }
 }
 
+/* Category tiles stay put until hover, then the pointed card pops over its neighbors. */
+.category-pop-card {
+  transition:
+    transform 500ms cubic-bezier(0.22, 1.25, 0.36, 1),
+    box-shadow 500ms ease;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .category-pop-grid .category-pop-card:nth-child(odd) {
+    transform-origin: left center;
+  }
+
+  .category-pop-grid .category-pop-card:nth-child(even) {
+    transform-origin: right center;
+  }
+
+  .category-pop-grid:has(.category-pop-card:hover) .category-pop-card:not(:hover) {
+    transform: scale(0.96);
+  }
+
+  .category-pop-grid .category-pop-card:hover {
+    z-index: 30;
+    transform: scale(1.7);
+    box-shadow: 0 18px 40px rgb(0 0 0 / 0.28);
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) and (min-width: 768px) {
+  .category-pop-grid .category-pop-card {
+    transform-origin: center;
+  }
+
+  .category-pop-grid .category-pop-card:nth-child(4n + 1) {
+    transform-origin: left center;
+  }
+
+  .category-pop-grid .category-pop-card:nth-child(4n) {
+    transform-origin: right center;
+  }
+}
+
+/* Brand site: editorial type scale and section rhythm. */
+@utility brand-kicker {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Thai stacks vowels and tone marks above the line, so headings need more leading than Latin. */
+@utility brand-display {
+  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+  font-weight: 500;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+@utility brand-heading {
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.28;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+
+@utility brand-index {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+@utility brand-section {
+  padding-block: clamp(4rem, 9vw, 7.5rem);
+}
+
+.brand-marquee {
+  display: flex;
+  width: max-content;
+  animation: home-gallery-scroll var(--marquee-duration, 40s) linear infinite;
+}
+.brand-marquee-reverse {
+  animation-direction: reverse;
+}
+.brand-marquee-host:hover .brand-marquee {
+  animation-play-state: paused;
+}
+
+/* Ribbon motif from the W mark — decorative only, never under body text. */
+.brand-ribbon {
+  background-image:
+    linear-gradient(
+      115deg,
+      transparent 0 38%,
+      color-mix(in oklch, var(--primary) 85%, transparent) 38% 46%,
+      transparent 46% 52%,
+      color-mix(in oklch, var(--accent) 85%, transparent) 52% 58%,
+      transparent 58%
+    );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-marquee {
+    animation: none;
+  }
+}
+
+/*
+ * Scroll motion driven by the compositor (no JS, no listeners).
+ * Guarded by @supports: without scroll timelines the keyframes would play once on load instead.
+ */
+@keyframes scroll-rise {
+  from {
+    opacity: 0;
+    transform: translateY(2.5rem);
+  }
+}
+
+@keyframes scroll-zoom {
+  from {
+    transform: scale(1.14);
+  }
+}
+
+@keyframes scroll-parallax {
+  to {
+    transform: translateY(22%);
+  }
+}
+
+@keyframes scroll-fade-away {
+  to {
+    opacity: 0;
+    transform: translateY(-3rem);
+  }
+}
+
+@keyframes scroll-marquee-left {
+  from {
+    transform: translateX(10%);
+  }
+  to {
+    transform: translateX(-35%);
+  }
+}
+
+@keyframes scroll-marquee-right {
+  from {
+    transform: translateX(-35%);
+  }
+  to {
+    transform: translateX(10%);
+  }
+}
+
+@keyframes scroll-line-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes scroll-scale-in {
+  from {
+    opacity: 0;
+    transform: translateY(2.5rem) scale(0.8);
+  }
+}
+
+/* Thin accent rule on top of a list item that draws itself in; static line where scroll timelines are missing. */
+.scroll-line-top {
+  position: relative;
+}
+
+.scroll-line-top::before {
+  content: "";
+  position: absolute;
+  inset: -1px 0 auto 0;
+  height: 1px;
+  background: var(--accent);
+  transform-origin: left;
+}
+
+@keyframes scroll-word {
+  from {
+    opacity: 0.18;
+  }
+}
+
+@keyframes scroll-slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(-3rem);
+  }
+}
+
+@keyframes scroll-slide-in-x {
+  from {
+    opacity: 0.2;
+    transform: translateX(18vw);
+  }
+}
+
+@keyframes scroll-wipe-up {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes scroll-wipe-up-soft {
+  from {
+    clip-path: inset(40% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes scroll-drift-up {
+  from {
+    transform: translateY(4rem);
+  }
+  to {
+    transform: translateY(-4rem);
+  }
+}
+
+@keyframes scroll-drift-down {
+  from {
+    transform: translateY(-2rem);
+  }
+  to {
+    transform: translateY(3rem);
+  }
+}
+
+@keyframes scroll-lag {
+  from {
+    transform: translateY(6rem);
+  }
+}
+
+@keyframes scroll-hero-shrink {
+  to {
+    clip-path: inset(0 3% 0 3% round 0 0 2.5rem 2.5rem);
+  }
+}
+
+/* Home hero folds into an inset rounded card while the next chapter slides up over it. */
+@keyframes scroll-hero-card {
+  to {
+    clip-path: inset(4svh 3% 0 3% round 2rem);
+    transform: scale(0.97);
+  }
+}
+
+@keyframes pin-x {
+  to {
+    transform: translateX(calc(-100% + 100vw));
+  }
+}
+
+@keyframes scroll-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Hero copy plays once on load (time-based), so it also works where scroll timelines are missing. */
+@keyframes hero-blur-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.45em);
+    filter: blur(10px);
+  }
+}
+
+/* Error pages: the big code sits behind venetian-blind slats that tilt open on load. */
+@property --slat {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes blinds-open {
+  from {
+    --slat: 18px;
+  }
+  to {
+    --slat: 0px;
+  }
+}
+
+.error-blinds {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--background) 0 var(--slat),
+    transparent var(--slat) 18px
+  );
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-word,
+  .hero-blur-in {
+    animation: hero-blur-in 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .error-blinds {
+    animation: blinds-open 1500ms cubic-bezier(0.65, 0, 0.35, 1) 200ms both;
+  }
+
+  .error-rise {
+    animation: hero-blur-in 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--delay, 0ms);
+  }
+
+  .hero-word {
+    animation-delay: calc(var(--i, 0) * 70ms + 150ms);
+  }
+
+  .hero-blur-in {
+    animation-delay: var(--delay, 0ms);
+  }
+}
+
+.scroll-progress {
+  display: none;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* --i staggers siblings that sit on the same row and would otherwise enter together. */
+    .scroll-rise {
+      animation: scroll-rise linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--i, 0) * 10%) entry calc(85% + var(--i, 0) * 10%);
+    }
+
+    /* Big outlined slogan lines that travel sideways as the page scrolls past them. */
+    .scroll-marquee-left,
+    .scroll-marquee-right {
+      animation: scroll-marquee-left linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+
+    .scroll-marquee-right {
+      animation-name: scroll-marquee-right;
+    }
+
+    .scroll-line-top::before {
+      animation: scroll-line-grow linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--i, 0) * 8%) entry calc(90% + var(--i, 0) * 8%);
+    }
+
+    .scroll-scale-in {
+      animation: scroll-scale-in linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--i, 0) * 12%) entry calc(85% + var(--i, 0) * 12%);
+    }
+
+    /* Statement sentence: each word brightens as it travels up from the bottom of the screen. */
+    .scroll-word {
+      animation: scroll-word linear both;
+      animation-timeline: view();
+      animation-range: entry 35% cover 28%;
+    }
+
+    .scroll-slide-right {
+      animation: scroll-slide-right linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+
+    .scroll-slide-in-x {
+      animation: scroll-slide-in-x linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+
+    .scroll-wipe-up {
+      animation: scroll-wipe-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 35%;
+    }
+
+    .scroll-wipe-up-soft {
+      animation: scroll-wipe-up-soft linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--i, 0) * 15%) cover calc(40% + var(--i, 0) * 10%);
+    }
+
+    .scroll-drift-up,
+    .scroll-drift-down {
+      animation: scroll-drift-up linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+
+    .scroll-drift-down {
+      animation-name: scroll-drift-down;
+    }
+
+    @media (min-width: 1024px) {
+      .scroll-lag-grid > :nth-child(3n + 2) {
+        animation: scroll-lag linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 60%;
+      }
+    }
+
+    .scroll-hero-shrink {
+      animation: scroll-hero-shrink linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100svh;
+    }
+
+    .scroll-progress {
+      display: block;
+      transform-origin: left;
+      animation: scroll-progress linear both;
+      animation-timeline: scroll(root);
+    }
+
+    .scroll-zoom {
+      animation: scroll-zoom linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+
+    .scroll-parallax {
+      animation: scroll-parallax linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100svh;
+    }
+
+    .scroll-fade-away {
+      animation: scroll-fade-away linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 75svh;
+    }
+
+    .scroll-hero-card {
+      transform-origin: 50% 100%;
+      animation: scroll-hero-card linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100svh;
+    }
+
+    /*
+     * Pinned horizontal rail: the tall section supplies scroll distance, the stage sticks,
+     * and the track slides left until its last card meets the right edge.
+     * Elsewhere (phones, short screens, Firefox) the rail stays a normal swipe row.
+     */
+    @media (min-width: 1024px) and (min-height: 680px) {
+      .pin-x {
+        height: var(--pin-x-height, 260svh);
+        view-timeline-name: --pin-x;
+      }
+
+      .pin-x-stage {
+        position: sticky;
+        top: 0;
+        display: flex;
+        height: 100svh;
+        flex-direction: column;
+        justify-content: center;
+        overflow: clip;
+        padding-block: 5rem 1.5rem;
+      }
+
+      .pin-x-viewport {
+        overflow: visible;
+        scroll-snap-type: none;
+      }
+
+      .pin-x-track {
+        animation: pin-x linear both;
+        animation-timeline: --pin-x;
+        animation-range: contain 0% contain 100%;
+      }
+    }
+  }
+}
+
 @utility no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/* ArrowFillLink — pill CTA with expanding arrow circle (Framer ArrowFillButton port) */
+.arrow-fill-btn {
+  --afb-bg: var(--accent);
+  --afb-text: #fff;
+  --afb-fill: #fff;
+  --afb-fill-text: var(--accent);
+  --afb-circle: 2.25rem;
+  --afb-gap: 0.25rem;
+  --afb-pad-l: 1.25rem;
+  --afb-pad-r: calc(var(--afb-circle) + var(--afb-gap) + 0.75rem);
+  --afb-inset-y: calc((100% - var(--afb-circle)) / 2);
+  --afb-ease: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  --afb-duration: 450ms;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 2.75rem;
+  overflow: hidden;
+  border-radius: 9999px;
+  padding: 0 var(--afb-pad-r) 0 var(--afb-pad-l);
+  background-color: var(--afb-bg);
+  color: var(--afb-text);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.arrow-fill-btn__label {
+  position: relative;
+  z-index: 1;
+}
+.arrow-fill-btn__circle {
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+  border-radius: 9999px;
+  background-color: var(--afb-fill);
+  top: var(--afb-inset-y);
+  bottom: var(--afb-inset-y);
+  right: var(--afb-gap);
+  left: calc(100% - var(--afb-gap) - var(--afb-circle));
+  transition: inset var(--afb-duration) var(--afb-ease);
+}
+.arrow-fill-btn__mask {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--afb-pad-r) 0 var(--afb-pad-l);
+  color: var(--afb-fill-text);
+  clip-path: inset(
+    var(--afb-inset-y) var(--afb-gap) var(--afb-inset-y)
+      calc(100% - var(--afb-gap) - var(--afb-circle))
+  );
+  transition:
+    clip-path var(--afb-duration) var(--afb-ease),
+    color var(--afb-duration) var(--afb-ease);
+}
+.arrow-fill-btn__icon {
+  pointer-events: none;
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  right: var(--afb-gap);
+  display: inline-flex;
+  width: var(--afb-circle);
+  height: var(--afb-circle);
+  transform: translateY(-50%);
+  overflow: hidden;
+  border-radius: 9999px;
+  background-color: var(--afb-fill);
+  color: var(--afb-fill-text);
+}
+.arrow-fill-btn__svg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1rem;
+  height: 1rem;
+  transition: transform var(--afb-duration) var(--afb-ease);
+}
+.arrow-fill-btn__svg--enter {
+  transform: translate(-170%, -50%) scale(0);
+}
+.arrow-fill-btn__svg--exit {
+  transform: translate(-50%, -50%) scale(1);
+}
+.arrow-fill-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.arrow-fill-btn:hover .arrow-fill-btn__circle,
+.arrow-fill-btn:focus-visible .arrow-fill-btn__circle,
+.arrow-fill-btn:active .arrow-fill-btn__circle {
+  inset: 0;
+}
+.arrow-fill-btn:hover .arrow-fill-btn__mask,
+.arrow-fill-btn:focus-visible .arrow-fill-btn__mask,
+.arrow-fill-btn:active .arrow-fill-btn__mask {
+  clip-path: inset(0 0 0 0);
+}
+.arrow-fill-btn:hover .arrow-fill-btn__svg--enter,
+.arrow-fill-btn:focus-visible .arrow-fill-btn__svg--enter,
+.arrow-fill-btn:active .arrow-fill-btn__svg--enter {
+  transform: translate(-50%, -50%) scale(1);
+}
+.arrow-fill-btn:hover .arrow-fill-btn__svg--exit,
+.arrow-fill-btn:focus-visible .arrow-fill-btn__svg--exit,
+.arrow-fill-btn:active .arrow-fill-btn__svg--exit {
+  transform: translate(70%, -50%) scale(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .arrow-fill-btn__circle,
+  .arrow-fill-btn__mask,
+  .arrow-fill-btn__svg {
+    transition: none;
   }
 }
