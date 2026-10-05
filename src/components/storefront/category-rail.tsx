@@ -1,13 +1,19 @@
 import { Link } from "@tanstack/react-router";
 import {
   Blinds,
+  Columns2,
+  DoorOpen,
+  Flag,
   Grid3X3,
+  Image as ImageIcon,
   Layers,
   Package,
   Palette,
   PanelTop,
+  RectangleHorizontal,
   Sparkles,
   Sun,
+  SunDim,
   Zap,
   type LucideIcon,
 } from "lucide-react";
@@ -17,17 +23,26 @@ import type { CategoryDto } from "@/types/api/categories";
 
 const iconMap: Record<string, LucideIcon> = {
   curtains: Layers,
+  accessories: Package,
   "roller-blinds": Blinds,
-  "aluminum-blinds": Blinds,
+  "vertical-blinds": Columns2,
   "wood-blinds": Blinds,
+  "aluminum-blinds": Blinds,
+  "outdoor-curtains": Sun,
+  "zip-blinds": RectangleHorizontal,
+  "skylight-fss": SunDim,
+  "pvc-folding-doors": DoorOpen,
+  "pvc-strip-curtains": Columns2,
+  wallpaper: ImageIcon,
+  "window-tinting": Sun,
+  "fabric-print": Palette,
+  "printed-roller-blinds": Palette,
+  noren: Flag,
   "zebra-blinds": Sun,
   "roman-blinds": Layers,
   "curtain-rails": PanelTop,
-  accessories: Package,
   "ready-made": Sparkles,
   "motorized-curtains": Zap,
-  "outdoor-curtains": Sun,
-  "fabric-print": Palette,
 };
 
 type CategoryRailProps = {
@@ -119,7 +134,7 @@ export function CategoryRail({
         <div className="grid grid-cols-4 gap-x-3 gap-y-4 py-1 sm:gap-x-4 md:hidden">
           {items}
         </div>
-        <div className="hidden md:flex md:flex-nowrap md:items-start md:justify-center md:gap-x-6 lg:gap-x-8 py-1">
+        <div className="hidden md:flex md:flex-wrap md:items-start md:justify-center md:gap-x-5 md:gap-y-4 lg:gap-x-6 py-1">
           {showAll ? (
             <CategoryItem
               to="/shop"

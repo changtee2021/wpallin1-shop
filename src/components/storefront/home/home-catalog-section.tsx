@@ -15,10 +15,12 @@ export function HomeCatalogSection({ catalogs }: Props) {
 
   if (catalogs.length === 0) return null;
 
-  const ordered = [...catalogs].sort((a, b) => {
-    if (a.isFeatured !== b.isFeatured) return a.isFeatured ? -1 : 1;
-    return a.sortOrder - b.sortOrder;
-  });
+  const ordered = catalogs
+    .filter((catalog) => catalog.visibility === "public")
+    .sort((a, b) => {
+      if (a.isFeatured !== b.isFeatured) return a.isFeatured ? -1 : 1;
+      return a.sortOrder - b.sortOrder;
+    });
 
   return (
     <section>

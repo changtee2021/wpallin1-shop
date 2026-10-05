@@ -18,7 +18,7 @@ const slides = [
     bg: "from-primary to-primary/80",
   },
   {
-    title: "มู่ลี่ & Zebra",
+    title: "ม่านม้วน",
     subtitle: "ลดแสง UV สไตล์โมเดิร์น",
     cta: "ดูสินค้า",
     to: "/shop" as const,
@@ -26,11 +26,11 @@ const slides = [
     bg: "from-accent to-accent/80",
   },
   {
-    title: "ผ้าม่านสำเร็จรูป",
-    subtitle: "พร้อมติดตั้ง ไม่ต้องรอ",
+    title: "ผ้าม่าน",
+    subtitle: "เลือกผ้าและสั่งตัดตามพื้นที่",
     cta: "สั่งซื้อวันนี้",
     to: "/shop" as const,
-    search: { category: "ready-made" },
+    search: { category: "curtains" },
     bg: "from-primary/90 to-teal-700",
   },
 ];

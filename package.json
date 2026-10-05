@@ -16,6 +16,8 @@
     "test:routes": "node scripts/check-routes.mjs",
     "catalog:compress": "node scripts/compress-catalog-pdf.mjs",
     "catalog:seed-roller": "node scripts/seed-roller-blinds-catalog.mjs",
+    "catalog:seed-wood": "node scripts/seed-wooden-blinds-catalog.mjs",
+    "catalog:seed-dealer-price": "node scripts/seed-dealer-price-list.mjs",
     "media:compress": "node scripts/compress-media.mjs",
     "seed:inspiration-materials": "node scripts/seed-inspiration-materials.mjs",
     "deploy:preview": "vercel deploy --yes",

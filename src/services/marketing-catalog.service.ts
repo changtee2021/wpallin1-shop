@@ -160,7 +160,13 @@ async function fetchCatalogRows(
     rows.map((row) => row.id),
   );
 
-  return rows.map((row) => mapCatalog(row, productMap.get(row.id) ?? []));
+  return rows.map((row) => {
+    const catalog = mapCatalog(row, productMap.get(row.id) ?? []);
+    if (filter?.storefront && catalog.visibility === "dealer") {
+      return stripPdfForLock(catalog);
+    }
+    return catalog;
+  });
 }
 
 export async function isApprovedDealerUser(

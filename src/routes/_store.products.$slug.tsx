@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { PageLoading } from "@/components/loading";
+import { CategorySpecPanel } from "@/components/storefront/category-spec-panel";
 import { ProductMarketingCatalogs } from "@/components/storefront/product-marketing-catalogs";
 import { ProductImage } from "@/components/storefront/product-image";
 import { ProductOptionSelectors } from "@/components/storefront/product-option-selectors";
@@ -47,6 +48,12 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   fabric: "เนื้อผ้า",
   moq: "ขั้นต่ำ",
   pack: "แพ็ก",
+  composition: "ส่วนผสม",
+  uv_blockage: "กันยูวี",
+  openness: "ช่องแสง",
+  thickness: "ความหนา",
+  fabric_width: "หน้ากว้างผ้า",
+  fire_rating: "กันลามไฟ",
 };
 
 function formatAttrLabel(key: string): string {
@@ -285,6 +292,18 @@ function ProductDetailPage() {
           )}
 
           <ProductMarketingCatalogs catalogs={marketingCatalogs} />
+
+          <div className="mt-4">
+            <CategorySpecPanel
+              categorySlug={product.categorySlug}
+              product={{
+                name: product.name,
+                sku: product.sku,
+                slug: product.slug,
+              }}
+              compact
+            />
+          </div>
 
           {attributeEntries.length > 0 && (
             <Card className="mt-4">

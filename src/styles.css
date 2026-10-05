@@ -170,6 +170,33 @@
   outline-offset: 2px;
 }
 
+.about-accent-underline {
+  position: relative;
+  display: inline-block;
+}
+.about-accent-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0.08em;
+  height: 0.12em;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: about-underline-draw 0.8s ease-out 0.35s forwards;
+}
+@keyframes about-underline-draw {
+  to {
+    transform: scaleX(1);
+  }
+}
+.about-gallery-track {
+  display: flex;
+  width: max-content;
+  animation: home-gallery-scroll 46s linear infinite;
+}
+
 .home-gallery-track {
   display: flex;
   width: max-content;
@@ -184,6 +211,11 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .about-accent-underline::after {
+    animation: none;
+    transform: scaleX(1);
+  }
+  .about-gallery-track,
   .home-gallery-track {
     animation: none;
   }
@@ -252,6 +284,47 @@
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .btn-shimmer:hover::after {
     animation: btn-shimmer-run 0.85s ease-out;
+  }
+}
+
+/* Category tiles stay put until hover, then the pointed card pops over its neighbors. */
+.category-pop-card {
+  transition:
+    transform 500ms cubic-bezier(0.22, 1.25, 0.36, 1),
+    box-shadow 500ms ease;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .category-pop-grid .category-pop-card:nth-child(odd) {
+    transform-origin: left center;
+  }
+
+  .category-pop-grid .category-pop-card:nth-child(even) {
+    transform-origin: right center;
+  }
+
+  .category-pop-grid:has(.category-pop-card:hover) .category-pop-card:not(:hover) {
+    transform: scale(0.96);
+  }
+
+  .category-pop-grid .category-pop-card:hover {
+    z-index: 30;
+    transform: scale(1.7);
+    box-shadow: 0 18px 40px rgb(0 0 0 / 0.28);
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) and (min-width: 768px) {
+  .category-pop-grid .category-pop-card {
+    transform-origin: center;
+  }
+
+  .category-pop-grid .category-pop-card:nth-child(4n + 1) {
+    transform-origin: left center;
+  }
+
+  .category-pop-grid .category-pop-card:nth-child(4n) {
+    transform-origin: right center;
   }
 }
 

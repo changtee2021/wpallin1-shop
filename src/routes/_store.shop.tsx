@@ -5,6 +5,7 @@ import { z } from "zod";
 import { InfiniteScrollSentinel } from "@/components/storefront/infinite-scroll-sentinel";
 import { PageLoading } from "@/components/loading";
 import { CategoryRail } from "@/components/storefront/category-rail";
+import { CategorySpecPanel } from "@/components/storefront/category-spec-panel";
 import { ShopHeroSlider } from "@/components/storefront/shop/shop-hero-slider";
 import { ProductFeed } from "@/components/storefront/product-feed";
 import { ShopActiveFilters } from "@/components/storefront/shop/shop-active-filters";
@@ -273,6 +274,12 @@ function ShopPage() {
               smartSource={smartSource}
               onChange={applySearch}
             />
+
+            {search.category ? (
+              <div className="mb-4">
+                <CategorySpecPanel categorySlug={search.category} />
+              </div>
+            ) : null}
 
             {items.length === 0 ? (
               activeCount > 0 ? (

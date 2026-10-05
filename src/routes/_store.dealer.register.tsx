@@ -166,7 +166,7 @@ function DealerRegisterPage() {
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12">
       <PageHeader
         title="สมัครตัวแทนจำหน่าย"
-        description="พาร์ทเนอร์ร้านม่าน / ช่างติดตั้ง — สั่งจากโรงงาน WP ALL โดยตรง"
+        description="พาร์ทเนอร์ร้านค้า โครงการ นักออกแบบ และช่าง — สั่งจากโรงงาน WP ALL โดยตรง"
       />
 
       <DealerRegisterSteps current={currentStep} />

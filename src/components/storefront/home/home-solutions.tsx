@@ -25,7 +25,7 @@ const items: SolutionItem[] = [
     titleKey: "home.solutions.outdoor.title",
     descKey: "home.solutions.outdoor.desc",
     to: "/shop",
-    search: { category: "roller-blinds" },
+    search: { category: "outdoor-curtains" },
   },
   {
     icon: Settings2,

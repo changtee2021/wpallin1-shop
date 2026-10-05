@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { useT } from "@/i18n";
 import { LINE_OA_URL } from "@/lib/catalog-config";
+import { siteConfig } from "@/lib/site-config";
 import { isContactTopic } from "@/lib/contact-inquiry";
 import {
   defaultFeedbackSubject,
@@ -122,6 +123,49 @@ function ContactPage() {
               <MessageCircle className="size-4 shrink-0" aria-hidden />
               LINE @wpfordealer
             </a>
+            {siteConfig.whatsapp.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-3.5 text-sm font-semibold text-white hover:brightness-95 active:opacity-90"
+              >
+                WhatsApp {item.display}
+              </a>
+            ))}
+            <a
+              href={siteConfig.facebookUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#1877F2] px-3.5 text-sm font-semibold text-white hover:brightness-95 active:opacity-90"
+            >
+              Facebook · {siteConfig.facebookLabel}
+            </a>
+            <div className="rounded-xl border border-border bg-white p-3">
+              <p className="text-xs font-semibold text-muted-foreground">
+                {locale === "en" ? siteConfig.salesLabelEn : siteConfig.salesLabel}
+              </p>
+              <ul className="mt-1">
+                {siteConfig.salesPhones.map((phone) => (
+                  <li key={phone.tel}>
+                    <a
+                      href={`tel:${phone.tel}`}
+                      className="inline-flex min-h-11 items-center text-sm font-semibold hover:text-primary"
+                    >
+                      {phone.display}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <a
+                href={`tel:${siteConfig.phoneTel}`}
+                className="inline-flex min-h-11 items-center text-sm text-muted-foreground hover:text-primary"
+              >
+                {locale === "en" ? siteConfig.officeLabelEn : siteConfig.officeLabel}{" "}
+                {siteConfig.phoneDisplay}
+              </a>
+            </div>
             <Link
               to="/contact"
               search={{ topic: "factory-visit" }}

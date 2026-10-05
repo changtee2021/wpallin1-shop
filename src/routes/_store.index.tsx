@@ -60,16 +60,14 @@ function HomePage() {
         <HomeGalleryStrip />
       </RevealOnScroll>
       <StorePage className="space-y-8 sm:space-y-10 md:space-y-12">
-        {categories.length > 0 ? (
-          <RevealOnScroll>
-            <section>
-              <h2 className="mb-4 text-lg font-bold text-primary sm:mb-5 sm:text-xl">
-                {t("home.categories.title")}
-              </h2>
-              <CategoryImageGrid categories={categories} />
-            </section>
-          </RevealOnScroll>
-        ) : null}
+        <RevealOnScroll>
+          <section className="relative z-20">
+            <h2 className="mb-4 text-lg font-bold text-primary sm:mb-5 sm:text-xl">
+              {t("home.categories.title")}
+            </h2>
+            <CategoryImageGrid categories={categories} />
+          </section>
+        </RevealOnScroll>
 
         <RevealOnScroll>
           <ProductFeed
