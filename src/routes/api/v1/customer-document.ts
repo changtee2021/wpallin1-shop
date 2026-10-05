@@ -90,10 +90,14 @@ export const Route = createFileRoute("/api/v1/customer-document")({
 
           let previewUrl: string | null = null;
           if (SUPABASE_SERVICE_ROLE_KEY) {
-            const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-              auth: { persistSession: false, autoRefreshToken: false },
-              db: { schema: SUPABASE_SCHEMA },
-            });
+            const admin = createClient(
+              SUPABASE_URL,
+              SUPABASE_SERVICE_ROLE_KEY,
+              {
+                auth: { persistSession: false, autoRefreshToken: false },
+                db: { schema: SUPABASE_SCHEMA },
+              },
+            );
             const { data: signed } = await admin.storage
               .from(BUCKET)
               .createSignedUrl(path, SIGNED_URL_TTL_SEC);

@@ -25,8 +25,8 @@ function isNewCatalog(updatedAt: string): boolean {
   return Date.now() - updated < thirtyDays;
 }
 
-function formatUpdatedDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("th-TH", {
+function formatUpdatedDate(iso: string, locale: string): string {
+  return new Date(iso).toLocaleDateString(locale === "en" ? "en-GB" : "th-TH", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -34,7 +34,7 @@ function formatUpdatedDate(iso: string): string {
 }
 
 export function MarketingCatalogGrid({ catalogs, compact = false }: Props) {
-  const { t } = useT();
+  const { t, locale } = useT();
 
   if (!catalogs.length) {
     return (
@@ -117,7 +117,7 @@ export function MarketingCatalogGrid({ catalogs, compact = false }: Props) {
               ) : null}
               <span>
                 {t("catalogs.card.updated")}{" "}
-                {formatUpdatedDate(catalog.updatedAt)}
+                {formatUpdatedDate(catalog.updatedAt, locale)}
               </span>
             </div>
             {catalog.description && !compact ? (

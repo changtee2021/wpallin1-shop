@@ -96,12 +96,6 @@ const STATIC_PAGES: AdminQuickNavPage[] = [
   },
   {
     type: "page",
-    label: "Custom",
-    href: "/admin/custom",
-    keywords: "configurator custom",
-  },
-  {
-    type: "page",
     label: "หมวดหมู่",
     href: "/admin/categories",
     keywords: "categories",

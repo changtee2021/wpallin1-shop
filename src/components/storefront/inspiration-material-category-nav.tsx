@@ -21,8 +21,7 @@ export function InspirationMaterialCategoryNav({ categories }: Props) {
       {categories.map((category) => (
         <Link
           key={category.id}
-          to="/shop"
-          search={{ category: category.slug }}
+          to="/products"
           className={cn(
             "rounded-full border border-border bg-white px-4 py-1.5 text-xs font-medium text-foreground shadow-sm transition",
             "hover:border-primary/40 hover:bg-primary/5",

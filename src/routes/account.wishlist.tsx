@@ -6,7 +6,10 @@ import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { ProductFeed } from "@/components/storefront/product-feed";
 import { Button } from "@/components/ui/button";
-import { ListEmptyState, ListErrorState } from "@/components/ui/list-query-state";
+import {
+  ListEmptyState,
+  ListErrorState,
+} from "@/components/ui/list-query-state";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchWishlist } from "@/lib/api.functions";
 import {
@@ -67,7 +70,7 @@ function AccountWishlistPage() {
           message="ยังไม่มีรายการโปรด"
           action={
             <Button asChild>
-              <Link to="/shop">ไปช้อปปิ้ง</Link>
+              <Link to="/products">ไปช้อปปิ้ง</Link>
             </Button>
           }
         />

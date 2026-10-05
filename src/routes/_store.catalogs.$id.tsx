@@ -16,6 +16,7 @@ import { MarketingCatalogGrid } from "@/components/storefront/marketing-catalog-
 import { Button } from "@/components/ui/button";
 import { useMemberProductPrices } from "@/hooks/use-member-product-prices";
 import { useAuth } from "@/hooks/use-auth";
+import { COMMERCE_ENABLED } from "@/lib/features";
 import {
   fetchCatalogCategoryProducts,
   fetchMarketingCatalogAccess,
@@ -81,7 +82,7 @@ export const Route = createFileRoute("/_store/catalogs/$id")({
         : [];
 
     const categoryProducts =
-      access.access === "full"
+      access.access === "full" && COMMERCE_ENABLED
         ? await fetchCatalogCategoryProducts({
             data: { catalogId: access.catalog.id, limit: 8 },
           })
@@ -213,7 +214,7 @@ function CatalogViewerPage() {
         </div>
       )}
 
-      {!locked && categoryProducts.length > 0 ? (
+      {COMMERCE_ENABLED && !locked && categoryProducts.length > 0 ? (
         <section className="mt-10 sm:mt-12">
           <CatalogCategoryProducts
             products={categoryProducts}

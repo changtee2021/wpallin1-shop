@@ -5,20 +5,27 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { toggleWishlistFn, fetchWishlistIds } from "@/lib/api.functions";
+import { COMMERCE_ENABLED } from "@/lib/features";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { cn } from "@/lib/utils";
 
-export function WishlistButton({
-  productId,
-  className,
-  variant = "outline",
-  iconClassName,
-}: {
+type WishlistButtonProps = {
   productId: string;
   className?: string;
   variant?: "outline" | "ghost";
   iconClassName?: string;
-}) {
+};
+
+export function WishlistButton(props: WishlistButtonProps) {
+  return COMMERCE_ENABLED ? <WishlistToggle {...props} /> : null;
+}
+
+function WishlistToggle({
+  productId,
+  className,
+  variant = "outline",
+  iconClassName,
+}: WishlistButtonProps) {
   const { session } = useAuth();
   const [wishlisted, setWishlisted] = useState(false);
   const [loading, setLoading] = useState(false);

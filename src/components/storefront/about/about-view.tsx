@@ -1,402 +1,350 @@
 import { Link } from "@tanstack/react-router";
-import { Factory, MessageCircle } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { ArrowRight, Factory, MessageCircle } from "lucide-react";
+import type { ReactNode } from "react";
 
+import { SectionHeading } from "@/components/brand/section-heading";
 import { CompanyContactDetails } from "@/components/layout/company-contact-details";
 import { LazyMapsEmbed } from "@/components/layout/lazy-maps-embed";
-import { RevealOnScroll } from "@/components/storefront/reveal-on-scroll";
-import { useT } from "@/i18n";
 import {
-  ABOUT_CERTS,
-  ABOUT_COPY,
-  ABOUT_GALLERY,
+  ABOUT_CPC,
   ABOUT_IMAGES,
-  ABOUT_PARTNER_CHIPS,
-  ABOUT_PRODUCTS,
+  ABOUT_INTRO,
+  ABOUT_PROCESS,
+  ABOUT_VALUES,
 } from "@/data/about-content";
+import { PRODUCT_CATEGORIES } from "@/data/products-catalog";
+import { useT } from "@/i18n";
+import { useBi } from "@/lib/bi";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
-function useAboutCopy() {
-  const { locale } = useT();
-  return ABOUT_COPY[locale === "en" ? "en" : "th"];
-}
-
-function useHeroParallax() {
-  const ref = useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
-    if (reduce || coarse) return;
-
-    const onScroll = () => {
-      const rect = el.getBoundingClientRect();
-      const progress = (window.innerHeight / 2 - rect.top) / window.innerHeight;
-      el.style.transform = `translate3d(0, ${Math.round(progress * 36)}px, 0) scale(1.06)`;
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return ref;
-}
-
-const ctaClass = {
-  primary:
-    "inline-flex min-h-11 items-center justify-center rounded-xl bg-accent px-5 text-sm font-semibold text-accent-foreground hover:bg-accent/90",
-  ghost:
-    "inline-flex min-h-11 items-center justify-center rounded-xl border border-white/50 bg-transparent px-5 text-sm font-semibold text-white hover:bg-white/10",
-  outline:
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-white px-4 text-sm font-semibold hover:bg-muted/60",
-} as const;
-
 export function AboutView() {
-  const copy = useAboutCopy();
   const { locale, t } = useT();
-  const heroRef = useHeroParallax();
-  const gallery = [...ABOUT_GALLERY, ...ABOUT_GALLERY];
-  const legalName = locale === "en" ? siteConfig.legalNameEn : siteConfig.legalName;
+  const pick = useBi();
+  const legalName =
+    locale === "en" ? siteConfig.legalNameEn : siteConfig.legalName;
 
   return (
     <div>
-      <section className="relative min-h-[88vh] overflow-hidden bg-primary">
-        <img
-          ref={heroRef}
-          src={ABOUT_IMAGES.hero}
-          alt={copy.heroTitle}
-          className="absolute inset-0 size-full origin-center scale-105 object-cover object-[center_35%]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/15" />
-        <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-end px-4 pb-16 pt-28 sm:px-6 sm:pb-20 lg:px-8">
-          <RevealOnScroll>
-            <p className="text-xs font-semibold tracking-[0.18em] text-white/80 uppercase">
-              {copy.heroKicker}
-            </p>
-            <h1 className="mt-3 max-w-3xl text-4xl font-bold leading-[1.1] text-white text-balance sm:text-5xl md:text-6xl">
-              {copy.heroTitle.includes(copy.heroAccent) ? (
-                <>
-                  {copy.heroTitle.slice(0, copy.heroTitle.indexOf(copy.heroAccent))}
-                  <span className="about-accent-underline">{copy.heroAccent}</span>
-                  {copy.heroTitle.slice(
-                    copy.heroTitle.indexOf(copy.heroAccent) + copy.heroAccent.length,
-                  )}
-                </>
-              ) : (
-                copy.heroTitle
-              )}
-            </h1>
-            <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/90 sm:text-base">
-              {copy.heroBody}
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link to="/shop" className={ctaClass.primary}>
-                {copy.ctaShop}
-              </Link>
-              <Link to="/dealer/register" className={ctaClass.ghost}>
-                {copy.ctaDealer}
-              </Link>
-            </div>
-          </RevealOnScroll>
+      <div
+        aria-hidden
+        className="scroll-progress pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 bg-accent"
+      />
+      <section className="scroll-hero-shrink relative isolate overflow-hidden bg-primary-deep text-white">
+        <div className="scroll-parallax absolute inset-0 -z-10">
+          <img
+            src={ABOUT_IMAGES.hero}
+            alt=""
+            aria-hidden
+            fetchPriority="high"
+            className="absolute inset-0 size-full object-cover object-[center_35%]"
+          />
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-primary-deep via-primary-deep/60 to-primary-deep/10"
+            aria-hidden
+          />
+        </div>
+        <div className="scroll-fade-away mx-auto flex min-h-[calc(88svh-4.5rem)] max-w-7xl flex-col justify-end px-4 pt-28 pb-14 sm:px-6 lg:px-8 lg:pb-20">
+          <p className="hero-blur-in brand-kicker text-accent">
+            {siteConfig.slogan}
+          </p>
+          <h1 className="brand-display mt-4 max-w-4xl text-white text-balance">
+            {pick(ABOUT_INTRO.title)
+              .split(" ")
+              .map((word, index) => (
+                <span
+                  key={`${word}-${index}`}
+                  className="hero-word inline-block"
+                  style={{ ["--i" as string]: index }}
+                >
+                  {word}
+                  {"\u00a0"}
+                </span>
+              ))}
+          </h1>
+          <p
+            className="hero-blur-in mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg sm:leading-8"
+            style={{ ["--delay" as string]: "600ms" }}
+          >
+            {pick({
+              th: "ผู้ผลิตและจัดจำหน่ายผ้าม่าน มู่ลี่ และระบบมอเตอร์ สำหรับบ้านและงานโครงการ",
+              en: "Manufacturer and distributor of curtains, blinds and motorised systems for homes and projects.",
+            })}
+          </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14">
-          <RevealOnScroll>
-            <p className="text-xs font-semibold tracking-[0.16em] text-accent uppercase">
-              {copy.storyEyebrow}
-            </p>
-            <div className="mt-2 h-0.5 w-12 bg-accent" />
-            <h2 className="mt-4 text-2xl font-bold text-primary sm:text-3xl">
-              {copy.storyTitle}
-            </h2>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
-              {copy.storyBody}
-            </p>
-          </RevealOnScroll>
-          <div className="grid gap-3">
-            {copy.values.map((value, index) => (
-              <RevealOnScroll key={value.en} delayMs={index * 120}>
-                <article className="rounded-2xl border border-border bg-white p-5 shadow-sm">
-                  <p className="text-[11px] font-semibold tracking-[0.14em] text-accent uppercase">
-                    {value.en}
-                  </p>
-                  <h3 className="mt-1 text-lg font-semibold text-foreground">
-                    {value.title}
-                  </h3>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    {value.body}
-                  </p>
-                </article>
-              </RevealOnScroll>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden">
-        <img
-          src={ABOUT_IMAGES.philosophy}
-          alt={copy.philosophyTitle}
-          className="absolute inset-0 size-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-primary/72" />
-        <div className="relative mx-auto max-w-5xl px-4 py-16 text-center text-white sm:px-6 sm:py-24">
-          <RevealOnScroll>
-            <p className="text-xs font-semibold tracking-[0.18em] text-white/75 uppercase">
-              {copy.philosophyEyebrow}
-            </p>
-            <h2 className="mt-3 text-3xl font-bold sm:text-4xl">{copy.philosophyTitle}</h2>
-          </RevealOnScroll>
-          <div className="mt-10 flex flex-col items-center gap-6 md:flex-row md:items-stretch md:justify-center md:gap-0">
-            {copy.cpc.map((item, index) => (
-              <div key={`${item.letter}-${item.title}`} className="contents">
-                {index > 0 ? (
-                  <div
-                    aria-hidden
-                    className="hidden h-px w-16 self-center bg-white/55 md:block md:origin-left"
-                  />
-                ) : null}
-                <RevealOnScroll delayMs={index * 140} className="w-full max-w-[14rem]">
-                  <div
-                    className={cn(
-                      "mx-auto flex size-24 flex-col items-center justify-center rounded-full border-2 bg-white/10 backdrop-blur-sm sm:size-28",
-                      index === 1 ? "border-white" : "border-accent",
-                    )}
-                  >
-                    <span className="text-3xl font-bold">{item.letter}</span>
-                  </div>
-                  <p className="mt-3 text-sm font-semibold">{item.title}</p>
-                  <p className="text-xs text-white/80">{item.th}</p>
-                </RevealOnScroll>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
-          <RevealOnScroll>
-            <p className="text-xs font-semibold tracking-[0.16em] text-accent uppercase">
-              {copy.productsEyebrow}
-            </p>
-            <div className="mt-2 h-0.5 w-12 bg-accent" />
-            <h2 className="mt-4 text-2xl font-bold text-primary sm:text-3xl">
-              {copy.productsTitle}
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">{copy.productsCaption}</p>
-            <ul className="mt-6 grid gap-x-8 gap-y-2.5 sm:grid-cols-2">
-              {ABOUT_PRODUCTS.map((product) => {
-                const label = locale === "en" ? product.en : product.th;
-                return (
-                  <li key={product.en} className="flex items-start gap-2 text-sm">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-accent" />
-                    {product.shopCategory ? (
-                      <Link
-                        to="/shop"
-                        search={{ category: product.shopCategory }}
-                        className="min-h-11 inline-flex items-center font-medium text-foreground hover:text-primary"
-                      >
-                        {label}
-                      </Link>
-                    ) : (
-                      <span className="min-h-11 inline-flex items-center text-muted-foreground">
-                        {label}
-                      </span>
-                    )}
-                  </li>
-                );
+      <section className="brand-section">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-20 lg:px-8">
+          <div>
+            <SectionHeading
+              index="01"
+              kicker={ABOUT_INTRO.kicker.en}
+              title={pick({
+                th: "โรงงานจริง งานตามพื้นที่จริง",
+                en: "A real factory, made for the space",
               })}
-            </ul>
-          </RevealOnScroll>
-          <RevealOnScroll direction="right" className="relative hidden min-h-[22rem] lg:block">
-            <img
-              src={ABOUT_IMAGES.aluminum}
-              alt=""
-              className="absolute top-0 right-0 w-[78%] rounded-2xl object-cover shadow-lg ring-1 ring-black/5"
             />
-            <img
-              src={ABOUT_IMAGES.roller}
-              alt=""
-              className="absolute bottom-0 left-0 w-[70%] rounded-2xl object-cover shadow-xl ring-1 ring-black/10"
-            />
-          </RevealOnScroll>
-        </div>
-      </section>
-
-      <section className="overflow-hidden bg-muted/30 py-8 sm:py-10">
-        <div className="about-gallery-track gap-4 pl-4 sm:gap-5 sm:pl-6">
-          {gallery.map((item, index) => (
-            <figure
-              key={`${item.en}-${index}`}
-              className="w-[10.5rem] shrink-0 sm:w-[13rem]"
-            >
-              <div className="overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/5">
-                <img
-                  src={item.image}
-                  alt={locale === "en" ? item.en : item.th}
-                  loading="lazy"
-                  decoding="async"
-                  className="aspect-[2/3] w-full object-cover transition-transform duration-500 hover:scale-[1.03]"
-                />
-              </div>
-              <figcaption className="mt-2 text-center text-xs font-semibold">
-                {locale === "en" ? item.en : item.th}
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </section>
-
-      <section className="grid md:grid-cols-2">
-        <img
-          src={ABOUT_IMAGES.print}
-          alt={copy.printTitle}
-          className="h-64 w-full object-cover md:h-full md:min-h-[28rem]"
-        />
-        <div className="flex flex-col justify-center bg-white px-4 py-12 sm:px-10 lg:px-16">
-          <RevealOnScroll direction="right">
-            <p className="text-xs font-semibold tracking-[0.16em] text-accent uppercase">
-              {copy.printKicker}
+            <p className="scroll-rise mt-6 max-w-2xl text-lg leading-8 text-muted-foreground text-pretty">
+              {pick(ABOUT_INTRO.body)}
             </p>
-            <h2 className="mt-2 text-3xl font-bold text-primary sm:text-4xl">
-              {copy.printTitle}
-            </h2>
-            <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
-              {copy.printBody}
-            </p>
-            <Link
-              to="/shop"
-              search={{ category: "fabric-print" }}
-              className={cn(ctaClass.primary, "mt-6 w-fit")}
-            >
-              {copy.printCta}
-            </Link>
-          </RevealOnScroll>
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden bg-primary text-white">
-        <img
-          src={ABOUT_IMAGES.woodHands}
-          alt=""
-          className="absolute inset-y-0 right-0 hidden h-full w-[42%] object-cover opacity-35 lg:block"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/92 to-primary/70" />
-        <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-          <RevealOnScroll>
-            <p className="text-xs font-semibold tracking-[0.14em] text-accent uppercase">
-              {copy.partnersKicker}
-            </p>
-            <h2 className="mt-3 text-3xl font-bold sm:text-4xl">{copy.partnersTitle}</h2>
-            <p className="mt-3 max-w-xl text-sm text-white/85 sm:text-base">
-              {copy.partnersBody}
-            </p>
-          </RevealOnScroll>
-          <ul className="mt-8 flex flex-wrap gap-2">
-            {ABOUT_PARTNER_CHIPS.map((chip, index) => (
-              <li key={chip.value}>
-                <RevealOnScroll delayMs={index * 40}>
-                  <Link
-                    to="/dealer/register"
-                    className="inline-flex min-h-11 items-center rounded-full border border-white/25 bg-white/10 px-3.5 text-sm font-medium hover:bg-white/20"
-                  >
-                    {locale === "en" ? chip.en : chip.th}
-                  </Link>
-                </RevealOnScroll>
+          </div>
+          <ol className="divide-y divide-border border-y border-border">
+            {ABOUT_VALUES.map((value, index) => (
+              <li
+                key={value.title.en}
+                className="scroll-slide-right group grid grid-cols-[3rem_minmax(0,1fr)] gap-4 py-6"
+              >
+                <span className="brand-index text-accent">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className="transition-transform duration-300 group-hover:translate-x-1.5">
+                  <h3 className="text-lg font-medium">{pick(value.title)}</h3>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    {pick(value.body)}
+                  </p>
+                </div>
               </li>
             ))}
-          </ul>
-          <RevealOnScroll className="mt-8">
-            <Link to="/dealer/register" className={ctaClass.primary}>
-              {copy.partnersCta}
-            </Link>
-          </RevealOnScroll>
+          </ol>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-2 lg:px-8">
-        <RevealOnScroll direction="left">
-          <article className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-            <img
-              src={ABOUT_IMAGES.motor}
-              alt={copy.motorTitle}
-              className="aspect-[16/10] w-full object-cover"
-            />
-            <div className="p-6">
-              <h2 className="text-xl font-bold text-primary">{copy.motorTitle}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {copy.motorBody}
-              </p>
-              <Link
-                to="/shop"
-                search={{ category: "roller-blinds" }}
-                className={cn(ctaClass.outline, "mt-5")}
-              >
-                {copy.motorCta}
-              </Link>
-            </div>
-          </article>
-        </RevealOnScroll>
-        <RevealOnScroll direction="right">
-          <article className="flex h-full flex-col justify-center rounded-2xl border border-border bg-muted/40 p-6 sm:p-8">
-            <h2 className="text-xl font-bold text-primary">{copy.certsTitle}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">{copy.certHint}</p>
-            <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-              {ABOUT_CERTS.map((cert) => (
-                <li key={cert.name}>
-                  <a
-                    href={cert.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex min-h-11 h-full flex-col items-center rounded-xl border border-border bg-white px-4 py-5 text-center transition-colors hover:border-primary/30"
-                  >
-                    <img
-                      src={cert.logo}
-                      alt={cert.name}
-                      className="h-28 w-auto max-w-full object-contain"
-                    />
-                    <p className="mt-3 text-sm font-semibold tracking-wide">{cert.name}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {locale === "en" ? cert.hint.en : cert.hint.th}
-                    </p>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </article>
-        </RevealOnScroll>
+      <section
+        aria-hidden
+        className="overflow-hidden border-y border-border bg-surface py-8 lg:py-12"
+      >
+        <p className="scroll-marquee-left whitespace-nowrap text-[clamp(3.5rem,11vw,9rem)] leading-none font-medium tracking-tight text-transparent uppercase [-webkit-text-stroke:1.5px_var(--color-primary)]">
+          {siteConfig.slogan} · {siteConfig.slogan} · {siteConfig.slogan}
+        </p>
+        <p className="scroll-marquee-right mt-2 whitespace-nowrap text-[clamp(3.5rem,11vw,9rem)] leading-none font-medium tracking-tight text-primary/15 uppercase lg:mt-4">
+          {siteConfig.sloganSub} · {siteConfig.sloganSub}
+        </p>
       </section>
 
-      <section className="border-t border-border bg-muted/30">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:px-8">
-          <RevealOnScroll>
-            <p className="text-xs font-semibold tracking-[0.16em] text-accent uppercase">
-              {copy.officeEyebrow}
-            </p>
-            <h2 className="mt-2 text-2xl font-bold text-primary">{legalName}</h2>
-            <CompanyContactDetails className="mt-5" />
-            <div className="mt-6 flex flex-wrap gap-2">
-              <a href={siteConfig.lineUrl} target="_blank" rel="noreferrer" className={ctaClass.primary}>
-                <MessageCircle className="mr-1.5 size-4" aria-hidden />
-                {copy.officeCtaLine}
+      <section className="relative isolate overflow-hidden bg-primary text-white">
+        <img
+          src={ABOUT_IMAGES.philosophy}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          className="scroll-drift-down absolute inset-x-0 -top-[14%] -z-10 h-[128%] w-full object-cover opacity-20"
+        />
+        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+          <SectionHeading
+            index="02"
+            tone="dark"
+            kicker="Our Business Philosophy"
+            title={pick({
+              th: "ปรัชญาธุรกิจ C-P-C",
+              en: "The C-P-C philosophy",
+            })}
+          />
+          <ol className="mt-14 grid gap-px overflow-hidden rounded-sm bg-white/15 md:grid-cols-3">
+            {ABOUT_CPC.map((item, index) => (
+              <li
+                key={item.title}
+                className="scroll-rise bg-primary/90 p-6 backdrop-blur-sm lg:p-10"
+                style={{ ["--i" as string]: index }}
+              >
+                <span
+                  className="scroll-scale-in block origin-left text-6xl font-medium text-accent lg:text-7xl"
+                  style={{ ["--i" as string]: index }}
+                >
+                  {item.letter}
+                </span>
+                <h3 className="mt-4 text-xl font-semibold">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/75">
+                  {pick(item.body)}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="brand-section">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            index="03"
+            kicker="Production"
+            title={pick({
+              th: "จากวัสดุถึงมือคุณ ใน 6 ขั้น",
+              en: "From raw material to you, in six steps",
+            })}
+            description={pick({
+              th: "ทุกออเดอร์ผ่านสายผลิตเดียวกันในโรงงานที่คลองสามวา กรุงเทพฯ",
+              en: "Every order runs through the same lines at our Khlong Sam Wa factory in Bangkok.",
+            })}
+          />
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {ABOUT_IMAGES.factory.map((src, index) => (
+              <div
+                key={src}
+                className={cn(
+                  "scroll-wipe-up-soft group aspect-[4/3] overflow-hidden rounded-sm bg-surface",
+                  index === 0 && "sm:col-span-2 sm:row-span-2 sm:aspect-auto",
+                )}
+                style={{ ["--i" as string]: index % 2 }}
+              >
+                <div className="scroll-zoom size-full">
+                  <img
+                    src={src}
+                    alt={pick({
+                      th: `สายผลิตในโรงงาน WP ALL ${index + 1}`,
+                      en: `WP ALL factory line ${index + 1}`,
+                    })}
+                    loading="lazy"
+                    decoding="async"
+                    className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <ol className="mt-14 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {ABOUT_PROCESS.map((step, index) => (
+              <li
+                key={step.title.en}
+                className="scroll-line-top scroll-rise border-t border-border pt-5"
+                style={{ ["--i" as string]: index % 3 }}
+              >
+                <span className="brand-index text-accent">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3 className="mt-2 text-lg font-medium">{pick(step.title)}</h3>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  {pick(step.body)}
+                </p>
+              </li>
+            ))}
+          </ol>
+          <Link
+            to="/contact"
+            search={{ topic: "factory-visit" }}
+            className="mt-12 inline-flex min-h-12 items-center gap-2 rounded-full border border-border px-6 text-sm font-semibold hover:border-primary hover:text-primary"
+          >
+            <Factory className="size-4" aria-hidden />
+            {pick({ th: "นัดเยี่ยมชมโรงงาน", en: "Book a factory visit" })}
+          </Link>
+        </div>
+      </section>
+
+      <section className="brand-section border-t border-border bg-surface">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:gap-20 lg:px-8">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <SectionHeading
+              index="04"
+              kicker="What we make"
+              title={pick({ th: "5 หมวดสินค้า", en: "Five product families" })}
+              action={
+                <Link
+                  to="/products"
+                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-primary"
+                >
+                  {t("site.cta.viewAll")}
+                  <ArrowRight className="size-4" aria-hidden />
+                </Link>
+              }
+            />
+          </div>
+          <ol className="divide-y divide-border border-y border-border">
+            {PRODUCT_CATEGORIES.map((category) => (
+              <li key={category.id} className="scroll-slide-right">
+                <Link
+                  to="/products"
+                  search={{ category: category.id }}
+                  className="group flex min-h-16 items-center gap-6 py-5 transition-[padding] duration-300 hover:pl-3 hover:text-primary"
+                >
+                  <span className="brand-index text-muted-foreground">
+                    {category.index}
+                  </span>
+                  <span className="flex-1">
+                    <span className="block text-lg font-medium">
+                      {pick(category.name)}
+                    </span>
+                    <span className="mt-0.5 block text-sm text-muted-foreground">
+                      {pick(category.description)}
+                    </span>
+                  </span>
+                  <ArrowRight
+                    className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary"
+                    aria-hidden
+                  />
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="grid border-t border-border md:grid-cols-2">
+        <Feature
+          image={ABOUT_IMAGES.print}
+          kicker="Specialist customised"
+          title={pick({ th: "พิมพ์ผ้าตามแบบ", en: "Custom print fabric" })}
+          body={pick({
+            th: "พิมพ์ลายหรือภาพของคุณลงผ้าม่าน ม่านม้วน และผ้าโนเรน จากสายผลิตของเราเอง",
+            en: "Your pattern or image printed onto curtains, roller blinds and noren — on our own line.",
+          })}
+          cta={
+            <Link
+              to="/products"
+              search={{ category: "custom-print" }}
+              className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary"
+            >
+              {pick({ th: "ดูงานพิมพ์ผ้า", en: "See custom printing" })}
+              <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          }
+        />
+        <Feature
+          image={ABOUT_IMAGES.motor}
+          kicker="Smart blinds & motor systems"
+          title={pick({ th: "ระบบม่านมอเตอร์", en: "Motorised systems" })}
+          body={pick({
+            th: "มอเตอร์ม่าน WP Nano Power และระบบม่านสองชั้น WP N23 ควบคุมได้ทั้งรีโมท สวิตช์ และมือถือ",
+            en: "WP Nano Power and the two-layer WP N23 system, controlled by remote, wall switch or phone.",
+          })}
+          cta={
+            <Link
+              to="/products/$slug"
+              params={{ slug: "wp-nano-power" }}
+              className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary"
+            >
+              {pick({ th: "ดูระบบมอเตอร์", en: "See motor systems" })}
+              <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          }
+        />
+      </section>
+
+      <section className="border-t border-border">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:px-8 lg:py-20">
+          <div className="scroll-rise">
+            <p className="brand-kicker text-primary">Head office & factory</p>
+            <h2 className="brand-heading mt-4">{legalName}</h2>
+            <CompanyContactDetails className="mt-6" />
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href={siteConfig.lineUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-12 items-center gap-2 rounded-full bg-accent px-6 text-sm font-semibold text-white hover:bg-accent/90"
+              >
+                <MessageCircle className="size-4" aria-hidden />
+                {t("site.cta.line")}
               </a>
-              <Link to="/contact" search={{ topic: "factory-visit" }} className={ctaClass.outline}>
-                <Factory className="size-4" aria-hidden />
-                {copy.officeCtaVisit}
-              </Link>
-              <Link to="/contact" search={{ topic: "project" }} className={ctaClass.outline}>
-                {copy.officeCtaProject}
+              <Link
+                to="/contact"
+                search={{ topic: "project" }}
+                className="inline-flex min-h-12 items-center rounded-full border border-border px-6 text-sm font-semibold hover:border-primary hover:text-primary"
+              >
+                {pick({ th: "ติดต่องานโครงการ", en: "Project enquiry" })}
               </Link>
             </div>
-          </RevealOnScroll>
-          <div className="overflow-hidden rounded-2xl border border-border bg-white">
+          </div>
+          <div className="scroll-wipe-up overflow-hidden rounded-sm border border-border">
             <LazyMapsEmbed
               title={t("footer.mapTitle")}
               src={siteConfig.mapsEmbedUrl}
@@ -408,5 +356,43 @@ export function AboutView() {
         </div>
       </section>
     </div>
+  );
+}
+
+function Feature({
+  image,
+  kicker,
+  title,
+  body,
+  cta,
+}: {
+  image: string;
+  kicker: string;
+  title: string;
+  body: string;
+  cta: ReactNode;
+}) {
+  return (
+    <article className="group border-border md:odd:border-r">
+      <div className="scroll-wipe-up aspect-[16/10] overflow-hidden bg-surface">
+        <div className="scroll-zoom size-full">
+          <img
+            src={image}
+            alt={title}
+            loading="lazy"
+            decoding="async"
+            className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+          />
+        </div>
+      </div>
+      <div className="scroll-rise p-6 sm:p-10">
+        <p className="brand-kicker text-muted-foreground">{kicker}</p>
+        <h2 className="mt-3 text-2xl font-medium">{title}</h2>
+        <p className="mt-3 max-w-md text-base leading-7 text-muted-foreground">
+          {body}
+        </p>
+        <div className="mt-4">{cta}</div>
+      </div>
+    </article>
   );
 }

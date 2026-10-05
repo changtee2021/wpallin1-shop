@@ -27,6 +27,7 @@ Exposed to the browser. Only non-secret config.
 | `VITE_SUPABASE_PROJECT_ID` | Yes | `erpzxusskbtdxvqadwxv` | Project reference |
 | `VITE_SUPABASE_SCHEMA` | Yes | `wpall_retail` | PostgreSQL schema isolation |
 | `VITE_APP_PUBLIC_URL` | Prod | `https://wpallin1-shop.vercel.app` | Canonical site URL (SEO, affiliate links, emails) |
+| `VITE_COMMERCE_ENABLED` | No | `false` | `false` = brand showcase (no prices, cart, checkout, account, dealer, inspiration). `true` restores the old storefront routes and header actions. Read in `src/lib/features.ts` |
 
 Local dev: `VITE_APP_PUBLIC_URL=http://localhost:8080` (or your Vite port).
 
@@ -64,6 +65,11 @@ Verify domain in Resend + SPF/DKIM/DMARC before go-live.
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `INTEGRATIONS_ENABLED` | `true` | Set `false` during migration to pause webhooks/email without throwing |
+| `WEB_QUOTE_OWNER_USER_ID` | — | Staff user UUID that owns guest quote requests (`quotations.user_id` is NOT NULL). Unset = guest quotes stay in `audit_logs` only, LINE alert still sent |
+| `LINE_STAFF_CHANNEL_ACCESS_TOKEN` | — | LINE Messaging API channel token used to push new enquiries to staff |
+| `LINE_STAFF_TARGET_ID` | — | LINE user/group ID that receives the push (bot must be in the group) |
+
+Contact form flow (`src/services/contact.service.ts`): every business enquiry pushes a LINE message; topic `quote` also creates a draft quotation visible in `/admin/quotations` (source `web_quote_request`).
 
 wpallin1-shop does not call backoffice production-intake directly; cross-app webhooks are documented in WP GROUP rules for other apps.
 

@@ -12,7 +12,6 @@ type Props = {
 export function CatalogCategoryProducts({
   products,
   categoryName,
-  shopCategorySlug,
   memberPrices,
 }: Props) {
   const { t } = useT();
@@ -23,9 +22,7 @@ export function CatalogCategoryProducts({
     ? t("catalogs.viewer.categoryProducts").replace("{category}", categoryName)
     : t("catalogs.viewer.categoryProductsFallback");
 
-  const seeAllHref = shopCategorySlug
-    ? `/shop?category=${encodeURIComponent(shopCategorySlug)}`
-    : "/shop";
+  const seeAllHref = "/products";
 
   return (
     <ProductFeed

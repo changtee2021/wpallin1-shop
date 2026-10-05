@@ -1,9 +1,5 @@
 export type OrderLinkStatus =
-  | "pending"
-  | "opened"
-  | "ordered"
-  | "expired"
-  | "cancelled";
+  "pending" | "opened" | "ordered" | "expired" | "cancelled";
 
 export type OrderLinkItemDto = {
   id: string;

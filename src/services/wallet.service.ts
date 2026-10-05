@@ -335,9 +335,7 @@ export async function listAdminTopupRequests(
   return Promise.all(
     (data ?? []).map(async (row) => {
       const profile = row.profiles as
-        | { email: string | null; full_name: string | null }
-        | null
-        | undefined;
+        { email: string | null; full_name: string | null } | null | undefined;
       return {
         id: row.id,
         userId: row.user_id,

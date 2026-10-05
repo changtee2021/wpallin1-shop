@@ -28,20 +28,24 @@ const password = process.env.SMOKE_TEST_PASSWORD?.trim() ?? "";
 
 const PUBLIC_ROUTES = [
   "/",
-  "/order",
-  "/shop",
-  "/inspiration",
-  "/configurator",
-  "/catalogs",
+  "/products",
+  "/products?category=blinds",
+  "/products/wood-blinds",
+  "/projects",
+  "/projects/colors-of-buriram-2025",
   "/about",
+  "/partners",
+  "/catalogs",
   "/contact",
-  "/cart",
-  "/dealer/register",
+  "/faq",
+  "/inspiration",
+  "/privacy",
+  "/terms",
   "/login",
 ];
 
+// Only reachable when VITE_COMMERCE_ENABLED=true; otherwise they redirect home.
 const AUTH_ROUTES = [
-  "/shop",
   "/account",
   "/account?tab=settings&section=personal",
   "/account/wishlist",
@@ -54,13 +58,19 @@ const AUTH_ROUTES = [
 ];
 
 async function hasCrash(page) {
-  const title = await page.getByRole("heading", {
-    name: "เกิดข้อผิดพลาดของระบบ",
-  }).count();
+  const title = await page
+    .getByRole("heading", {
+      name: "เกิดข้อผิดพลาดของระบบ",
+    })
+    .count();
   if (title > 0) return "500 shell";
-  const chatErr = await page.getByText(/useChatUi must be used within/i).count();
+  const chatErr = await page
+    .getByText(/useChatUi must be used within/i)
+    .count();
   if (chatErr > 0) return "useChatUi missing provider";
-  const compareErr = await page.getByText(/useCompare must be used within/i).count();
+  const compareErr = await page
+    .getByText(/useCompare must be used within/i)
+    .count();
   if (compareErr > 0) return "useCompare missing provider";
   return null;
 }
@@ -91,13 +101,18 @@ console.log(`Checking public routes on ${baseURL}...`);
 for (const route of PUBLIC_ROUTES) {
   const errors = await checkRoute(page, route);
   results.push({ route, errors });
-  console.log(`${errors.length ? "FAIL" : "OK  "} ${route}${errors.length ? ` — ${errors.join("; ")}` : ""}`);
+  console.log(
+    `${errors.length ? "FAIL" : "OK  "} ${route}${errors.length ? ` — ${errors.join("; ")}` : ""}`,
+  );
 }
 
 if (email && password) {
   console.log("\nLogging in...");
   await page.goto(`${baseURL}/login`, { waitUntil: "domcontentloaded" });
-  await page.locator('input[type="email"], input[name="email"]').first().fill(email);
+  await page
+    .locator('input[type="email"], input[name="email"]')
+    .first()
+    .fill(email);
   await page
     .locator('input[type="password"], input[name="password"]')
     .first()
@@ -110,7 +125,9 @@ if (email && password) {
   for (const route of AUTH_ROUTES) {
     const errors = await checkRoute(page, route);
     results.push({ route, errors, auth: true });
-    console.log(`${errors.length ? "FAIL" : "OK  "} ${route}${errors.length ? ` — ${errors.join("; ")}` : ""}`);
+    console.log(
+      `${errors.length ? "FAIL" : "OK  "} ${route}${errors.length ? ` — ${errors.join("; ")}` : ""}`,
+    );
   }
 } else {
   console.log("\nSkip auth routes (no SMOKE_TEST_EMAIL/PASSWORD)");

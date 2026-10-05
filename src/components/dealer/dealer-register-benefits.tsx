@@ -30,7 +30,8 @@ export function DealerRegisterBenefits() {
     <aside className="rounded-2xl border bg-muted/30 p-6">
       <h2 className="text-lg font-bold text-primary">สิทธิ์ตัวแทน WP ALL</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        สำหรับร้านค้าปลีก ขายส่ง งานโครงการ นักออกแบบ และช่าง — สั่งจากโรงงานโดยตรง
+        สำหรับร้านค้าปลีก ขายส่ง งานโครงการ นักออกแบบ และช่าง —
+        สั่งจากโรงงานโดยตรง
       </p>
       <ul className="mt-4 flex flex-wrap gap-1.5">
         {ABOUT_PARTNER_CHIPS.map((chip) => (

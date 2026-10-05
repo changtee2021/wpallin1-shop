@@ -59,7 +59,9 @@ async function loadRoles(userId: string): Promise<string[]> {
       fetchRoles(),
       new Promise<string[]>((resolve) => {
         setTimeout(() => {
-          console.warn("[auth] loadRoles timed out — defaulting to retail_customer");
+          console.warn(
+            "[auth] loadRoles timed out — defaulting to retail_customer",
+          );
           resolve(["retail_customer"]);
         }, ROLES_TIMEOUT_MS);
       }),

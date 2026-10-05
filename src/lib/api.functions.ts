@@ -21,6 +21,7 @@ import {
   listPublicProducts,
   getProductBySlug,
   getShopFilterFacets,
+  stripOptionPrices,
 } from "@/services/catalog.service";
 import { smartSearchProducts } from "@/services/smart-search.service";
 import {
@@ -452,7 +453,9 @@ export const fetchProductOptionGroups = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const supabase = await getAdminClient();
-    return listProductOptionGroups(supabase, data.productId);
+    return stripOptionPrices(
+      await listProductOptionGroups(supabase, data.productId),
+    );
   });
 
 export const removeFromCart = createServerFn({ method: "POST" })
@@ -675,11 +678,14 @@ export const submitContactForm = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z
       .object({
-        name: z.string().min(1),
-        email: z.string().email(),
-        phone: z.string().optional(),
-        subject: z.string().min(1),
-        message: z.string().min(1),
+        name: z.string().trim().min(1).max(120),
+        email: z
+          .union([z.string().trim().email(), z.literal("")])
+          .optional()
+          .transform((value) => value || undefined),
+        phone: z.string().trim().max(40).optional(),
+        subject: z.string().min(1).max(300),
+        message: z.string().min(1).max(5000),
         errorCode: z.string().optional(),
         sourceUrl: z.string().optional(),
         category: z.enum(["contact", "error", "404", "403", "500"]).optional(),
@@ -706,7 +712,27 @@ export const submitContactForm = createServerFn({ method: "POST" })
           .array(z.enum(["blinds", "curtain", "partition"]))
           .optional(),
         purpose: z.string().optional(),
-        productInterest: z.string().optional(),
+        productInterest: z.string().max(300).optional(),
+      })
+      .superRefine((value, ctx) => {
+        // Quote requests from homeowners may come with a phone number only.
+        if (value.inquiryType === "quote") {
+          if (!value.phone && !value.email) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ["phone"],
+              message: "Phone or email is required",
+            });
+          }
+          return;
+        }
+        if (!value.email) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["email"],
+            message: "Email is required",
+          });
+        }
       })
       .parse(input),
   )
@@ -1538,18 +1564,6 @@ export {
 } from "@/lib/server-fns/inspiration-materials";
 
 export { fetchAdminMediaAssets } from "@/lib/server-fns/admin-media";
-
-export {
-  createRoomAdvisorSessionFn,
-  analyzeRoomAdvisorSessionFn,
-  fetchRoomAdvisorSessionFn,
-  fetchRoomAdvisorByTokenFn,
-  enableRoomAdvisorShareFn,
-  submitRoomAdvisorResponseFn,
-  updateRoomAdvisorMetaFn,
-  listMyRoomAdvisorSessionsFn,
-  listAdminRoomAdvisorSessionsFn,
-} from "@/lib/server-fns/room-advisor";
 
 export { searchAdminQuickNavFn } from "@/lib/server-fns/admin-nav";
 

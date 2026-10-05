@@ -8,7 +8,10 @@ type MarketingCategoryRef = {
 };
 
 const CATEGORY_RULES: { test: RegExp; productSlug: string }[] = [
-  { test: /print.?roller|ม่านม้วนพิมพ์|printed.?roller/i, productSlug: "printed-roller-blinds" },
+  {
+    test: /print.?roller|ม่านม้วนพิมพ์|printed.?roller/i,
+    productSlug: "printed-roller-blinds",
+  },
   { test: /roller|ม้วน|roll/i, productSlug: "roller-blinds" },
   { test: /vertical|แนวตั้ง|zebra/i, productSlug: "vertical-blinds" },
   { test: /aluminum|aluminium|อลูมิเนียม/i, productSlug: "aluminum-blinds" },

@@ -1,5 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { Building2, Check, Factory, FileText, Handshake, Loader2, MessageSquare, Receipt } from "lucide-react";
+import {
+  Building2,
+  Check,
+  Factory,
+  FileText,
+  Handshake,
+  Loader2,
+  MessageSquare,
+  Receipt,
+} from "lucide-react";
 import { useMemo, useState, type ComponentProps, type FormEvent } from "react";
 import { toast } from "sonner";
 
@@ -8,9 +17,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { CATALOG_PRODUCTS, getCatalogProduct } from "@/data/products-catalog";
 import { useOptionalAuth } from "@/hooks/use-auth";
 import { useT } from "@/i18n";
 import { submitContactForm } from "@/lib/api.functions";
+import { bi, type Bi } from "@/lib/bi";
+import { COMMERCE_ENABLED } from "@/lib/features";
+import { siteConfig } from "@/lib/site-config";
 import {
   CONTACT_TOPICS,
   VISIT_PURPOSES,
@@ -39,14 +52,29 @@ const TOPIC_ICONS = {
 
 type FieldErrors = Partial<Record<string, string>>;
 
+/** Topics where we deal with a company, so the company name is required. */
+const COMPANY_TOPICS: ContactTopic[] = [
+  "project",
+  "factory-visit",
+  "dealer",
+  "profile",
+];
+
 type BusinessContactFormProps = {
   initialTopic?: ContactTopic;
+  /** Catalogue slug from `/contact?product=` — pre-selects the product of interest. */
+  initialProduct?: string;
 };
 
 export function BusinessContactForm({
   initialTopic,
+  initialProduct,
 }: BusinessContactFormProps) {
   const { locale } = useT();
+  const pick = (value: Bi) => bi(locale, value);
+  const initialProductName = initialProduct
+    ? getCatalogProduct(initialProduct)?.name
+    : undefined;
   const auth = useOptionalAuth();
   const session = auth?.session ?? null;
   const user = auth?.user ?? null;
@@ -63,7 +91,12 @@ export function BusinessContactForm({
   const [formError, setFormError] = useState<string | null>(null);
   const [honeypot, setHoneypot] = useState("");
 
+  const [reference, setReference] = useState<string | null>(null);
+
   const isVisit = inquiryType === "factory-visit";
+  const isQuote = inquiryType === "quote";
+  const needsCompany =
+    inquiryType !== "" && COMPANY_TOPICS.includes(inquiryType);
 
   function toggleSite(id: VisitSiteId) {
     setVisitSites((prev) =>
@@ -87,15 +120,31 @@ export function BusinessContactForm({
     const message = String(data.get("message") ?? "").trim();
     const pdpa = data.get("pdpaAccepted") === "on";
 
-    if (!companyName) next.companyName = locale === "en" ? "Enter company name" : "กรอกชื่อบริษัท";
-    if (!name) next.name = locale === "en" ? "Enter contact name" : "กรอกชื่อผู้ติดต่อ";
-    if (!phone) next.phone = locale === "en" ? "Enter a phone number" : "กรอกเบอร์โทร";
-    if (!email) next.email = locale === "en" ? "Enter email" : "กรอกอีเมล";
-    if (!inquiryType) next.inquiryType = locale === "en" ? "Choose a topic" : "เลือกเรื่องที่ติดต่อ";
-    if (inquiryType === "other" && !message) {
-      next.message = locale === "en" ? "Tell us a bit more" : "บอกเพิ่มเติมหน่อย";
+    if (needsCompany && !companyName)
+      next.companyName =
+        locale === "en" ? "Enter company name" : "กรอกชื่อบริษัท";
+    if (!name)
+      next.name = locale === "en" ? "Enter contact name" : "กรอกชื่อผู้ติดต่อ";
+    if (!phone)
+      next.phone = locale === "en" ? "Enter a phone number" : "กรอกเบอร์โทร";
+    if (!email && !isQuote)
+      next.email = locale === "en" ? "Enter email" : "กรอกอีเมล";
+    if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+      next.email =
+        locale === "en" ? "Check the email address" : "รูปแบบอีเมลไม่ถูกต้อง";
     }
-    if (!pdpa) next.pdpaAccepted = locale === "en" ? "Please accept the privacy policy" : "กรุณายินยอมนโยบายความเป็นส่วนตัว";
+    if (!inquiryType)
+      next.inquiryType =
+        locale === "en" ? "Choose a topic" : "เลือกเรื่องที่ติดต่อ";
+    if (inquiryType === "other" && !message) {
+      next.message =
+        locale === "en" ? "Tell us a bit more" : "บอกเพิ่มเติมหน่อย";
+    }
+    if (!pdpa)
+      next.pdpaAccepted =
+        locale === "en"
+          ? "Please accept the privacy policy"
+          : "กรุณายินยอมนโยบายความเป็นส่วนตัว";
 
     if (isVisit) {
       const jobTitle = String(data.get("jobTitle") ?? "").trim();
@@ -106,21 +155,33 @@ export function BusinessContactForm({
       const purpose = String(data.get("purpose") ?? "").trim();
       const productInterest = String(data.get("productInterest") ?? "").trim();
 
-      if (!jobTitle) next.jobTitle = locale === "en" ? "Enter job title" : "กรอกตำแหน่ง";
-      if (!lineId) next.lineId = locale === "en" ? "Enter LINE ID" : "กรอก LINE ID";
+      if (!jobTitle)
+        next.jobTitle = locale === "en" ? "Enter job title" : "กรอกตำแหน่ง";
+      if (!lineId)
+        next.lineId = locale === "en" ? "Enter LINE ID" : "กรอก LINE ID";
       if (taxId.length !== 13) {
-        next.taxId = locale === "en" ? "Enter 13-digit tax or ID number" : "กรอกเลข 13 หลัก";
+        next.taxId =
+          locale === "en"
+            ? "Enter 13-digit tax or ID number"
+            : "กรอกเลข 13 หลัก";
       }
-      if (!visitDate) next.visitDate = locale === "en" ? "Pick a date" : "เลือกวันที่";
+      if (!visitDate)
+        next.visitDate = locale === "en" ? "Pick a date" : "เลือกวันที่";
       if (!visitorCount || visitorCount < 1) {
-        next.visitorCount = locale === "en" ? "Enter visitor count" : "กรอกจำนวนผู้เข้าชม";
+        next.visitorCount =
+          locale === "en" ? "Enter visitor count" : "กรอกจำนวนผู้เข้าชม";
       }
       if (visitSites.length === 0) {
-        next.visitSites = locale === "en" ? "Pick at least one production line" : "เลือกสายผลิตอย่างน้อย 1 ที่";
+        next.visitSites =
+          locale === "en"
+            ? "Pick at least one production line"
+            : "เลือกสายผลิตอย่างน้อย 1 ที่";
       }
-      if (!purpose) next.purpose = locale === "en" ? "Pick a purpose" : "เลือกวัตถุประสงค์";
+      if (!purpose)
+        next.purpose = locale === "en" ? "Pick a purpose" : "เลือกวัตถุประสงค์";
       if (!productInterest) {
-        next.productInterest = locale === "en" ? "Tell us which products" : "บอกสินค้าที่สนใจ";
+        next.productInterest =
+          locale === "en" ? "Tell us which products" : "บอกสินค้าที่สนใจ";
       }
     }
 
@@ -153,9 +214,10 @@ export function BusinessContactForm({
       visitorCount: isVisit ? Number(data.get("visitorCount")) : undefined,
       visitSites: isVisit ? visitSites : undefined,
       purpose: isVisit ? String(data.get("purpose") ?? "") : undefined,
-      productInterest: isVisit
-        ? String(data.get("productInterest") ?? "").trim()
-        : undefined,
+      productInterest:
+        isVisit || isQuote
+          ? String(data.get("productInterest") ?? "").trim() || undefined
+          : undefined,
     };
 
     const formatted = formatBusinessContact(payload, locale);
@@ -186,15 +248,16 @@ export function BusinessContactForm({
         },
         ...authServerFnOptions(session),
       });
+      const shortRef =
+        result.referenceId.length > 16
+          ? result.referenceId.slice(0, 8)
+          : result.referenceId;
       toast.success(
-        result.ticketId
-          ? locale === "en"
-            ? "Sent — our team will contact you"
-            : "ส่งแล้ว — ทีมงานจะติดต่อกลับ"
-          : locale === "en"
-            ? `Received (Ref: ${result.referenceId.slice(0, 8)})`
-            : `รับเรื่องแล้ว (Ref: ${result.referenceId.slice(0, 8)})`,
+        locale === "en"
+          ? `Received (Ref: ${shortRef})`
+          : `รับเรื่องแล้ว (Ref: ${shortRef})`,
       );
+      setReference(shortRef);
       setSubmitted(true);
     } catch (err) {
       const message =
@@ -217,7 +280,9 @@ export function BusinessContactForm({
           <Check className="size-6" aria-hidden />
         </div>
         <h2 className="mt-4 text-lg font-semibold sm:text-xl">
-          {locale === "en" ? "We received your request" : "ได้รับคำขอของท่านแล้ว"}
+          {locale === "en"
+            ? "We received your request"
+            : "ได้รับคำขอของท่านแล้ว"}
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           {isVisit
@@ -228,12 +293,34 @@ export function BusinessContactForm({
               ? "The WP ALL sales team will get back to you by phone, email, or LINE."
               : "ทีมขาย WP ALL จะติดต่อกลับทางโทร อีเมล หรือ LINE"}
         </p>
+        {reference ? (
+          <p className="mt-3 text-sm">
+            {locale === "en" ? "Reference" : "เลขอ้างอิง"}:{" "}
+            <span className="font-semibold">{reference}</span>
+          </p>
+        ) : null}
+        {isQuote ? (
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            {locale === "en"
+              ? "Have photos of the windows or the site? Send them to us on LINE with your reference number."
+              : "มีรูปหน้าต่างหรือหน้างาน ส่งให้เราทาง LINE พร้อมเลขอ้างอิงได้เลย"}{" "}
+            <a
+              href={siteConfig.lineUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold text-primary underline"
+            >
+              LINE {siteConfig.lineId}
+            </a>
+          </p>
+        ) : null}
         <Button
           type="button"
           variant="outline"
           className="mt-5"
           onClick={() => {
             setSubmitted(false);
+            setReference(null);
             setInquiryType(initialTopic ?? "");
             setVisitSites([]);
             setVisitSession("morning");
@@ -253,7 +340,10 @@ export function BusinessContactForm({
       onSubmit={(event) => void handleSubmit(event)}
       noValidate
     >
-      <div className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden" aria-hidden>
+      <div
+        className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
+        aria-hidden
+      >
         <Label htmlFor="biz-company-website">Company website</Label>
         <Input
           id="biz-company-website"
@@ -321,9 +411,17 @@ export function BusinessContactForm({
         <Field
           id="companyName"
           name="companyName"
-          label={locale === "en" ? "Company / organization" : "ชื่อบริษัท / องค์กร"}
+          label={
+            needsCompany
+              ? locale === "en"
+                ? "Company / organization"
+                : "ชื่อบริษัท / องค์กร"
+              : locale === "en"
+                ? "Company / shop (optional)"
+                : "ชื่อบริษัท / ร้าน (ถ้ามี)"
+          }
           autoComplete="organization"
-          required
+          required={needsCompany}
           error={errors.companyName}
         />
         <div className="grid gap-4 sm:grid-cols-2">
@@ -367,7 +465,7 @@ export function BusinessContactForm({
             type="email"
             autoComplete="email"
             label={locale === "en" ? "Email" : "อีเมล"}
-            required
+            required={!isQuote}
             defaultValue={user?.email ?? ""}
             error={errors.email}
           />
@@ -398,10 +496,40 @@ export function BusinessContactForm({
         </div>
       </section>
 
+      {isQuote ? (
+        <div className="space-y-1.5">
+          <Label htmlFor="productInterest">
+            {locale === "en" ? "Product of interest" : "สินค้าที่สนใจ"}
+            <span className="ml-1 text-xs font-normal text-muted-foreground">
+              {locale === "en" ? "(optional)" : "(ไม่บังคับ)"}
+            </span>
+          </Label>
+          <select
+            id="productInterest"
+            name="productInterest"
+            defaultValue={initialProductName ? pick(initialProductName) : ""}
+            className="flex h-11 w-full rounded-md border border-input bg-transparent px-3 text-base shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] md:text-sm"
+          >
+            <option value="">
+              {locale === "en"
+                ? "Not sure yet / several products"
+                : "ยังไม่แน่ใจ / หลายรายการ"}
+            </option>
+            {CATALOG_PRODUCTS.map((product) => (
+              <option key={product.slug} value={pick(product.name)}>
+                {pick(product.name)}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
+
       {isVisit ? (
         <section className="space-y-4 border-t border-border pt-5">
           <h2 className="text-sm font-semibold">
-            {locale === "en" ? "Visit date and production lines" : "สถานที่และรอบเยี่ยมชม"}
+            {locale === "en"
+              ? "Visit date and production lines"
+              : "สถานที่และรอบเยี่ยมชม"}
           </h2>
           <p className="text-xs text-muted-foreground">
             {locale === "en"
@@ -494,7 +622,9 @@ export function BusinessContactForm({
               name="visitDate"
               type="date"
               min={minDate}
-              label={locale === "en" ? "Preferred date" : "วันที่ต้องการเข้าเยี่ยมชม"}
+              label={
+                locale === "en" ? "Preferred date" : "วันที่ต้องการเข้าเยี่ยมชม"
+              }
               required
               error={errors.visitDate}
             />
@@ -506,7 +636,9 @@ export function BusinessContactForm({
               max={100}
               defaultValue="1"
               label={
-                locale === "en" ? "Number of visitors" : "จำนวนผู้เข้าเยี่ยมชม (คน)"
+                locale === "en"
+                  ? "Number of visitors"
+                  : "จำนวนผู้เข้าเยี่ยมชม (คน)"
               }
               required
               error={errors.visitorCount}
@@ -571,19 +703,30 @@ export function BusinessContactForm({
               ? locale === "en"
                 ? "e.g. need an interpreter, guests with mobility needs"
                 : "เช่น ต้องการล่าม มีผู้สูงอายุร่วมเยี่ยมชม"
-              : locale === "en"
-                ? "Project size, number of sites, when to call back…"
-                : "บอกโปรเจกต์ จำนวนสาขา ช่วงเวลาที่ต้องการติดต่อกลับ"
+              : isQuote
+                ? locale === "en"
+                  ? "Window sizes (width × height), number of windows, room, installation area…"
+                  : "ขนาดหน้าต่าง (กว้าง × สูง) จำนวนบาน ห้องที่ติดตั้ง พื้นที่ติดตั้ง"
+                : locale === "en"
+                  ? "Project size, number of sites, when to call back…"
+                  : "บอกโปรเจกต์ จำนวนสาขา ช่วงเวลาที่ต้องการติดต่อกลับ"
           }
         />
         <FieldError>{errors.message}</FieldError>
       </div>
 
-      {inquiryType === "dealer" ? (
+      {inquiryType === "dealer" && COMMERCE_ENABLED ? (
         <p className="rounded-xl bg-muted/70 px-3 py-2.5 text-sm text-muted-foreground">
-          {locale === "en" ? "Want a full dealer account?" : "อยากสมัครตัวแทนเต็มรูปแบบ?"}{" "}
-          <Link to="/dealer/register" className="font-semibold text-primary underline">
-            {locale === "en" ? "Go to dealer registration" : "ไปที่ฟอร์มสมัครตัวแทน"}
+          {locale === "en"
+            ? "Want a full dealer account?"
+            : "อยากสมัครตัวแทนเต็มรูปแบบ?"}{" "}
+          <Link
+            to="/dealer/register"
+            className="font-semibold text-primary underline"
+          >
+            {locale === "en"
+              ? "Go to dealer registration"
+              : "ไปที่ฟอร์มสมัครตัวแทน"}
           </Link>
         </p>
       ) : null}
@@ -595,7 +738,9 @@ export function BusinessContactForm({
           className="mt-1 size-5 shrink-0 rounded border-input"
         />
         <span>
-          {locale === "en" ? "I agree to the " : "ข้าพเจ้ายินยอมให้เก็บข้อมูลตาม "}
+          {locale === "en"
+            ? "I agree to the "
+            : "ข้าพเจ้ายินยอมให้เก็บข้อมูลตาม "}
           <Link to="/privacy" className="font-medium text-primary underline">
             {locale === "en" ? "privacy policy" : "นโยบายความเป็นส่วนตัว"}
           </Link>
@@ -617,9 +762,15 @@ export function BusinessContactForm({
             {locale === "en" ? "Sending…" : "กำลังส่ง..."}
           </>
         ) : isVisit ? (
-          locale === "en" ? "Request a factory visit" : "ส่งคำขอนัดเยี่ยมชม"
+          locale === "en" ? (
+            "Request a factory visit"
+          ) : (
+            "ส่งคำขอนัดเยี่ยมชม"
+          )
+        ) : locale === "en" ? (
+          "Send message"
         ) : (
-          locale === "en" ? "Send message" : "ส่งข้อความถึงเรา"
+          "ส่งข้อความถึงเรา"
         )}
       </Button>
       {isVisit ? (

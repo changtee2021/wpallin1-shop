@@ -109,9 +109,8 @@ async function preparePdf(filePath) {
 }
 
 async function renderFirstPageCover(pdfFilePath) {
-  const workerPath = require.resolve(
-    "pdfjs-dist/legacy/build/pdf.worker.min.mjs",
-  );
+  const workerPath =
+    require.resolve("pdfjs-dist/legacy/build/pdf.worker.min.mjs");
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
   pdfjs.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href;
 

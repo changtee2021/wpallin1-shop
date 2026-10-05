@@ -85,7 +85,7 @@ export async function visitAndCheck(
     .allTextContents();
   for (const text of uiErrors) {
     const trimmed = text.trim();
-    if (!trimmed || trimmed.length > 300) continue;
+    if (!trimmed || trimmed === "*" || trimmed.length > 300) continue;
     if (/เข้าสู่ระบบ|login|required/i.test(trimmed)) continue;
     issues.push({ path: url, kind: "ui", message: trimmed });
   }
@@ -107,13 +107,16 @@ export async function loginAsAdmin(page: Page) {
   const { email, password } = smokeCredentials();
 
   await page.goto("/login");
-  await page.locator('input[type="email"], input[name="email"]').first().fill(email);
+  await page
+    .locator('input[type="email"], input[name="email"]')
+    .first()
+    .fill(email);
   await page
     .locator('input[type="password"], input[name="password"]')
     .first()
     .fill(password);
   await page.locator('form button[type="submit"]').click();
 
-  await page.waitForURL(/\/account/, { timeout: 20_000 });
-  await assertHealthyPage(page, "/account (after login)");
+  await page.waitForURL(/\/(account|admin)/, { timeout: 20_000 });
+  await assertHealthyPage(page, "after login");
 }

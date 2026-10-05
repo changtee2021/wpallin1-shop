@@ -3,12 +3,18 @@ import { BookOpen, Search } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 
+import { SectionHeading } from "@/components/brand/section-heading";
+import {
+  BrandGridSkeleton,
+  BrandPageError,
+} from "@/components/brand/page-states";
 import { CatalogCategoryHero } from "@/components/storefront/catalog-category-hero";
 import { MarketingCatalogGrid } from "@/components/storefront/marketing-catalog-grid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fetchPublicMarketingCatalogs } from "@/lib/api.functions";
 import { useT } from "@/i18n";
+import { pageHead } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_store/catalogs/")({
@@ -23,6 +29,19 @@ export const Route = createFileRoute("/_store/catalogs/")({
     ).map(([id, name]) => ({ id, name }));
     return { catalogs, categories };
   },
+  head: () =>
+    pageHead({
+      title: "แคตตาล็อกสินค้า | WP ALL",
+      description:
+        "อ่านและดาวน์โหลดแคตตาล็อกม่าน มู่ลี่ ราง และระบบมอเตอร์ WP ALL ออนไลน์",
+      path: "/catalogs",
+    }),
+  pendingComponent: () => (
+    <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+      <BrandGridSkeleton count={6} />
+    </div>
+  ),
+  errorComponent: ({ reset }) => <BrandPageError onRetry={reset} />,
   component: CatalogsPage,
 });
 
@@ -68,76 +87,89 @@ function CatalogsPage() {
   }, [catalogs]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <div className="mb-8 rounded-2xl bg-gradient-to-br from-primary/5 via-background to-accent/5 p-6 sm:p-8">
-        <div className="flex items-start gap-4">
-          <div className="rounded-xl bg-primary/10 p-3 text-primary">
-            <BookOpen className="size-7" />
+    <>
+      <section className="border-b border-border bg-surface">
+        <div className="mx-auto max-w-7xl px-4 pt-14 pb-10 sm:px-6 lg:px-8 lg:pt-20">
+          <SectionHeading
+            as="h1"
+            kicker="Catalogue"
+            title={t("catalogs.title")}
+            description={t("catalogs.subtitle")}
+          />
+          <div className="relative mt-8 max-w-xl">
+            <Search
+              className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden
+            />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t("catalogs.searchPlaceholder")}
+              aria-label={t("catalogs.searchPlaceholder")}
+              className="h-12 rounded-full bg-background pl-11"
+            />
           </div>
-          <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-bold sm:text-3xl">
-              {t("catalogs.title")}
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-              {t("catalogs.subtitle")}
+        </div>
+      </section>
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        {activeCategory === "all" && categories.length > 0 ? (
+          <CatalogCategoryHero
+            categories={categories}
+            counts={categoryCounts}
+            activeCategory={activeCategory}
+            onSelect={setActiveCategory}
+            title={t("catalogs.categories.title")}
+          />
+        ) : null}
+
+        <div className="mb-6 flex flex-wrap gap-2">
+          <CategoryPill
+            active={activeCategory === "all"}
+            onClick={() => setActiveCategory("all")}
+          >
+            {t("catalogs.all")} ({catalogs.length})
+          </CategoryPill>
+          {categories.map((category) => {
+            const count = catalogs.filter(
+              (item) => item.categoryId === category.id,
+            ).length;
+            return (
+              <CategoryPill
+                key={category.id}
+                active={activeCategory === category.id}
+                onClick={() => setActiveCategory(category.id)}
+              >
+                {category.name} ({count})
+              </CategoryPill>
+            );
+          })}
+        </div>
+
+        {featured.length > 0 ? (
+          <section className="mb-10">
+            <h2 className="mb-4 text-lg font-semibold">
+              {t("catalogs.featured")}
+            </h2>
+            <MarketingCatalogGrid catalogs={featured} />
+          </section>
+        ) : null}
+
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 rounded-sm border border-dashed border-border py-16 text-center">
+            <BookOpen className="size-8 text-muted-foreground" aria-hidden />
+            <p className="text-sm text-muted-foreground">
+              {catalogs.length === 0
+                ? t("catalogs.empty")
+                : t("catalogs.noResults")}
             </p>
           </div>
-        </div>
-        <div className="relative mt-6 max-w-xl">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t("catalogs.searchPlaceholder")}
-            className="h-11 rounded-full bg-background pl-10 shadow-sm"
+        ) : (
+          <MarketingCatalogGrid
+            catalogs={featured.length ? regular : filtered}
           />
-        </div>
+        )}
       </div>
-
-      {activeCategory === "all" && categories.length > 0 ? (
-        <CatalogCategoryHero
-          categories={categories}
-          counts={categoryCounts}
-          activeCategory={activeCategory}
-          onSelect={setActiveCategory}
-          title={t("catalogs.categories.title")}
-        />
-      ) : null}
-
-      <div className="mb-6 flex flex-wrap gap-2">
-        <CategoryPill
-          active={activeCategory === "all"}
-          onClick={() => setActiveCategory("all")}
-        >
-          {t("catalogs.all")} ({catalogs.length})
-        </CategoryPill>
-        {categories.map((category) => {
-          const count = catalogs.filter(
-            (item) => item.categoryId === category.id,
-          ).length;
-          return (
-            <CategoryPill
-              key={category.id}
-              active={activeCategory === category.id}
-              onClick={() => setActiveCategory(category.id)}
-            >
-              {category.name} ({count})
-            </CategoryPill>
-          );
-        })}
-      </div>
-
-      {featured.length > 0 ? (
-        <section className="mb-10">
-          <h2 className="mb-4 text-lg font-semibold">
-            {t("catalogs.featured")}
-          </h2>
-          <MarketingCatalogGrid catalogs={featured} />
-        </section>
-      ) : null}
-
-      <MarketingCatalogGrid catalogs={featured.length ? regular : filtered} />
-    </div>
+    </>
   );
 }
 

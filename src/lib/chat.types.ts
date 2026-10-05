@@ -2,13 +2,7 @@ import type { QuotationStatus } from "@/types/api/quotations";
 import type { ProductType } from "@/types/api/products";
 
 export type ChatMessageKind =
-  | "text"
-  | "image"
-  | "file"
-  | "product"
-  | "quotation"
-  | "greeting"
-  | "system";
+  "text" | "image" | "file" | "product" | "quotation" | "greeting" | "system";
 
 export type ChatAttachment = {
   url: string;

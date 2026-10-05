@@ -54,6 +54,12 @@ export const siteConfig = {
     city: "กรุงเทพมหานคร 10510",
     country: "Thailand",
   },
+  addressEn: {
+    line1: "117 Soi Charoen Phatthana 11",
+    line2: "Bang Chan, Khlong Sam Wa",
+    city: "Bangkok 10510",
+    country: "Thailand",
+  },
   mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAPS_QUERY)}`,
   mapsEmbedUrl: `https://www.google.com/maps?q=${encodeURIComponent(MAPS_QUERY)}&hl=th&z=16&output=embed`,
   social: [

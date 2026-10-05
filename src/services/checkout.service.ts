@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { toAddressJson, validateShippingAddress } from "@/domain/checkout";
 import { calcOrderTotals } from "@/domain/pricing";
+import { COMMERCE_ENABLED } from "@/lib/features";
 import { recordAffiliateConversion } from "@/services/affiliate.service";
 import {
   clearCart,
@@ -46,6 +47,8 @@ export async function placeOrder(
   userId: string,
   input: CheckoutInput,
 ): Promise<CheckoutResult> {
+  if (!COMMERCE_ENABLED)
+    throw new Error("ระบบสั่งซื้อออนไลน์ยังไม่เปิดให้บริการ");
   const addressErr = validateShippingAddress(input);
   if (addressErr) throw new Error(addressErr);
 

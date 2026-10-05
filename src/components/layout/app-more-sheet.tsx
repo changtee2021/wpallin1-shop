@@ -10,11 +10,8 @@ import {
   LayoutDashboard,
   LogOut,
   MessageCircle,
-  ScanLine,
   Settings,
-  Share2,
   Shield,
-  SlidersHorizontal,
   Store,
   Tag,
   Wallet,
@@ -54,11 +51,7 @@ function sectionsForStoreZone(user: boolean): MoreSection[] {
   const sections: MoreSection[] = [
     {
       titleKey: "account.section.tools",
-      links: [
-        { to: "/inspiration", label: "แรงบันดาลใจ", icon: ImageIcon },
-        { to: "/room-advisor", label: "AI ที่ปรึกษาห้อง", icon: ScanLine },
-        { to: "/configurator", label: "Custom", icon: SlidersHorizontal },
-      ],
+      links: [{ to: "/inspiration", label: "แรงบันดาลใจ", icon: ImageIcon }],
     },
     {
       titleKey: "account.section.mine",
@@ -70,11 +63,6 @@ function sectionsForStoreZone(user: boolean): MoreSection[] {
                 to: "/account/notifications",
                 label: "แจ้งเตือน",
                 icon: Bell,
-              },
-              {
-                to: "/account/affiliate",
-                label: "Affiliate",
-                icon: Share2,
               },
             ]
           : []),
@@ -119,8 +107,7 @@ function linksForZone(
       { to: "/account/notifications", label: "แจ้งเตือน", icon: Bell },
       { to: "/account/quotations", label: "ใบเสนอราคา", icon: FileText },
       { to: "/account/wishlist", label: "รายการโปรด", icon: Heart },
-      { to: "/account/affiliate", label: "Affiliate", icon: Share2 },
-      { to: "/shop", label: "กลับร้านค้า", icon: Store },
+      { to: "/products", label: "กลับหน้าสินค้า", icon: Store },
       ...(isDealer ? [{ to: "/dealer", label: "ตัวแทน", icon: Store }] : []),
       ...(isAdmin ? [{ to: "/admin", label: "แอดมิน", icon: Shield }] : []),
       {
@@ -146,7 +133,7 @@ function linksForZone(
     return [
       { to: "/dealer/wallet", label: "กระเป๋า", icon: Wallet },
       { to: "/account", label: "บัญชี", icon: Settings },
-      { to: "/shop", label: "ร้านค้า", icon: Store },
+      { to: "/products", label: "สินค้า", icon: Store },
       ...(isAdmin ? [{ to: "/admin", label: "แอดมิน", icon: Shield }] : []),
     ];
   }
@@ -159,13 +146,12 @@ function linksForZone(
     { to: "/admin/coupons", label: "คูปอง", icon: Tag },
     { to: "/admin/inventory", label: "สต็อก", icon: Boxes },
     { to: "/admin/inspiration", label: "Inspiration", icon: ImageIcon },
-    { to: "/admin/room-advisor", label: "Room Advisor", icon: ScanLine },
+    { to: "/admin/quotations", label: "ใบเสนอราคา", icon: FileText },
     { to: "/admin/banners", label: "แบนเนอร์", icon: ImageIcon },
     { to: "/admin/catalogs", label: "แคตตาล็อก", icon: FileText },
-    { to: "/admin/custom", label: "Custom", icon: SlidersHorizontal },
     { to: "/admin/reports", label: "รายงาน", icon: BarChart3 },
     { to: "/admin/support", label: "Support", icon: Bell },
-    { to: "/shop", label: "ร้านค้า", icon: Store },
+    { to: "/", label: "หน้าเว็บ", icon: Store },
   ];
 }
 
@@ -244,12 +230,13 @@ export function AppMoreSheet({
 }) {
   const { t } = useT();
   const { user, isAdmin, isDealer } = useAuth();
-  const { requestSignOut, SignOutDialog } = useSignOutConfirm(() => onOpenChange(false));
+  const { requestSignOut, SignOutDialog } = useSignOutConfirm(() =>
+    onOpenChange(false),
+  );
   const { openChat } = useChatUiSafe();
   const [helpOpen, setHelpOpen] = useState(false);
   const flatLinks = linksForZone(zone, isAdmin, isDealer, !!user);
-  const storeSections =
-    zone === "store" ? sectionsForStoreZone(!!user) : null;
+  const storeSections = zone === "store" ? sectionsForStoreZone(!!user) : null;
   const sheetTitle = title ?? t("nav.more") ?? "เพิ่มเติม";
 
   const close = () => onOpenChange(false);
@@ -257,7 +244,10 @@ export function AppMoreSheet({
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl pb-8">
+        <SheetContent
+          side="bottom"
+          className="max-h-[85vh] overflow-y-auto rounded-t-2xl pb-8"
+        >
           <SheetHeader>
             <SheetTitle>{sheetTitle}</SheetTitle>
           </SheetHeader>

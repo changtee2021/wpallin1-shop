@@ -93,7 +93,7 @@ function AccountTaxInvoicesPage() {
           <CardContent className="space-y-3 p-8 text-center text-muted-foreground">
             <Receipt className="mx-auto size-10 text-accent/70" />
             <p>ยังไม่มีออเดอร์ที่ชำระเงินแล้ว</p>
-            <Link to="/shop" className="text-primary underline">
+            <Link to="/products" className="text-primary underline">
               เริ่มช้อปเลย
             </Link>
           </CardContent>

@@ -7,9 +7,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/hooks/use-cart";
 import { useCompare } from "@/hooks/use-compare";
 import { formatPrice } from "@/lib/format";
+import { requireCommerce } from "@/lib/commerce-guard";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_store/compare")({
+  beforeLoad: requireCommerce,
   component: ComparePage,
 });
 
@@ -31,7 +33,7 @@ function ComparePage() {
           description="เลือกอย่างน้อย 2 รายการจากหน้าร้าน"
         />
         <Button asChild>
-          <Link to="/shop">ไปเลือกสินค้า</Link>
+          <Link to="/products">ไปเลือกสินค้า</Link>
         </Button>
       </div>
     );

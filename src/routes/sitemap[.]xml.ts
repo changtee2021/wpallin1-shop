@@ -1,13 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import {
+  CATALOG_PRODUCTS,
+  PRODUCT_CATEGORY_IDS,
+} from "@/data/products-catalog";
+import { PROJECTS } from "@/data/projects";
 import { getPublicUrl } from "@/lib/public-url";
 import { getAdminClient } from "@/lib/server-fns/_shared";
-import { listPublicProducts } from "@/services/catalog.service";
 import { listPublicMarketingCatalogs } from "@/services/marketing-catalog.service";
 
 type SitemapEntry = {
   path: string;
   lastmod?: string;
+  changefreq?: "weekly" | "monthly" | "yearly";
 };
 
 function formatLastmod(iso?: string | null): string | undefined {
@@ -16,12 +21,19 @@ function formatLastmod(iso?: string | null): string | undefined {
   return date.length === 10 ? date : undefined;
 }
 
+function escapeXml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 function renderUrl(base: string, entry: SitemapEntry): string {
-  const loc = `${base}${entry.path}`;
+  const loc = escapeXml(`${base}${entry.path}`);
   const lastmod = entry.lastmod
     ? `\n    <lastmod>${entry.lastmod}</lastmod>`
     : "";
-  return `  <url><loc>${loc}</loc>${lastmod}\n    <changefreq>weekly</changefreq>\n  </url>`;
+  return `  <url><loc>${loc}</loc>${lastmod}\n    <changefreq>${entry.changefreq ?? "weekly"}</changefreq>\n  </url>`;
 }
 
 export const Route = createFileRoute("/sitemap.xml")({
@@ -31,41 +43,33 @@ export const Route = createFileRoute("/sitemap.xml")({
         const base = getPublicUrl().replace(/\/$/, "");
         const staticEntries: SitemapEntry[] = [
           { path: "" },
-          { path: "/shop" },
+          { path: "/products" },
+          { path: "/projects" },
+          { path: "/about", changefreq: "monthly" },
+          { path: "/partners", changefreq: "monthly" },
           { path: "/catalogs" },
-          { path: "/configurator" },
-          { path: "/about" },
-          { path: "/contact" },
-          { path: "/terms" },
-          { path: "/privacy" },
-          { path: "/cookies" },
+          { path: "/contact", changefreq: "monthly" },
+          { path: "/faq", changefreq: "monthly" },
+          { path: "/terms", changefreq: "yearly" },
+          { path: "/privacy", changefreq: "yearly" },
+          { path: "/cookies", changefreq: "yearly" },
         ];
 
-        const productEntries: SitemapEntry[] = [];
-        try {
-          const supabase = await getAdminClient();
-          let page = 1;
-          let totalPages = 1;
-
-          while (page <= totalPages) {
-            const batch = await listPublicProducts(supabase, {
-              page,
-              pageSize: 100,
-            });
-            productEntries.push(
-              ...batch.data
-                .filter((product) => !product.isMock)
-                .map((product) => ({
-                  path: `/products/${product.slug}`,
-                  lastmod: formatLastmod(product.createdAt),
-                })),
-            );
-            totalPages = Math.max(1, batch.meta.totalPages || 1);
-            page += 1;
-          }
-        } catch (err) {
-          console.error("[sitemap] product fetch failed:", err);
-        }
+        const categoryEntries: SitemapEntry[] = PRODUCT_CATEGORY_IDS.map(
+          (id) => ({
+            path: `/products?category=${id}`,
+          }),
+        );
+        const productEntries: SitemapEntry[] = CATALOG_PRODUCTS.map(
+          (product) => ({
+            path: `/products/${product.slug}`,
+            changefreq: "monthly",
+          }),
+        );
+        const projectEntries: SitemapEntry[] = PROJECTS.map((project) => ({
+          path: `/projects/${project.slug}`,
+          changefreq: "monthly",
+        }));
 
         const catalogEntries: SitemapEntry[] = [];
         try {
@@ -83,7 +87,13 @@ export const Route = createFileRoute("/sitemap.xml")({
           console.error("[sitemap] catalog fetch failed:", err);
         }
 
-        const urls = [...staticEntries, ...productEntries, ...catalogEntries];
+        const urls = [
+          ...staticEntries,
+          ...categoryEntries,
+          ...productEntries,
+          ...projectEntries,
+          ...catalogEntries,
+        ];
 
         const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

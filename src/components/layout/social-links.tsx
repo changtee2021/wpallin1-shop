@@ -11,8 +11,15 @@ const brandClass: Record<string, string> = {
   YouTube: "bg-[#FF0000] text-white hover:brightness-95",
 };
 
-function SocialIcon({ label, className }: { label: string; className?: string }) {
-  if (label === "LINE") return <LineMonoIcon className={className} aria-hidden />;
+function SocialIcon({
+  label,
+  className,
+}: {
+  label: string;
+  className?: string;
+}) {
+  if (label === "LINE")
+    return <LineMonoIcon className={className} aria-hidden />;
   if (label === "Facebook") {
     return <FacebookMonoIcon className={className} aria-hidden />;
   }
@@ -20,7 +27,10 @@ function SocialIcon({ label, className }: { label: string; className?: string })
     return <WhatsappMonoIcon className={className} aria-hidden />;
   }
   return (
-    <span className={cn("text-[10px] font-bold leading-none", className)} aria-hidden>
+    <span
+      className={cn("text-[10px] font-bold leading-none", className)}
+      aria-hidden
+    >
       {label.slice(0, 2)}
     </span>
   );

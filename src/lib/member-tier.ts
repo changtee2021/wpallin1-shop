@@ -9,10 +9,7 @@ export function tierLabel(tier: string | null): string {
 }
 
 export type MemberTierKey =
-  | "retail"
-  | "silver_dealer"
-  | "gold_dealer"
-  | "platinum_dealer";
+  "retail" | "silver_dealer" | "gold_dealer" | "platinum_dealer";
 
 export function isDealerMemberTier(tier: string | null): boolean {
   return (

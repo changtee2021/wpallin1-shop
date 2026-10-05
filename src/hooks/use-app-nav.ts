@@ -57,7 +57,7 @@ export function useAppNavItems(cartCount = 0): AppNavItem[] {
       },
       {
         id: "products",
-        to: "/shop",
+        to: "/products",
         label: "สินค้า",
         icon: Store,
       },
@@ -137,7 +137,7 @@ export function useAppNavItems(cartCount = 0): AppNavItem[] {
       icon: Home,
       exact: true,
     },
-    { id: "shop", to: "/shop", label: "ร้านค้า", icon: Store },
+    { id: "products", to: "/products", label: "สินค้า", icon: Store },
     {
       id: "order",
       to: "/order",

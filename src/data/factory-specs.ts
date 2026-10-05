@@ -268,7 +268,8 @@ export const FACTORY_SPECS: FactoryCategorySpecs[] = [
   {
     categorySlug: "outdoor-curtains",
     title: "สเปคม่านม้วนภายนอก",
-    intro: "ผ้า+อุปกรณ์สำหรับงานนอกบ้าน — สั่งขั้นต่ำ 10 ตร.หลา / ชุด ไม่รวมมอเตอร์",
+    intro:
+      "ผ้า+อุปกรณ์สำหรับงานนอกบ้าน — สั่งขั้นต่ำ 10 ตร.หลา / ชุด ไม่รวมมอเตอร์",
     notes: ["รองรับผ้า Sunscreen 1% / 3% / 5% และ Blackout Fiberglass"],
     collections: [
       {
@@ -276,7 +277,10 @@ export const FACTORY_SPECS: FactoryCategorySpecs[] = [
         name: "Outdoor Roller",
         rows: [
           { label: "ขั้นต่ำ", value: "10 ตร.หลา / ชุด" },
-          { label: "ผ้าที่ใช้ได้", value: "Sunscreen 1–5% · Blackout Fiberglass" },
+          {
+            label: "ผ้าที่ใช้ได้",
+            value: "Sunscreen 1–5% · Blackout Fiberglass",
+          },
           { label: "มอเตอร์", value: "สั่งเพิ่มแยกต่างหาก" },
         ],
       },
@@ -285,7 +289,8 @@ export const FACTORY_SPECS: FactoryCategorySpecs[] = [
   {
     categorySlug: "zip-blinds",
     title: "สเปคม่านซิป (Zip Blinds)",
-    intro: "ม่านม้วนซิป ผ้า+อุปกรณ์ — สั่งขั้นต่ำ 10 ตร.หลา / ชุด ไม่รวมมอเตอร์",
+    intro:
+      "ม่านม้วนซิป ผ้า+อุปกรณ์ — สั่งขั้นต่ำ 10 ตร.หลา / ชุด ไม่รวมมอเตอร์",
     notes: ["รองรับผ้า Sunscreen 1% / 3% / 5% และ Blackout Fiberglass"],
     collections: [
       {
@@ -293,7 +298,10 @@ export const FACTORY_SPECS: FactoryCategorySpecs[] = [
         name: "Zip Blinds",
         rows: [
           { label: "ขั้นต่ำ", value: "10 ตร.หลา / ชุด" },
-          { label: "ผ้าที่ใช้ได้", value: "Sunscreen 1–5% · Blackout Fiberglass" },
+          {
+            label: "ผ้าที่ใช้ได้",
+            value: "Sunscreen 1–5% · Blackout Fiberglass",
+          },
           { label: "มอเตอร์", value: "สั่งเพิ่มแยกต่างหาก" },
         ],
       },
@@ -302,7 +310,8 @@ export const FACTORY_SPECS: FactoryCategorySpecs[] = [
   {
     categorySlug: "skylight-fss",
     title: "สเปค Skylight FSS",
-    intro: "ม่านม้วนสกายไลท์ ผ้า+อุปกรณ์ — สั่งขั้นต่ำ 8 ตร.หลา / ชุด ไม่รวมมอเตอร์",
+    intro:
+      "ม่านม้วนสกายไลท์ ผ้า+อุปกรณ์ — สั่งขั้นต่ำ 8 ตร.หลา / ชุด ไม่รวมมอเตอร์",
     notes: ["รองรับผ้า Sunscreen 1% / 3% / 5% และ Blackout Fiberglass"],
     collections: [
       {
@@ -310,7 +319,10 @@ export const FACTORY_SPECS: FactoryCategorySpecs[] = [
         name: "Skylight FSS",
         rows: [
           { label: "ขั้นต่ำ", value: "8 ตร.หลา / ชุด" },
-          { label: "ผ้าที่ใช้ได้", value: "Sunscreen 1–5% · Blackout Fiberglass" },
+          {
+            label: "ผ้าที่ใช้ได้",
+            value: "Sunscreen 1–5% · Blackout Fiberglass",
+          },
           { label: "มอเตอร์", value: "สั่งเพิ่มแยกต่างหาก" },
         ],
       },

@@ -6,7 +6,6 @@ import {
   Package,
   Receipt,
   Settings,
-  Share2,
   Shield,
   Store,
 } from "lucide-react";
@@ -129,12 +128,6 @@ export function AccountProfileSummary({
       label: "รายการโปรด",
       icon: Heart,
       key: "wishlist",
-    },
-    {
-      to: "/account/affiliate",
-      label: "Affiliate",
-      icon: Share2,
-      key: "affiliate",
     },
     {
       to: "/account/notifications",

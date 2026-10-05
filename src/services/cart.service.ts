@@ -8,6 +8,7 @@ import {
   validateSelectedOptions,
 } from "@/domain/product-options";
 import { calcCartSubtotal, calcLineTotal } from "@/domain/pricing";
+import { COMMERCE_ENABLED } from "@/lib/features";
 import { getProductById } from "@/services/catalog.service";
 import { listProductOptionGroups } from "@/services/product-options.service";
 import {
@@ -208,6 +209,8 @@ export async function addToCart(
   qty = 1,
   selectedOptions: SelectedProductOptions = {},
 ): Promise<CartDto> {
+  if (!COMMERCE_ENABLED)
+    throw new Error("ระบบสั่งซื้อออนไลน์ยังไม่เปิดให้บริการ");
   const product = await getProductById(supabase, productId);
   if (!product) throw new Error("ไม่พบสินค้า");
 

@@ -15,7 +15,6 @@ import {
   BarChart3,
   Boxes,
   CreditCard,
-  SlidersHorizontal,
 } from "lucide-react";
 
 import {
@@ -61,7 +60,6 @@ export function AdminSidebar() {
       label: "สินค้า & สต็อก",
       items: [
         { to: "/admin/products", label: t("admin.products"), icon: Package },
-        { to: "/admin/custom", label: "Custom", icon: SlidersHorizontal },
         { to: "/admin/categories", label: "หมวดหมู่", icon: Package },
         { to: "/admin/inventory", label: "สต็อก", icon: Boxes },
         { to: "/admin/catalogs", label: "แคตตาล็อก PDF", icon: FileText },

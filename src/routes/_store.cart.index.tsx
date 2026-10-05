@@ -128,7 +128,7 @@ function CartPage() {
               </p>
             </div>
             <Button asChild className="bg-primary" size="lg">
-              <Link to="/shop">
+              <Link to="/products">
                 {t("nav.shop")}
                 <ArrowRight className="size-4" />
               </Link>

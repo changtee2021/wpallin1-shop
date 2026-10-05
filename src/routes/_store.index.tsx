@@ -1,101 +1,46 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { PageLoading } from "@/components/loading";
-import { CategoryImageGrid } from "@/components/storefront/category-image-grid";
-import { HomeCapabilities } from "@/components/storefront/home/home-capabilities";
-import { HomeCatalogSection } from "@/components/storefront/home/home-catalog-section";
-import { HomeDealerCta } from "@/components/storefront/home/home-dealer-cta";
-import { HomeFactoryTour3D } from "@/components/storefront/home/home-factory-tour-3d";
-import { HomeGalleryStrip } from "@/components/storefront/home/home-gallery-strip";
-import { HomeHero } from "@/components/storefront/home/home-hero";
-import { HomeStatsBand } from "@/components/storefront/home/home-stats-band";
-import { ProductFeed } from "@/components/storefront/product-feed";
-import { RevealOnScroll } from "@/components/storefront/reveal-on-scroll";
-import { StorePage } from "@/components/layout/store-page";
-import { useMemberProductPrices } from "@/hooks/use-member-product-prices";
-import { useT } from "@/i18n";
 import {
-  fetchCategories,
-  fetchPublicMarketingCatalogs,
-  fetchPublicProducts,
-} from "@/lib/api.functions";
+  BrandEntrySplit,
+  BrandHero,
+  BrandProductRail,
+  BrandProjectsBento,
+} from "@/components/storefront/home/brand-home-sections";
+import {
+  BrandFactory,
+  BrandStatement,
+} from "@/components/storefront/home/brand-story-sections";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_store/")({
-  loader: async () => {
-    const productQuery = {
-      pageSize: 8,
-      sortBy: "created_at" as const,
-      sortDir: "desc" as const,
-    };
-
-    const [featuredResult, fallbackResult, categories, catalogs] =
-      await Promise.all([
-        fetchPublicProducts({
-          data: { ...productQuery, featured: true },
-        }),
-        fetchPublicProducts({ data: productQuery }),
-        fetchCategories(),
-        fetchPublicMarketingCatalogs({ data: {} }),
-      ]);
-
-    const featuredProducts = featuredResult.data.length
-      ? featuredResult.data
-      : fallbackResult.data;
-
-    return { featuredProducts, categories, catalogs };
-  },
-  pendingComponent: () => <PageLoading variant="grid" />,
+  head: () =>
+    pageHead({
+      title: "WP ALL — ม่าน มู่ลี่ และระบบมอเตอร์ ผลิตในไทย",
+      description:
+        "WP ALL IN 1 ผู้ผลิตผ้าม่าน มู่ลี่ ม่านม้วน ฉากกั้นห้อง PVC รางม่าน และระบบมอเตอร์อัจฉริยะ สั่งทำตามขนาด สำหรับบ้าน โครงการ และตัวแทนจำหน่าย",
+      path: "/",
+      image: "/home/hero-living-curtains.png",
+    }),
   component: HomePage,
 });
 
+/**
+ * Story order: promise → factory → range → projects → two doors (footer closes with the contact CTA).
+ * Chapter numbers 01–04 are printed in each section heading; backgrounds alternate white / deep / cream / white.
+ */
 function HomePage() {
-  const { t } = useT();
-  const { featuredProducts, categories, catalogs } = Route.useLoaderData();
-  const memberPrices = useMemberProductPrices(featuredProducts);
-
   return (
     <>
-      <HomeHero />
-      <RevealOnScroll direction="none">
-        <HomeGalleryStrip />
-      </RevealOnScroll>
-      <StorePage className="space-y-8 sm:space-y-10 md:space-y-12">
-        <RevealOnScroll>
-          <section className="relative z-20">
-            <h2 className="mb-4 text-lg font-bold text-primary sm:mb-5 sm:text-xl">
-              {t("home.categories.title")}
-            </h2>
-            <CategoryImageGrid categories={categories} />
-          </section>
-        </RevealOnScroll>
-
-        <RevealOnScroll>
-          <ProductFeed
-            title={t("home.popular.title")}
-            products={featuredProducts}
-            memberPrices={memberPrices}
-            seeAllHref="/shop"
-            seeAllLabel={t("home.featured.seeAll")}
-          />
-        </RevealOnScroll>
-
-        <HomeCatalogSection catalogs={catalogs} />
-
-        <div className="space-y-10 md:space-y-14">
-          <div>
-            <RevealOnScroll>
-              <HomeStatsBand />
-            </RevealOnScroll>
-            <RevealOnScroll>
-              <HomeFactoryTour3D />
-            </RevealOnScroll>
-          </div>
-          <RevealOnScroll>
-            <HomeDealerCta />
-          </RevealOnScroll>
-        </div>
-      </StorePage>
-      <HomeCapabilities />
+      <div
+        aria-hidden
+        className="scroll-progress pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 bg-accent"
+      />
+      <BrandHero />
+      <BrandStatement />
+      <BrandFactory />
+      <BrandProductRail />
+      <BrandProjectsBento />
+      <BrandEntrySplit />
     </>
   );
 }

@@ -57,11 +57,27 @@ export const HOME_CATEGORY_TILES: Array<{
 }> = [
   { slug: "curtains", nameTh: "ผ้าม่าน", nameEn: "Curtain" },
   { slug: "roller-blinds", nameTh: "ม่านม้วน", nameEn: "Roller Blinds" },
-  { slug: "wood-blinds", nameTh: "มู่ลี่ไม้", nameEn: "Wooden Venetian Blinds" },
-  { slug: "aluminum-blinds", nameTh: "มู่ลี่อลูมิเนียม", nameEn: "Aluminium Venetian Blinds" },
+  {
+    slug: "wood-blinds",
+    nameTh: "มู่ลี่ไม้",
+    nameEn: "Wooden Venetian Blinds",
+  },
+  {
+    slug: "aluminum-blinds",
+    nameTh: "มู่ลี่อลูมิเนียม",
+    nameEn: "Aluminium Venetian Blinds",
+  },
   { slug: "vertical-blinds", nameTh: "ม่านปรับแสง", nameEn: "Vertical Blinds" },
-  { slug: "pvc-folding-doors", nameTh: "ฉากกั้นห้อง - กันแอร์", nameEn: "Folding Door" },
-  { slug: "noren", nameTh: "ม่านญี่ปุ่น ม่านพิมพ์ลาย", nameEn: "Print Curtain" },
+  {
+    slug: "pvc-folding-doors",
+    nameTh: "ฉากกั้นห้อง - กันแอร์",
+    nameEn: "Folding Door",
+  },
+  {
+    slug: "noren",
+    nameTh: "ม่านญี่ปุ่น ม่านพิมพ์ลาย",
+    nameEn: "Print Curtain",
+  },
   { slug: "wallpaper", nameTh: "วอลเปเปอร์", nameEn: "Wallpaper" },
 ];
 
@@ -71,8 +87,6 @@ export function categoryLabelEn(slug: string): string | null {
 
 export function resolveCategoryImageUrl(category: CategoryDto): string | null {
   return (
-    CATEGORY_IMAGE_BY_SLUG[category.slug] ??
-    category.imageUrl?.trim() ??
-    null
+    CATEGORY_IMAGE_BY_SLUG[category.slug] ?? category.imageUrl?.trim() ?? null
   );
 }
