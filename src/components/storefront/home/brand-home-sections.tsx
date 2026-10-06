@@ -1,12 +1,25 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BadgeCheck,
+  BookOpen,
+  Headset,
+  MessageCircle,
+  PackageCheck,
+  type LucideIcon,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 import { SectionHeading } from "@/components/brand/section-heading";
 import { Button } from "@/components/ui/button";
 import { CATALOG_PRODUCTS, type CatalogProduct } from "@/data/products-catalog";
 import { PROJECT_KIND_LABELS, PROJECTS, type Project } from "@/data/projects";
-import { SMART_MOTOR_TYPES } from "@/data/smart-motor";
+import {
+  SMART_MOTOR_CONTROLS,
+  SMART_MOTOR_TYPES,
+  smartMotorImage,
+} from "@/data/smart-motor";
 import { useT } from "@/i18n";
 import { useBi, type Bi } from "@/lib/bi";
 import { cn } from "@/lib/utils";
@@ -77,14 +90,7 @@ export function BrandHero() {
           "scroll-fade-away flex min-h-svh flex-col justify-end pt-28 pb-10 lg:pb-14",
         )}
       >
-        <p
-          className="hero-blur-in brand-kicker flex items-center gap-3 text-white/75"
-          style={{ ["--delay" as string]: "100ms" }}
-        >
-          <span aria-hidden className="h-px w-8 bg-accent" />
-          Made in Thailand · Made to measure
-        </p>
-        <h1 className="mt-5 max-w-4xl text-4xl leading-[1.2] font-medium tracking-tight text-balance sm:text-5xl lg:text-6xl">
+        <h1 className="max-w-4xl text-4xl leading-[1.2] font-medium tracking-tight text-balance sm:text-5xl lg:text-6xl">
           {pick({
             th: "พอดีทุกหน้าต่าง สวยทุกมุมห้อง",
             en: "Made to fit every window. Made to be lived with.",
@@ -102,28 +108,18 @@ export function BrandHero() {
             ))}
         </h1>
         <p
-          className="hero-blur-in mt-5 max-w-xl text-base leading-7 text-white/80 text-pretty sm:text-lg sm:leading-8"
+          className="hero-blur-in mt-5 max-w-xl text-base leading-7 text-white/80 text-pretty whitespace-pre-line sm:text-lg sm:leading-8"
           style={{ ["--delay" as string]: "500ms" }}
         >
           {pick({
-            th: "ม่าน มู่ลี่ และระบบมอเตอร์ ออกแบบให้เข้ากับทุกพื้นที่ สั่งทำตามขนาดจริงทุกชิ้น",
-            en: "Curtains, blinds and motorized systems, designed for every space and made to the exact size of every window.",
+            th: "Solutions ม่าน มู่ลี่ และระบบมอเตอร์\nที่ผสานดีไซน์ ฟังก์ชัน และเทคโนโลยี ให้ลงตัวกับทุกพื้นที่",
+            en: "Curtain, blind and motorized solutions\nthat bring design, function and technology together for every space.",
           })}
         </p>
         <div
-          className="hero-blur-in mt-8 flex items-center justify-between gap-6"
+          className="hero-blur-in mt-8 flex items-center justify-end gap-6"
           style={{ ["--delay" as string]: "650ms" }}
         >
-          <Button
-            size="lg"
-            className="h-12 rounded-full bg-accent px-6 text-white hover:bg-accent/90"
-            asChild
-          >
-            <Link to="/products">
-              {pick({ th: "ดูสินค้าทั้งหมด", en: "Explore products" })}
-              <ArrowRight className="ml-1 size-4" aria-hidden />
-            </Link>
-          </Button>
           <div className="flex gap-2">
             {HERO_SLIDES.map((slide, index) => (
               <button
@@ -270,6 +266,98 @@ export function BrandProductRail() {
   );
 }
 
+/** Chapter 3 — Smart Motor, ahead of the projects: every curtain and blind can be motorised. */
+export function BrandSmartMotor() {
+  const pick = useBi();
+
+  return (
+    <section className="brand-section relative isolate bg-primary-deep text-white">
+      <div className={container}>
+        <SectionHeading
+          tone="dark"
+          index="03"
+          kicker="Smart Motor"
+          title={pick({
+            th: "ม่านและมู่ลี่ทุกแบบ ติดมอเตอร์ได้",
+            en: "Motors for every curtain and blind",
+          })}
+          description={pick({
+            th: "เปิด-ปิดจากรีโมท สวิตช์ติดผนัง หรือมือถือ เลือกติดได้ทั้งม่านและมู่ลี่",
+            en: "Run from a remote, a wall switch or your phone, for curtains and blinds alike.",
+          })}
+          action={
+            <Link
+              to="/smart-motor"
+              className="group inline-flex min-h-11 items-center gap-2 text-sm font-medium text-white"
+            >
+              {pick({ th: "ดู Smart Motor", en: "Explore Smart Motor" })}
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-1"
+                aria-hidden
+              />
+            </Link>
+          }
+        />
+
+        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:mt-16 lg:grid-cols-4">
+          {SMART_MOTOR_TYPES.map((type, index) => {
+            const image = smartMotorImage(type);
+            return (
+              <li
+                key={type.id}
+                className="scroll-wipe-up-soft"
+                style={{ ["--i" as string]: index % 3 }}
+              >
+                <Link
+                  to="/smart-motor"
+                  className="group relative isolate flex aspect-[3/4] flex-col justify-end overflow-hidden rounded-sm bg-black/20 p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-4 focus-visible:ring-offset-primary-deep"
+                >
+                  {image ? (
+                    <div className="scroll-zoom absolute inset-0 -z-10">
+                      <img
+                        src={image}
+                        alt=""
+                        aria-hidden
+                        loading="lazy"
+                        decoding="async"
+                        className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                      />
+                    </div>
+                  ) : null}
+                  <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgb(0_0_0/0.78),rgb(0_0_0/0.05)_65%)]" />
+                  <p className="text-xs tracking-wide text-white/70 uppercase">
+                    {type.kind === "curtain"
+                      ? pick({ th: "ม่าน", en: "Curtain" })
+                      : pick({ th: "มู่ลี่", en: "Blind" })}
+                  </p>
+                  <h3 className="mt-1 text-lg font-medium tracking-tight text-balance">
+                    {type.title}
+                  </h3>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+
+        <ul className="mt-12 grid gap-x-8 gap-y-8 border-t border-white/15 pt-8 sm:grid-cols-3">
+          {SMART_MOTOR_CONTROLS.map((control, index) => (
+            <li
+              key={control.id}
+              className="scroll-rise"
+              style={{ ["--i" as string]: index }}
+            >
+              <p className="brand-kicker text-accent">{control.title}</p>
+              <p className="mt-2 text-base text-white/80">
+                {pick(control.body)}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 /** Home shows exactly these three, in this order. */
 const FEATURED_PROJECT_SLUGS = [
   "colors-of-buriram-2025",
@@ -278,7 +366,7 @@ const FEATURED_PROJECT_SLUGS = [
 ] as const;
 
 /**
- * Chapter 3 — proof. One full-width project at a time; each next project
+ * Chapter 4 — proof. One full-width project at a time; each next project
  * slides up and covers the previous one (CSS sticky stack, no JS).
  */
 export function BrandProjectsBento() {
@@ -292,7 +380,7 @@ export function BrandProjectsBento() {
     <section className="brand-section relative isolate bg-background">
       <div className={container}>
         <SectionHeading
-          index="03"
+          index="04"
           kicker="Projects"
           title={pick({
             th: "งานจริงจากโครงการและตัวแทนของเรา",
@@ -365,180 +453,298 @@ export function BrandProjectsBento() {
   );
 }
 
-/** Chapter 4 — Smart Motor: one photo, three controls, five types. Detail lives on /smart-motor. */
-export function BrandSmartMotor() {
-  const pick = useBi();
+type PartnerStep = {
+  icon: LucideIcon;
+  title: Bi;
+  text: Bi;
+  tags: Bi[];
+};
 
-  return (
-    <section className="brand-section bg-cream">
-      <div className={container}>
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="scroll-rise relative aspect-[4/3] overflow-hidden rounded-sm bg-surface">
-            <img
-              src="/products/motorized-track.webp"
-              alt={pick({
-                th: "รางม่านมอเตอร์ WP ALL",
-                en: "WP ALL motorised curtain track",
-              })}
-              loading="lazy"
-              decoding="async"
-              className="size-full object-cover"
-            />
-          </div>
-
-          <div>
-            <SectionHeading
-              index="04"
-              kicker="Smart Motor"
-              title={pick({
-                th: "ม่านและมู่ลี่ทุกแบบ ติดมอเตอร์ได้",
-                en: "Every curtain and blind, made smart.",
-              })}
-              description={pick({
-                th: "เปิด-ปิดจากรีโมท สวิตช์ติดผนัง หรือมือถือ",
-                en: "Run it from a remote, a wall switch or your phone.",
-              })}
-            />
-
-            <ul className="mt-8 divide-y divide-border border-y border-border">
-              {SMART_MOTOR_TYPES.map((type, index) => (
-                <li
-                  key={type.id}
-                  className="flex min-h-12 items-baseline gap-4 py-3"
-                >
-                  <span className="brand-index w-6 shrink-0 text-muted-foreground">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="text-base font-medium tracking-tight text-foreground lg:text-lg">
-                    {type.title}
-                  </span>
-                </li>
-              ))}
-            </ul>
-
-            <Link
-              to="/smart-motor"
-              className="group mt-8 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary"
-            >
-              {pick({
-                th: "ดู Smart Motor ทั้งหมด",
-                en: "Explore Smart Motor",
-              })}
-              <ArrowRight
-                className="size-4 transition-transform group-hover:translate-x-1"
-                aria-hidden
-              />
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-const CHOOSE_STEPS: { title: Bi; text: Bi }[] = [
+/** How a shop becomes a WP ALL partner, in the order it happens. */
+const PARTNER_STEPS: PartnerStep[] = [
   {
-    title: { th: "วัดขนาดหน้าต่าง", en: "Measure your window" },
+    icon: MessageCircle,
+    title: { th: "ติดต่อทีมงาน", en: "Get in touch" },
     text: {
-      th: "วัดความกว้างและความสูงของหน้าต่างหรือผนังที่จะติดตั้ง วัดหลายจุดแล้วใช้ค่าที่ต้องการให้ม่านคลุม",
-      en: "Measure the width and height of the window or wall. Check a few points and use the size you want the curtain to cover.",
+      th: "ติดต่อเราผ่านช่องทางที่สะดวก ทั้ง LINE โทรศัพท์ หรือแบบฟอร์มบนเว็บไซต์",
+      en: "Reach us through LINE, phone or the online form, whichever suits you.",
     },
+    tags: [
+      { th: "LINE", en: "LINE" },
+      { th: "โทรศัพท์", en: "Phone" },
+      { th: "แบบฟอร์มออนไลน์", en: "Online form" },
+    ],
   },
   {
-    title: { th: "เลือกตามห้องและแสง", en: "Match the room and light" },
+    icon: BadgeCheck,
+    title: { th: "ลงทะเบียนเป็นพาร์ทเนอร์", en: "Register as a partner" },
     text: {
-      th: "ห้องนอนมักใช้ม่านทึบคู่ม่านโปร่ง ห้องนั่งเล่นเน้นความโปร่งและลวดลาย ห้องน้ำหรือครัวเลือกวัสดุที่ทนความชื้น",
-      en: "Bedrooms often pair blackout with sheer. Living rooms favour airy fabric and pattern. Bathrooms and kitchens need moisture-friendly materials.",
+      th: "เปิดบัญชีผู้จำหน่าย (Vendor) เพื่อรับสิทธิ์และเงื่อนไขสำหรับพาร์ทเนอร์",
+      en: "Open your vendor account to unlock partner terms and benefits.",
     },
+    tags: [
+      { th: "บัญชีผู้จำหน่าย", en: "Vendor account" },
+      { th: "ราคาตัวแทน", en: "Dealer pricing" },
+    ],
   },
   {
-    title: { th: "เลือกวิธีเปิด-ปิด", en: "Choose how it opens" },
+    icon: Headset,
+    title: { th: "ทีมขายดูแลประจำ", en: "Dedicated sales support" },
     text: {
-      th: "เปิดด้วยมือ ดึงโซ่ หรือติดมอเตอร์ควบคุมผ่านรีโมทและมือถือ เหมาะกับหน้าต่างบานสูงหรือบานกว้าง",
-      en: "Open by hand, by chain, or add a motor with remote and phone control — handy for tall or wide windows.",
+      th: "มีเจ้าหน้าที่ขายดูแลบัญชีของคุณโดยเฉพาะ ให้คำปรึกษาตลอดการทำงาน",
+      en: "A sales representative is assigned to your account and advises you throughout.",
     },
+    tags: [
+      { th: "ผู้ดูแลบัญชี", en: "Account manager" },
+      { th: "ให้คำปรึกษา", en: "Advice" },
+    ],
   },
   {
-    title: { th: "ส่งขนาดให้เรา", en: "Send us your sizes" },
-    text: {
-      th: "ส่งขนาดและรูปหน้าต่าง ทีมงานช่วยแนะนำรุ่นที่เหมาะ แล้วผลิตตามขนาดจริงของคุณ",
-      en: "Share your sizes and a photo. Our team recommends a fit, then makes it to your exact measurements.",
+    icon: BookOpen,
+    title: {
+      th: "รับแคตตาล็อกและข้อมูลสินค้า",
+      en: "Receive catalogues and product information",
     },
+    text: {
+      th: "จัดส่งแคตตาล็อกและข้อมูลสินค้าตามที่คุณต้องการ",
+      en: "We send the catalogues and product details you need.",
+    },
+    tags: [
+      { th: "แคตตาล็อก", en: "Catalogues" },
+      { th: "ข้อมูลสินค้า", en: "Product details" },
+    ],
+  },
+  {
+    icon: PackageCheck,
+    title: { th: "สั่งซื้ออย่างสะดวก", en: "Order with ease" },
+    text: {
+      th: "สั่งซื้อผ่านทีมขายของเรา และผ่านเว็บไซต์เมื่อระบบพร้อมให้บริการ",
+      en: "Place orders through your sales representative, and on our website once the system is ready.",
+    },
+    tags: [
+      { th: "สั่งผ่านทีมขาย", en: "Via sales team" },
+      { th: "สั่งผ่านเว็บไซต์", en: "Via website" },
+    ],
   },
 ];
 
-/** Chapter 5 — how to choose curtains for your home. Explains the path from window to order. */
+/**
+ * Chapter 7 — how a shop becomes a partner. A pinned stage on the left changes scene
+ * as each step on the right scrolls through the middle of the screen.
+ */
 export function BrandChooseGuide() {
   const pick = useBi();
+  const [active, setActive] = useState(0);
+  const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
+
+  useEffect(() => {
+    const nodes = itemRefs.current.filter((node): node is HTMLLIElement =>
+      Boolean(node),
+    );
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActive(Number((entry.target as HTMLElement).dataset.index));
+          }
+        }
+      },
+      { rootMargin: "-45% 0px -45% 0px" },
+    );
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, []);
+
+  const total = PARTNER_STEPS.length;
+  const pad = (value: number) => String(value).padStart(2, "0");
 
   return (
     <section className="brand-section relative isolate border-t border-border bg-surface">
       <div className={container}>
         <SectionHeading
           index="06"
-          kicker="For homes"
+          kicker="Partner onboarding"
           title={pick({
-            th: "เลือกม่านให้บ้านคุณยังไงดี",
-            en: "How to choose curtains for your home",
+            th: "เริ่มต้นเป็นพาร์ทเนอร์กับ WP ALL",
+            en: "Become a WP ALL partner",
           })}
           description={pick({
-            th: "สี่ขั้นตอนสั้นๆ ตั้งแต่วัดหน้าต่าง จนได้ม่านที่พอดีกับห้อง",
-            en: "Four short steps, from measuring the window to a curtain that fits the room.",
+            th: "ขั้นตอนที่ชัดเจน ตั้งแต่การติดต่อครั้งแรก จนถึงการสั่งซื้อและการดูแลต่อเนื่อง",
+            en: "A clear path from first contact to ordering, with a dedicated sales contact throughout.",
           })}
         />
 
-        <div className="mt-10 grid gap-10 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start lg:gap-16">
-          <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-black/10 lg:sticky lg:top-28">
+        <div className="mt-10 grid gap-10 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-16">
+          {/* Pinned stage: decorative, the list carries the real content. */}
+          <div
+            aria-hidden
+            className="relative hidden aspect-[4/5] overflow-hidden rounded-md bg-primary-deep text-white lg:sticky lg:top-28 lg:block"
+          >
             <img
-              src="/home/hero-bedroom-sheer.png"
+              src="/home/dealer-business-talk.png"
               alt=""
-              aria-hidden
               loading="lazy"
               decoding="async"
-              className="size-full object-cover"
+              className="absolute inset-0 size-full scale-105 object-cover opacity-40 transition-transform duration-1000 ease-out"
+              style={{ transform: "scale(" + (1.05 + active * 0.025) + ")" }}
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary-deep via-primary-deep/60 to-primary-deep/30" />
+
+            <p className="brand-index absolute top-6 left-6 text-white/70">
+              {pad(active + 1)} / {pad(total)}
+            </p>
+
+            {PARTNER_STEPS.map((step, index) => {
+              const Icon = step.icon;
+              const on = index === active;
+              return (
+                <div
+                  key={step.title.en}
+                  className={cn(
+                    "absolute inset-0 flex flex-col items-center justify-center gap-6 p-10 text-center transition-[opacity,transform,filter] duration-700 ease-out motion-reduce:transition-none",
+                    on
+                      ? "translate-y-0 opacity-100 blur-0"
+                      : "pointer-events-none translate-y-8 opacity-0 blur-sm",
+                  )}
+                >
+                  <span className="relative flex size-28 items-center justify-center">
+                    <span
+                      className={cn(
+                        "absolute inset-0 rounded-full border border-accent/60",
+                        on && "motion-safe:animate-ping",
+                      )}
+                    />
+                    <span className="absolute inset-2 rounded-full bg-white/10 ring-1 ring-white/25" />
+                    <Icon className="relative size-11 text-accent" />
+                  </span>
+                  <p className="text-2xl font-medium tracking-tight text-balance lg:text-3xl">
+                    {pick(step.title)}
+                  </p>
+                  <ul className="flex flex-wrap justify-center gap-2">
+                    {step.tags.map((tag) => (
+                      <li
+                        key={tag.en}
+                        className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs text-white/85"
+                      >
+                        {pick(tag)}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+
+            <div className="absolute inset-x-6 bottom-6 flex gap-1.5">
+              {PARTNER_STEPS.map((step, index) => (
+                <span
+                  key={step.title.en}
+                  className="h-1 flex-1 overflow-hidden rounded-full bg-white/20"
+                >
+                  <span
+                    className={cn(
+                      "block h-full origin-left bg-accent transition-transform duration-700 ease-out motion-reduce:transition-none",
+                      index <= active ? "scale-x-100" : "scale-x-0",
+                    )}
+                  />
+                </span>
+              ))}
+            </div>
           </div>
 
           <div>
-            <ol className="divide-y divide-border border-y border-border">
-              {CHOOSE_STEPS.map((step, index) => (
-                <li
-                  key={step.title.en}
-                  className="scroll-rise flex items-start gap-5 py-7 lg:gap-7 lg:py-9"
-                  style={{ ["--i" as string]: index }}
-                >
-                  <span className="text-4xl leading-none font-medium tracking-tight text-accent lg:text-5xl">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <div>
-                    <h3 className="text-lg font-medium tracking-tight text-foreground lg:text-xl">
-                      {pick(step.title)}
-                    </h3>
-                    <p className="mt-2 text-sm leading-7 text-muted-foreground lg:text-base">
-                      {pick(step.text)}
-                    </p>
-                  </div>
-                </li>
-              ))}
+            <ol>
+              {PARTNER_STEPS.map((step, index) => {
+                const Icon = step.icon;
+                const on = index === active;
+                const passed = index < active;
+                const last = index === total - 1;
+                return (
+                  <li
+                    key={step.title.en}
+                    ref={(node) => {
+                      itemRefs.current[index] = node;
+                    }}
+                    data-index={index}
+                    className="relative flex gap-5 pb-14 lg:min-h-[44svh] lg:gap-7 lg:pb-0"
+                  >
+                    {!last ? (
+                      <span
+                        aria-hidden
+                        className="absolute top-12 bottom-0 left-[1.375rem] w-px bg-border lg:top-14 lg:left-[1.625rem]"
+                      >
+                        <span
+                          className={cn(
+                            "block size-full origin-top bg-accent transition-transform duration-700 ease-out motion-reduce:transition-none",
+                            passed ? "scale-y-100" : "scale-y-0",
+                          )}
+                        />
+                      </span>
+                    ) : null}
+
+                    <span
+                      className={cn(
+                        "relative z-10 flex size-11 shrink-0 items-center justify-center rounded-full border text-sm font-medium transition-colors duration-500 lg:size-[3.25rem]",
+                        on
+                          ? "border-accent bg-accent text-white"
+                          : passed
+                            ? "border-accent bg-surface text-accent"
+                            : "border-border bg-surface text-muted-foreground",
+                      )}
+                    >
+                      {pad(index + 1)}
+                    </span>
+
+                    <div
+                      className={cn(
+                        "pt-1.5 transition-opacity duration-500 lg:pt-2.5",
+                        on ? "opacity-100" : "opacity-100 lg:opacity-40",
+                      )}
+                    >
+                      <h3 className="flex items-center gap-2 text-lg font-medium tracking-tight text-foreground lg:text-2xl">
+                        <Icon
+                          className="size-5 text-accent lg:hidden"
+                          aria-hidden
+                        />
+                        {pick(step.title)}
+                      </h3>
+                      <p className="mt-2 max-w-md text-sm leading-7 text-muted-foreground lg:text-base">
+                        {pick(step.text)}
+                      </p>
+                      <ul className="mt-3 flex flex-wrap gap-2 lg:hidden">
+                        {step.tags.map((tag) => (
+                          <li
+                            key={tag.en}
+                            className="rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground"
+                          >
+                            {pick(tag)}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </li>
+                );
+              })}
             </ol>
 
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 lg:pl-[5rem]">
               <Button
                 size="lg"
                 className="h-12 rounded-full bg-accent px-6 text-white hover:bg-accent/90"
                 asChild
               >
-                <Link to="/products">
-                  {pick({ th: "ดูสินค้า", en: "Browse products" })}
+                <Link to="/contact" search={{ topic: "dealer" }}>
+                  {pick({ th: "สมัครเป็นพาร์ทเนอร์", en: "Become a partner" })}
                   <ArrowRight className="ml-1 size-4" aria-hidden />
                 </Link>
               </Button>
               <Link
-                to="/contact"
-                search={{ topic: "quote" }}
+                to="/partners"
                 className="group inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary"
               >
-                {pick({ th: "ส่งขนาดขอคำแนะนำ", en: "Send sizes for advice" })}
+                {pick({
+                  th: "ดูโปรแกรมตัวแทน",
+                  en: "See the dealer programme",
+                })}
                 <ArrowRight
                   className="size-4 transition-transform group-hover:translate-x-1"
                   aria-hidden

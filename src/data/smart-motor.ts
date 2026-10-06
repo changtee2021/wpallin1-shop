@@ -52,23 +52,12 @@ export const SMART_MOTOR_TYPES: SmartMotorType[] = [
     motorSlugs: [],
   },
   {
-    id: "pleated",
+    id: "curtain-track",
     kind: "curtain",
-    title: "Pleated curtain motor",
+    title: "Curtain Track Motor",
     description: t(
-      "มอเตอร์ผ้าม่านจีบ เงียบ เปิด-ปิดนุ่ม ซ่อนหลังรางได้",
-      "Motorised pleated curtains that glide quietly, hidden behind the track.",
-    ),
-    imageFrom: "standard-track",
-    motorSlugs: ["wp-nano-power", "wp-n23"],
-  },
-  {
-    id: "wave",
-    kind: "curtain",
-    title: "Wave curtain motor",
-    description: t(
-      "มอเตอร์ม่านลอน ลอนเรียบเท่ากันตลอดแนวทุกครั้งที่เปิดปิด",
-      "Motorised wave curtains that keep an even fold every time.",
+      "มอเตอร์รางม่าน ใช้ได้ทั้งม่านจีบและม่านลอน เงียบ เปิด-ปิดนุ่ม ซ่อนหลังรางได้",
+      "Motorised curtain tracks for pleated and wave curtains, gliding quietly and hidden behind the track.",
     ),
     imageFrom: "s-curve-track",
     motorSlugs: ["wp-nano-power", "wp-n23"],
@@ -90,6 +79,50 @@ export const SMART_MOTOR_CONTROLS: { id: string; title: string; body: Bi }[] = [
     id: "phone",
     title: "Phone",
     body: t("ควบคุมผ่านมือถือ", "Mobile app control"),
+  },
+];
+
+/** How it works — every line restates a fact already on the WP Nano Power / N23 spec sheets. */
+export const SMART_MOTOR_FEATURES: { id: string; title: Bi; body: Bi }[] = [
+  {
+    id: "brushless",
+    title: t("มอเตอร์ไร้แปรงถ่าน", "Brushless drive"),
+    body: t(
+      "แรงดึงเสถียร อายุการใช้งานยาว",
+      "Steady pull and a long service life.",
+    ),
+  },
+  {
+    id: "quiet",
+    title: t("เงียบ จนลืมว่ามีมอเตอร์", "So quiet you forget it's there"),
+    body: t(
+      "เสียงรบกวนต่ำสุด 20 dB เปิด-ปิดนุ่ม",
+      "As low as 20 dB, gliding smoothly open and shut.",
+    ),
+  },
+  {
+    id: "memory",
+    title: t("จำตำแหน่งหยุดอัตโนมัติ", "Automatic memory trip"),
+    body: t(
+      "มอเตอร์จดจำตำแหน่งหยุดให้เอง เปิดและปิดตรงจุดเดิมทุกครั้ง",
+      "The motor remembers where to stop, so the curtain opens and closes to the same point.",
+    ),
+  },
+  {
+    id: "hidden",
+    title: t("เล็กพอจะซ่อนหลังราง", "Small enough to hide"),
+    body: t(
+      "มอเตอร์ขนาด 47 × 65 × 80 มม. ซ่อนหลังรางได้สวย",
+      "A 47 × 65 × 80 mm motor that tucks neatly behind the track.",
+    ),
+  },
+  {
+    id: "dual",
+    title: t("ม่านสองชั้น พร้อมเสียบปลั๊ก", "Two layers, plug-in ready"),
+    body: t(
+      "WP N23 มีมอเตอร์หลักและมอเตอร์รองสำหรับม่านสองชั้น หัวปลั๊กพร้อมใช้งาน",
+      "WP N23 pairs a main and a secondary motor for two-layer curtains, with a ready-to-use plug.",
+    ),
   },
 ];
 

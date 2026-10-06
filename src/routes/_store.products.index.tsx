@@ -1,19 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
+  ArrowLeft,
   ArrowRight,
+  ArrowUpRight,
   BookOpen,
-  ChevronDown,
   SearchX,
-  SlidersHorizontal,
-  X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { z } from "zod";
 
-import {
-  ContactCtaBand,
-  ContactLineButton,
-} from "@/components/brand/contact-cta";
+import { ContactLineButton } from "@/components/brand/contact-cta";
 import {
   BrandPageError,
   BrandGridSkeleton,
@@ -24,17 +20,12 @@ import {
   CATALOG_PRODUCTS,
   PRODUCT_CATEGORIES,
   PRODUCT_CATEGORY_IDS,
-  PRODUCT_CONTROL_LABELS,
-  PRODUCT_CONTROLS,
-  PRODUCT_MATERIAL_LABELS,
-  PRODUCT_MATERIALS,
-  PRODUCT_ROOM_LABELS,
-  PRODUCT_ROOMS,
   PRODUCT_SUBCATEGORY_IDS,
   getProductCategory,
   subcategoriesOf,
   type CatalogProduct,
   type ProductCategoryId,
+  type ProductSubcategoryId,
 } from "@/data/products-catalog";
 import { useT } from "@/i18n";
 import { useBi, type Bi } from "@/lib/bi";
@@ -44,9 +35,6 @@ import { cn } from "@/lib/utils";
 const productsSearchSchema = z.object({
   category: z.enum(PRODUCT_CATEGORY_IDS).optional().catch(undefined),
   sub: z.enum(PRODUCT_SUBCATEGORY_IDS).optional().catch(undefined),
-  room: z.enum(PRODUCT_ROOMS).optional().catch(undefined),
-  control: z.enum(PRODUCT_CONTROLS).optional().catch(undefined),
-  material: z.enum(PRODUCT_MATERIALS).optional().catch(undefined),
 });
 
 type ProductsSearch = z.infer<typeof productsSearchSchema>;
@@ -77,60 +65,6 @@ export const Route = createFileRoute("/_store/products/")({
   component: ProductsPage,
 });
 
-function FilterGroup<T extends string>({
-  label,
-  options,
-  labels,
-  value,
-  onChange,
-}: {
-  label: Bi;
-  options: readonly T[];
-  labels: Record<T, Bi>;
-  value: T | undefined;
-  onChange: (next: T | undefined) => void;
-}) {
-  const pick = useBi();
-
-  return (
-    <details open className="group/filter border-b border-border py-5">
-      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between text-sm font-medium text-foreground [&::-webkit-details-marker]:hidden">
-        <span>
-          {pick(label)}
-          {value ? (
-            <span className="ml-2 inline-block size-1.5 rounded-full bg-accent align-middle" />
-          ) : null}
-        </span>
-        <ChevronDown
-          className="size-4 text-muted-foreground transition-transform group-open/filter:rotate-180"
-          aria-hidden
-        />
-      </summary>
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        {options.map((option) => {
-          const selected = value === option;
-          return (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={selected}
-              onClick={() => onChange(selected ? undefined : option)}
-              className={cn(
-                "inline-flex min-h-11 items-center rounded-full px-3.5 text-[0.8125rem] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary lg:min-h-9",
-                selected
-                  ? "bg-foreground text-background"
-                  : "bg-surface text-foreground/80 hover:bg-paper hover:text-foreground",
-              )}
-            >
-              {pick(labels[option])}
-            </button>
-          );
-        })}
-      </div>
-    </details>
-  );
-}
-
 function ProductGrid({ products }: { products: CatalogProduct[] }) {
   return (
     <ul className="grid gap-x-6 gap-y-14 sm:grid-cols-2 xl:grid-cols-3">
@@ -143,13 +77,101 @@ function ProductGrid({ products }: { products: CatalogProduct[] }) {
   );
 }
 
+type ProductGroup = {
+  id: string;
+  name: Bi;
+  description: Bi;
+  category: ProductCategoryId;
+  /** Subcategories shown in this row; omitted = the whole category. */
+  subcategories?: ProductSubcategoryId[];
+  /** Sub filter applied by "View all" (only when the row maps to exactly one). */
+  sub?: ProductSubcategoryId;
+};
+
+/** What each group is about, in concept terms (shown beside the product row). */
+const GROUP_CONCEPTS: Record<string, Bi> = {
+  "blinds-venetian": {
+    th: "บังแสงอย่างละเอียดด้วยใบมู่ลี่ ปรับองศาแสงได้ตามเวลาของวัน เลือกความอบอุ่นของไม้จริง หรือความเบาและเรียวของอลูมิเนียม",
+    en: "Fine control of light with adjustable slats. Choose the warmth of real wood or the slim, light feel of aluminium.",
+  },
+  "blinds-roller": {
+    th: "ผืนผ้าเรียบง่ายสำหรับหน้าต่างทั่วไปจนถึงบานกว้าง ม้วนเก็บได้เรียบร้อย หรือเลื่อนปรับแสงตามแนวตั้ง",
+    en: "Clean fabric panels for everyday windows and wide openings, rolled away neatly or tilted and drawn along vertical vanes.",
+  },
+  outdoor: {
+    th: "ลดแดดและความร้อนก่อนถึงตัวอาคาร สำหรับพื้นที่นอกชายคา เช่น ระเบียง เพอร์โกล่า และหลังคากระจก",
+    en: "Cut sun and heat before it reaches the building, for terraces, pergolas and glass roofs.",
+  },
+  partitions: {
+    th: "แบ่งพื้นที่ใช้สอยโดยไม่ต้องก่อผนัง พับเก็บได้เมื่ออยากได้พื้นที่โล่ง เลือกสไตล์ใบฉากให้เข้ากับห้อง",
+    en: "Divide a space without building a wall, folding away when you want it open. Pick the panel style that suits the room.",
+  },
+  tracks: {
+    th: "โครงสร้างที่ทำให้ม่านเลื่อนเรียบและห้อยเป็นทรงสวยตามหัวม่านที่เลือก ตั้งแต่ม่านบ้านจนถึงโรงพยาบาลและงานโครงการ",
+    en: "The structure that lets a curtain glide smoothly and hang in the heading you chose, from homes to hospitals and projects.",
+  },
+  motorization: {
+    th: "ม่านที่เปิด-ปิดเองอย่างเงียบและนุ่ม ควบคุมจากรีโมท สวิตช์ หรือมือถือ ซ่อนมอเตอร์ไว้หลังรางให้ภาพรวมเรียบร้อย",
+    en: "Curtains that open and close themselves, quietly and smoothly, from a remote, a wall switch or your phone, with the motor hidden behind the track.",
+  },
+  rods: {
+    th: "ส่วนตกแต่งที่มองเห็นได้ ทำให้ม่านดูสมบูรณ์ด้วยรางโชว์หลายสีและหลายผิว หัวราง ขาจับ และอุปกรณ์เสริม",
+    en: "The visible finishing touch: decorative rods in many finishes, with finials, brackets and hardware.",
+  },
+  "custom-print": {
+    th: "เปลี่ยนภาพหรือลวดลายของลูกค้าให้เป็นผ้าม่าน ม่านญี่ปุ่น และม่านม้วนเฉพาะงาน เหมาะกับงานแบรนด์และงานนิทรรศการ",
+    en: "Turn a customer's artwork or photo into one-off fabric, noren and roller blinds, for brands, exhibitions and statement interiors.",
+  },
+};
+
+/** Overview rows: one per category, except Interior Blinds which is split in two. */
+const PRODUCT_GROUPS: ProductGroup[] = PRODUCT_CATEGORIES.flatMap(
+  (category): ProductGroup[] =>
+    category.id === "blinds"
+      ? [
+          {
+            id: "blinds-venetian",
+            name: {
+              th: "มู่ลี่ไม้และอลูมิเนียม",
+              en: "Wood & Aluminium Blinds",
+            },
+            description: {
+              th: "มู่ลี่ไม้และมู่ลี่อลูมิเนียม ผลิตตามขนาดหน้างาน",
+              en: "Wood and aluminium venetian blinds, made to measure.",
+            },
+            category: "blinds",
+            subcategories: ["venetian"],
+            sub: "venetian",
+          },
+          {
+            id: "blinds-roller",
+            name: {
+              th: "ม่านม้วนและม่านปรับแสง",
+              en: "Roller & Vertical Blinds",
+            },
+            description: {
+              th: "ม่านม้วนและม่านปรับแสง ผลิตตามขนาดหน้างาน",
+              en: "Roller and vertical blinds, made to measure.",
+            },
+            category: "blinds",
+            subcategories: ["roller", "vertical"],
+          },
+        ]
+      : [
+          {
+            id: category.id,
+            name: category.name,
+            description: category.description,
+            category: category.id,
+          },
+        ],
+);
+
 function ProductsPage() {
   const { t } = useT();
   const pick = useBi();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const [filtersOpen, setFiltersOpen] = useState(false);
-
   const setSearch = (patch: Partial<ProductsSearch>) => {
     void navigate({
       search: (prev) => ({ ...prev, ...patch }),
@@ -163,12 +185,9 @@ function ProductsPage() {
       CATALOG_PRODUCTS.filter(
         (product) =>
           (!search.category || product.category === search.category) &&
-          (!search.sub || product.subcategory === search.sub) &&
-          (!search.room || product.rooms.includes(search.room)) &&
-          (!search.control || product.controls.includes(search.control)) &&
-          (!search.material || product.materials.includes(search.material)),
+          (!search.sub || product.subcategory === search.sub),
       ),
-    [search.category, search.sub, search.room, search.control, search.material],
+    [search.category, search.sub],
   );
 
   const activeCategory = search.category
@@ -177,98 +196,51 @@ function ProductsPage() {
   const subcategories = activeCategory
     ? subcategoriesOf(activeCategory.id)
     : [];
-  const refinementCount = [search.room, search.control, search.material].filter(
-    Boolean,
-  ).length;
-  const showGrouped = !activeCategory && refinementCount === 0;
-
-  const clearRefinements = () =>
-    setSearch({ room: undefined, control: undefined, material: undefined });
-
-  const tabs: {
-    id: ProductCategoryId | undefined;
-    label: string;
-    index: string;
-  }[] = [
-    { id: undefined, label: pick({ th: "ทั้งหมด", en: "All" }), index: "00" },
-    ...PRODUCT_CATEGORIES.map((category) => ({
-      id: category.id,
-      label: pick(category.name),
-      index: category.index,
-    })),
-  ];
+  const showGrouped = !activeCategory;
 
   return (
     <>
       <section className="border-b border-border">
-        <div className="mx-auto max-w-7xl px-4 pt-14 sm:px-6 lg:px-8 lg:pt-20">
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="brand-kicker text-primary">
-                {activeCategory
-                  ? `${activeCategory.index} — ${activeCategory.name.en}`
-                  : t("nav.products")}
-              </p>
-              <h1
-                className={cn(
-                  "mt-4 font-medium tracking-tight text-foreground",
-                  activeCategory
-                    ? "brand-display"
-                    : "text-[clamp(3.5rem,12vw,9.5rem)] leading-[0.92]",
-                )}
-              >
-                {activeCategory ? pick(activeCategory.name) : "Products"}
-              </h1>
-            </div>
-            <p className="max-w-sm text-base leading-7 text-muted-foreground text-pretty lg:pb-3 lg:text-right">
-              {activeCategory
-                ? pick(activeCategory.description)
-                : pick({
-                    th: "ผลิตภัณฑ์ทุกชิ้นของ WP ALL สั่งทำตามขนาดหน้างาน ด้วยมาตรฐานเดียวกันทุกรายการ",
-                    en: "Every WP ALL product is made to the measurements of your space, to one consistent standard.",
-                  })}
+        <div className="mx-auto max-w-7xl px-4 pt-14 pb-10 sm:px-6 lg:px-8 lg:pt-20 lg:pb-14">
+          {activeCategory ? (
+            <button
+              type="button"
+              onClick={() => setSearch({ category: undefined, sub: undefined })}
+              className="mb-6 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <ArrowLeft className="size-4" aria-hidden />
+              {pick({ th: "สินค้าทั้งหมด", en: "All products" })}
+            </button>
+          ) : null}
+          {activeCategory ? (
+            <p className="brand-kicker text-primary">
+              {`${activeCategory.index} — ${pick({ th: "หมวดสินค้า", en: "Category" })}`}
             </p>
-          </div>
-
-          <nav
-            aria-label={pick({ th: "หมวดสินค้า", en: "Product categories" })}
-            className="no-scrollbar -mx-4 mt-12 overflow-x-auto px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0"
+          ) : null}
+          <h1
+            className={cn(
+              activeCategory && "mt-4",
+              "font-medium tracking-tight text-foreground",
+              activeCategory
+                ? "brand-display"
+                : "text-[clamp(3.5rem,12vw,9.5rem)] leading-[0.92]",
+            )}
           >
-            <ul className="flex min-w-max gap-1">
-              {tabs.map((tab) => {
-                const selected = search.category === tab.id;
-                return (
-                  <li key={tab.index}>
-                    <button
-                      type="button"
-                      aria-current={selected ? "page" : undefined}
-                      onClick={() =>
-                        setSearch({ category: tab.id, sub: undefined })
-                      }
-                      className={cn(
-                        "relative inline-flex min-h-12 items-baseline gap-2 px-4 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                        selected
-                          ? "font-medium text-foreground"
-                          : "text-muted-foreground hover:text-foreground",
-                      )}
-                    >
-                      <span className="brand-index text-[0.6875rem] text-muted-foreground">
-                        {tab.index}
-                      </span>
-                      {tab.label}
-                      <span
-                        aria-hidden
-                        className={cn(
-                          "absolute inset-x-3 bottom-0 h-0.5 bg-foreground transition-opacity",
-                          selected ? "opacity-100" : "opacity-0",
-                        )}
-                      />
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+            {activeCategory ? activeCategory.name.en : "Products"}
+          </h1>
+          {activeCategory ? (
+            <p className="mt-2 text-lg text-muted-foreground">
+              {activeCategory.name.th}
+            </p>
+          ) : null}
+          <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground text-pretty lg:mt-8 lg:text-lg lg:leading-8">
+            {activeCategory
+              ? pick(activeCategory.description)
+              : pick({
+                  th: "ผลิตภัณฑ์ทุกชิ้นของ WP ALL สั่งทำตามขนาดหน้างาน ด้วยมาตรฐานเดียวกันทุกรายการ",
+                  en: "Every WP ALL product is made to the measurements of your space, to one consistent standard.",
+                })}
+          </p>
         </div>
       </section>
 
@@ -307,156 +279,101 @@ function ProductsPage() {
         </div>
       ) : null}
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[14rem_1fr] lg:gap-14 lg:px-8 lg:py-16">
-        <aside className="lg:sticky lg:top-28 lg:self-start">
-          <div className="flex items-center justify-between lg:hidden">
-            <Button
-              variant="outline"
-              className="h-11 rounded-full"
-              aria-expanded={filtersOpen}
-              onClick={() => setFiltersOpen((open) => !open)}
-            >
-              <SlidersHorizontal className="mr-2 size-4" aria-hidden />
-              {pick({ th: "ตัวกรอง", en: "Filters" })}
-              {refinementCount ? ` (${refinementCount})` : ""}
-            </Button>
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
+        <div>
+          {showGrouped ? null : (
             <p className="text-sm text-muted-foreground" aria-live="polite">
               {pick({
-                th: `${results.length} รายการ`,
-                en: `${results.length} ${results.length === 1 ? "product" : "products"}`,
+                th: `แสดง ${results.length} รายการ`,
+                en: `Showing ${results.length} ${results.length === 1 ? "product" : "products"}`,
               })}
             </p>
-          </div>
-
-          <div
-            className={cn(
-              "mt-4 lg:mt-0 lg:block",
-              filtersOpen ? "block" : "hidden",
-            )}
-          >
-            <p className="brand-kicker hidden pb-2 text-muted-foreground lg:block">
-              {pick({ th: "ตัวกรอง", en: "Filter" })}
-            </p>
-            <div className="border-t border-border">
-              <FilterGroup
-                label={{ th: "พื้นที่ใช้งาน", en: "Space" }}
-                options={PRODUCT_ROOMS}
-                labels={PRODUCT_ROOM_LABELS}
-                value={search.room}
-                onChange={(room) => setSearch({ room })}
-              />
-              <FilterGroup
-                label={{ th: "การควบคุม", en: "Control" }}
-                options={PRODUCT_CONTROLS}
-                labels={PRODUCT_CONTROL_LABELS}
-                value={search.control}
-                onChange={(control) => setSearch({ control })}
-              />
-              <FilterGroup
-                label={{ th: "วัสดุ", en: "Material" }}
-                options={PRODUCT_MATERIALS}
-                labels={PRODUCT_MATERIAL_LABELS}
-                value={search.material}
-                onChange={(material) => setSearch({ material })}
-              />
-            </div>
-            {refinementCount ? (
-              <Button
-                variant="ghost"
-                className="mt-3 min-h-11 px-0 text-foreground hover:bg-transparent hover:underline"
-                onClick={clearRefinements}
-              >
-                <X className="mr-1 size-4" aria-hidden />
-                {pick({ th: "ล้างตัวกรอง", en: "Clear filters" })}
-              </Button>
-            ) : null}
-          </div>
-        </aside>
-
-        <div>
-          <p
-            className="hidden text-sm text-muted-foreground lg:block"
-            aria-live="polite"
-          >
-            {pick({
-              th: `แสดง ${results.length} รายการ`,
-              en: `Showing ${results.length} ${results.length === 1 ? "product" : "products"}`,
-            })}
-          </p>
+          )}
 
           {results.length === 0 ? (
             <div className="mt-6 flex flex-col items-center rounded-sm bg-surface px-6 py-20 text-center">
               <SearchX className="size-8 text-muted-foreground" aria-hidden />
               <h2 className="mt-4 text-lg font-semibold">
                 {pick({
-                  th: "ไม่พบสินค้าที่ตรงกับตัวกรอง",
-                  en: "No products match these filters",
+                  th: "ไม่พบสินค้าในหมวดนี้",
+                  en: "No products in this category",
                 })}
               </h2>
               <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
                 {pick({
-                  th: "ลองล้างตัวกรองบางส่วน หรือเล่าความต้องการให้ทีมงานฟัง เราช่วยแนะนำสินค้าที่เหมาะให้ได้",
-                  en: "Try removing a filter, or tell our team what you need and we'll suggest the right product.",
+                  th: "ลองดูสินค้าทั้งหมด หรือเล่าความต้องการให้ทีมงานฟัง เราช่วยแนะนำสินค้าที่เหมาะให้ได้",
+                  en: "Try viewing all products, or tell our team what you need and we'll suggest the right product.",
                 })}
               </p>
               <div className="mt-6 flex flex-wrap justify-center gap-3">
                 <Button
                   variant="outline"
                   className="h-11 rounded-full"
-                  onClick={clearRefinements}
+                  onClick={() =>
+                    setSearch({ category: undefined, sub: undefined })
+                  }
                 >
-                  {pick({ th: "ล้างตัวกรอง", en: "Clear filters" })}
+                  {pick({ th: "ดูสินค้าทั้งหมด", en: "View all products" })}
                 </Button>
                 <ContactLineButton size="default" />
               </div>
             </div>
           ) : showGrouped ? (
-            <div className="mt-6 space-y-24">
-              {PRODUCT_CATEGORIES.map((category) => {
+            <div className="divide-y divide-border">
+              {PRODUCT_GROUPS.map((group, groupIndex) => {
                 const products = results.filter(
-                  (product) => product.category === category.id,
+                  (product) =>
+                    product.category === group.category &&
+                    (!group.subcategories ||
+                      group.subcategories.includes(product.subcategory)),
                 );
                 if (!products.length) return null;
                 return (
                   <section
-                    key={category.id}
-                    aria-labelledby={`cat-${category.id}`}
+                    key={group.id}
+                    aria-labelledby={`group-${group.id}`}
+                    className="grid gap-8 py-12 first:pt-0 lg:grid-cols-[15rem_1fr] lg:gap-10"
                   >
-                    <div className="flex flex-col gap-4 border-t border-foreground pt-6 sm:flex-row sm:items-end sm:justify-between">
-                      <div className="flex items-baseline gap-5">
-                        <span className="brand-index text-muted-foreground">
-                          {category.index}
-                        </span>
-                        <div>
-                          <h2
-                            id={`cat-${category.id}`}
-                            className="text-2xl font-medium tracking-tight lg:text-3xl"
-                          >
-                            {pick(category.name)}
-                          </h2>
-                          <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-                            {pick(category.description)}
-                          </p>
-                        </div>
-                      </div>
+                    <div className="flex flex-col items-start">
+                      <h2
+                        id={`group-${group.id}`}
+                        className="text-3xl leading-tight font-medium tracking-tight text-balance"
+                      >
+                        {group.name.en}
+                      </h2>
+                      <p className="mt-1 text-base text-muted-foreground">
+                        {group.name.th}
+                      </p>
+                      <p className="mt-4 text-sm leading-7 text-muted-foreground text-pretty">
+                        {pick(GROUP_CONCEPTS[group.id] ?? group.description)}
+                      </p>
                       <button
                         type="button"
                         onClick={() => {
-                          setSearch({ category: category.id, sub: undefined });
+                          setSearch({
+                            category: group.category,
+                            sub: group.sub,
+                          });
                           window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
-                        className="group inline-flex min-h-11 shrink-0 items-center gap-2 text-sm font-medium text-foreground"
+                        className="group mt-6 inline-flex min-h-11 items-center gap-3 text-sm font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary lg:mt-auto lg:pt-8"
                       >
+                        <span className="flex size-11 items-center justify-center rounded-full border border-foreground/30 transition-colors group-hover:bg-foreground group-hover:text-background">
+                          <ArrowUpRight className="size-4" aria-hidden />
+                        </span>
                         {t("site.cta.viewAll")}
-                        <ArrowRight
-                          className="size-4 transition-transform group-hover:translate-x-1"
-                          aria-hidden
-                        />
                       </button>
                     </div>
-                    <div className="mt-10">
-                      <ProductGrid products={products} />
-                    </div>
+                    <ul className="grid grid-cols-2 gap-x-5 gap-y-10 lg:grid-cols-3">
+                      {products.slice(0, 3).map((product) => (
+                        <li key={product.slug}>
+                          <ProductCard
+                            product={product}
+                            eager={groupIndex < 2}
+                          />
+                        </li>
+                      ))}
+                    </ul>
                   </section>
                 );
               })}
@@ -501,8 +418,6 @@ function ProductsPage() {
           </Button>
         </div>
       </section>
-
-      <ContactCtaBand />
     </>
   );
 }

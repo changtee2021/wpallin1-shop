@@ -40,7 +40,7 @@ export function StorefrontFooter() {
             <p className="brand-kicker text-accent">Become a partner</p>
             <p className="brand-heading mt-3">
               {pick({
-                th: "มาเป็นพาร์ทเนอร์กับเรา",
+                th: "มาร่วมเป็นพาร์ทเนอร์กับเรา",
                 en: "Grow with us as a partner.",
               })}
             </p>
@@ -120,13 +120,13 @@ export function StorefrontFooter() {
               </Link>
             </li>
             <li>
-              <Link to="/projects" className={linkClass}>
-                {t("nav.projects")}
+              <Link to="/smart-motor" className={linkClass}>
+                {t("nav.smartMotor")}
               </Link>
             </li>
             <li>
-              <Link to="/smart-motor" className={linkClass}>
-                {t("nav.smartMotor")}
+              <Link to="/projects" className={linkClass}>
+                {t("nav.projects")}
               </Link>
             </li>
             <li>

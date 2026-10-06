@@ -1,14 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import {
-  Building2,
-  Check,
-  Factory,
-  FileText,
-  Handshake,
-  Loader2,
-  MessageSquare,
-  Receipt,
-} from "lucide-react";
+import { Check, Factory, Handshake, Loader2 } from "lucide-react";
 import { useMemo, useState, type ComponentProps, type FormEvent } from "react";
 import { toast } from "sonner";
 
@@ -25,7 +16,7 @@ import { bi, type Bi } from "@/lib/bi";
 import { COMMERCE_ENABLED } from "@/lib/features";
 import { siteConfig } from "@/lib/site-config";
 import {
-  CONTACT_TOPICS,
+  CONTACT_FORM_TOPICS,
   VISIT_PURPOSES,
   VISIT_SITES,
   VISIT_SITE_IDS,
@@ -42,12 +33,8 @@ import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { cn } from "@/lib/utils";
 
 const TOPIC_ICONS = {
-  project: Building2,
-  quote: Receipt,
   "factory-visit": Factory,
   dealer: Handshake,
-  profile: FileText,
-  other: MessageSquare,
 } as const;
 
 type FieldErrors = Partial<Record<string, string>>;
@@ -93,6 +80,9 @@ export function BusinessContactForm({
 
   const [reference, setReference] = useState<string | null>(null);
 
+  const activeTopicIndex = CONTACT_FORM_TOPICS.findIndex(
+    (topic) => topic === inquiryType,
+  );
   const isVisit = inquiryType === "factory-visit";
   const isQuote = inquiryType === "quote";
   const needsCompany =
@@ -359,48 +349,55 @@ export function BusinessContactForm({
           {locale === "en" ? "What can we help with?" : "เรื่องที่ติดต่อ"}
           <span className="ml-1 text-destructive">*</span>
         </legend>
-        <div className="mt-3 grid gap-2 sm:grid-cols-2">
-          {CONTACT_TOPICS.map((topic) => {
+        <div
+          role="radiogroup"
+          aria-label={
+            locale === "en" ? "What can we help with?" : "เรื่องที่ติดต่อ"
+          }
+          className="relative mt-3 grid grid-cols-2 rounded-full border border-border bg-muted/60 p-1"
+        >
+          <span
+            aria-hidden
+            className={cn(
+              "absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-primary shadow-sm transition-[transform,opacity] duration-300 ease-out motion-reduce:transition-none",
+              activeTopicIndex < 0 && "opacity-0",
+            )}
+            style={{
+              transform: `translateX(${Math.max(activeTopicIndex, 0) * 100}%)`,
+            }}
+          />
+          {CONTACT_FORM_TOPICS.map((topic) => {
             const Icon = TOPIC_ICONS[topic];
             const selected = inquiryType === topic;
             return (
               <button
                 key={topic}
                 type="button"
+                role="radio"
+                aria-checked={selected}
                 onClick={() => {
                   setInquiryType(topic);
                   setErrors({});
                   setFormError(null);
                 }}
                 className={cn(
-                  "flex min-h-11 items-start gap-3 rounded-xl border px-3 py-3 text-left transition-colors",
+                  "relative z-10 flex min-h-11 items-center justify-center gap-2 rounded-full px-3 py-2 text-center text-sm leading-tight font-semibold transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                   selected
-                    ? "border-primary bg-primary/8"
-                    : "border-border bg-white hover:border-primary/40",
+                    ? "text-primary-foreground"
+                    : "text-foreground hover:text-primary",
                 )}
               >
-                <span
-                  className={cn(
-                    "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg",
-                    selected
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground",
-                  )}
-                >
-                  <Icon className="size-4" aria-hidden />
-                </span>
-                <span>
-                  <span className="block text-sm font-semibold">
-                    {topicLabel(topic, locale)}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-muted-foreground">
-                    {topicHint(topic, locale)}
-                  </span>
-                </span>
+                <Icon className="hidden size-4 shrink-0 sm:block" aria-hidden />
+                <span>{topicLabel(topic, locale)}</span>
               </button>
             );
           })}
         </div>
+        {inquiryType ? (
+          <p className="mt-2 px-1 text-xs text-muted-foreground">
+            {topicHint(inquiryType, locale)}
+          </p>
+        ) : null}
         <FieldError className="mt-2">{errors.inquiryType}</FieldError>
       </fieldset>
 

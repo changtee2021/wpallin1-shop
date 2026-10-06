@@ -12,6 +12,7 @@ import {
   ABOUT_PROCESS,
   ABOUT_VALUES,
 } from "@/data/about-content";
+import { WpallValuesPinned } from "@/components/storefront/wpall-values";
 import { PRODUCT_CATEGORIES } from "@/data/products-catalog";
 import { useT } from "@/i18n";
 import { useBi } from "@/lib/bi";
@@ -122,6 +123,8 @@ export function AboutView() {
         </p>
       </section>
 
+      <WpallValuesPinned index="02" />
+
       <section className="relative isolate overflow-hidden bg-primary text-white">
         <img
           src={ABOUT_IMAGES.philosophy}
@@ -132,7 +135,7 @@ export function AboutView() {
         />
         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
           <SectionHeading
-            index="02"
+            index="03"
             tone="dark"
             kicker="Our Business Philosophy"
             title={pick({
@@ -166,7 +169,7 @@ export function AboutView() {
       <section className="brand-section">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading
-            index="03"
+            index="04"
             kicker="Craftsmanship"
             title={pick({
               th: "จากวัสดุถึงมือคุณ ใน 6 ขั้น",
@@ -234,7 +237,7 @@ export function AboutView() {
         <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:gap-20 lg:px-8">
           <div className="lg:sticky lg:top-28 lg:self-start">
             <SectionHeading
-              index="04"
+              index="05"
               kicker="What we make"
               title={pick({ th: "5 หมวดสินค้า", en: "Five product families" })}
               action={

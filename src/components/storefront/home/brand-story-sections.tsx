@@ -108,7 +108,7 @@ const STEP_PHOTOS = [
   "/brand/process-qc.webp",
 ] as const;
 
-/** Chapter 4 — the factory, after the projects. One screen: photo + six steps that expand on tap or hover. */
+/** Chapter 5 — the factory, after the projects. One screen: photo + six steps that expand on tap or hover. */
 export function BrandFactory() {
   const pick = useBi();
   const [active, setActive] = useState(0);

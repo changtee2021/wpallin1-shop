@@ -58,12 +58,15 @@ export function CompanyContactDetails({
           {salesLabel}
         </p>
         <ul className="mt-1 grid grid-cols-1 sm:grid-cols-2 sm:gap-x-4">
-          {siteConfig.salesPhones.map((phone) => (
+          {siteConfig.salesPhones.map((phone, index) => (
             <li key={phone.tel}>
               <a
                 href={`tel:${phone.tel}`}
-                className={cn(itemLink, "font-medium text-foreground")}
+                className={cn(itemLink, "gap-2 font-medium text-foreground")}
               >
+                <span className="text-xs font-normal whitespace-nowrap text-muted-foreground">
+                  Sale {index + 1}
+                </span>
                 {phone.display}
               </a>
             </li>

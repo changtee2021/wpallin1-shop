@@ -11,6 +11,17 @@ export const CONTACT_TOPICS = [
 
 export type ContactTopic = (typeof CONTACT_TOPICS)[number];
 
+/** Topics shown in the contact form picker (the rest stay valid for old links / stored records). */
+export const CONTACT_FORM_TOPICS = ["dealer", "factory-visit"] as const;
+
+export function isContactFormTopic(
+  value: string | undefined,
+): value is (typeof CONTACT_FORM_TOPICS)[number] {
+  return CONTACT_FORM_TOPICS.includes(
+    value as (typeof CONTACT_FORM_TOPICS)[number],
+  );
+}
+
 export const VISIT_SESSIONS = ["morning", "evening"] as const;
 export type VisitSession = (typeof VISIT_SESSIONS)[number];
 

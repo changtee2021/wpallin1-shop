@@ -26,8 +26,9 @@ export const Route = createFileRoute("/_store/")({
 });
 
 /**
- * Story order: promise → range → projects → craftsmanship → how to choose (footer closes with the contact CTA).
- * Chapter numbers 01–05 are printed in each section heading; backgrounds alternate white / cream / white / deep / surface.
+ * Story order: promise → range → projects → craftsmanship → partner steps (footer closes with the contact CTA).
+ * W-P-A-L-L values live on the About page only.
+ * Chapter numbers 01–06 are printed in each section heading; backgrounds alternate white / cream / white / deep / surface.
  */
 function HomePage() {
   return (
@@ -39,8 +40,8 @@ function HomePage() {
       <BrandHero />
       <BrandStatement />
       <BrandProductRail />
-      <BrandProjectsBento />
       <BrandSmartMotor />
+      <BrandProjectsBento />
       <BrandFactory />
       <BrandChooseGuide />
     </>

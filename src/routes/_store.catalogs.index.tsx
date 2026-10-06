@@ -10,10 +10,12 @@ import {
 } from "@/components/brand/page-states";
 import { CatalogCategoryHero } from "@/components/storefront/catalog-category-hero";
 import { MarketingCatalogGrid } from "@/components/storefront/marketing-catalog-grid";
+import { PrintCatalogueShelf } from "@/components/storefront/print-catalogue-shelf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fetchPublicMarketingCatalogs } from "@/lib/api.functions";
 import { useT } from "@/i18n";
+import { useBi } from "@/lib/bi";
 import { pageHead } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
@@ -47,6 +49,7 @@ export const Route = createFileRoute("/_store/catalogs/")({
 
 function CatalogsPage() {
   const { t } = useT();
+  const pick = useBi();
   const { catalogs, categories } = Route.useLoaderData();
   const [activeCategory, setActiveCategory] = useState<string | "all">("all");
   const [search, setSearch] = useState("");
@@ -89,14 +92,45 @@ function CatalogsPage() {
   return (
     <>
       <section className="border-b border-border bg-surface">
-        <div className="mx-auto max-w-7xl px-4 pt-14 pb-10 sm:px-6 lg:px-8 lg:pt-20">
+        <div className="mx-auto max-w-7xl px-4 pt-14 pb-12 sm:px-6 lg:px-8 lg:pt-20">
           <SectionHeading
             as="h1"
             kicker="Catalogue"
+            title={pick({ th: "แคตตาล็อก", en: "Catalogues" })}
+            description={pick({
+              th: "ขอรับแคตตาล็อกเล่มจริงจากทีมขาย หรืออ่านแบบออนไลน์ได้ทันที",
+              en: "Request a printed copy from our sales team, or read online right away.",
+            })}
+          />
+        </div>
+      </section>
+
+      <section className="brand-section bg-cream">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            index="01"
+            kicker="Printed"
+            title={pick({ th: "แคตตาล็อกเล่มจริง", en: "Printed catalogues" })}
+            description={pick({
+              th: "แคตตาล็อกแบบเล่มแยกตามหมวดสินค้า กด “ขอตัวอย่าง” เพื่อกรอกฟอร์มร่วมเป็นพาร์ทเนอร์ ทีมขายจะติดต่อกลับ",
+              en: "Printed books by product category. Tap “Request a copy” to fill in the partner form and our sales team will get back to you.",
+            })}
+          />
+          <div className="mt-14">
+            <PrintCatalogueShelf />
+          </div>
+        </div>
+      </section>
+
+      <section className="brand-section bg-background">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            index="02"
+            kicker="Online"
             title={t("catalogs.title")}
             description={t("catalogs.subtitle")}
           />
-          <div className="relative mt-8 max-w-xl">
+          <div className="relative mt-8 mb-10 max-w-xl">
             <Search
               className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
               aria-hidden
@@ -109,9 +143,6 @@ function CatalogsPage() {
               className="h-12 rounded-full bg-background pl-11"
             />
           </div>
-        </div>
-      </section>
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         {activeCategory === "all" && categories.length > 0 ? (
           <CatalogCategoryHero
             categories={categories}
@@ -168,7 +199,8 @@ function CatalogsPage() {
             catalogs={featured.length ? regular : filtered}
           />
         )}
-      </div>
+        </div>
+      </section>
     </>
   );
 }

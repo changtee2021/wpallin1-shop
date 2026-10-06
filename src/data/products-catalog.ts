@@ -174,7 +174,7 @@ export const PRODUCT_CATEGORIES: ProductCategory[] = [
   {
     id: "motorization",
     index: "05",
-    name: t("ระบบมอเตอร์", "Motorization"),
+    name: t("รางม่านมอเตอร์", "Motorized Curtain Tracks"),
     description: t(
       "มอเตอร์ม่านไร้แปรงถ่าน เสียงเงียบ ควบคุมด้วยรีโมท สวิตช์ หรือมือถือ",
       "Quiet brushless curtain motors, run by remote, wall switch or phone.",

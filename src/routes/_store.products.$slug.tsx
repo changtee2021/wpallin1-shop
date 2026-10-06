@@ -13,10 +13,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import {
-  ContactCtaBand,
-  ContactLineButton,
-} from "@/components/brand/contact-cta";
+import { ContactLineButton } from "@/components/brand/contact-cta";
 import { BrandPageError } from "@/components/brand/page-states";
 import { ProductCard } from "@/components/brand/product-card";
 import { ProjectCard } from "@/components/brand/project-card";
@@ -822,8 +819,6 @@ function ProductDetailPage() {
           </div>
         </section>
       ) : null}
-
-      <ContactCtaBand />
     </article>
   );
 }

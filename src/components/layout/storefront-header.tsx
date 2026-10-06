@@ -29,8 +29,8 @@ type NavItem = {
 
 export const SITE_NAV: NavItem[] = [
   { to: "/products", key: "nav.products" },
-  { to: "/projects", key: "nav.projects" },
   { to: "/smart-motor", key: "nav.smartMotor" },
+  { to: "/projects", key: "nav.projects" },
   { to: "/catalogs", key: "nav.catalogs" },
   { to: "/about", key: "nav.about" },
 ];

@@ -143,3 +143,99 @@ export const ABOUT_PROCESS: { title: Bi; body: Bi }[] = [
     ),
   },
 ];
+
+/**
+ * W-P-A-L-L: the five core values behind the WP ALL name (WP Trading Intergroup, 2026 HR review).
+ * "promise" restates each value as a commitment to a customer; "evidence" points to what already
+ * happens on the production line (steps are 1-based indexes into ABOUT_PROCESS). No figures or
+ * certifications are claimed on purpose.
+ */
+export type WpallValue = {
+  letter: "W" | "P" | "A" | "L";
+  name: string;
+  tagline: Bi;
+  promise: Bi;
+  evidence: Bi;
+  steps: number[];
+};
+
+export const WPALL_VALUES: WpallValue[] = [
+  {
+    letter: "W",
+    name: "Working Together",
+    tagline: t("รวมมือ รวมใจ ก้าวไปด้วยกัน", "Together We Achieve More"),
+    promise: t(
+      "ทีมขาย ทีมผลิต และช่างทำงานจากโจทย์เดียวกัน เพื่อให้งานของคุณไม่ตกหล่นระหว่างทาง",
+      "Sales, production and installers work from one brief, so nothing is lost along the way.",
+    ),
+    evidence: t(
+      "ทุกออเดอร์เริ่มจากใบสั่งผลิตเดียว ตั้งแต่เตรียมวัสดุจนส่งมอบ",
+      "Every order starts from a single work order, from material prep to delivery.",
+    ),
+    steps: [1],
+  },
+  {
+    letter: "P",
+    name: "Professionalism",
+    tagline: t("มืออาชีพในทุกการกระทำ", "Excellence in Every Action"),
+    promise: t(
+      "ทำงานอย่างมีวินัยและโปร่งใส และตรวจคุณภาพทุกชิ้นก่อนส่ง",
+      "Disciplined, transparent work, with every piece checked before it ships.",
+    ),
+    evidence: t(
+      "ตรวจการทำงานและความเรียบร้อยก่อนแพ็กส่งทุกชิ้น",
+      "A function-and-finish check on every piece before it is packed.",
+    ),
+    steps: [6],
+  },
+  {
+    letter: "A",
+    name: "Accountability",
+    tagline: t("รับผิดชอบ ทำให้สำเร็จ", "Own It, Deliver It"),
+    promise: t(
+      "ส่งมอบตามขนาดที่สั่งและตรงตามเวลา หากผิดพลาดเรายอมรับและแก้ไข",
+      "We deliver to the size you ordered, on time. If something is wrong, we own it and fix it.",
+    ),
+    evidence: t(
+      "ตัดและเจาะตามขนาดที่สั่ง และเก็บวัสดุแยกตามรหัสสี เพื่อหยิบใช้ได้ถูกต้อง",
+      "Cut and drilled to the ordered size, with materials stored by colour code so the right one is picked.",
+    ),
+    steps: [2, 3, 5],
+  },
+  {
+    letter: "L",
+    name: "Longevity",
+    tagline: t(
+      "ความสำเร็จที่ยั่งยืนสู่อนาคต",
+      "Sustaining Success for the Future",
+    ),
+    promise: t(
+      "วางแผนระยะยาว ให้ร้านพาร์ทเนอร์และงานโครงการเติบโตไปพร้อมกับเรา",
+      "We plan for the long term, so partners and projects grow with us.",
+    ),
+    evidence: t(
+      "ทุกออเดอร์ผ่านขั้นตอนเดียวกันด้วยมาตรฐานเดียวกัน ทำซ้ำได้ทุกครั้ง",
+      "Every order follows the same steps to the same standard, every time.",
+    ),
+    steps: [4],
+  },
+  {
+    letter: "L",
+    name: "Loyalty",
+    tagline: t("ภักดีด้วยใจ มั่นคงด้วยศรัทธา", "Committed with Heart"),
+    promise: t(
+      "ซื่อสัตย์ โปร่งใส และรักษาคำมั่นกับพาร์ทเนอร์ ด้วยทีมขายที่ดูแลประจำ",
+      "Honest, transparent and true to our word, backed by a dedicated sales contact.",
+    ),
+    evidence: t(
+      "พาร์ทเนอร์ทุกร้านมีเจ้าหน้าที่ขายดูแลบัญชีโดยเฉพาะตลอดการทำงาน",
+      "Every partner has a dedicated sales representative throughout.",
+    ),
+    steps: [],
+  },
+];
+
+export const WPALL_TAGLINE: Bi = t(
+  "บ้านของคุณ เรื่องของเรา...ตลอดชีวิต",
+  "Your home, our lifelong care",
+);

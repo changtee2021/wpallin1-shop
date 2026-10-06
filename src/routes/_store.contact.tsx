@@ -9,7 +9,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { useT } from "@/i18n";
 import { useBi } from "@/lib/bi";
-import { isContactTopic } from "@/lib/contact-inquiry";
+import { isContactFormTopic } from "@/lib/contact-inquiry";
 import {
   defaultFeedbackSubject,
   feedbackCategoryFromKind,
@@ -58,10 +58,10 @@ function ContactPage() {
       ? search.code
       : "generic";
 
-  const initialTopic = isContactTopic(search.topic) ? search.topic : undefined;
+  const initialTopic = isContactFormTopic(search.topic)
+    ? search.topic
+    : undefined;
   const isVisit = initialTopic === "factory-visit";
-  const isQuote = initialTopic === "quote";
-
   if (isFeedback) {
     return (
       <div className="mx-auto max-w-xl px-4 py-12 sm:px-6">
@@ -91,9 +91,7 @@ function ContactPage() {
 
   const title = isVisit
     ? pick({ th: "นัดเยี่ยมชมโรงงาน", en: "Book a factory visit" })
-    : isQuote
-      ? pick({ th: "ขอใบเสนอราคา", en: "Request a quote" })
-      : pick({ th: "ติดต่อเรา", en: "Contact us" });
+    : pick({ th: "ติดต่อเรา", en: "Contact us" });
 
   const description = isVisit
     ? pick({
@@ -165,12 +163,15 @@ function ContactPage() {
               {siteConfig.salesLabelEn}
             </p>
             <ul className="mt-3 grid grid-cols-2 gap-x-4">
-              {siteConfig.salesPhones.map((phone) => (
+              {siteConfig.salesPhones.map((phone, index) => (
                 <li key={phone.tel}>
                   <a
                     href={`tel:${phone.tel}`}
-                    className="inline-flex min-h-11 items-center text-sm font-medium hover:text-primary"
+                    className="inline-flex min-h-11 items-center gap-2 text-sm font-medium hover:text-primary"
                   >
+                    <span className="text-xs font-normal whitespace-nowrap text-muted-foreground">
+                      Sale {index + 1}
+                    </span>
                     {phone.display}
                   </a>
                 </li>
