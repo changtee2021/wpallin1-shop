@@ -15,11 +15,7 @@ import { SectionHeading } from "@/components/brand/section-heading";
 import { Button } from "@/components/ui/button";
 import { CATALOG_PRODUCTS, type CatalogProduct } from "@/data/products-catalog";
 import { PROJECT_KIND_LABELS, PROJECTS, type Project } from "@/data/projects";
-import {
-  SMART_MOTOR_CONTROLS,
-  SMART_MOTOR_TYPES,
-  smartMotorImage,
-} from "@/data/smart-motor";
+import { SMART_MOTOR_TYPES, smartMotorImage } from "@/data/smart-motor";
 import { useT } from "@/i18n";
 import { useBi, type Bi } from "@/lib/bi";
 import { cn } from "@/lib/utils";
@@ -107,20 +103,20 @@ export function BrandHero() {
               </span>
             ))}
         </h1>
-        <p
-          className="hero-blur-in mt-5 max-w-xl text-base leading-7 text-white/80 text-pretty whitespace-pre-line sm:text-lg sm:leading-8"
-          style={{ ["--delay" as string]: "500ms" }}
-        >
-          {pick({
-            th: "Solutions ม่าน มู่ลี่ และระบบมอเตอร์\nที่ผสานดีไซน์ ฟังก์ชัน และเทคโนโลยี ให้ลงตัวกับทุกพื้นที่",
-            en: "Curtain, blind and motorized solutions\nthat bring design, function and technology together for every space.",
-          })}
-        </p>
-        <div
-          className="hero-blur-in mt-8 flex items-center justify-end gap-6"
-          style={{ ["--delay" as string]: "650ms" }}
-        >
-          <div className="flex gap-2">
+        <div className="mt-5 flex items-end justify-between gap-6">
+          <p
+            className="hero-blur-in max-w-xl text-base leading-7 text-white/80 text-pretty whitespace-pre-line sm:text-lg sm:leading-8"
+            style={{ ["--delay" as string]: "500ms" }}
+          >
+            {pick({
+              th: "Solutions ม่าน มู่ลี่ และระบบมอเตอร์\nที่ผสานดีไซน์ ฟังก์ชัน และเทคโนโลยี ให้ลงตัวกับทุกพื้นที่",
+              en: "Curtain, blind and motorized solutions\nthat bring design, function and technology together for every space.",
+            })}
+          </p>
+          <div
+            className="hero-blur-in flex shrink-0 translate-y-[22px] gap-2"
+            style={{ ["--delay" as string]: "650ms" }}
+          >
             {HERO_SLIDES.map((slide, index) => (
               <button
                 key={slide.src}
@@ -209,13 +205,10 @@ export function BrandProductRail() {
             hideKicker
             index="02"
             kicker="Our products"
-            title={pick({
-              th: "ครบทุกอย่างสำหรับหน้าต่าง ในที่เดียว",
-              en: "Everything for the window, in one place",
-            })}
+            title="Everything for the window, in one place"
             description={pick({
-              th: "ทุกรายการสั่งผลิตตามขนาด ขอใบเสนอราคาได้ฟรี",
-              en: "Every item is made to measure. Quotes are free.",
+              th: "ครบทุกอย่างสำหรับหน้าต่าง ในที่เดียว",
+              en: "",
             })}
             action={
               <Link
@@ -279,13 +272,10 @@ export function BrandSmartMotor() {
           tone="dark"
           index="03"
           kicker="Smart Motor"
-          title={pick({
-            th: "ม่านและมู่ลี่ทุกแบบ ติดมอเตอร์ได้",
-            en: "Motors for every curtain and blind",
-          })}
+          title="Motors for every curtain and blind"
           description={pick({
-            th: "เปิด-ปิดจากรีโมท สวิตช์ติดผนัง หรือมือถือ เลือกติดได้ทั้งม่านและมู่ลี่",
-            en: "Run from a remote, a wall switch or your phone, for curtains and blinds alike.",
+            th: "ม่านและมู่ลี่ทุกแบบ ติดมอเตอร์ได้",
+            en: "",
           })}
           action={
             <Link
@@ -340,21 +330,6 @@ export function BrandSmartMotor() {
             );
           })}
         </ul>
-
-        <ul className="mt-12 grid gap-x-8 gap-y-8 border-t border-white/15 pt-8 sm:grid-cols-3">
-          {SMART_MOTOR_CONTROLS.map((control, index) => (
-            <li
-              key={control.id}
-              className="scroll-rise"
-              style={{ ["--i" as string]: index }}
-            >
-              <p className="brand-kicker text-accent">{control.title}</p>
-              <p className="mt-2 text-base text-white/80">
-                {pick(control.body)}
-              </p>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );
@@ -385,9 +360,10 @@ export function BrandProjectsBento() {
           hideKicker
           index="04"
           kicker="Projects"
-          title={pick({
+          title="Real work from our projects and dealers"
+          description={pick({
             th: "งานจริงจากโครงการและตัวแทนของเรา",
-            en: "Real work from our projects and dealers",
+            en: "",
           })}
           action={
             <Link
@@ -568,13 +544,10 @@ export function BrandChooseGuide() {
           hideKicker
           index="06"
           kicker="Partner onboarding"
-          title={pick({
-            th: "เริ่มต้นเป็นพาร์ทเนอร์กับ WP ALL",
-            en: "Become a WP ALL partner",
-          })}
+          title="Become a WP ALL partner"
           description={pick({
             th: "ขั้นตอนที่ชัดเจน ตั้งแต่การติดต่อครั้งแรก จนถึงการสั่งซื้อและการดูแลต่อเนื่อง",
-            en: "A clear path from first contact to ordering, with a dedicated sales contact throughout.",
+            en: "",
           })}
         />
 

@@ -23,7 +23,7 @@ import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
 type NavItem = {
-  to: "/products" | "/projects" | "/smart-motor" | "/about" | "/catalogs";
+  to: "/" | "/products" | "/projects" | "/smart-motor" | "/about" | "/catalogs";
   key: TranslationKey;
 };
 

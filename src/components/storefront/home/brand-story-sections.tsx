@@ -71,19 +71,13 @@ export function BrandStatement() {
           {USP_ITEMS.map((item, index) => (
             <li
               key={item.title.en}
-              className="scroll-line-top group flex items-start gap-4 py-7 sm:px-2 lg:px-6 lg:first:pl-0 lg:last:pr-0"
+              className="scroll-rise flex items-start gap-4 py-7 sm:px-2 lg:px-6 lg:first:pl-0 lg:last:pr-0"
               style={{ ["--i" as string]: index }}
             >
-              <span
-                className="scroll-scale-in block origin-left text-4xl leading-none font-medium tracking-tight text-accent transition-transform duration-300 group-hover:translate-x-1 lg:text-5xl"
-                style={{ ["--i" as string]: index }}
-              >
+              <span className="text-4xl leading-none font-medium tracking-tight text-accent lg:text-5xl">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <div
-                className="scroll-rise"
-                style={{ ["--i" as string]: index + 1 }}
-              >
+              <div>
                 <h2 className="text-base font-medium tracking-tight text-foreground lg:text-lg">
                   {item.title.en}
                 </h2>
@@ -153,9 +147,10 @@ export function BrandFactory() {
           tone="dark"
           index="05"
           kicker="Craftsmanship"
-          title={pick({
+          title="Six steps of care in every piece"
+          description={pick({
             th: "ความใส่ใจ 6 ขั้นตอน ในทุกชิ้นงาน",
-            en: "Six steps of care in every piece",
+            en: "",
           })}
         />
 

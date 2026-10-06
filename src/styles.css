@@ -437,9 +437,7 @@
 
 @keyframes scroll-word {
   from {
-    opacity: 0.12;
-    transform: translateY(0.45em);
-    filter: blur(3px);
+    opacity: 0.18;
   }
 }
 
