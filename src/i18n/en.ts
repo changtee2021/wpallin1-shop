@@ -6,6 +6,7 @@ export const en: Translations = {
   ...th,
   "app.tagline": "WP all in one – Home Decoration",
   "nav.home": "Home",
+  "nav.homeMenu": "Home",
   "nav.order": "Order now",
   "nav.shop": "Shop",
   "nav.catalogs": "Catalogs",

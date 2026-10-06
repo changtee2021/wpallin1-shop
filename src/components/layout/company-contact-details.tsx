@@ -113,29 +113,6 @@ export function CompanyContactDetails({
               </div>
 
               <p>
-                <span className="text-muted-foreground">WhatsApp</span>
-                <br />
-                {siteConfig.whatsapp.map((item, index) => (
-                  <span key={item.href}>
-                    {index > 0 ? (
-                      <span className="text-muted-foreground"> · </span>
-                    ) : null}
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={cn(
-                        itemLink,
-                        "font-semibold text-[#25D366] hover:underline",
-                      )}
-                    >
-                      {item.display}
-                    </a>
-                  </span>
-                ))}
-              </p>
-
-              <p>
                 <span className="text-muted-foreground">Facebook</span>
                 <br />
                 <a

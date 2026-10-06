@@ -28,6 +28,7 @@ type NavItem = {
 };
 
 export const SITE_NAV: NavItem[] = [
+  { to: "/", key: "nav.homeMenu" },
   { to: "/products", key: "nav.products" },
   { to: "/smart-motor", key: "nav.smartMotor" },
   { to: "/projects", key: "nav.projects" },
@@ -192,6 +193,7 @@ function MobileMenu() {
                   onClick={() => setOpen(false)}
                   className="flex min-h-14 items-baseline gap-4 py-3 text-2xl font-semibold text-white/90 hover:text-white"
                   activeProps={{ className: "text-white" }}
+                  activeOptions={{ exact: item.to === "/" }}
                 >
                   <span className="brand-index text-white/40">
                     {String(index + 1).padStart(2, "0")}
@@ -206,7 +208,9 @@ function MobileMenu() {
                 onClick={() => setOpen(false)}
                 className="flex min-h-14 items-baseline gap-4 py-3 text-2xl font-semibold text-white/90 hover:text-white"
               >
-                <span className="brand-index text-white/40">05</span>
+                <span className="brand-index text-white/40">
+                  {String(SITE_NAV.length + 1).padStart(2, "0")}
+                </span>
                 {t("nav.partners")}
               </Link>
             </li>
@@ -295,6 +299,7 @@ export function StorefrontHeader() {
                   to={item.to}
                   className="group relative inline-flex min-h-11 items-center px-3.5 text-[15px] text-white/80 transition-colors hover:text-white"
                   activeProps={{ className: "text-white" }}
+                  activeOptions={{ exact: item.to === "/" }}
                 >
                   {({ isActive }) => (
                     <>

@@ -206,6 +206,7 @@ export function BrandProductRail() {
       <div>
         <div className={container}>
           <SectionHeading
+            hideKicker
             index="02"
             kicker="Our products"
             title={pick({
@@ -274,6 +275,7 @@ export function BrandSmartMotor() {
     <section className="brand-section relative isolate bg-primary-deep text-white">
       <div className={container}>
         <SectionHeading
+          hideKicker
           tone="dark"
           index="03"
           kicker="Smart Motor"
@@ -380,6 +382,7 @@ export function BrandProjectsBento() {
     <section className="brand-section relative isolate bg-background">
       <div className={container}>
         <SectionHeading
+          hideKicker
           index="04"
           kicker="Projects"
           title={pick({
@@ -562,6 +565,7 @@ export function BrandChooseGuide() {
     <section className="brand-section relative isolate border-t border-border bg-surface">
       <div className={container}>
         <SectionHeading
+          hideKicker
           index="06"
           kicker="Partner onboarding"
           title={pick({

@@ -13,6 +13,19 @@ import { useBi } from "@/lib/bi";
 import { cn } from "@/lib/utils";
 
 const container = "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8";
+
+/**
+ * Stage backdrop per value, same order as WPALL_VALUES. Each photo is the production step
+ * that backs the value up: W preparation, P quality check, A drilling (precision),
+ * L assembly (longevity), L a finished room (loyalty to the home we dressed).
+ */
+const WPALL_BACKDROPS = [
+  "/brand/process-prep.webp",
+  "/brand/process-qc.webp",
+  "/brand/process-drill.webp",
+  "/brand/process-assemble.webp",
+  "/about/philosophy-drapes.webp",
+] as const;
 const pad = (value: number) => String(value).padStart(2, "0");
 
 /** Chips naming the production steps (or partner service) that back a value up. */
@@ -98,14 +111,34 @@ export function WpallValuesPinned({
             aria-hidden
             className="relative hidden min-h-[30rem] overflow-hidden rounded-md bg-primary-deep text-white lg:sticky lg:top-28 lg:block"
           >
+            {WPALL_BACKDROPS.map((src, i) => (
+              <img
+                key={src}
+                src={src}
+                alt=""
+                aria-hidden
+                loading="lazy"
+                decoding="async"
+                className={cn(
+                  "absolute inset-0 size-full object-cover transition-[opacity,transform] duration-[1400ms] ease-out motion-reduce:transition-none",
+                  i === active
+                    ? "scale-100 opacity-100"
+                    : "scale-110 opacity-0",
+                )}
+              />
+            ))}
+            <div
+              className="absolute inset-0 bg-gradient-to-t from-primary-deep via-primary-deep/75 to-primary-deep/55"
+              aria-hidden
+            />
             <div className="absolute inset-x-8 top-7 flex items-center justify-between">
-              <div className="flex gap-3 text-2xl font-medium">
+              <div className="font-display flex gap-3 text-3xl font-medium tracking-[0.18em]">
                 {WPALL_VALUES.map((value, i) => (
                   <span
                     key={value.name}
                     className={cn(
                       "transition-colors duration-500",
-                      i === active ? "text-accent" : "text-white/25",
+                      i === active ? "text-accent" : "text-white/40",
                     )}
                   >
                     {value.letter}
@@ -129,7 +162,7 @@ export function WpallValuesPinned({
                       : "pointer-events-none translate-y-8 opacity-0 blur-sm",
                   )}
                 >
-                  <span className="text-[11rem] leading-[0.85] font-medium text-accent xl:text-[13rem]">
+                  <span className="font-display text-[11rem] leading-[0.85] font-medium text-accent drop-shadow-[0_8px_28px_rgba(0,0,0,0.35)] xl:text-[13rem]">
                     {value.letter}
                   </span>
                   <p className="text-3xl font-medium tracking-tight">
@@ -178,7 +211,7 @@ export function WpallValuesPinned({
                     )}
                   >
                     <div className="flex items-baseline gap-4 lg:hidden">
-                      <span className="text-5xl leading-none font-medium text-accent">
+                      <span className="font-display text-5xl leading-none font-medium text-accent">
                         {value.letter}
                       </span>
                       <div>

@@ -4,6 +4,7 @@ export type TranslationKey =
   | "app.name"
   | "app.tagline"
   | "nav.home"
+  | "nav.homeMenu"
   | "nav.order"
   | "nav.shop"
   | "nav.catalogs"

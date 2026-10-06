@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 type SectionHeadingProps = {
   index?: string;
   kicker: string;
+  /** Drop the "01 — KICKER" line and show only the title. */
+  hideKicker?: boolean;
   title: ReactNode;
   description?: ReactNode;
   action?: ReactNode;
@@ -21,6 +23,7 @@ type SectionHeadingProps = {
 export function SectionHeading({
   index,
   kicker,
+  hideKicker = false,
   title,
   description,
   action,
@@ -64,7 +67,7 @@ export function SectionHeading({
         masthead
           ? "text-[clamp(2.75rem,8.5vw,6.5rem)] leading-[1.12] font-medium tracking-tight text-balance"
           : "brand-heading",
-        "mt-4",
+        hideKicker ? "mt-0" : "mt-4",
         dark ? "text-white" : "text-foreground",
       )}
     >
@@ -81,7 +84,7 @@ export function SectionHeading({
         )}
       >
         <div className="min-w-0 max-w-5xl">
-          {kickerEl}
+          {hideKicker ? null : kickerEl}
           {titleEl}
         </div>
         {description || action ? (
@@ -111,7 +114,7 @@ export function SectionHeading({
       )}
     >
       <div className="max-w-3xl">
-        {kickerEl}
+        {hideKicker ? null : kickerEl}
         {titleEl}
         {description ? (
           <p

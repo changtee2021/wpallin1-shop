@@ -1,30 +1,20 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Factory, MessageCircle } from "lucide-react";
-import type { ReactNode } from "react";
+import { Factory } from "lucide-react";
 
 import { SectionHeading } from "@/components/brand/section-heading";
-import { CompanyContactDetails } from "@/components/layout/company-contact-details";
-import { LazyMapsEmbed } from "@/components/layout/lazy-maps-embed";
 import {
-  ABOUT_CPC,
   ABOUT_IMAGES,
   ABOUT_INTRO,
   ABOUT_PROCESS,
   ABOUT_VALUES,
 } from "@/data/about-content";
 import { WpallValuesPinned } from "@/components/storefront/wpall-values";
-import { PRODUCT_CATEGORIES } from "@/data/products-catalog";
-import { useT } from "@/i18n";
 import { useBi } from "@/lib/bi";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
 export function AboutView() {
-  const { locale, t } = useT();
   const pick = useBi();
-  const legalName =
-    locale === "en" ? siteConfig.legalNameEn : siteConfig.legalName;
-
   return (
     <div>
       <div
@@ -125,51 +115,10 @@ export function AboutView() {
 
       <WpallValuesPinned index="02" />
 
-      <section className="relative isolate overflow-hidden bg-primary text-white">
-        <img
-          src={ABOUT_IMAGES.philosophy}
-          alt=""
-          aria-hidden
-          loading="lazy"
-          className="scroll-drift-down absolute inset-x-0 -top-[14%] -z-10 h-[128%] w-full object-cover opacity-20"
-        />
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <SectionHeading
-            index="03"
-            tone="dark"
-            kicker="Our Business Philosophy"
-            title={pick({
-              th: "ปรัชญาธุรกิจ C-P-C",
-              en: "The C-P-C philosophy",
-            })}
-          />
-          <ol className="mt-14 grid gap-px overflow-hidden rounded-sm bg-white/15 md:grid-cols-3">
-            {ABOUT_CPC.map((item, index) => (
-              <li
-                key={item.title}
-                className="scroll-rise bg-primary/90 p-6 backdrop-blur-sm lg:p-10"
-                style={{ ["--i" as string]: index }}
-              >
-                <span
-                  className="scroll-scale-in block origin-left text-6xl font-medium text-accent lg:text-7xl"
-                  style={{ ["--i" as string]: index }}
-                >
-                  {item.letter}
-                </span>
-                <h3 className="mt-4 text-xl font-semibold">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-white/75">
-                  {pick(item.body)}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
       <section className="brand-section">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading
-            index="04"
+            index="03"
             kicker="Craftsmanship"
             title={pick({
               th: "จากวัสดุถึงมือคุณ ใน 6 ขั้น",
@@ -233,51 +182,82 @@ export function AboutView() {
         </div>
       </section>
 
-      <section className="brand-section border-t border-border bg-surface">
-        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:gap-20 lg:px-8">
-          <div className="lg:sticky lg:top-28 lg:self-start">
+      <section className="brand-section">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-16 lg:px-8">
+          <div className="scroll-wipe-up-soft overflow-hidden rounded-sm bg-surface">
+            <div className="scroll-zoom">
+              <img
+                src="/about/ready-stock-containers.webp"
+                alt={pick({
+                  th: "ตู้คอนเทนเนอร์หลากสีซ้อนกันเป็นชั้น สื่อถึงสินค้าที่เตรียมพร้อมส่ง",
+                  en: "Colourful shipping containers stacked in tiers, suggesting stock ready to ship",
+                })}
+                width={1024}
+                height={682}
+                loading="lazy"
+                decoding="async"
+                className="aspect-[3/2] w-full object-cover"
+              />
+            </div>
+          </div>
+          <div>
+            <SectionHeading
+              index="04"
+              kicker="Ready to supply"
+              title={pick({
+                th: "สินค้าพร้อมขาย พร้อมส่งถึงมือร้านค้า",
+                en: "Stock ready to sell, ready to ship",
+              })}
+            />
+            <p className="scroll-rise mt-6 text-base leading-7 text-muted-foreground text-pretty lg:text-lg lg:leading-8">
+              {pick({
+                th: "ตั้งแต่มู่ลี่ ม่านม้วน ฉากกั้นห้อง ราง ไปจนถึงมอเตอร์และอุปกรณ์ WP ALL เตรียมสินค้าให้ครบในที่เดียว เพื่อให้ร้านม่านและตัวแทนสั่งต่อเนื่องได้ ไม่ต้องไล่หาจากหลายแหล่ง",
+                en: "From blinds, rollers and partitions to tracks, motors and hardware, WP ALL keeps the range together in one place, so curtain shops and dealers can reorder steadily without chasing several suppliers.",
+              })}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="relative isolate overflow-hidden bg-primary-deep text-white">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-20 lg:px-8 lg:py-28">
+          <div>
             <SectionHeading
               index="05"
-              kicker="What we make"
-              title={pick({ th: "5 หมวดสินค้า", en: "Five product families" })}
-              action={
-                <Link
-                  to="/products"
-                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-primary"
-                >
-                  {t("site.cta.viewAll")}
-                  <ArrowRight className="size-4" aria-hidden />
-                </Link>
-              }
+              tone="dark"
+              kicker="Trade promotion"
+              title={pick({
+                th: "จากโรงงานไทย สู่เวทีการค้าระดับประเทศ",
+                en: "From a Thai workshop to the trade-show floor",
+              })}
             />
+            <p className="scroll-rise mt-6 max-w-xl text-base leading-7 text-white/80 text-pretty lg:text-lg lg:leading-8">
+              {pick({
+                th: "WP ALL เคยร่วมออกงานการค้ากับกรมส่งเสริมการค้าระหว่างประเทศ (DITP) นำสินค้าม่านและงานฝีมือที่ผลิตในไทยไปแสดงให้ผู้ซื้อได้เห็นคุณภาพจริงในเวทีที่กว้างกว่าหน้าร้าน",
+                en: "WP ALL has exhibited alongside the Department of International Trade Promotion (DITP), taking curtain products made in Thailand to the trade-show floor, where buyers can judge the quality first-hand.",
+              })}
+            </p>
           </div>
-          <ol className="divide-y divide-border border-y border-border">
-            {PRODUCT_CATEGORIES.map((category) => (
-              <li key={category.id} className="scroll-slide-right">
-                <Link
-                  to="/products"
-                  search={{ category: category.id }}
-                  className="group flex min-h-16 items-center gap-6 py-5 transition-[padding] duration-300 hover:pl-3 hover:text-primary"
-                >
-                  <span className="brand-index text-muted-foreground">
-                    {category.index}
-                  </span>
-                  <span className="flex-1">
-                    <span className="block text-lg font-medium">
-                      {pick(category.name)}
-                    </span>
-                    <span className="mt-0.5 block text-sm text-muted-foreground">
-                      {pick(category.description)}
-                    </span>
-                  </span>
-                  <ArrowRight
-                    className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary"
-                    aria-hidden
-                  />
-                </Link>
-              </li>
-            ))}
-          </ol>
+          <figure className="scroll-rise rounded-sm bg-white p-8 text-primary-deep sm:p-10 lg:p-12">
+            <img
+              src="/about/ditp-logo.webp"
+              alt={pick({
+                th: "โลโก้กรมส่งเสริมการค้าระหว่างประเทศ (DITP)",
+                en: "Department of International Trade Promotion (DITP) logo",
+              })}
+              width={601}
+              height={117}
+              loading="lazy"
+              decoding="async"
+              className="mx-auto h-auto w-full max-w-sm"
+            />
+            <figcaption className="mt-6 border-t border-border pt-4 text-center text-sm text-muted-foreground">
+              {pick({
+                th: "ร่วมออกงานกับ กรมส่งเสริมการค้าระหว่างประเทศ",
+                en: "Exhibited with the Department of International Trade Promotion",
+              })}
+            </figcaption>
+          </figure>
         </div>
       </section>
 
@@ -290,16 +270,6 @@ export function AboutView() {
             th: "พิมพ์ลายหรือภาพของคุณลงผ้าม่าน ม่านม้วน และผ้าโนเรน จากสายผลิตของเราเอง",
             en: "Your pattern or image printed onto curtains, roller blinds and noren — on our own line.",
           })}
-          cta={
-            <Link
-              to="/products"
-              search={{ category: "custom-print" }}
-              className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary"
-            >
-              {pick({ th: "ดูงานพิมพ์ผ้า", en: "See custom printing" })}
-              <ArrowRight className="size-4" aria-hidden />
-            </Link>
-          }
         />
         <Feature
           image={ABOUT_IMAGES.motor}
@@ -309,54 +279,7 @@ export function AboutView() {
             th: "มอเตอร์ม่าน WP Nano Power และระบบม่านสองชั้น WP N23 ควบคุมได้ทั้งรีโมท สวิตช์ และมือถือ",
             en: "WP Nano Power and the two-layer WP N23 system, controlled by remote, wall switch or phone.",
           })}
-          cta={
-            <Link
-              to="/products/$slug"
-              params={{ slug: "wp-nano-power" }}
-              className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary"
-            >
-              {pick({ th: "ดูระบบมอเตอร์", en: "See motor systems" })}
-              <ArrowRight className="size-4" aria-hidden />
-            </Link>
-          }
         />
-      </section>
-
-      <section className="border-t border-border">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:px-8 lg:py-20">
-          <div className="scroll-rise">
-            <p className="brand-kicker text-primary">Head office</p>
-            <h2 className="brand-heading mt-4">{legalName}</h2>
-            <CompanyContactDetails className="mt-6" />
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href={siteConfig.lineUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-12 items-center gap-2 rounded-full bg-accent px-6 text-sm font-semibold text-white hover:bg-accent/90"
-              >
-                <MessageCircle className="size-4" aria-hidden />
-                {t("site.cta.line")}
-              </a>
-              <Link
-                to="/contact"
-                search={{ topic: "project" }}
-                className="inline-flex min-h-12 items-center rounded-full border border-border px-6 text-sm font-semibold hover:border-primary hover:text-primary"
-              >
-                {pick({ th: "ติดต่องานโครงการ", en: "Project enquiry" })}
-              </Link>
-            </div>
-          </div>
-          <div className="scroll-wipe-up overflow-hidden rounded-sm border border-border">
-            <LazyMapsEmbed
-              title={t("footer.mapTitle")}
-              src={siteConfig.mapsEmbedUrl}
-              loadLabel={t("footer.loadMap")}
-              hintLabel="Google Maps"
-              className="aspect-[4/3] w-full"
-            />
-          </div>
-        </div>
       </section>
     </div>
   );
@@ -367,13 +290,11 @@ function Feature({
   kicker,
   title,
   body,
-  cta,
 }: {
   image: string;
   kicker: string;
   title: string;
   body: string;
-  cta: ReactNode;
 }) {
   return (
     <article className="group border-border md:odd:border-r">
@@ -394,7 +315,6 @@ function Feature({
         <p className="mt-3 max-w-md text-base leading-7 text-muted-foreground">
           {body}
         </p>
-        <div className="mt-4">{cta}</div>
       </div>
     </article>
   );

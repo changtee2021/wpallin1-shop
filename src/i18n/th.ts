@@ -4,6 +4,7 @@ export const th: Translations = {
   "app.name": "WP ALL",
   "app.tagline": "ศูนย์กลางผ้าม่าน — ครบวงจร",
   "nav.home": "หน้าแรก",
+  "nav.homeMenu": "Home",
   "nav.order": "สั่งเลย",
   "nav.shop": "ร้านค้า",
   "nav.catalogs": "Catalogs",

@@ -64,6 +64,8 @@
   --color-surface: var(--surface);
   --color-cream: var(--cream);
   --font-sans: "IBM Plex Sans Thai", ui-sans-serif, system-ui, sans-serif;
+  /* Latin display serif, loaded for the letters W P A L only (see __root.tsx). */
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
   /* Plex reads heavy at 600+, so the scale is shifted one step lighter for a quieter look. */
   --font-weight-semibold: 500;
   --font-weight-bold: 600;
@@ -435,7 +437,9 @@
 
 @keyframes scroll-word {
   from {
-    opacity: 0.18;
+    opacity: 0.12;
+    transform: translateY(0.45em);
+    filter: blur(3px);
   }
 }
 

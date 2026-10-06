@@ -54,12 +54,7 @@ export function BrandStatement() {
   return (
     <section className="brand-section bg-background">
       <div className={container}>
-        <p className="brand-kicker flex items-center gap-3 text-primary">
-          <span className="brand-index text-muted-foreground">01</span>
-          <span aria-hidden className="h-px w-8 bg-border" />
-          Why WP ALL
-        </p>
-        <p className="mt-8 max-w-5xl text-3xl leading-[1.4] font-medium tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl lg:leading-[1.35]">
+        <p className="max-w-5xl text-3xl leading-[1.4] font-medium tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl lg:leading-[1.35]">
           {words.map((word, index) => (
             <span
               key={`${word}-${index}`}
@@ -76,13 +71,19 @@ export function BrandStatement() {
           {USP_ITEMS.map((item, index) => (
             <li
               key={item.title.en}
-              className="scroll-rise flex items-start gap-4 py-7 sm:px-2 lg:px-6 lg:first:pl-0 lg:last:pr-0"
+              className="scroll-line-top group flex items-start gap-4 py-7 sm:px-2 lg:px-6 lg:first:pl-0 lg:last:pr-0"
               style={{ ["--i" as string]: index }}
             >
-              <span className="text-4xl leading-none font-medium tracking-tight text-accent lg:text-5xl">
+              <span
+                className="scroll-scale-in block origin-left text-4xl leading-none font-medium tracking-tight text-accent transition-transform duration-300 group-hover:translate-x-1 lg:text-5xl"
+                style={{ ["--i" as string]: index }}
+              >
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <div>
+              <div
+                className="scroll-rise"
+                style={{ ["--i" as string]: index + 1 }}
+              >
                 <h2 className="text-base font-medium tracking-tight text-foreground lg:text-lg">
                   {item.title.en}
                 </h2>
@@ -148,6 +149,7 @@ export function BrandFactory() {
     <section className="brand-section relative isolate bg-primary-deep text-white">
       <div className={container}>
         <SectionHeading
+          hideKicker
           tone="dark"
           index="05"
           kicker="Craftsmanship"
