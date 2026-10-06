@@ -157,7 +157,7 @@ Current oklch values (light mode):
 
 พื้นสลับ: ขาว → teal เข้ม → ครีม (`bg-cream`) → ขาว เพื่อให้แต่ละบทแยกกันชัด
 
-**ระบบโมชันหน้าแรกใช้ 3 แบบเท่านั้น:** Reveal (`scroll-rise` + `--i`) สำหรับข้อความ/การ์ด · Mask (`scroll-wipe-up-soft` + `scroll-zoom` ข้างใน) สำหรับรูป · Scroll-linked เฉพาะ 3 จุด (hero, โรงงาน, rail สินค้า) อย่าเพิ่มชนิดใหม่ในหน้าแรก
+**ระบบโมชันหน้าแรกใช้ 3 แบบเท่านั้น:** Reveal (`scroll-rise` + `--i`) สำหรับข้อความ/การ์ด · Mask (`scroll-wipe-up-soft` + `scroll-zoom` ข้างใน) สำหรับรูป · Scroll-linked เฉพาะ 2 จุด (hero, โรงงาน) · แถวสินค้าเป็น marquee วิ่งเอง (ไม่ผูกกับการเลื่อน) อย่าเพิ่มชนิดใหม่ในหน้าแรก
 
 | Section | คลาส | เอฟเฟกต์ |
 |---------|------|----------|
@@ -165,7 +165,7 @@ Current oklch values (light mode):
 | Hero | `hero-word` / `hero-blur-in` / `scroll-hero-card` | ข้อความเบลอเข้าทีละคำตอนโหลด · เลื่อนแล้ว hero พับเป็นการ์ดมุมโค้งเว้นขอบ |
 | ประโยคเปิด + จุดเด่น 4 ข้อ | `scroll-word` · `scroll-rise` + `--i` | คำสว่างทีละคำ · ลอยขึ้นไล่ทีละข้อ |
 | โรงงาน | `BrandFactory` (IntersectionObserver) | รูปตรึง ครอสเฟดตามขั้นตอน · ตัวเลขนับขึ้น |
-| สินค้า | `pin-x` / `pin-x-stage` / `pin-x-viewport` / `pin-x-track` | desktop (≥1024px, สูง ≥680px): ตรึงส่วนนี้ เลื่อนลงแล้วการ์ดวิ่งไปซ้าย · มือถือ/Firefox: ปัดแนวนอนปกติ |
+| สินค้า | `product-marquee` / `product-marquee-track` / `product-marquee-group` | สินค้า 2 แถววิ่งสวนกันเอง (แถวล่าง `data-reverse`) · เมาส์ชี้หรือโฟกัสแล้วหยุด · กดการ์ดไปหน้าสินค้า · reduced motion: ปัดแนวนอนปกติ |
 | ผลงาน | `scroll-wipe-up-soft` + `scroll-zoom` | กริด bento 1 ใหญ่ + 4 เล็ก รูปเปิดจากล่าง |
 | บ้าน / ตัวแทน | `scroll-wipe-up-soft` + `--i` | กล่องภาพเปิดจากล่าง กล่องที่สองตามหลัง + รูปซูมออก |
 | หน้า About | `scroll-hero-shrink` · `scroll-marquee-left/right` · `scroll-line-top` · `scroll-scale-in` | แถบสโลแกนวิ่งสวนทาง · เส้นส้มวาดตัวเอง · ตัวอักษร C-P-C ซูมเข้า |

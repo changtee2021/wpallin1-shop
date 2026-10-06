@@ -224,8 +224,8 @@ function ProductsPage() {
               {activeCategory
                 ? pick(activeCategory.description)
                 : pick({
-                    th: "ผลิตภัณฑ์ทั้งหมดของ WP ALL ผลิตในโรงงานของเราเอง และสั่งทำตามขนาดหน้างานทุกชิ้น",
-                    en: "Every WP ALL product is made in our own factory, to the measurements of your space.",
+                    th: "ผลิตภัณฑ์ทุกชิ้นของ WP ALL สั่งทำตามขนาดหน้างาน ด้วยมาตรฐานเดียวกันทุกรายการ",
+                    en: "Every WP ALL product is made to the measurements of your space, to one consistent standard.",
                   })}
             </p>
           </div>

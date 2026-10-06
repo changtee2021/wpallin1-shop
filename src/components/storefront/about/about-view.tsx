@@ -67,8 +67,8 @@ export function AboutView() {
             style={{ ["--delay" as string]: "600ms" }}
           >
             {pick({
-              th: "ผู้ผลิตและจัดจำหน่ายผ้าม่าน มู่ลี่ และระบบมอเตอร์ สำหรับบ้านและงานโครงการ",
-              en: "Manufacturer and distributor of curtains, blinds and motorised systems for homes and projects.",
+              th: "แบรนด์ผ้าม่าน มู่ลี่ และระบบมอเตอร์ สำหรับบ้านและงานโครงการ",
+              en: "A brand of curtains, blinds and motorised systems for homes and projects.",
             })}
           </p>
         </div>
@@ -81,8 +81,8 @@ export function AboutView() {
               index="01"
               kicker={ABOUT_INTRO.kicker.en}
               title={pick({
-                th: "โรงงานจริง งานตามพื้นที่จริง",
-                en: "A real factory, made for the space",
+                th: "ออกแบบเพื่อพื้นที่จริง",
+                en: "Designed for real spaces",
               })}
             />
             <p className="scroll-rise mt-6 max-w-2xl text-lg leading-8 text-muted-foreground text-pretty">
@@ -167,14 +167,14 @@ export function AboutView() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading
             index="03"
-            kicker="Production"
+            kicker="Craftsmanship"
             title={pick({
               th: "จากวัสดุถึงมือคุณ ใน 6 ขั้น",
               en: "From raw material to you, in six steps",
             })}
             description={pick({
-              th: "ทุกออเดอร์ผ่านสายผลิตเดียวกันในโรงงานที่คลองสามวา กรุงเทพฯ",
-              en: "Every order runs through the same lines at our Khlong Sam Wa factory in Bangkok.",
+              th: "ทุกออเดอร์ผ่านขั้นตอนเดียวกัน ด้วยมาตรฐานเดียวกัน",
+              en: "Every order follows the same steps, to the same standard.",
             })}
           />
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -191,8 +191,8 @@ export function AboutView() {
                   <img
                     src={src}
                     alt={pick({
-                      th: `สายผลิตในโรงงาน WP ALL ${index + 1}`,
-                      en: `WP ALL factory line ${index + 1}`,
+                      th: `ขั้นตอนการผลิต WP ALL ${index + 1}`,
+                      en: `WP ALL craftsmanship ${index + 1}`,
                     })}
                     loading="lazy"
                     decoding="async"
@@ -225,7 +225,7 @@ export function AboutView() {
             className="mt-12 inline-flex min-h-12 items-center gap-2 rounded-full border border-border px-6 text-sm font-semibold hover:border-primary hover:text-primary"
           >
             <Factory className="size-4" aria-hidden />
-            {pick({ th: "นัดเยี่ยมชมโรงงาน", en: "Book a factory visit" })}
+            {pick({ th: "นัดเยี่ยมชม WP ALL", en: "Book a visit" })}
           </Link>
         </div>
       </section>
@@ -322,7 +322,7 @@ export function AboutView() {
       <section className="border-t border-border">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:px-8 lg:py-20">
           <div className="scroll-rise">
-            <p className="brand-kicker text-primary">Head office & factory</p>
+            <p className="brand-kicker text-primary">Head office</p>
             <h2 className="brand-heading mt-4">{legalName}</h2>
             <CompanyContactDetails className="mt-6" />
             <div className="mt-8 flex flex-wrap gap-3">

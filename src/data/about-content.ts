@@ -39,12 +39,12 @@ export const ABOUT_IMAGES = {
 export const ABOUT_INTRO = {
   kicker: t("เกี่ยวกับเรา", "About us"),
   title: t(
-    "ศูนย์กลางผ้าม่าน ครบในโรงงานเดียว",
-    "The centre of curtains, all from one factory",
+    "ศูนย์กลางผ้าม่าน ครบในที่เดียว",
+    "The centre of curtains, all in one place",
   ),
   body: t(
-    "WP ALL เป็นผู้ผลิตและจัดจำหน่ายผ้าม่าน มู่ลี่ และระบบมอเตอร์ ทั้งภายในและภายนอก ยึดมาตรฐานมืออาชีพและงานเฉพาะทาง เพื่อส่งมอบโซลูชันที่ออกแบบตามพื้นที่จริง ทั้งลูกค้าบ้านและงานโครงการ",
-    "WP ALL is a manufacturer and distributor of curtains, blinds and motorised systems for indoor and outdoor spaces. Driven by professional standards and specialist expertise, we deliver tailor-made solutions for homes and commercial projects.",
+    "WP ALL คือแบรนด์ผ้าม่าน มู่ลี่ และระบบมอเตอร์ ทั้งภายในและภายนอก ยึดมาตรฐานมืออาชีพและงานเฉพาะทาง เพื่อส่งมอบโซลูชันที่ออกแบบตามพื้นที่จริง ทั้งลูกค้าบ้านและงานโครงการ",
+    "WP ALL is a brand of curtains, blinds and motorised systems for indoor and outdoor spaces. Driven by professional standards and specialist expertise, we deliver tailor-made solutions for homes and commercial projects.",
   ),
 };
 
@@ -52,8 +52,8 @@ export const ABOUT_VALUES: { title: Bi; body: Bi }[] = [
   {
     title: t("คนที่ไว้ใจได้", "Trusted people"),
     body: t(
-      "ทีมขาย โรงงาน และช่างคุยจากโจทย์เดียวกัน",
-      "Sales, factory and installers work from the same brief.",
+      "ทีมขาย ทีมผลิต และช่างคุยจากโจทย์เดียวกัน",
+      "Sales, production and installers work from the same brief.",
     ),
   },
   {
@@ -66,8 +66,8 @@ export const ABOUT_VALUES: { title: Bi; body: Bi }[] = [
   {
     title: t("เติบโตไปด้วยกัน", "Growing together"),
     body: t(
-      "ร้านคู่ค้าและงานโครงการเติบโตไปพร้อมโรงงาน",
-      "Dealers and projects grow with the factory.",
+      "ร้านคู่ค้าและงานโครงการเติบโตไปพร้อมกับเรา",
+      "Dealers and projects grow with us.",
     ),
   },
 ];
@@ -85,8 +85,8 @@ export const ABOUT_CPC: { letter: string; title: string; body: Bi }[] = [
     letter: "P",
     title: "Professional Standards",
     body: t(
-      "ผลิตด้วยวินัยโรงงาน มีขั้นตอนตรวจคุณภาพก่อนส่ง",
-      "Factory discipline, with a quality check before shipping",
+      "ทำงานด้วยมาตรฐานมืออาชีพ ตรวจคุณภาพทุกชิ้นก่อนส่ง",
+      "Professional standards, with every piece checked before shipping",
     ),
   },
   {

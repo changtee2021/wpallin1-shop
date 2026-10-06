@@ -45,6 +45,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "" },
           { path: "/products" },
           { path: "/projects" },
+          { path: "/smart-motor", changefreq: "monthly" },
           { path: "/about", changefreq: "monthly" },
           { path: "/partners", changefreq: "monthly" },
           { path: "/catalogs" },

@@ -266,7 +266,8 @@
     transform-origin: right center;
   }
 
-  .category-pop-grid:has(.category-pop-card:hover) .category-pop-card:not(:hover) {
+  .category-pop-grid:has(.category-pop-card:hover)
+    .category-pop-card:not(:hover) {
     transform: scale(0.96);
   }
 
@@ -341,15 +342,14 @@
 
 /* Ribbon motif from the W mark — decorative only, never under body text. */
 .brand-ribbon {
-  background-image:
-    linear-gradient(
-      115deg,
-      transparent 0 38%,
-      color-mix(in oklch, var(--primary) 85%, transparent) 38% 46%,
-      transparent 46% 52%,
-      color-mix(in oklch, var(--accent) 85%, transparent) 52% 58%,
-      transparent 58%
-    );
+  background-image: linear-gradient(
+    115deg,
+    transparent 0 38%,
+    color-mix(in oklch, var(--primary) 85%, transparent) 38% 46%,
+    transparent 46% 52%,
+    color-mix(in oklch, var(--accent) 85%, transparent) 52% 58%,
+    transparent 58%
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -509,9 +509,9 @@
   }
 }
 
-@keyframes pin-x {
+@keyframes product-marquee {
   to {
-    transform: translateX(calc(-100% + 100vw));
+    transform: translateX(-50%);
   }
 }
 
@@ -591,7 +591,8 @@
     .scroll-rise {
       animation: scroll-rise linear both;
       animation-timeline: view();
-      animation-range: entry calc(var(--i, 0) * 10%) entry calc(85% + var(--i, 0) * 10%);
+      animation-range: entry calc(var(--i, 0) * 10%) entry
+        calc(85% + var(--i, 0) * 10%);
     }
 
     /* Big outlined slogan lines that travel sideways as the page scrolls past them. */
@@ -609,13 +610,15 @@
     .scroll-line-top::before {
       animation: scroll-line-grow linear both;
       animation-timeline: view();
-      animation-range: entry calc(var(--i, 0) * 8%) entry calc(90% + var(--i, 0) * 8%);
+      animation-range: entry calc(var(--i, 0) * 8%) entry
+        calc(90% + var(--i, 0) * 8%);
     }
 
     .scroll-scale-in {
       animation: scroll-scale-in linear both;
       animation-timeline: view();
-      animation-range: entry calc(var(--i, 0) * 12%) entry calc(85% + var(--i, 0) * 12%);
+      animation-range: entry calc(var(--i, 0) * 12%) entry
+        calc(85% + var(--i, 0) * 12%);
     }
 
     /* Statement sentence: each word brightens as it travels up from the bottom of the screen. */
@@ -646,7 +649,8 @@
     .scroll-wipe-up-soft {
       animation: scroll-wipe-up-soft linear both;
       animation-timeline: view();
-      animation-range: entry calc(var(--i, 0) * 15%) cover calc(40% + var(--i, 0) * 10%);
+      animation-range: entry calc(var(--i, 0) * 15%) cover
+        calc(40% + var(--i, 0) * 10%);
     }
 
     .scroll-drift-up,
@@ -705,40 +709,55 @@
       animation-timeline: scroll(root);
       animation-range: 0 100svh;
     }
+  }
+}
 
-    /*
-     * Pinned horizontal rail: the tall section supplies scroll distance, the stage sticks,
-     * and the track slides left until its last card meets the right edge.
-     * Elsewhere (phones, short screens, Firefox) the rail stays a normal swipe row.
-     */
-    @media (min-width: 1024px) and (min-height: 680px) {
-      .pin-x {
-        height: var(--pin-x-height, 260svh);
-        view-timeline-name: --pin-x;
-      }
+/*
+ * Home product marquee: each track holds the row twice and slides by half its width,
+ * so the loop is seamless. Pointer or keyboard focus pauses it so a card can be clicked.
+ * With reduced motion the row becomes a normal swipe row instead.
+ */
+.product-marquee {
+  overflow-x: auto;
+  padding-inline: 1rem;
+}
+.product-marquee-track {
+  display: flex;
+  width: max-content;
+}
+.product-marquee-group {
+  display: flex;
+  gap: 1.25rem;
+  padding-right: 1.25rem;
+}
+.product-marquee-group[aria-hidden] {
+  display: none;
+}
 
-      .pin-x-stage {
-        position: sticky;
-        top: 0;
-        display: flex;
-        height: 100svh;
-        flex-direction: column;
-        justify-content: center;
-        overflow: clip;
-        padding-block: 5rem 1.5rem;
-      }
-
-      .pin-x-viewport {
-        overflow: visible;
-        scroll-snap-type: none;
-      }
-
-      .pin-x-track {
-        animation: pin-x linear both;
-        animation-timeline: --pin-x;
-        animation-range: contain 0% contain 100%;
-      }
-    }
+@media (prefers-reduced-motion: no-preference) {
+  .product-marquee {
+    overflow: hidden;
+    padding-inline: 0;
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 4%,
+      #000 96%,
+      transparent
+    );
+  }
+  .product-marquee-group[aria-hidden] {
+    display: flex;
+  }
+  .product-marquee-track {
+    animation: product-marquee var(--marquee-duration, 50s) linear infinite;
+  }
+  .product-marquee[data-reverse] .product-marquee-track {
+    animation-direction: reverse;
+  }
+  .product-marquee:hover .product-marquee-track,
+  .product-marquee:focus-within .product-marquee-track {
+    animation-play-state: paused;
   }
 }
 

@@ -132,7 +132,7 @@ const FAQ_GROUPS: FaqGroup[] = [
   },
   {
     id: "company",
-    title: { th: "ตัวแทนและโรงงาน", en: "Dealers & factory" },
+    title: { th: "ตัวแทนและการเยี่ยมชม", en: "Dealers & visits" },
     items: [
       {
         id: "dealer",
@@ -173,7 +173,7 @@ export const Route = createFileRoute("/_store/faq")({
     pageHead({
       title: "คำถามที่พบบ่อย | WP ALL",
       description:
-        "คำตอบเรื่องราคา การวัดขนาดหน้าต่าง ตัวอย่างสี ม่านมอเตอร์ งานพิมพ์ผ้า การสมัครตัวแทน และการเยี่ยมชมโรงงาน WP ALL",
+        "คำตอบเรื่องราคา การวัดขนาดหน้าต่าง ตัวอย่างสี ม่านมอเตอร์ งานพิมพ์ผ้า การสมัครตัวแทน และการนัดเยี่ยมชม WP ALL",
       path: "/faq",
       jsonLd: {
         "@context": "https://schema.org",

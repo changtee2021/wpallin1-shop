@@ -38,7 +38,7 @@ export const Route = createFileRoute("/_store/contact")({
     pageHead({
       title: "ติดต่อเรา / ขอใบเสนอราคา | WP ALL",
       description:
-        "ขอใบเสนอราคา ปรึกษางานโครงการ สมัครตัวแทน หรือนัดเยี่ยมชมโรงงาน WP ALL ที่คลองสามวา กรุงเทพฯ โทร 02-334-0235 LINE @wpfordealer",
+        "ขอใบเสนอราคา ปรึกษางานโครงการ สมัครตัวแทน หรือนัดเยี่ยมชม WP ALL ที่คลองสามวา กรุงเทพฯ โทร 02-334-0235 LINE @wpfordealer",
       path: "/contact",
     }),
   component: ContactPage,
@@ -196,9 +196,7 @@ function ContactPage() {
           </div>
 
           <div className="border-t border-border pt-8">
-            <p className="brand-kicker text-muted-foreground">
-              Office & factory
-            </p>
+            <p className="brand-kicker text-muted-foreground">Head office</p>
             <address className="mt-3 text-sm leading-6 not-italic">
               {locale === "en" ? siteConfig.legalNameEn : siteConfig.legalName}
               <br />

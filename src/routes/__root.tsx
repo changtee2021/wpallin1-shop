@@ -54,7 +54,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         {
           name: "description",
           content:
-            "WP ALL IN 1 ผู้ผลิตผ้าม่าน มู่ลี่ ม่านม้วน ฉากกั้นห้อง PVC รางม่าน และระบบมอเตอร์อัจฉริยะ สั่งทำตามขนาด สำหรับบ้าน โครงการ และตัวแทนจำหน่าย",
+            "WP ALL IN 1 แบรนด์ผ้าม่าน มู่ลี่ ม่านม้วน ฉากกั้นห้อง PVC รางม่าน และระบบมอเตอร์อัจฉริยะ สั่งทำตามขนาด สำหรับบ้าน โครงการ และตัวแทนจำหน่าย",
         },
         { name: "theme-color", content: "#188F8B" },
         { property: "og:type", content: "website" },

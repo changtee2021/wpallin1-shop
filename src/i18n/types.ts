@@ -23,6 +23,7 @@ export type TranslationKey =
   | "nav.logout"
   | "nav.products"
   | "nav.projects"
+  | "nav.smartMotor"
   | "nav.partners"
   | "nav.faq"
   | "site.cta.quote"

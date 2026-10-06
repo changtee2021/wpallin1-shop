@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_store/partners")({
     pageHead({
       title: "ตัวแทนจำหน่าย / OEM / ODM | WP ALL",
       description:
-        "ร่วมเป็นตัวแทนจำหน่ายม่าน มู่ลี่ ราง และมอเตอร์ WP ALL หรือสั่งผลิตแบบ OEM / ODM ภายใต้แบรนด์ของคุณ ผลิตตามออเดอร์จากโรงงานในกรุงเทพฯ",
+        "ร่วมเป็นตัวแทนจำหน่ายม่าน มู่ลี่ ราง และมอเตอร์ WP ALL หรือสั่งผลิตแบบ OEM / ODM ภายใต้แบรนด์ของคุณ ผลิตตามออเดอร์และจัดส่งถึงร้านคุณ",
       path: "/partners",
       image: "/brand/factory-2.webp",
     }),
@@ -28,7 +28,7 @@ const MODELS: { code: string; title: Bi; body: Bi; points: Bi[] }[] = [
     code: "Dealer",
     title: { th: "ตัวแทนจำหน่าย", en: "Dealer" },
     body: {
-      th: "สำหรับร้านผ้าม่าน ช่างติดตั้ง และผู้รับเหมาตกแต่ง สั่งสินค้าตามขนาดหน้างาน โรงงานผลิตและจัดส่งให้",
+      th: "สำหรับร้านผ้าม่าน ช่างติดตั้ง และผู้รับเหมาตกแต่ง สั่งสินค้าตามขนาดหน้างาน เราผลิตและจัดส่งให้",
       en: "For curtain shops, installers and fit-out contractors. Order to site sizes — we make and ship.",
     },
     points: [
@@ -93,7 +93,7 @@ const STEPS: { title: Bi; body: Bi }[] = [
     },
   },
   {
-    title: { th: "ดูตัวอย่างหรือเยี่ยมโรงงาน", en: "See samples or visit" },
+    title: { th: "ดูตัวอย่างหรือนัดเยี่ยมชม", en: "See samples or visit" },
     body: {
       th: "ขอตัวอย่างสีและวัสดุ หรือนัดดูสายผลิตที่คลองสามวา",
       en: "Request colour and material samples, or book a tour of our Khlong Sam Wa lines.",
@@ -102,7 +102,7 @@ const STEPS: { title: Bi; body: Bi }[] = [
   {
     title: { th: "เริ่มสั่งผลิต", en: "Place your first order" },
     body: {
-      th: "ส่งขนาดหน้างาน โรงงานผลิตตามออเดอร์และจัดส่งถึงคุณ",
+      th: "ส่งขนาดหน้างาน เราผลิตตามออเดอร์และจัดส่งถึงคุณ",
       en: "Send site sizes — we make to order and deliver.",
     },
   },
@@ -206,7 +206,7 @@ function PartnersPage() {
           <SectionHeading
             index="02"
             kicker="What we make"
-            title={pick({ th: "ครบในโรงงานเดียว", en: "All from one factory" })}
+            title={pick({ th: "ครบในที่เดียว", en: "All in one place" })}
             description={pick({
               th: "ตั้งแต่มู่ลี่ ม่านม้วน ฉากกั้น ไปจนถึงรางม่าน ราวม่าน มอเตอร์ และงานพิมพ์ผ้า",
               en: "From blinds, roller shades and partitions to curtain tracks, rods, motors and fabric printing.",
@@ -332,8 +332,8 @@ function PartnersPage() {
             >
               <Factory className="size-4" aria-hidden />
               {pick({
-                th: "หรือนัดเยี่ยมชมโรงงาน",
-                en: "Or book a factory visit",
+                th: "หรือนัดเยี่ยมชม WP ALL",
+                en: "Or book a visit",
               })}
             </Link>
           </div>

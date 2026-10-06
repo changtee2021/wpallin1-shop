@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { ChevronDown, Globe, Menu, Phone, ShoppingCart } from "lucide-react";
+import { Menu, Phone, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { AccountMenuButton } from "@/components/account/account-menu-button";
@@ -7,13 +7,6 @@ import { ArrowFillLink } from "@/components/brand/arrow-fill-link";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -30,13 +23,14 @@ import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
 type NavItem = {
-  to: "/products" | "/projects" | "/about" | "/catalogs";
+  to: "/products" | "/projects" | "/smart-motor" | "/about" | "/catalogs";
   key: TranslationKey;
 };
 
 export const SITE_NAV: NavItem[] = [
   { to: "/products", key: "nav.products" },
   { to: "/projects", key: "nav.projects" },
+  { to: "/smart-motor", key: "nav.smartMotor" },
   { to: "/catalogs", key: "nav.catalogs" },
   { to: "/about", key: "nav.about" },
 ];
@@ -44,11 +38,12 @@ export const SITE_NAV: NavItem[] = [
 const headerIconClass =
   "size-11 rounded-full text-white hover:bg-white/10 hover:text-white";
 
-const LOCALE_OPTIONS: { value: Locale; label: string }[] = [
-  { value: "th", label: "ไทย" },
-  { value: "en", label: "English" },
+const LOCALE_OPTIONS: { value: Locale; label: string; name: string }[] = [
+  { value: "th", label: "TH", name: "ไทย" },
+  { value: "en", label: "EN", name: "English" },
 ];
 
+/** Plain-text language switch: "TH | EN". The active language is bold, the other is one tap away. */
 export function LocaleToggle({
   className,
   tone = "light",
@@ -58,43 +53,52 @@ export function LocaleToggle({
 }) {
   const { t } = useT();
   const { locale, setLocale } = useLocaleControl();
+  const light = tone === "light";
 
   return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          aria-label={t("site.lang.label")}
-          className={cn(
-            "inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
-            tone === "light"
-              ? "text-white/85 hover:bg-white/10 hover:text-white"
-              : "text-foreground hover:bg-muted",
-            className,
-          )}
-        >
-          <Globe className="size-4" aria-hidden />
-          {locale.toUpperCase()}
-          <ChevronDown className="size-3.5 opacity-70" aria-hidden />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-36">
-        <DropdownMenuRadioGroup
-          value={locale}
-          onValueChange={(value) => setLocale(value as Locale)}
-        >
-          {LOCALE_OPTIONS.map((option) => (
-            <DropdownMenuRadioItem
-              key={option.value}
-              value={option.value}
-              className="min-h-10"
+    <div
+      role="group"
+      aria-label={t("site.lang.label")}
+      className={cn(
+        "inline-flex items-center text-sm",
+        light ? "text-white" : "text-foreground",
+        className,
+      )}
+    >
+      {LOCALE_OPTIONS.map((option, index) => {
+        const active = locale === option.value;
+        return (
+          <span key={option.value} className="inline-flex items-center">
+            {index > 0 ? (
+              <span
+                aria-hidden
+                className={cn(
+                  "h-3.5 w-px",
+                  light ? "bg-white/30" : "bg-border",
+                )}
+              />
+            ) : null}
+            <button
+              type="button"
+              lang={option.value}
+              title={option.name}
+              aria-pressed={active}
+              onClick={() => setLocale(option.value)}
+              className={cn(
+                "inline-flex min-h-11 min-w-11 items-center justify-center px-2 tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+                active
+                  ? "font-semibold"
+                  : light
+                    ? "text-white/55 hover:text-white"
+                    : "text-muted-foreground hover:text-foreground",
+              )}
             >
               {option.label}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            </button>
+          </span>
+        );
+      })}
+    </div>
   );
 }
 
@@ -283,7 +287,7 @@ export function StorefrontHeader() {
 
             <nav
               aria-label="Main"
-              className="hidden items-center gap-1 lg:flex"
+              className="ml-auto mr-4 hidden items-center gap-1 lg:flex"
             >
               {SITE_NAV.map((item) => (
                 <Link
@@ -310,7 +314,7 @@ export function StorefrontHeader() {
               ))}
             </nav>
 
-            <div className="ml-auto flex items-center gap-1.5">
+            <div className="ml-auto flex items-center gap-1.5 lg:ml-0">
               <LocaleToggle className="hidden sm:inline-flex" />
               {COMMERCE_ENABLED ? <CommerceActions /> : null}
               <ArrowFillLink to="/contact" className="hidden md:inline-flex">

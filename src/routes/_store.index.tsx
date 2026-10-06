@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import {
-  BrandEntrySplit,
+  BrandChooseGuide,
   BrandHero,
   BrandProductRail,
   BrandProjectsBento,
+  BrandSmartMotor,
 } from "@/components/storefront/home/brand-home-sections";
 import {
   BrandFactory,
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/_store/")({
     pageHead({
       title: "WP ALL — ม่าน มู่ลี่ และระบบมอเตอร์ ผลิตในไทย",
       description:
-        "WP ALL IN 1 ผู้ผลิตผ้าม่าน มู่ลี่ ม่านม้วน ฉากกั้นห้อง PVC รางม่าน และระบบมอเตอร์อัจฉริยะ สั่งทำตามขนาด สำหรับบ้าน โครงการ และตัวแทนจำหน่าย",
+        "WP ALL IN 1 แบรนด์ผ้าม่าน มู่ลี่ ม่านม้วน ฉากกั้นห้อง PVC รางม่าน และระบบมอเตอร์อัจฉริยะ สั่งทำตามขนาด สำหรับบ้าน โครงการ และตัวแทนจำหน่าย",
       path: "/",
       image: "/home/hero-living-curtains.png",
     }),
@@ -25,8 +26,8 @@ export const Route = createFileRoute("/_store/")({
 });
 
 /**
- * Story order: promise → factory → range → projects → two doors (footer closes with the contact CTA).
- * Chapter numbers 01–04 are printed in each section heading; backgrounds alternate white / deep / cream / white.
+ * Story order: promise → range → projects → craftsmanship → how to choose (footer closes with the contact CTA).
+ * Chapter numbers 01–05 are printed in each section heading; backgrounds alternate white / cream / white / deep / surface.
  */
 function HomePage() {
   return (
@@ -37,10 +38,11 @@ function HomePage() {
       />
       <BrandHero />
       <BrandStatement />
-      <BrandFactory />
       <BrandProductRail />
       <BrandProjectsBento />
-      <BrandEntrySplit />
+      <BrandSmartMotor />
+      <BrandFactory />
+      <BrandChooseGuide />
     </>
   );
 }

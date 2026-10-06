@@ -4,20 +4,14 @@ import { useEffect, useState } from "react";
 
 import { SectionHeading } from "@/components/brand/section-heading";
 import { Button } from "@/components/ui/button";
-import {
-  PRODUCT_CATEGORIES,
-  productsInCategory,
-} from "@/data/products-catalog";
-import { PROJECT_KIND_LABELS, PROJECTS } from "@/data/projects";
+import { CATALOG_PRODUCTS, type CatalogProduct } from "@/data/products-catalog";
+import { PROJECT_KIND_LABELS, PROJECTS, type Project } from "@/data/projects";
+import { SMART_MOTOR_TYPES } from "@/data/smart-motor";
 import { useT } from "@/i18n";
 import { useBi, type Bi } from "@/lib/bi";
 import { cn } from "@/lib/utils";
 
 const container = "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8";
-
-/** Left padding that lines a full-bleed row up with the 7xl container. */
-const bleedPadding =
-  "px-4 sm:px-6 lg:px-[max(2rem,calc((100vw-80rem)/2+2rem))]";
 
 const HERO_SLIDES: { src: string; caption: Bi }[] = [
   {
@@ -83,10 +77,17 @@ export function BrandHero() {
           "scroll-fade-away flex min-h-svh flex-col justify-end pt-28 pb-10 lg:pb-14",
         )}
       >
-        <h1 className="mt-0 max-w-3xl text-3xl leading-[1.3] font-medium tracking-tight text-balance sm:text-4xl lg:text-5xl">
+        <p
+          className="hero-blur-in brand-kicker flex items-center gap-3 text-white/75"
+          style={{ ["--delay" as string]: "100ms" }}
+        >
+          <span aria-hidden className="h-px w-8 bg-accent" />
+          Made in Thailand · Made to measure
+        </p>
+        <h1 className="mt-5 max-w-4xl text-4xl leading-[1.2] font-medium tracking-tight text-balance sm:text-5xl lg:text-6xl">
           {pick({
-            th: "ม่าน มู่ลี่ และระบบมอเตอร์ ผลิตในไทย สั่งทำ พอดีทุกหน้าต่าง",
-            en: "Curtains, blinds and motorized systems — made in Thailand, made to fit.",
+            th: "พอดีทุกหน้าต่าง สวยทุกมุมห้อง",
+            en: "Made to fit every window. Made to be lived with.",
           })
             .split(" ")
             .map((phrase, index) => (
@@ -100,6 +101,15 @@ export function BrandHero() {
               </span>
             ))}
         </h1>
+        <p
+          className="hero-blur-in mt-5 max-w-xl text-base leading-7 text-white/80 text-pretty sm:text-lg sm:leading-8"
+          style={{ ["--delay" as string]: "500ms" }}
+        >
+          {pick({
+            th: "ม่าน มู่ลี่ และระบบมอเตอร์ ออกแบบให้เข้ากับทุกพื้นที่ สั่งทำตามขนาดจริงทุกชิ้น",
+            en: "Curtains, blinds and motorized systems, designed for every space and made to the exact size of every window.",
+          })}
+        </p>
         <div
           className="hero-blur-in mt-8 flex items-center justify-between gap-6"
           style={{ ["--delay" as string]: "650ms" }}
@@ -110,7 +120,7 @@ export function BrandHero() {
             asChild
           >
             <Link to="/products">
-              All Product
+              {pick({ th: "ดูสินค้าทั้งหมด", en: "Explore products" })}
               <ArrowRight className="ml-1 size-4" aria-hidden />
             </Link>
           </Button>
@@ -141,17 +151,66 @@ export function BrandHero() {
   );
 }
 
-/** Chapter 3 — the range. On desktop the section pins and the category cards travel sideways. */
+/** Alternate products between the two rows so each row mixes categories. */
+const MARQUEE_ROWS = [0, 1].map((row) =>
+  CATALOG_PRODUCTS.filter((_, index) => index % 2 === row),
+);
+
+const MARQUEE_SECONDS_PER_CARD = 5;
+
+function MarqueeCard({
+  product,
+  hidden,
+}: {
+  product: CatalogProduct;
+  hidden?: boolean;
+}) {
+  const pick = useBi();
+
+  return (
+    <li className="w-[15rem] shrink-0 sm:w-[17rem] lg:w-[19rem]">
+      <Link
+        to="/products/$slug"
+        params={{ slug: product.slug }}
+        tabIndex={hidden ? -1 : undefined}
+        className="group block rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-cream"
+      >
+        <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-surface">
+          <img
+            src={product.image}
+            alt=""
+            aria-hidden
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+            className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+          />
+        </div>
+        <div className="mt-4 flex items-baseline justify-between gap-4">
+          <h3 className="truncate text-lg font-medium tracking-tight text-foreground transition-colors group-hover:text-primary">
+            {pick(product.name)}
+          </h3>
+          <ArrowUpRight
+            className="size-5 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary"
+            aria-hidden
+          />
+        </div>
+      </Link>
+    </li>
+  );
+}
+
+/** Chapter 2 — the range. Two rows of products drift in opposite directions and pause under the pointer. */
 export function BrandProductRail() {
   const { t } = useT();
   const pick = useBi();
 
   return (
-    <section className="pin-x bg-cream">
-      <div className="pin-x-stage py-20 lg:py-28">
-        <div className={cn(container, "w-full")}>
+    <section className="overflow-hidden bg-cream py-20 lg:py-28">
+      <div>
+        <div className={container}>
           <SectionHeading
-            index="03"
+            index="02"
             kicker="Our products"
             title={pick({
               th: "ครบทุกอย่างสำหรับหน้าต่าง ในที่เดียว",
@@ -176,92 +235,64 @@ export function BrandProductRail() {
           />
         </div>
 
-        <div className="pin-x-viewport no-scrollbar mt-10 snap-x snap-mandatory scroll-px-4 overflow-x-auto sm:scroll-px-6 lg:mt-12 lg:scroll-px-8">
-          <ol className={cn("pin-x-track flex w-max gap-6 pb-2", bleedPadding)}>
-            {PRODUCT_CATEGORIES.map((category, index) => {
-              const products = productsInCategory(category.id);
-              return (
-                <li
-                  key={category.id}
-                  className="scroll-rise w-[80vw] shrink-0 snap-start sm:w-[22rem] lg:w-[24rem]"
-                  style={{ ["--i" as string]: Math.min(index, 2) }}
-                >
-                  <Link
-                    to="/products"
-                    search={{ category: category.id }}
-                    className="group block rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-cream"
+        <div className="mt-10 flex flex-col gap-7 lg:mt-12 lg:gap-8">
+          {MARQUEE_ROWS.map((products, row) => (
+            <div
+              key={row}
+              className="product-marquee no-scrollbar"
+              data-reverse={row === 1 ? "" : undefined}
+              style={{
+                ["--marquee-duration" as string]: `${products.length * MARQUEE_SECONDS_PER_CARD}s`,
+              }}
+            >
+              <div className="product-marquee-track">
+                {[false, true].map((hidden) => (
+                  <ul
+                    key={String(hidden)}
+                    aria-hidden={hidden || undefined}
+                    className="product-marquee-group"
                   >
-                    <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-surface">
-                      <img
-                        src={category.image}
-                        alt=""
-                        aria-hidden
-                        loading="lazy"
-                        decoding="async"
-                        className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                    {products.map((product) => (
+                      <MarqueeCard
+                        key={product.slug}
+                        product={product}
+                        hidden={hidden}
                       />
-                      <span className="brand-index absolute top-3 left-3 rounded-full bg-white/90 px-3 py-1.5 text-foreground">
-                        {category.index}
-                      </span>
-                    </div>
-                    <div className="mt-5 flex items-baseline justify-between gap-4">
-                      <h3 className="text-xl font-medium tracking-tight text-foreground transition-colors group-hover:text-primary lg:text-2xl">
-                        {pick(category.name)}
-                      </h3>
-                      <ArrowUpRight
-                        className="size-5 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary"
-                        aria-hidden
-                      />
-                    </div>
-                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
-                      {pick(category.description)}
-                    </p>
-                    <p className="brand-index mt-4 text-muted-foreground">
-                      {products.length}{" "}
-                      {pick({
-                        th: "รายการ",
-                        en: products.length === 1 ? "line" : "lines",
-                      })}
-                    </p>
-                  </Link>
-                </li>
-              );
-            })}
-            <li className="w-[80vw] shrink-0 snap-start sm:w-[22rem] lg:w-[24rem]">
-              <Link
-                to="/products"
-                className="group flex aspect-[4/3] flex-col justify-between rounded-sm bg-primary-deep p-8 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-cream"
-              >
-                <span className="brand-kicker text-accent">All products</span>
-                <span className="flex items-end justify-between gap-4">
-                  <span className="brand-heading">
-                    {pick({ th: "ดูสินค้าทั้งหมด", en: "See every product" })}
-                  </span>
-                  <ArrowRight
-                    className="size-6 shrink-0 transition-transform group-hover:translate-x-1"
-                    aria-hidden
-                  />
-                </span>
-              </Link>
-            </li>
-          </ol>
+                    ))}
+                  </ul>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-/** Chapter 4 — proof. One large project and four smaller ones, each revealed by a mask. */
+/** Home shows exactly these three, in this order. */
+const FEATURED_PROJECT_SLUGS = [
+  "colors-of-buriram-2025",
+  "bangkok-design-week-2025",
+  "merit-and-woranakorn",
+] as const;
+
+/**
+ * Chapter 3 — proof. One full-width project at a time; each next project
+ * slides up and covers the previous one (CSS sticky stack, no JS).
+ */
 export function BrandProjectsBento() {
   const { t } = useT();
   const pick = useBi();
-  const projects = PROJECTS.slice(0, 5);
+  const projects = FEATURED_PROJECT_SLUGS.map((slug) =>
+    PROJECTS.find((project) => project.slug === slug),
+  ).filter((project): project is Project => Boolean(project));
 
   return (
-    <section className="brand-section bg-background">
+    <section className="brand-section relative isolate bg-background">
       <div className={container}>
         <SectionHeading
-          index="04"
+          index="03"
           kicker="Projects"
           title={pick({
             th: "งานจริงจากโครงการและตัวแทนของเรา",
@@ -281,7 +312,7 @@ export function BrandProjectsBento() {
           }
         />
 
-        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:auto-rows-[17rem] lg:grid-cols-4">
+        <ul className="mt-12">
           {projects.map((project, index) => {
             const meta = [
               pick(PROJECT_KIND_LABELS[project.kind]),
@@ -290,51 +321,40 @@ export function BrandProjectsBento() {
             ]
               .filter(Boolean)
               .join(" · ");
-            const lead = index === 0;
+            const last = index === projects.length - 1;
 
             return (
               <li
                 key={project.slug}
                 className={cn(
-                  "scroll-wipe-up-soft",
-                  lead
-                    ? "aspect-[4/3] sm:col-span-2 lg:row-span-2 lg:aspect-auto"
-                    : "aspect-[4/3] lg:aspect-auto",
+                  "sticky top-20 lg:top-24",
+                  last ? undefined : "pb-[14svh]",
                 )}
-                style={{ ["--i" as string]: lead ? 0 : (index - 1) % 2 }}
+                style={{ zIndex: index + 1 }}
               >
                 <Link
                   to="/projects/$slug"
                   params={{ slug: project.slug }}
-                  className="group relative isolate flex size-full flex-col justify-end overflow-hidden rounded-sm bg-surface p-5 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 lg:p-6"
+                  className="group relative isolate flex h-[68svh] min-h-[22rem] w-full flex-col justify-end overflow-hidden rounded-md bg-surface p-6 text-white shadow-[0_-12px_40px_rgb(0_0_0/0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 sm:p-8 lg:h-[72svh] lg:p-10"
                 >
-                  <div className="scroll-zoom absolute inset-0 -z-10">
-                    <img
-                      src={project.cover}
-                      alt=""
-                      aria-hidden
-                      loading="lazy"
-                      decoding="async"
-                      className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                    />
-                  </div>
-                  <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgb(0_0_0/0.72),rgb(0_0_0/0)_60%)]" />
+                  <img
+                    src={project.cover}
+                    alt=""
+                    aria-hidden
+                    loading={index === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    className="absolute inset-0 -z-10 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                  />
+                  <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgb(0_0_0/0.75),rgb(0_0_0/0)_60%)]" />
                   <p className="text-xs tracking-wide text-white/75 uppercase">
                     {meta}
                   </p>
-                  <h3
-                    className={cn(
-                      "mt-1 font-medium tracking-tight text-balance",
-                      lead ? "text-2xl lg:text-3xl" : "text-lg",
-                    )}
-                  >
+                  <h3 className="mt-1 text-2xl font-medium tracking-tight text-balance lg:text-4xl">
                     {pick(project.title)}
                   </h3>
-                  {lead ? (
-                    <p className="mt-2 line-clamp-2 max-w-lg text-sm leading-6 text-white/80">
-                      {pick(project.summary)}
-                    </p>
-                  ) : null}
+                  <p className="mt-2 line-clamp-2 max-w-xl text-sm leading-6 text-white/80 lg:text-base">
+                    {pick(project.summary)}
+                  </p>
                 </Link>
               </li>
             );
@@ -345,67 +365,189 @@ export function BrandProjectsBento() {
   );
 }
 
-export function BrandEntrySplit() {
+/** Chapter 4 — Smart Motor: one photo, three controls, five types. Detail lives on /smart-motor. */
+export function BrandSmartMotor() {
   const pick = useBi();
-  const entries = [
-    {
-      to: "/products" as const,
-      image: "/home/hero-bedroom-sheer.png",
-      kicker: { th: "สำหรับบ้านและที่พักอาศัย", en: "For homes" },
-      title: { th: "เลือกม่านให้บ้านคุณ", en: "Dress your home" },
-      text: {
-        th: "ดูสินค้า ส่งขนาดหน้าต่าง แล้วเราช่วยแนะนำรุ่นที่เหมาะกับห้อง",
-        en: "Browse products, send your window sizes and we'll recommend what suits each room.",
-      },
-      cta: { th: "ดูสินค้า", en: "Browse products" },
-    },
-    {
-      to: "/partners" as const,
-      image: "/home/dealer-business-talk.png",
-      kicker: {
-        th: "สำหรับร้านม่านและผู้รับเหมา",
-        en: "For dealers and contractors",
-      },
-      title: { th: "เป็นตัวแทนจำหน่าย WP ALL", en: "Become a WP ALL dealer" },
-      text: {
-        th: "ราคาตัวแทน ผลิตตามออเดอร์ และงาน OEM / ODM สำหรับแบรนด์ของคุณ",
-        en: "Dealer pricing, made-to-order production and OEM / ODM for your own brand.",
-      },
-      cta: { th: "ดูโปรแกรมตัวแทน", en: "See the dealer programme" },
-    },
-  ];
 
   return (
-    <section className="grid md:grid-cols-2">
-      {entries.map((entry, index) => (
-        <Link
-          key={entry.to}
-          to={entry.to}
-          style={{ ["--i" as string]: index }}
-          className="scroll-wipe-up-soft group relative isolate flex min-h-[28rem] flex-col justify-end overflow-hidden p-8 text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-accent sm:p-12 lg:min-h-[36rem]"
-        >
-          <img
-            src={entry.image}
-            alt=""
-            aria-hidden
-            loading="lazy"
-            className="scroll-zoom absolute inset-0 -z-10 size-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.04]"
-          />
-          <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgb(0_0_0/0.7),rgb(0_0_0/0.15))]" />
-          <p className="brand-kicker text-white/75">{entry.kicker.en}</p>
-          <h2 className="brand-heading mt-3">{pick(entry.title)}</h2>
-          <p className="mt-3 max-w-md text-sm leading-6 text-white/80">
-            {pick(entry.text)}
-          </p>
-          <span className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-medium">
-            {pick(entry.cta)}
-            <ArrowRight
-              className="size-4 transition-transform group-hover:translate-x-1"
-              aria-hidden
+    <section className="brand-section bg-cream">
+      <div className={container}>
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <div className="scroll-rise relative aspect-[4/3] overflow-hidden rounded-sm bg-surface">
+            <img
+              src="/products/motorized-track.webp"
+              alt={pick({
+                th: "รางม่านมอเตอร์ WP ALL",
+                en: "WP ALL motorised curtain track",
+              })}
+              loading="lazy"
+              decoding="async"
+              className="size-full object-cover"
             />
-          </span>
-        </Link>
-      ))}
+          </div>
+
+          <div>
+            <SectionHeading
+              index="04"
+              kicker="Smart Motor"
+              title={pick({
+                th: "ม่านและมู่ลี่ทุกแบบ ติดมอเตอร์ได้",
+                en: "Every curtain and blind, made smart.",
+              })}
+              description={pick({
+                th: "เปิด-ปิดจากรีโมท สวิตช์ติดผนัง หรือมือถือ",
+                en: "Run it from a remote, a wall switch or your phone.",
+              })}
+            />
+
+            <ul className="mt-8 divide-y divide-border border-y border-border">
+              {SMART_MOTOR_TYPES.map((type, index) => (
+                <li
+                  key={type.id}
+                  className="flex min-h-12 items-baseline gap-4 py-3"
+                >
+                  <span className="brand-index w-6 shrink-0 text-muted-foreground">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="text-base font-medium tracking-tight text-foreground lg:text-lg">
+                    {type.title}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              to="/smart-motor"
+              className="group mt-8 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary"
+            >
+              {pick({
+                th: "ดู Smart Motor ทั้งหมด",
+                en: "Explore Smart Motor",
+              })}
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-1"
+                aria-hidden
+              />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const CHOOSE_STEPS: { title: Bi; text: Bi }[] = [
+  {
+    title: { th: "วัดขนาดหน้าต่าง", en: "Measure your window" },
+    text: {
+      th: "วัดความกว้างและความสูงของหน้าต่างหรือผนังที่จะติดตั้ง วัดหลายจุดแล้วใช้ค่าที่ต้องการให้ม่านคลุม",
+      en: "Measure the width and height of the window or wall. Check a few points and use the size you want the curtain to cover.",
+    },
+  },
+  {
+    title: { th: "เลือกตามห้องและแสง", en: "Match the room and light" },
+    text: {
+      th: "ห้องนอนมักใช้ม่านทึบคู่ม่านโปร่ง ห้องนั่งเล่นเน้นความโปร่งและลวดลาย ห้องน้ำหรือครัวเลือกวัสดุที่ทนความชื้น",
+      en: "Bedrooms often pair blackout with sheer. Living rooms favour airy fabric and pattern. Bathrooms and kitchens need moisture-friendly materials.",
+    },
+  },
+  {
+    title: { th: "เลือกวิธีเปิด-ปิด", en: "Choose how it opens" },
+    text: {
+      th: "เปิดด้วยมือ ดึงโซ่ หรือติดมอเตอร์ควบคุมผ่านรีโมทและมือถือ เหมาะกับหน้าต่างบานสูงหรือบานกว้าง",
+      en: "Open by hand, by chain, or add a motor with remote and phone control — handy for tall or wide windows.",
+    },
+  },
+  {
+    title: { th: "ส่งขนาดให้เรา", en: "Send us your sizes" },
+    text: {
+      th: "ส่งขนาดและรูปหน้าต่าง ทีมงานช่วยแนะนำรุ่นที่เหมาะ แล้วผลิตตามขนาดจริงของคุณ",
+      en: "Share your sizes and a photo. Our team recommends a fit, then makes it to your exact measurements.",
+    },
+  },
+];
+
+/** Chapter 5 — how to choose curtains for your home. Explains the path from window to order. */
+export function BrandChooseGuide() {
+  const pick = useBi();
+
+  return (
+    <section className="brand-section relative isolate border-t border-border bg-surface">
+      <div className={container}>
+        <SectionHeading
+          index="06"
+          kicker="For homes"
+          title={pick({
+            th: "เลือกม่านให้บ้านคุณยังไงดี",
+            en: "How to choose curtains for your home",
+          })}
+          description={pick({
+            th: "สี่ขั้นตอนสั้นๆ ตั้งแต่วัดหน้าต่าง จนได้ม่านที่พอดีกับห้อง",
+            en: "Four short steps, from measuring the window to a curtain that fits the room.",
+          })}
+        />
+
+        <div className="mt-10 grid gap-10 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start lg:gap-16">
+          <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-black/10 lg:sticky lg:top-28">
+            <img
+              src="/home/hero-bedroom-sheer.png"
+              alt=""
+              aria-hidden
+              loading="lazy"
+              decoding="async"
+              className="size-full object-cover"
+            />
+          </div>
+
+          <div>
+            <ol className="divide-y divide-border border-y border-border">
+              {CHOOSE_STEPS.map((step, index) => (
+                <li
+                  key={step.title.en}
+                  className="scroll-rise flex items-start gap-5 py-7 lg:gap-7 lg:py-9"
+                  style={{ ["--i" as string]: index }}
+                >
+                  <span className="text-4xl leading-none font-medium tracking-tight text-accent lg:text-5xl">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <h3 className="text-lg font-medium tracking-tight text-foreground lg:text-xl">
+                      {pick(step.title)}
+                    </h3>
+                    <p className="mt-2 text-sm leading-7 text-muted-foreground lg:text-base">
+                      {pick(step.text)}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <Button
+                size="lg"
+                className="h-12 rounded-full bg-accent px-6 text-white hover:bg-accent/90"
+                asChild
+              >
+                <Link to="/products">
+                  {pick({ th: "ดูสินค้า", en: "Browse products" })}
+                  <ArrowRight className="ml-1 size-4" aria-hidden />
+                </Link>
+              </Button>
+              <Link
+                to="/contact"
+                search={{ topic: "quote" }}
+                className="group inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary"
+              >
+                {pick({ th: "ส่งขนาดขอคำแนะนำ", en: "Send sizes for advice" })}
+                <ArrowRight
+                  className="size-4 transition-transform group-hover:translate-x-1"
+                  aria-hidden
+                />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

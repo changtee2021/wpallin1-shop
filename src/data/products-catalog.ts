@@ -1058,14 +1058,14 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "A rod that finishes the room.",
     ),
     summary: t(
-      "รางโชว์ผลิตในโรงงานของเรา มีหลายผิวและหลายสี ทั้งขาว ดำ ลายไม้ โครเมียม และทอง เข้ากับหัวรางและขาจับหลายแบบ",
-      "Decorative rods made in our own workshop, in white, black, woodgrain, chrome and gold, matched with a range of finials and brackets.",
+      "รางโชว์ WP ALL มีหลายผิวและหลายสี ทั้งขาว ดำ ลายไม้ โครเมียม และทอง เข้ากับหัวรางและขาจับหลายแบบ",
+      "WP ALL decorative rods come in white, black, woodgrain, chrome and gold, matched with a range of finials and brackets.",
     ),
     image: "/products/curtain-rod.webp",
     gallery: ["/products/curtain-rod-colors.webp", "/brand/factory-3.webp"],
     highlights: [
       t("หลายสีและหลายผิว", "Many colours and finishes"),
-      t("ผลิตและตัดตามขนาดในโรงงาน", "Made and cut to size in-house"),
+      t("ตัดตามขนาดที่สั่ง", "Cut to the size you order"),
       t("เข้าชุดกับหัวรางและขาจับ", "Matching finials and brackets"),
     ],
     rooms: ["living", "bedroom", "commercial"],

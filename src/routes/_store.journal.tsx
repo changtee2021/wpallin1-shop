@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_store/journal")({
     pageHead({
       title: "บทความ | WP ALL",
       description:
-        "ไอเดียแต่งบ้าน วิธีเลือกม่านและมู่ลี่ และเรื่องราวจากโรงงาน WP ALL",
+        "ไอเดียแต่งบ้าน วิธีเลือกม่านและมู่ลี่ และเรื่องราวจาก WP ALL",
       path: "/journal",
     }),
   component: JournalPage,

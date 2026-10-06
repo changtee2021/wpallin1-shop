@@ -37,12 +37,24 @@ export function StorefrontFooter() {
         />
         <div className="relative mx-auto flex max-w-7xl flex-col gap-6 px-4 py-14 sm:px-6 md:flex-row md:items-end md:justify-between lg:px-8 lg:py-20">
           <div className="max-w-2xl">
-            <p className="brand-kicker text-accent">Start your project</p>
+            <p className="brand-kicker text-accent">Become a partner</p>
             <p className="brand-heading mt-3">
               {pick({
-                th: "ส่งขนาดหน้างานมา เราช่วยเลือกสินค้าและทำใบเสนอราคาให้",
-                en: "Send us your sizes — we'll help you choose and prepare a quote.",
+                th: "มาเป็นพาร์ทเนอร์กับเรา",
+                en: "Grow with us as a partner.",
               })}
+            </p>
+            <p className="mt-4 max-w-xl text-base leading-7 text-white/70 text-pretty">
+              {pick({
+                th: "ทีมงานพร้อมดูแลตัวแทนทุกท่าน ตั้งแต่เลือกสินค้า ราคาตัวแทน จนถึงผลิตและส่งมอบงาน",
+                en: "Our team looks after every partner, from choosing products and dealer pricing to production and delivery.",
+              })
+                .split(" ")
+                .map((phrase, index) => (
+                  <span key={index} className="inline-block whitespace-nowrap">
+                    {phrase}&nbsp;
+                  </span>
+                ))}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -51,8 +63,8 @@ export function StorefrontFooter() {
               className="h-12 rounded-full bg-accent px-6 text-white hover:bg-accent/90"
               asChild
             >
-              <Link to="/contact" search={{ topic: "quote" }}>
-                {t("site.cta.quote")}
+              <Link to="/contact" search={{ topic: "dealer" }}>
+                {pick({ th: "สมัครเป็นตัวแทน", en: "Become a dealer" })}
               </Link>
             </Button>
             <Button
@@ -110,6 +122,11 @@ export function StorefrontFooter() {
             <li>
               <Link to="/projects" className={linkClass}>
                 {t("nav.projects")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/smart-motor" className={linkClass}>
+                {t("nav.smartMotor")}
               </Link>
             </li>
             <li>
