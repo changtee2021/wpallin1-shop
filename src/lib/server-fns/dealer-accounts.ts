@@ -88,13 +88,17 @@ export const signInWithDealerCode = createServerFn({ method: "POST" })
     const ip = getClientIp(getRequest());
     const code = normalizeDealerCode(data.code);
     try {
+      // This project has no Redis in production yet, so a missing limiter must
+      // not block login. The limits apply as soon as Upstash is configured.
       await enforceRateLimit("dealer-code-login", `${ip}:${code}`, {
         requests: 8,
         window: "10 m",
+        requiredInProduction: false,
       });
       await enforceRateLimit("dealer-code-login-code", code, {
         requests: 20,
         window: "1 h",
+        requiredInProduction: false,
       });
     } catch (err) {
       if (err instanceof RateLimitError) {
