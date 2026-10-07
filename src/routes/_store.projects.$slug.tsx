@@ -169,7 +169,8 @@ function ProjectDetailPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <SectionHeading
               kicker="Products used"
-              title={pick({ th: "สินค้าในงานนี้", en: "In this project" })}
+              title="In this project"
+              description={pick({ th: "สินค้าในงานนี้", en: "" })}
             />
             <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
               {products.map((product) => (

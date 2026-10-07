@@ -69,7 +69,11 @@ function ProductGrid({ products }: { products: CatalogProduct[] }) {
   return (
     <ul className="grid gap-x-6 gap-y-14 sm:grid-cols-2 xl:grid-cols-3">
       {products.map((product, index) => (
-        <li key={product.slug}>
+        <li
+          key={product.slug}
+          className="scroll-rise"
+          style={{ ["--i" as string]: index % 3 }}
+        >
           <ProductCard product={product} eager={index < 3} />
         </li>
       ))}
@@ -132,7 +136,7 @@ const PRODUCT_GROUPS: ProductGroup[] = PRODUCT_CATEGORIES.flatMap(
           {
             id: "blinds-venetian",
             name: {
-              th: "มู่ลี่ไม้และอลูมิเนียม",
+              th: "มู่ลี่ไม้และมู่ลี่อลูมิเนียม",
               en: "Wood & Aluminium Blinds",
             },
             description: {
@@ -200,40 +204,64 @@ function ProductsPage() {
 
   return (
     <>
+      <div
+        aria-hidden
+        className="scroll-progress pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 bg-accent"
+      />
+
       <section className="border-b border-border">
-        <div className="mx-auto max-w-7xl px-4 pt-14 pb-10 sm:px-6 lg:px-8 lg:pt-20 lg:pb-14">
+        <div
+          key={activeCategory?.id ?? "all"}
+          className="mx-auto max-w-7xl px-4 pt-12 pb-10 sm:px-6 lg:px-8 lg:pt-16 lg:pb-14"
+        >
           {activeCategory ? (
             <button
               type="button"
               onClick={() => setSearch({ category: undefined, sub: undefined })}
-              className="mb-6 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="hero-blur-in mb-6 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <ArrowLeft className="size-4" aria-hidden />
               {pick({ th: "สินค้าทั้งหมด", en: "All products" })}
             </button>
           ) : null}
-          {activeCategory ? (
-            <p className="brand-kicker text-primary">
-              {`${activeCategory.index} — ${pick({ th: "หมวดสินค้า", en: "Category" })}`}
-            </p>
-          ) : null}
+          <p className="hero-blur-in brand-kicker flex items-center gap-3 text-primary">
+            <span aria-hidden className="h-px w-8 bg-accent" />
+            {activeCategory
+              ? `${activeCategory.index} — ${pick({ th: "หมวดสินค้า", en: "Category" })}`
+              : "Made to measure"}
+          </p>
           <h1
             className={cn(
-              activeCategory && "mt-4",
-              "font-medium tracking-tight text-foreground",
+              "scroll-fade-away mt-5 font-medium tracking-tight text-foreground",
               activeCategory
                 ? "brand-display"
                 : "text-[clamp(3.5rem,12vw,9.5rem)] leading-[0.92]",
             )}
           >
-            {activeCategory ? activeCategory.name.en : "Products"}
+            {(activeCategory ? activeCategory.name.en : "Products")
+              .split(" ")
+              .map((word, index) => (
+                <span
+                  key={`${word}-${index}`}
+                  className="hero-word inline-block pr-[0.22em] last:pr-0"
+                  style={{ ["--i" as string]: index }}
+                >
+                  {word}
+                </span>
+              ))}
           </h1>
           {activeCategory ? (
-            <p className="mt-2 text-lg text-muted-foreground">
+            <p
+              className="hero-blur-in mt-2 text-lg text-muted-foreground"
+              style={{ ["--delay" as string]: "350ms" }}
+            >
               {activeCategory.name.th}
             </p>
           ) : null}
-          <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground text-pretty lg:mt-8 lg:text-lg lg:leading-8">
+          <p
+            className="hero-blur-in mt-6 max-w-2xl text-base leading-7 text-muted-foreground text-pretty lg:mt-8 lg:text-lg lg:leading-8"
+            style={{ ["--delay" as string]: "450ms" }}
+          >
             {activeCategory
               ? pick(activeCategory.description)
               : pick({
@@ -334,7 +362,7 @@ function ProductsPage() {
                     aria-labelledby={`group-${group.id}`}
                     className="grid gap-8 py-12 first:pt-0 lg:grid-cols-[15rem_1fr] lg:gap-10"
                   >
-                    <div className="flex flex-col items-start">
+                    <div className="scroll-rise flex flex-col items-start">
                       <h2
                         id={`group-${group.id}`}
                         className="text-3xl leading-tight font-medium tracking-tight text-balance"
@@ -365,8 +393,12 @@ function ProductsPage() {
                       </button>
                     </div>
                     <ul className="grid grid-cols-2 gap-x-5 gap-y-10 lg:grid-cols-3">
-                      {products.slice(0, 3).map((product) => (
-                        <li key={product.slug}>
+                      {products.slice(0, 3).map((product, index) => (
+                        <li
+                          key={product.slug}
+                          className="scroll-rise"
+                          style={{ ["--i" as string]: index + 1 }}
+                        >
                           <ProductCard
                             product={product}
                             eager={groupIndex < 2}

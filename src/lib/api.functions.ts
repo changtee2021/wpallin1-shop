@@ -1187,17 +1187,27 @@ export const fetchDealerApplications = createServerFn({ method: "GET" })
 export const approveDealerApp = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ applicationId: z.string().uuid() }).parse(input),
+    z
+      .object({
+        applicationId: z.string().uuid(),
+        provinceCode: z
+          .string()
+          .trim()
+          .toUpperCase()
+          .regex(/^[A-Z]{2,4}$/),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     await requireAdmin(context.userId);
     const supabase = await getAdminClient();
-    await approveDealerApplication(
+    const { dealerCode } = await approveDealerApplication(
       supabase,
       data.applicationId,
       context.userId,
+      data.provinceCode,
     );
-    return { ok: true };
+    return { ok: true, dealerCode };
   });
 
 export const rejectDealerApp = createServerFn({ method: "POST" })
@@ -1521,6 +1531,14 @@ export {
 } from "@/lib/server-fns/order-links";
 
 export { fetchAdminMemberProfile } from "@/lib/server-fns/member-admin";
+
+export {
+  createDealerAccountFn,
+  resetDealerPasswordFn,
+  signInWithDealerCode,
+  fetchMyDealerAccount,
+  completeDealerPasswordChange,
+} from "@/lib/server-fns/dealer-accounts";
 
 export {
   fetchPublicMarketingCatalogs,

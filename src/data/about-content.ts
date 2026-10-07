@@ -235,6 +235,139 @@ export const WPALL_VALUES: WpallValue[] = [
   },
 ];
 
+/**
+ * Company-profile facts. `confirmed: false` items render only in `npm run dev` (with a DRAFT tag)
+ * so an unverified figure can never reach production; flip to `true` once management signs off.
+ */
+export type AboutStat = { value: string; label: Bi; confirmed: boolean };
+
+export const ABOUT_STATS: AboutStat[] = [
+  {
+    value: "20+",
+    label: t(
+      "ปี รากฐานจากธุรกิจผ้าม่านของครอบครัว",
+      "Years of family roots in curtains",
+    ),
+    confirmed: true,
+  },
+  {
+    value: "10+",
+    label: t("ปีประสบการณ์ของทีมงาน", "Years of hands-on experience"),
+    confirmed: true,
+  },
+  {
+    value: "100+",
+    label: t("ร้านค้าและดีลเลอร์", "Dealers and shops"),
+    confirmed: true,
+  },
+  {
+    value: "10,000+",
+    label: t("รายการสินค้า (SKU)", "Products (SKUs)"),
+    confirmed: true,
+  },
+  {
+    value: "10,000+",
+    label: t("ตร.ม. โรงงานและคลังสินค้า", "m² of factory & warehouse"),
+    confirmed: true,
+  },
+  {
+    value: "TH + Export",
+    label: t(
+      "ส่งสินค้าทั้งในประเทศและต่างประเทศ",
+      "Shipping in Thailand and abroad",
+    ),
+    confirmed: true,
+  },
+];
+
+export type AboutMilestone = {
+  year: string;
+  title: Bi;
+  body: Bi;
+  /** Revealed when the card is hovered. */
+  image?: string;
+  /** Logos sit on white and are not cropped. */
+  imageFit?: "cover" | "contain";
+  confirmed: boolean;
+};
+
+export const ABOUT_MILESTONES: AboutMilestone[] = [
+  {
+    year: "2020",
+    title: t("ก่อตั้งบริษัท", "Company founded"),
+    body: t(
+      "ก่อตั้ง บริษัท ดับบลิวพี เทรดดิ้ง อินเตอร์กรุ๊ป จำกัด ต่อยอดจากธุรกิจผ้าม่านของครอบครัวที่ทำมากว่า 20 ปี",
+      "WP Trading Intergroup Co., Ltd. is founded, building on a family curtain business of more than 20 years.",
+    ),
+    image: "/brand/factory-1.webp",
+    confirmed: true,
+  },
+  {
+    year: "2025",
+    title: t("Colors of Buriram 2025", "Colors of Buriram 2025"),
+    body: t(
+      "พิมพ์ลายผ้าลายสิริราชพัสตราภรณ์ลงผ้าโปร่งผืนใหญ่",
+      "Large sheer fabric printed with the Siriraj Phastraporn pattern.",
+    ),
+    image: "/projects/buriram-curtain.webp",
+    confirmed: true,
+  },
+  {
+    year: "2025",
+    title: t("Bangkok Design Week 2025", "Bangkok Design Week 2025"),
+    body: t(
+      "ม่านพิมพ์ลายใน Pavilion ป่าสีแดง “หย่อมป่า”",
+      "Printed curtains for the “Yom Pa” red forest pavilion.",
+    ),
+    image: "/projects/bdw-pavilion.webp",
+    confirmed: true,
+  },
+  {
+    year: "2026",
+    title: t("WP ALL x HD Expo 2026", "WP ALL x HD Expo 2026"),
+    body: t(
+      "ร่วมออกงานกับกรมส่งเสริมการค้าระหว่างประเทศ (DITP) นำสินค้าม่านที่ผลิตในไทยสู่เวทีนานาชาติ",
+      "With the Department of International Trade Promotion (DITP), taking Thai-made curtain products to an international stage.",
+    ),
+    image: "/about/ditp-logo.webp",
+    imageFit: "contain",
+    confirmed: true,
+  },
+  {
+    year: "2026",
+    title: t("แคตตาล็อกชุดใหม่", "New catalogue collection"),
+    body: t(
+      "แคตตาล็อกเล่มจริงแยกตามหมวด มู่ลี่ไม้ ม่านม้วน ฉากกั้นห้อง ราง และรางโชว์",
+      "Printed books for wood blinds, rollers, partitions, tracks and rods.",
+    ),
+    image: "/catalogues/wood-blinds.webp",
+    confirmed: true,
+  },
+];
+
+export type AboutFact = { label: Bi; value: Bi; confirmed: boolean };
+
+export const ABOUT_COMPANY_EXTRA_FACTS: AboutFact[] = [
+  {
+    label: t("ปีที่ก่อตั้ง", "Founded"),
+    value: t("พ.ศ. 2563 (ค.ศ. 2020)", "2020"),
+    confirmed: true,
+  },
+  {
+    label: t("เลขประจำตัวผู้เสียภาษี", "Tax ID"),
+    value: t("0105564055496", "0105564055496"),
+    confirmed: true,
+  },
+  {
+    label: t("การรับประกัน", "Warranty"),
+    value: t(
+      "ตามประเภทสินค้า เช่น มอเตอร์รางม่าน รับประกัน 6 ปี",
+      "Varies by product — e.g. 6 years on curtain track motors",
+    ),
+    confirmed: true,
+  },
+];
+
 export const WPALL_TAGLINE: Bi = t(
   "บ้านของคุณ เรื่องของเรา...ตลอดชีวิต",
   "Your home, our lifelong care",

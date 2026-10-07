@@ -272,7 +272,7 @@ export function BrandSmartMotor() {
           tone="dark"
           index="03"
           kicker="Smart Motor"
-          title="Motors for every curtain and blind"
+          title="Motors for curtains and blinds"
           description={pick({
             th: "ม่านและมู่ลี่ทุกแบบ ติดมอเตอร์ได้",
             en: "",
@@ -360,9 +360,9 @@ export function BrandProjectsBento() {
           hideKicker
           index="04"
           kicker="Projects"
-          title="Real work from our projects and dealers"
+          title="Projects from Partners"
           description={pick({
-            th: "งานจริงจากโครงการและตัวแทนของเรา",
+            th: "ผลงานจากพาร์ทเนอร์ของเรา",
             en: "",
           })}
           action={

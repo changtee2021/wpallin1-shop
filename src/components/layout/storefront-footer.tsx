@@ -11,7 +11,7 @@ import { useBi } from "@/lib/bi";
 import { siteConfig } from "@/lib/site-config";
 
 const linkClass =
-  "inline-flex min-h-11 items-center text-sm text-white/70 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm sm:min-h-9";
+  "inline-flex min-h-11 items-center text-sm text-white/70 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm sm:min-h-8";
 
 const legalLinkClass =
   "inline-flex min-h-11 items-center text-white/60 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm sm:min-h-0";
@@ -81,7 +81,7 @@ export function StorefrontFooter() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] lg:px-8">
         <div>
           <img
             src="/brand/logo-white.png"
@@ -156,9 +156,9 @@ export function StorefrontFooter() {
           </ul>
         </div>
 
-        <div className="space-y-4 text-sm">
+        <div className="space-y-2 text-sm">
           <FooterHeading>{t("footer.contact")}</FooterHeading>
-          <div>
+          <div className="pt-1">
             <p className="text-white/50">
               {locale === "en"
                 ? siteConfig.officeLabelEn
@@ -166,32 +166,20 @@ export function StorefrontFooter() {
             </p>
             <a
               href={`tel:${siteConfig.phoneTel}`}
-              className="inline-flex min-h-11 items-center text-lg font-medium hover:text-accent sm:min-h-9"
+              className="inline-flex min-h-11 items-center text-lg font-medium hover:text-accent sm:min-h-8"
             >
               {siteConfig.phoneDisplay}
             </a>
           </div>
-          <div className="flex items-start gap-3">
-            <img
-              src={siteConfig.lineQrSrc}
-              alt={`LINE ${siteConfig.lineId}`}
-              width={72}
-              height={72}
-              loading="lazy"
-              className="size-[72px] rounded-md bg-white object-cover"
-            />
-            <div>
-              <p className="text-white/50">LINE</p>
-              <a
-                href={siteConfig.lineUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-11 items-center font-medium hover:text-accent sm:min-h-9"
-              >
-                {siteConfig.lineId}
-              </a>
-            </div>
-          </div>
+          <a
+            href={siteConfig.lineUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-11 items-center gap-2 font-medium hover:text-accent sm:min-h-8"
+          >
+            <span className="text-white/50">LINE</span>
+            {siteConfig.lineId}
+          </a>
           <address className="not-italic leading-6 text-white/70">
             {address.line1}
             <br />
@@ -203,7 +191,7 @@ export function StorefrontFooter() {
             href={siteConfig.mapsUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-h-11 items-center gap-1 font-medium text-white hover:text-accent sm:min-h-9"
+            className="inline-flex min-h-11 items-center gap-1 font-medium text-white hover:text-accent sm:min-h-8"
           >
             {pick({ th: "เปิดแผนที่", en: "Open map" })}
             <ArrowUpRight className="size-4" aria-hidden />

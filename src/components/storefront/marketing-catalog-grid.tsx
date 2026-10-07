@@ -52,13 +52,14 @@ export function MarketingCatalogGrid({ catalogs, compact = false }: Props) {
           : "grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3"
       }
     >
-      {catalogs.map((catalog) => (
+      {catalogs.map((catalog, index) => (
         <Card
           key={catalog.id}
           className={cn(
             "group overflow-hidden border-0 shadow-md transition-shadow hover:shadow-lg",
-            !compact && "rounded-2xl",
+            !compact && "scroll-rise rounded-2xl",
           )}
+          style={compact ? undefined : { ["--i" as string]: index % 3 }}
         >
           <div className="relative aspect-[3/4] bg-gradient-to-br from-muted/80 to-muted">
             {catalog.coverImageUrl ? (

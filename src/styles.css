@@ -65,7 +65,7 @@
   --color-cream: var(--cream);
   --font-sans: "IBM Plex Sans Thai", ui-sans-serif, system-ui, sans-serif;
   /* Latin display serif, loaded for the letters W P A L only (see __root.tsx). */
-  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+  --font-display: "the-seasons", "Playfair Display", ui-serif, Georgia, serif;
   /* Plex reads heavy at 600+, so the scale is shifted one step lighter for a quieter look. */
   --font-weight-semibold: 500;
   --font-weight-bold: 600;

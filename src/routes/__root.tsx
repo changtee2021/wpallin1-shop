@@ -12,6 +12,7 @@ import { ErrorPageShell } from "@/components/errors/error-page-shell";
 import { SkipLink } from "@/components/layout/skip-link";
 import { ChatWidget } from "@/components/chat/chat-widget";
 import { CookieConsent } from "@/components/cookie-consent";
+import { DealerPasswordGate } from "@/components/dealer/dealer-password-gate";
 import { Toaster } from "@/components/ui/sonner";
 import { LocaleSync } from "@/components/locale-sync";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -82,6 +83,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           rel: "stylesheet",
           href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&text=WPAL&display=swap",
         },
+        {
+          rel: "preconnect",
+          href: "https://use.typekit.net",
+          crossOrigin: "anonymous",
+        },
+        { rel: "stylesheet", href: "https://use.typekit.net/kts4wjg.css" },
         { rel: "stylesheet", href: appCss },
         { rel: "icon", href: "/brand/logo-mono-dark.png", type: "image/png" },
       ],
@@ -122,6 +129,7 @@ function RootComponent() {
               <ChatWidget />
               <Toaster position="top-center" richColors />
               <CookieConsent />
+              <DealerPasswordGate />
             </ChatUiProvider>
           </CartProvider>
         </AuthProvider>

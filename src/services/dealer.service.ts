@@ -23,13 +23,16 @@ export type DealerApplicationDto = {
   businessType: string | null;
   address: string | null;
   status: DealerApplicationStatus;
+  source: "web" | "line" | "sales";
+  provinceCode: string | null;
+  dealerCode: string | null;
   reviewNote: string | null;
   reviewedAt: string | null;
   createdAt: string;
 };
 
 const APPLICATION_SELECT =
-  "id, user_id, company_name, tax_id, contact_name, contact_phone, contact_email, business_type, address, status, review_note, reviewed_at, created_at";
+  "id, user_id, company_name, tax_id, contact_name, contact_phone, contact_email, business_type, address, status, source, province_code, review_note, reviewed_at, created_at";
 
 function mapApplicationRow(row: Record<string, unknown>): DealerApplicationDto {
   return {
@@ -43,6 +46,9 @@ function mapApplicationRow(row: Record<string, unknown>): DealerApplicationDto {
     businessType: (row.business_type as string | null) ?? null,
     address: (row.address as string | null) ?? null,
     status: row.status as DealerApplicationStatus,
+    source: (row.source as DealerApplicationDto["source"]) ?? "web",
+    provinceCode: (row.province_code as string | null) ?? null,
+    dealerCode: null,
     reviewNote: (row.review_note as string | null) ?? null,
     reviewedAt: (row.reviewed_at as string | null) ?? null,
     createdAt: row.created_at as string,
@@ -143,14 +149,32 @@ export async function listDealerApplications(
   const { data, error } = await query;
   if (error) throw new Error(error.message);
 
-  return (data ?? []).map((row) => mapApplicationRow(row));
+  const apps = (data ?? []).map((row) => mapApplicationRow(row));
+  const userIds = [...new Set(apps.map((app) => app.userId))];
+  if (userIds.length === 0) return apps;
+
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, dealer_code")
+    .in("id", userIds);
+  const codes = new Map(
+    (profiles ?? []).map((p) => [
+      p.id as string,
+      p.dealer_code as string | null,
+    ]),
+  );
+  return apps.map((app) => ({
+    ...app,
+    dealerCode: codes.get(app.userId) ?? null,
+  }));
 }
 
 export async function approveDealerApplication(
   supabase: SupabaseClient,
   applicationId: string,
   adminUserId: string,
-): Promise<void> {
+  provinceCode: string,
+): Promise<{ dealerCode: string }> {
   const { data: app, error } = await supabase
     .from("dealer_applications")
     .select("*")
@@ -169,14 +193,25 @@ export async function approveDealerApplication(
       status: "approved",
       reviewed_by: adminUserId,
       reviewed_at: new Date().toISOString(),
+      province_code: provinceCode,
     })
     .eq("id", applicationId);
 
   if (updateErr) throw new Error(updateErr.message);
 
+  const { data: currentProfile } = await supabase
+    .from("profiles")
+    .select("sales_rep_id")
+    .eq("id", app.user_id)
+    .maybeSingle();
+
   const { error: profileErr } = await supabase
     .from("profiles")
-    .update({ account_status: "approved", member_tier: "silver_dealer" })
+    .update({
+      account_status: "approved",
+      member_tier: "silver_dealer",
+      sales_rep_id: currentProfile?.sales_rep_id ?? adminUserId,
+    })
     .eq("id", app.user_id);
 
   if (profileErr) throw new Error(profileErr.message);
@@ -190,10 +225,15 @@ export async function approveDealerApplication(
 
   if (roleErr) throw new Error(roleErr.message);
 
+  const { issueDealerCode } = await import("@/services/dealer-account.service");
+  const dealerCode = await issueDealerCode(supabase, app.user_id, provinceCode);
+
   const { notifyUserEvent } = await import("@/services/notification.service");
   await notifyUserEvent(supabase, app.user_id, "dealer_approved", {
     companyName: app.company_name,
   });
+
+  return { dealerCode };
 }
 
 export async function rejectDealerApplication(

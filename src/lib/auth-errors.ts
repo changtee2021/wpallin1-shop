@@ -13,7 +13,7 @@ const AUTH_ERROR_MAP: Record<string, string> = {
 };
 
 /** Showcase mode has no customer area, so only staff log in — send them to the back office. */
-export const POST_AUTH_PATH = COMMERCE_ENABLED ? "/products" : "/admin";
+export const POST_AUTH_PATH = COMMERCE_ENABLED ? "/shop" : "/admin";
 
 export function translateAuthError(message: string, fallback: string): string {
   return AUTH_ERROR_MAP[message] ?? fallback;

@@ -8,10 +8,7 @@ import {
 } from "lucide-react";
 
 import { SectionHeading } from "@/components/brand/section-heading";
-import {
-  getCatalogProduct,
-  type ProductStat,
-} from "@/data/products-catalog";
+import { getCatalogProduct, type ProductStat } from "@/data/products-catalog";
 import {
   SMART_MOTOR_CONTROLS,
   SMART_MOTOR_FEATURES,
@@ -41,7 +38,7 @@ export function SmartMotorHero() {
       <div className={cn(container, "pt-12 pb-8 lg:pt-16 lg:pb-10")}>
         <p className="hero-blur-in brand-kicker flex items-center gap-3 text-primary">
           <span aria-hidden className="h-px w-8 bg-accent" />
-          Every curtain · Every blind
+          Curtains · Blinds
         </p>
         <h1 className="scroll-fade-away mt-5 text-[clamp(3.5rem,14.5vw,13rem)] leading-[0.98] font-medium tracking-tighter text-foreground">
           {["Smart", "Motor"].map((word, index) => (
@@ -61,7 +58,7 @@ export function SmartMotorHero() {
           >
             {pick({
               th: "ม่านและมู่ลี่ทุกแบบ ติดมอเตอร์ได้ เปิด-ปิดจากรีโมท สวิตช์ หรือมือถือ",
-              en: "Motors for every curtain and blind, run from a remote, a wall switch or your phone.",
+              en: "Motors for curtains and blinds, run from a remote, a wall switch or your phone.",
             })}
           </p>
           <ul
@@ -395,7 +392,10 @@ export function SmartMotorModels() {
         <SectionHeading
           index="04"
           kicker="Models"
-          title={pick({ th: "รางม่านมอเตอร์ 2 รุ่น", en: "Two motorised tracks" })}
+          title={pick({
+            th: "รางม่านมอเตอร์ 2 รุ่น",
+            en: "Two motorised tracks",
+          })}
           description={pick({
             th: "WP Nano Power สำหรับม่านชั้นเดียว และ WP N23 สำหรับม่านสองชั้น",
             en: "WP Nano Power for a single curtain, WP N23 for two layers.",
@@ -489,7 +489,7 @@ export function SmartMotorTypes() {
           kicker="Compatibility"
           title={pick({
             th: "ใช้ได้กับม่านและมู่ลี่ทุกแบบ",
-            en: "Fits every blind and curtain",
+            en: "Fits blinds and curtains",
           })}
         />
         <ul className={cn(tileFrame, "mt-12 sm:grid-cols-2 lg:grid-cols-4")}>

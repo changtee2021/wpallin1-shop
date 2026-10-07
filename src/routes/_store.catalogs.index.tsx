@@ -91,29 +91,42 @@ function CatalogsPage() {
 
   return (
     <>
-      <section className="border-b border-border bg-surface">
-        <div className="mx-auto max-w-7xl px-4 pt-14 pb-12 sm:px-6 lg:px-8 lg:pt-20">
-          <SectionHeading
-            as="h1"
-            kicker="Catalogue"
-            title={pick({ th: "แคตตาล็อก", en: "Catalogues" })}
-            description={pick({
+      <div
+        aria-hidden
+        className="scroll-progress pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 bg-accent"
+      />
+
+      <section className="mx-auto max-w-7xl px-4 pt-12 pb-14 sm:px-6 lg:px-8 lg:pt-16 lg:pb-20">
+        <p className="hero-blur-in brand-kicker flex items-center gap-3 text-primary">
+          <span aria-hidden className="h-px w-8 bg-accent" />
+          Printed · Online
+        </p>
+        <div className="mt-5 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
+          <h1 className="scroll-fade-away text-[clamp(3.25rem,11vw,8.5rem)] leading-[0.95] font-medium tracking-tight text-foreground">
+            <span className="hero-word inline-block">Catalogues</span>
+          </h1>
+          <p
+            className="hero-blur-in max-w-sm text-base leading-7 text-pretty text-muted-foreground lg:pb-4 lg:text-right"
+            style={{ ["--delay" as string]: "450ms" }}
+          >
+            {pick({
               th: "ขอรับแคตตาล็อกเล่มจริงจากทีมขาย หรืออ่านแบบออนไลน์ได้ทันที",
-              en: "Request a printed copy from our sales team, or read online right away.",
+              en: "",
             })}
-          />
+          </p>
         </div>
       </section>
 
       <section className="brand-section bg-cream">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading
+            hideKicker
             index="01"
             kicker="Printed"
-            title={pick({ th: "แคตตาล็อกเล่มจริง", en: "Printed catalogues" })}
+            title="Printed catalogues"
             description={pick({
-              th: "แคตตาล็อกแบบเล่มแยกตามหมวดสินค้า กด “ขอตัวอย่าง” เพื่อกรอกฟอร์มร่วมเป็นพาร์ทเนอร์ ทีมขายจะติดต่อกลับ",
-              en: "Printed books by product category. Tap “Request a copy” to fill in the partner form and our sales team will get back to you.",
+              th: "แคตตาล็อกเล่มจริงแยกตามหมวดสินค้า กด “ขอตัวอย่าง” แล้วทีมขายจะติดต่อกลับ",
+              en: "",
             })}
           />
           <div className="mt-14">
@@ -125,12 +138,16 @@ function CatalogsPage() {
       <section className="brand-section bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading
+            hideKicker
             index="02"
             kicker="Online"
-            title={t("catalogs.title")}
-            description={t("catalogs.subtitle")}
+            title="Online catalogues"
+            description={pick({
+              th: "อ่านแคตตาล็อกฉบับเต็มบนเว็บแบบ E-book ได้ทุกอุปกรณ์",
+              en: "",
+            })}
           />
-          <div className="relative mt-8 mb-10 max-w-xl">
+          <div className="scroll-rise relative mt-8 mb-10 max-w-xl">
             <Search
               className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
               aria-hidden
@@ -143,62 +160,62 @@ function CatalogsPage() {
               className="h-12 rounded-full bg-background pl-11"
             />
           </div>
-        {activeCategory === "all" && categories.length > 0 ? (
-          <CatalogCategoryHero
-            categories={categories}
-            counts={categoryCounts}
-            activeCategory={activeCategory}
-            onSelect={setActiveCategory}
-            title={t("catalogs.categories.title")}
-          />
-        ) : null}
+          {activeCategory === "all" && categories.length > 0 ? (
+            <CatalogCategoryHero
+              categories={categories}
+              counts={categoryCounts}
+              activeCategory={activeCategory}
+              onSelect={setActiveCategory}
+              title={t("catalogs.categories.title")}
+            />
+          ) : null}
 
-        <div className="mb-6 flex flex-wrap gap-2">
-          <CategoryPill
-            active={activeCategory === "all"}
-            onClick={() => setActiveCategory("all")}
-          >
-            {t("catalogs.all")} ({catalogs.length})
-          </CategoryPill>
-          {categories.map((category) => {
-            const count = catalogs.filter(
-              (item) => item.categoryId === category.id,
-            ).length;
-            return (
-              <CategoryPill
-                key={category.id}
-                active={activeCategory === category.id}
-                onClick={() => setActiveCategory(category.id)}
-              >
-                {category.name} ({count})
-              </CategoryPill>
-            );
-          })}
-        </div>
-
-        {featured.length > 0 ? (
-          <section className="mb-10">
-            <h2 className="mb-4 text-lg font-semibold">
-              {t("catalogs.featured")}
-            </h2>
-            <MarketingCatalogGrid catalogs={featured} />
-          </section>
-        ) : null}
-
-        {filtered.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-sm border border-dashed border-border py-16 text-center">
-            <BookOpen className="size-8 text-muted-foreground" aria-hidden />
-            <p className="text-sm text-muted-foreground">
-              {catalogs.length === 0
-                ? t("catalogs.empty")
-                : t("catalogs.noResults")}
-            </p>
+          <div className="mb-6 flex flex-wrap gap-2">
+            <CategoryPill
+              active={activeCategory === "all"}
+              onClick={() => setActiveCategory("all")}
+            >
+              {t("catalogs.all")} ({catalogs.length})
+            </CategoryPill>
+            {categories.map((category) => {
+              const count = catalogs.filter(
+                (item) => item.categoryId === category.id,
+              ).length;
+              return (
+                <CategoryPill
+                  key={category.id}
+                  active={activeCategory === category.id}
+                  onClick={() => setActiveCategory(category.id)}
+                >
+                  {category.name} ({count})
+                </CategoryPill>
+              );
+            })}
           </div>
-        ) : (
-          <MarketingCatalogGrid
-            catalogs={featured.length ? regular : filtered}
-          />
-        )}
+
+          {featured.length > 0 ? (
+            <section className="mb-10">
+              <h2 className="mb-4 text-lg font-semibold">
+                {t("catalogs.featured")}
+              </h2>
+              <MarketingCatalogGrid catalogs={featured} />
+            </section>
+          ) : null}
+
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 rounded-sm border border-dashed border-border py-16 text-center">
+              <BookOpen className="size-8 text-muted-foreground" aria-hidden />
+              <p className="text-sm text-muted-foreground">
+                {catalogs.length === 0
+                  ? t("catalogs.empty")
+                  : t("catalogs.noResults")}
+              </p>
+            </div>
+          ) : (
+            <MarketingCatalogGrid
+              catalogs={featured.length ? regular : filtered}
+            />
+          )}
         </div>
       </section>
     </>

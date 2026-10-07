@@ -21,6 +21,12 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
 import { useT } from "@/i18n";
+import { supabase } from "@/integrations/supabase/client";
+import { signInWithDealerCode } from "@/lib/api.functions";
+import {
+  looksLikeDealerCode,
+  normalizeDealerCode,
+} from "@/lib/dealer-provinces";
 import {
   translateAuthError,
   navigateAfterAuth,
@@ -92,20 +98,37 @@ function LoginPage() {
   async function handleLogin(e: FormEvent) {
     e.preventDefault();
     const nextErrors: Record<string, string> = {};
-    if (!email.trim()) nextErrors.email = "กรอกอีเมล";
+    const identifier = email.trim();
+    const isDealerCode = looksLikeDealerCode(identifier);
+    if (!identifier) nextErrors.email = "กรอกอีเมลหรือรหัสตัวแทน";
+    else if (!isDealerCode && !identifier.includes("@")) {
+      nextErrors.email = "กรอกอีเมล หรือรหัสตัวแทนแบบ WPD-BKK-0001";
+    }
     if (!password) nextErrors.password = "กรอกรหัสผ่าน";
     setFieldErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
     setLoading(true);
     try {
-      await signIn(email.trim(), password);
+      if (isDealerCode) {
+        const tokens = await signInWithDealerCode({
+          data: { code: normalizeDealerCode(identifier), password },
+        });
+        const { error } = await supabase.auth.setSession({
+          access_token: tokens.accessToken,
+          refresh_token: tokens.refreshToken,
+        });
+        if (error) throw error;
+      } else {
+        await signIn(identifier, password);
+      }
       toast.success("เข้าสู่ระบบสำเร็จ");
       goAfterAuth();
     } catch (err) {
-      const message = translateAuthError(
-        err instanceof Error ? err.message : "",
-        "เข้าสู่ระบบไม่สำเร็จ",
-      );
+      const raw = err instanceof Error ? err.message : "";
+      const message =
+        isDealerCode && /[\u0E00-\u0E7F]/.test(raw)
+          ? raw
+          : translateAuthError(raw, "เข้าสู่ระบบไม่สำเร็จ");
       setFieldErrors({ password: message });
       toast.error(message);
     } finally {
@@ -318,11 +341,18 @@ function LoginPage() {
                 <TabsContent value="login" className="mt-6 space-y-4">
                   <form onSubmit={handleLogin} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="login-email">{t("auth.email")}</Label>
+                      <Label htmlFor="login-email">
+                        {t("auth.email")} / รหัสตัวแทน
+                      </Label>
                       <Input
                         id="login-email"
-                        type="email"
-                        autoComplete="email"
+                        type="text"
+                        inputMode="email"
+                        autoCapitalize="none"
+                        autoCorrect="off"
+                        spellCheck={false}
+                        autoComplete="username"
+                        placeholder="you@example.com หรือ WPD-BKK-0001"
                         value={email}
                         onChange={(e) => {
                           setEmail(e.target.value);

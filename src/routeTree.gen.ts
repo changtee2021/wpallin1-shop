@@ -80,6 +80,8 @@ import { Route as StoreProductsIndexRouteImport } from './routes/_store.products
 import { Route as StoreProductsSlugRouteImport } from './routes/_store.products.$slug'
 import { Route as StoreProjectsIndexRouteImport } from './routes/_store.projects.index'
 import { Route as StoreProjectsSlugRouteImport } from './routes/_store.projects.$slug'
+import { Route as StoreShopIndexRouteImport } from './routes/_store.shop.index'
+import { Route as StoreShopSlugRouteImport } from './routes/_store.shop.$slug'
 import { Route as AccountOrdersOrderIdRouteImport } from './routes/account.orders.$orderId'
 import { Route as AdminInspirationIndexRouteImport } from './routes/admin.inspiration.index'
 import { Route as AdminInspirationMaterialsRouteImport } from './routes/admin.inspiration.materials'
@@ -461,6 +463,16 @@ const StoreProjectsSlugRoute = StoreProjectsSlugRouteImport.update({
   path: '/projects/$slug',
   getParentRoute: () => StoreRoute,
 } as any)
+const StoreShopIndexRoute = StoreShopIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StoreShopRoute,
+} as any)
+const StoreShopSlugRoute = StoreShopSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => StoreShopRoute,
+} as any)
 const AccountOrdersOrderIdRoute = AccountOrdersOrderIdRouteImport.update({
   id: '/$orderId',
   path: '/$orderId',
@@ -619,7 +631,7 @@ export interface FileRoutesByFullPath {
   '/order': typeof StoreOrderRoute
   '/partners': typeof StorePartnersRoute
   '/privacy': typeof StorePrivacyRoute
-  '/shop': typeof StoreShopRoute
+  '/shop': typeof StoreShopRouteWithChildren
   '/smart-motor': typeof StoreSmartMotorRoute
   '/terms': typeof StoreTermsRoute
   '/account/notifications': typeof AccountNotificationsRoute
@@ -662,6 +674,7 @@ export interface FileRoutesByFullPath {
   '/inspiration/$slug': typeof StoreInspirationSlugRoute
   '/products/$slug': typeof StoreProductsSlugRoute
   '/projects/$slug': typeof StoreProjectsSlugRoute
+  '/shop/$slug': typeof StoreShopSlugRoute
   '/account/orders/$orderId': typeof AccountOrdersOrderIdRoute
   '/admin/inspiration/materials': typeof AdminInspirationMaterialsRouteWithChildren
   '/admin/members/$userId': typeof AdminMembersUserIdRoute
@@ -687,6 +700,7 @@ export interface FileRoutesByFullPath {
   '/inspiration/': typeof StoreInspirationIndexRoute
   '/products/': typeof StoreProductsIndexRoute
   '/projects/': typeof StoreProjectsIndexRoute
+  '/shop/': typeof StoreShopIndexRoute
   '/admin/inspiration/': typeof AdminInspirationIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/quotations/': typeof AdminQuotationsIndexRoute
@@ -710,7 +724,6 @@ export interface FileRoutesByTo {
   '/order': typeof StoreOrderRoute
   '/partners': typeof StorePartnersRoute
   '/privacy': typeof StorePrivacyRoute
-  '/shop': typeof StoreShopRoute
   '/smart-motor': typeof StoreSmartMotorRoute
   '/terms': typeof StoreTermsRoute
   '/account/notifications': typeof AccountNotificationsRoute
@@ -751,6 +764,7 @@ export interface FileRoutesByTo {
   '/inspiration/$slug': typeof StoreInspirationSlugRoute
   '/products/$slug': typeof StoreProductsSlugRoute
   '/projects/$slug': typeof StoreProjectsSlugRoute
+  '/shop/$slug': typeof StoreShopSlugRoute
   '/account/orders/$orderId': typeof AccountOrdersOrderIdRoute
   '/admin/inspiration/materials': typeof AdminInspirationMaterialsRouteWithChildren
   '/admin/members/$userId': typeof AdminMembersUserIdRoute
@@ -776,6 +790,7 @@ export interface FileRoutesByTo {
   '/inspiration': typeof StoreInspirationIndexRoute
   '/products': typeof StoreProductsIndexRoute
   '/projects': typeof StoreProjectsIndexRoute
+  '/shop': typeof StoreShopIndexRoute
   '/admin/inspiration': typeof AdminInspirationIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
   '/admin/quotations': typeof AdminQuotationsIndexRoute
@@ -807,7 +822,7 @@ export interface FileRoutesById {
   '/_store/order': typeof StoreOrderRoute
   '/_store/partners': typeof StorePartnersRoute
   '/_store/privacy': typeof StorePrivacyRoute
-  '/_store/shop': typeof StoreShopRoute
+  '/_store/shop': typeof StoreShopRouteWithChildren
   '/_store/smart-motor': typeof StoreSmartMotorRoute
   '/_store/terms': typeof StoreTermsRoute
   '/account/notifications': typeof AccountNotificationsRoute
@@ -851,6 +866,7 @@ export interface FileRoutesById {
   '/_store/inspiration/$slug': typeof StoreInspirationSlugRoute
   '/_store/products/$slug': typeof StoreProductsSlugRoute
   '/_store/projects/$slug': typeof StoreProjectsSlugRoute
+  '/_store/shop/$slug': typeof StoreShopSlugRoute
   '/account/orders/$orderId': typeof AccountOrdersOrderIdRoute
   '/admin/inspiration/materials': typeof AdminInspirationMaterialsRouteWithChildren
   '/admin/members/$userId': typeof AdminMembersUserIdRoute
@@ -876,6 +892,7 @@ export interface FileRoutesById {
   '/_store/inspiration/': typeof StoreInspirationIndexRoute
   '/_store/products/': typeof StoreProductsIndexRoute
   '/_store/projects/': typeof StoreProjectsIndexRoute
+  '/_store/shop/': typeof StoreShopIndexRoute
   '/admin/inspiration/': typeof AdminInspirationIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/quotations/': typeof AdminQuotationsIndexRoute
@@ -951,6 +968,7 @@ export interface FileRouteTypes {
     | '/inspiration/$slug'
     | '/products/$slug'
     | '/projects/$slug'
+    | '/shop/$slug'
     | '/account/orders/$orderId'
     | '/admin/inspiration/materials'
     | '/admin/members/$userId'
@@ -976,6 +994,7 @@ export interface FileRouteTypes {
     | '/inspiration/'
     | '/products/'
     | '/projects/'
+    | '/shop/'
     | '/admin/inspiration/'
     | '/admin/products/'
     | '/admin/quotations/'
@@ -999,7 +1018,6 @@ export interface FileRouteTypes {
     | '/order'
     | '/partners'
     | '/privacy'
-    | '/shop'
     | '/smart-motor'
     | '/terms'
     | '/account/notifications'
@@ -1040,6 +1058,7 @@ export interface FileRouteTypes {
     | '/inspiration/$slug'
     | '/products/$slug'
     | '/projects/$slug'
+    | '/shop/$slug'
     | '/account/orders/$orderId'
     | '/admin/inspiration/materials'
     | '/admin/members/$userId'
@@ -1065,6 +1084,7 @@ export interface FileRouteTypes {
     | '/inspiration'
     | '/products'
     | '/projects'
+    | '/shop'
     | '/admin/inspiration'
     | '/admin/products'
     | '/admin/quotations'
@@ -1139,6 +1159,7 @@ export interface FileRouteTypes {
     | '/_store/inspiration/$slug'
     | '/_store/products/$slug'
     | '/_store/projects/$slug'
+    | '/_store/shop/$slug'
     | '/account/orders/$orderId'
     | '/admin/inspiration/materials'
     | '/admin/members/$userId'
@@ -1164,6 +1185,7 @@ export interface FileRouteTypes {
     | '/_store/inspiration/'
     | '/_store/products/'
     | '/_store/projects/'
+    | '/_store/shop/'
     | '/admin/inspiration/'
     | '/admin/products/'
     | '/admin/quotations/'
@@ -1699,6 +1721,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoreProjectsSlugRouteImport
       parentRoute: typeof StoreRoute
     }
+    '/_store/shop/': {
+      id: '/_store/shop/'
+      path: '/'
+      fullPath: '/shop/'
+      preLoaderRoute: typeof StoreShopIndexRouteImport
+      parentRoute: typeof StoreShopRoute
+    }
+    '/_store/shop/$slug': {
+      id: '/_store/shop/$slug'
+      path: '/$slug'
+      fullPath: '/shop/$slug'
+      preLoaderRoute: typeof StoreShopSlugRouteImport
+      parentRoute: typeof StoreShopRoute
+    }
     '/account/orders/$orderId': {
       id: '/account/orders/$orderId'
       path: '/$orderId'
@@ -1927,6 +1963,20 @@ const StoreInspirationRouteChildren: StoreInspirationRouteChildren = {
 const StoreInspirationRouteWithChildren =
   StoreInspirationRoute._addFileChildren(StoreInspirationRouteChildren)
 
+interface StoreShopRouteChildren {
+  StoreShopSlugRoute: typeof StoreShopSlugRoute
+  StoreShopIndexRoute: typeof StoreShopIndexRoute
+}
+
+const StoreShopRouteChildren: StoreShopRouteChildren = {
+  StoreShopSlugRoute: StoreShopSlugRoute,
+  StoreShopIndexRoute: StoreShopIndexRoute,
+}
+
+const StoreShopRouteWithChildren = StoreShopRoute._addFileChildren(
+  StoreShopRouteChildren,
+)
+
 interface StoreRouteChildren {
   StoreAboutRoute: typeof StoreAboutRoute
   StoreCartRoute: typeof StoreCartRouteWithChildren
@@ -1941,7 +1991,7 @@ interface StoreRouteChildren {
   StoreOrderRoute: typeof StoreOrderRoute
   StorePartnersRoute: typeof StorePartnersRoute
   StorePrivacyRoute: typeof StorePrivacyRoute
-  StoreShopRoute: typeof StoreShopRoute
+  StoreShopRoute: typeof StoreShopRouteWithChildren
   StoreSmartMotorRoute: typeof StoreSmartMotorRoute
   StoreTermsRoute: typeof StoreTermsRoute
   StoreIndexRoute: typeof StoreIndexRoute
@@ -1966,7 +2016,7 @@ const StoreRouteChildren: StoreRouteChildren = {
   StoreOrderRoute: StoreOrderRoute,
   StorePartnersRoute: StorePartnersRoute,
   StorePrivacyRoute: StorePrivacyRoute,
-  StoreShopRoute: StoreShopRoute,
+  StoreShopRoute: StoreShopRouteWithChildren,
   StoreSmartMotorRoute: StoreSmartMotorRoute,
   StoreTermsRoute: StoreTermsRoute,
   StoreIndexRoute: StoreIndexRoute,

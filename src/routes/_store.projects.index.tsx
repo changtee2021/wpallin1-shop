@@ -1,15 +1,13 @@
+import type { ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { z } from "zod";
 
-import { ProjectCard } from "@/components/brand/project-card";
-import { SectionHeading } from "@/components/brand/section-heading";
-import { RevealOnScroll } from "@/components/storefront/reveal-on-scroll";
 import {
   PROJECT_KIND_LABELS,
   PROJECTS,
+  type Project,
   type ProjectKind,
 } from "@/data/projects";
-import { useT } from "@/i18n";
 import { useBi } from "@/lib/bi";
 import { pageHead } from "@/lib/seo";
 import { cn } from "@/lib/utils";
@@ -22,6 +20,9 @@ const PROJECT_KINDS = [
 const projectsSearchSchema = z.object({
   kind: z.enum(PROJECT_KINDS).optional().catch(undefined),
 });
+
+/** Tiles in the first row play the page-entry motion; later rows rise on scroll instead. */
+const FIRST_ROW = 4;
 
 export const Route = createFileRoute("/_store/projects/")({
   validateSearch: (search) => projectsSearchSchema.parse(search),
@@ -36,100 +37,92 @@ export const Route = createFileRoute("/_store/projects/")({
 });
 
 function ProjectsPage() {
-  const { t } = useT();
   const pick = useBi();
   const { kind } = Route.useSearch();
   const visible = kind
     ? PROJECTS.filter((project) => project.kind === kind)
     : PROJECTS;
-  const [lead, ...rest] = visible;
 
-  const tabs: {
-    value: ProjectKind | undefined;
-    label: string;
-    count: number;
-  }[] = [
-    {
-      value: undefined,
-      label: pick({ th: "ทั้งหมด", en: "All" }),
-      count: PROJECTS.length,
-    },
+  const kindOptions: { value: ProjectKind | undefined; label: string }[] = [
+    { value: undefined, label: pick({ th: "ทั้งหมด", en: "All" }) },
     ...PROJECT_KINDS.map((value) => ({
       value,
       label: pick(PROJECT_KIND_LABELS[value]),
-      count: PROJECTS.filter((project) => project.kind === value).length,
     })),
   ];
 
   return (
     <>
-      <section className="border-b border-border bg-surface">
-        <div className="mx-auto max-w-7xl px-4 pt-14 pb-10 sm:px-6 lg:px-8 lg:pt-20">
-          <SectionHeading
-            as="h1"
-            kicker={t("nav.projects")}
-            title={pick({
-              th: "งานจริงที่ใช้สินค้าของเรา",
-              en: "Work built with our products",
-            })}
-            description={pick({
-              th: "ตั้งแต่ผ้าม่านพิมพ์ลายผืนใหญ่ในงานนิทรรศการ ไปจนถึงงานติดตั้งของตัวแทนจำหน่ายทั่วประเทศ",
-              en: "From large printed curtains at exhibitions to installations by our dealers across Thailand.",
-            })}
-          />
-          <nav
-            aria-label={pick({ th: "กรองผลงาน", en: "Filter projects" })}
-            className="mt-10 flex flex-wrap gap-2"
+      <div
+        aria-hidden
+        className="scroll-progress pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 bg-accent"
+      />
+
+      <section className="mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8 lg:pt-16">
+        <p className="hero-blur-in brand-kicker flex items-center gap-3 text-primary">
+          <span aria-hidden className="h-px w-8 bg-accent" />
+          Showcase · Dealers
+        </p>
+        <div className="mt-5 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
+          <h1 className="scroll-fade-away text-[clamp(3.25rem,11vw,8.5rem)] leading-[0.95] font-medium tracking-tight text-foreground">
+            <span className="hero-word inline-block">Projects</span>
+            <sup
+              className="hero-blur-in ml-2 inline-block align-super text-[0.22em] font-normal tracking-normal text-muted-foreground"
+              style={{ ["--delay" as string]: "350ms" }}
+            >
+              ({PROJECTS.length})
+            </sup>
+          </h1>
+          <p
+            className="hero-blur-in max-w-sm text-base leading-7 text-pretty text-muted-foreground lg:pb-4 lg:text-right"
+            style={{ ["--delay" as string]: "450ms" }}
           >
-            {tabs.map((tab) => {
-              const active = tab.value === kind;
+            {pick({
+              th: "งานจริงที่ใช้สินค้าของเรา ตั้งแต่ผ้าม่านพิมพ์ลายในงานนิทรรศการ ไปจนถึงงานติดตั้งของตัวแทนทั่วประเทศ",
+              en: "",
+            })}
+          </p>
+        </div>
+
+        <nav
+          aria-label="Type"
+          className="hero-blur-in mt-12 flex gap-8 border-t border-border pt-6 sm:gap-12 lg:mt-16"
+          style={{ ["--delay" as string]: "600ms" }}
+        >
+          <p className="w-12 pt-3 text-sm text-foreground">Type</p>
+          <ul className="flex flex-col">
+            {kindOptions.map((option) => {
+              const count = option.value
+                ? PROJECTS.filter((p) => p.kind === option.value).length
+                : PROJECTS.length;
               return (
-                <Link
-                  key={tab.value ?? "all"}
-                  to="/projects"
-                  search={tab.value ? { kind: tab.value } : {}}
-                  aria-current={active ? "page" : undefined}
-                  className={cn(
-                    "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors",
-                    active
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-background hover:border-primary hover:text-primary",
-                  )}
+                <FilterLink
+                  key={option.value ?? "all"}
+                  active={option.value === kind}
+                  kind={option.value}
                 >
-                  {tab.label}
-                  <span
-                    className={cn(
-                      "text-xs",
-                      active
-                        ? "text-primary-foreground/70"
-                        : "text-muted-foreground",
-                    )}
-                  >
-                    {tab.count}
+                  {option.label}
+                  <span className="ml-1.5 text-xs text-muted-foreground">
+                    {count}
                   </span>
-                </Link>
+                </FilterLink>
               );
             })}
-          </nav>
-        </div>
+          </ul>
+        </nav>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        {lead ? (
-          <RevealOnScroll>
-            <ProjectCard
-              project={lead}
-              imageClassName="aspect-[4/3] lg:aspect-[21/9]"
-            />
-          </RevealOnScroll>
-        ) : null}
-        {rest.length ? (
-          <div className="mt-16 grid gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-            {rest.map((project) => (
-              <ProjectCard key={project.slug} project={project} />
-            ))}
-          </div>
-        ) : null}
+      <section className="mx-auto max-w-7xl px-4 pt-10 pb-16 sm:px-6 lg:px-8 lg:pb-24">
+        {visible.length === 0 ? (
+          <p className="py-20 text-center text-muted-foreground">
+            {pick({
+              th: "ยังไม่มีผลงานในหมวดนี้",
+              en: "No projects in this category yet.",
+            })}
+          </p>
+        ) : (
+          <ProjectGallery key={kind ?? "all"} projects={visible} />
+        )}
       </section>
 
       <section className="border-t border-border bg-primary-deep text-white">
@@ -153,5 +146,92 @@ function ProjectsPage() {
         </div>
       </section>
     </>
+  );
+}
+
+function FilterLink({
+  active,
+  kind,
+  children,
+}: {
+  active: boolean;
+  kind: ProjectKind | undefined;
+  children: ReactNode;
+}) {
+  return (
+    <li>
+      <Link
+        to="/projects"
+        search={kind ? { kind } : {}}
+        replace
+        resetScroll={false}
+        aria-current={active ? "page" : undefined}
+        className={cn(
+          "inline-flex min-h-11 items-center text-sm transition-colors",
+          active
+            ? "font-medium text-foreground"
+            : "text-muted-foreground hover:text-foreground",
+        )}
+      >
+        {children}
+      </Link>
+    </li>
+  );
+}
+
+function ProjectGallery({ projects }: { projects: Project[] }) {
+  const pick = useBi();
+
+  return (
+    <ul className="grid grid-cols-2 gap-1 md:grid-cols-3 lg:grid-cols-4">
+      {projects.map((project, index) => {
+        const firstRow = index < FIRST_ROW;
+        const meta = [
+          pick(PROJECT_KIND_LABELS[project.kind]),
+          project.location ? pick(project.location) : null,
+          project.year,
+        ]
+          .filter(Boolean)
+          .join(" · ");
+
+        return (
+          <li
+            key={project.slug}
+            className={firstRow ? "hero-blur-in" : "scroll-rise"}
+            style={
+              firstRow
+                ? { ["--delay" as string]: `${700 + index * 90}ms` }
+                : { ["--i" as string]: index % FIRST_ROW }
+            }
+          >
+            <Link
+              to="/projects/$slug"
+              params={{ slug: project.slug }}
+              className="group relative block overflow-hidden bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
+              <div className="aspect-square overflow-hidden">
+                <div className="scroll-zoom size-full">
+                  <img
+                    src={project.cover}
+                    alt={pick(project.title)}
+                    loading={firstRow ? "eager" : "lazy"}
+                    decoding="async"
+                    className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                  />
+                </div>
+              </div>
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent p-3 pt-12 text-white transition-opacity duration-300 sm:p-4 sm:pt-16 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-visible:opacity-100">
+                <p className="line-clamp-2 text-sm font-medium sm:text-base">
+                  {pick(project.title)}
+                </p>
+                <p className="mt-0.5 hidden truncate text-xs text-white/75 sm:block">
+                  {meta}
+                </p>
+              </div>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

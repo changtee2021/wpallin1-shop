@@ -12,6 +12,7 @@ import {
 } from "@/services/cart.service";
 import { getProductById } from "@/services/catalog.service";
 import { incrementCouponUsage } from "@/services/coupon.service";
+import { assertCanPurchase } from "@/services/purchase-access.service";
 import { decrementStockForPaidOrder } from "@/services/inventory.service";
 import {
   recordPaidOrderStats,
@@ -49,6 +50,7 @@ export async function placeOrder(
 ): Promise<CheckoutResult> {
   if (!COMMERCE_ENABLED)
     throw new Error("ระบบสั่งซื้อออนไลน์ยังไม่เปิดให้บริการ");
+  await assertCanPurchase(supabase, userId);
   const addressErr = validateShippingAddress(input);
   if (addressErr) throw new Error(addressErr);
 

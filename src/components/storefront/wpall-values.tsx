@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { SectionHeading } from "@/components/brand/section-heading";
 import {
   ABOUT_PROCESS,
-  WPALL_TAGLINE,
   WPALL_VALUES,
   type WpallValue,
 } from "@/data/about-content";
@@ -49,9 +48,13 @@ function useEvidenceChips() {
 export function WpallValuesPinned({
   index,
   linkToAbout = false,
+  hideKicker = false,
+  englishTitle = false,
 }: {
   index?: string;
   linkToAbout?: boolean;
+  hideKicker?: boolean;
+  englishTitle?: boolean;
 }) {
   const pick = useBi();
   const evidenceChips = useEvidenceChips();
@@ -82,10 +85,15 @@ export function WpallValuesPinned({
         <SectionHeading
           index={index}
           kicker="How we work"
-          title={pick({
-            th: "W-P-A-L-L หลักการทำงานของเรา",
-            en: "W-P-A-L-L: how we work",
-          })}
+          hideKicker={hideKicker}
+          title={
+            englishTitle
+              ? "W-P-A-L-L: how we work"
+              : pick({
+                  th: "W-P-A-L-L หลักการทำงานของเรา",
+                  en: "W-P-A-L-L: how we work",
+                })
+          }
           description={pick({
             th: "ค่านิยม 5 ข้อที่เราแปลงเป็นคำมั่นต่อลูกค้า พร้อมหลักฐานจากขั้นตอนการทำงานจริง",
             en: "Five values turned into commitments to our customers, each backed by what happens on the production line.",
@@ -253,10 +261,6 @@ export function WpallValuesPinned({
             })}
           </ol>
         </div>
-
-        <p className="mt-14 border-t border-border pt-6 text-lg font-medium tracking-tight text-foreground text-balance lg:text-2xl">
-          {pick(WPALL_TAGLINE)}
-        </p>
       </div>
     </section>
   );

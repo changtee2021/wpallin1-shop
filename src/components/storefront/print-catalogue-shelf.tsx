@@ -1,34 +1,58 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 
-import { PRODUCT_CATEGORIES } from "@/data/products-catalog";
-import { useBi } from "@/lib/bi";
+import { useBi, type Bi } from "@/lib/bi";
 
 /** Edition printed on every cover — change once when a new print run arrives. */
 const PRINT_EDITION = "2026";
 
 /**
- * Printed catalogue books, one per product category.
- * Covers reuse each category photo until scans of the real covers arrive;
- * swap `cover` here (or point it at /public/catalogues/*.webp) and nothing else changes.
+ * Printed catalogue books that are actually in print.
+ * Books without a cover photo yet (aluminium) borrow the product photo until one arrives.
  */
-const PRINT_CATALOGUES = PRODUCT_CATEGORIES.map((category) => ({
-  id: category.id,
-  index: category.index,
-  title: category.name,
-  cover: category.image,
-}));
+const PRINT_CATALOGUES: { id: string; title: Bi; cover: string }[] = [
+  {
+    id: "wood-blinds",
+    title: { th: "มู่ลี่ไม้", en: "Wood Blinds" },
+    cover: "/catalogues/wood-blinds.webp",
+  },
+  {
+    id: "roller-blinds",
+    title: { th: "ม่านม้วน", en: "Roller Blinds" },
+    cover: "/catalogues/roller-blinds.webp",
+  },
+  {
+    id: "aluminium-blinds",
+    title: { th: "มู่ลี่อลูมิเนียม", en: "Aluminium Blinds" },
+    cover: "/products/aluminium-blinds.webp",
+  },
+  {
+    id: "partitions",
+    title: { th: "ฉากกั้นห้อง", en: "Room Partitions" },
+    cover: "/catalogues/partitions.webp",
+  },
+  {
+    id: "tracks",
+    title: { th: "รางม่าน", en: "Curtain Tracks" },
+    cover: "/products/s-curve-track.webp",
+  },
+  {
+    id: "rods",
+    title: { th: "รางโชว์และอุปกรณ์", en: "Curtain Rods & Hardware" },
+    cover: "/products/curtain-rod.webp",
+  },
+];
 
 export function PrintCatalogueShelf() {
   const pick = useBi();
 
   return (
-    <ul className="grid grid-cols-2 gap-x-5 gap-y-14 md:grid-cols-3 lg:grid-cols-4">
+    <ul className="grid grid-cols-2 gap-x-5 gap-y-14 md:grid-cols-3">
       {PRINT_CATALOGUES.map((book, index) => (
         <li
           key={book.id}
           className="scroll-rise flex flex-col"
-          style={{ ["--i" as string]: index % 4 }}
+          style={{ ["--i" as string]: index % 3 }}
         >
           <div className="group relative mx-auto w-full max-w-[16rem] pb-1.5 pr-1.5">
             {/* Page block peeking out behind the cover. */}
@@ -65,7 +89,7 @@ export function PrintCatalogueShelf() {
 
           <div className="mx-auto mt-6 flex w-full max-w-[16rem] items-center justify-between gap-3">
             <span className="brand-index text-muted-foreground">
-              {book.index}
+              {String(index + 1).padStart(2, "0")}
             </span>
             <Link
               to="/contact"

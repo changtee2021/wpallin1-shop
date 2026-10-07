@@ -11,13 +11,20 @@ import {
   Play,
   Ruler,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 
+import { ArrowFillAnchor } from "@/components/brand/arrow-fill-link";
 import { ContactLineButton } from "@/components/brand/contact-cta";
 import { BrandPageError } from "@/components/brand/page-states";
 import { ProductCard } from "@/components/brand/product-card";
 import { ProjectCard } from "@/components/brand/project-card";
 import { SectionHeading } from "@/components/brand/section-heading";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
   CATALOG_PRODUCTS,
@@ -31,9 +38,11 @@ import {
   type ProductDocumentType,
   type ProductVideo,
 } from "@/data/products-catalog";
+import { getProductFaqs } from "@/data/product-faqs";
 import { PROJECTS } from "@/data/projects";
 import { useT } from "@/i18n";
 import { useBi, type Bi } from "@/lib/bi";
+import { shopHref } from "@/lib/features";
 import { absoluteUrl } from "@/lib/public-url";
 import { pageHead } from "@/lib/seo";
 import { siteConfig } from "@/lib/site-config";
@@ -48,6 +57,19 @@ export const Route = createFileRoute("/_store/products/$slug")({
   head: ({ loaderData }) => {
     if (!loaderData?.product) return {};
     const { product } = loaderData;
+    const faqs = getProductFaqs(product.slug);
+    const productLd = {
+      "@type": "Product",
+      name: product.name.th,
+      alternateName: product.name.en,
+      description: product.summary.th,
+      image: [product.image, ...(product.gallery ?? [])].map((src) =>
+        absoluteUrl(src),
+      ),
+      category: getProductCategory(product.category).name.en,
+      brand: { "@type": "Brand", name: "WP ALL" },
+      manufacturer: { "@type": "Organization", name: siteConfig.legalNameEn },
+    };
     return pageHead({
       title: `${product.name.th} (${product.code}) | WP ALL`,
       description: product.summary.th,
@@ -56,16 +78,21 @@ export const Route = createFileRoute("/_store/products/$slug")({
       type: "product",
       jsonLd: {
         "@context": "https://schema.org",
-        "@type": "Product",
-        name: product.name.th,
-        alternateName: product.name.en,
-        description: product.summary.th,
-        image: [product.image, ...(product.gallery ?? [])].map((src) =>
-          absoluteUrl(src),
-        ),
-        category: getProductCategory(product.category).name.en,
-        brand: { "@type": "Brand", name: "WP ALL" },
-        manufacturer: { "@type": "Organization", name: siteConfig.legalNameEn },
+        "@graph": [
+          productLd,
+          ...(faqs.length
+            ? [
+                {
+                  "@type": "FAQPage",
+                  mainEntity: faqs.map((item) => ({
+                    "@type": "Question",
+                    name: item.question.th,
+                    acceptedAnswer: { "@type": "Answer", text: item.answer.th },
+                  })),
+                },
+              ]
+            : []),
+        ],
       },
     });
   },
@@ -168,6 +195,21 @@ function DocumentRow({ document }: { document: ProductDocument }) {
   );
 }
 
+function scrollToSection(event: MouseEvent<HTMLAnchorElement>) {
+  const id = event.currentTarget.hash.slice(1);
+  const target = document.getElementById(id);
+  if (!target) return;
+  event.preventDefault();
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  target.scrollIntoView({
+    behavior: reduceMotion ? "auto" : "smooth",
+    block: "start",
+  });
+  window.history.replaceState(null, "", `#${id}`);
+}
+
 function ProductDetailPage() {
   const { t } = useT();
   const pick = useBi();
@@ -178,6 +220,7 @@ function ProductDetailPage() {
   const [activeImage, setActiveImage] = useState(0);
   const currentImage = images[Math.min(activeImage, images.length - 1)];
   const featureImage = product.gallery?.[0] ?? product.image;
+  const gallery = product.gallery ?? [];
 
   const related = CATALOG_PRODUCTS.filter(
     (item) => item.category === product.category && item.slug !== product.slug,
@@ -187,6 +230,7 @@ function ProductDetailPage() {
   );
   const documents = product.documents ?? [];
   const videos = product.videos ?? [];
+  const faqs = getProductFaqs(product.slug);
 
   const sections = [
     { id: "overview", label: { th: "ภาพรวม", en: "Overview" }, show: true },
@@ -194,6 +238,11 @@ function ProductDetailPage() {
       id: "highlights",
       label: { th: "จุดเด่น", en: "Highlights" },
       show: Boolean(product.stats?.length),
+    },
+    {
+      id: "gallery",
+      label: { th: "แกลเลอรี", en: "Gallery" },
+      show: gallery.length > 0,
     },
     {
       id: "series",
@@ -215,6 +264,11 @@ function ProductDetailPage() {
       id: "projects",
       label: { th: "ผลงานจริง", en: "Projects" },
       show: projects.length > 0,
+    },
+    {
+      id: "faq",
+      label: { th: "คำถามที่พบบ่อย", en: "FAQ" },
+      show: faqs.length > 0,
     },
   ].filter((section) => section.show);
   const sectionIndex = (id: string) =>
@@ -352,7 +406,7 @@ function ProductDetailPage() {
                   {pick({ th: "ดูแคตตาล็อก", en: "View catalogue" })}
                 </Link>
               ) : (
-                <a href="#downloads">
+                <a href="#downloads" onClick={scrollToSection}>
                   <BookOpen className="mr-2 size-4" aria-hidden />
                   {pick({
                     th: "แคตตาล็อกและเอกสาร",
@@ -361,6 +415,21 @@ function ProductDetailPage() {
                 </a>
               )}
             </Button>
+          </div>
+          <div className="mt-6 border-t border-border pt-6">
+            <p className="text-sm text-muted-foreground">
+              {pick({
+                th: "สำหรับตัวแทนจำหน่าย ดูราคาและสั่งซื้อออนไลน์",
+                en: "For dealers: see prices and order online",
+              })}
+            </p>
+            <ArrowFillAnchor
+              href={shopHref()}
+              className="mt-3 w-full"
+              style={{ height: "3rem" }}
+            >
+              {pick({ th: "ไปที่ร้านค้าตัวแทน", en: "Go to the dealer shop" })}
+            </ArrowFillAnchor>
           </div>
         </div>
 
@@ -418,18 +487,15 @@ function ProductDetailPage() {
                 <li key={section.id}>
                   <a
                     href={`#${section.id}`}
+                    onClick={scrollToSection}
                     className="inline-flex min-h-12 items-center px-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    {pick(section.label)}
+                    {section.label.en}
                   </a>
                 </li>
               ))}
             </ul>
           </nav>
-          <ContactLineButton
-            size="default"
-            className="hidden h-9 shrink-0 px-4 text-xs sm:inline-flex"
-          />
         </div>
       </div>
 
@@ -491,10 +557,7 @@ function ProductDetailPage() {
             <SectionHeading
               index={sectionIndex("highlights")}
               kicker="Highlights"
-              title={pick({
-                th: "ตัวเลขที่บอกคุณภาพ",
-                en: "The numbers behind it",
-              })}
+              title="The numbers behind it"
             />
             <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-[repeat(2,13rem)]">
               <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-surface sm:col-span-2 lg:row-span-2 lg:aspect-auto">
@@ -549,7 +612,7 @@ function ProductDetailPage() {
               <div className="max-w-md">
                 <p className="brand-kicker text-muted-foreground">Craft</p>
                 <h2 className="mt-4 text-2xl font-medium tracking-tight lg:text-3xl">
-                  {pick(block.title)}
+                  {block.title.en}
                 </h2>
                 <p className="mt-5 text-base leading-8 text-muted-foreground text-pretty">
                   {pick(block.body)}
@@ -557,6 +620,46 @@ function ProductDetailPage() {
               </div>
             </div>
           ))}
+        </section>
+      ) : null}
+
+      {/* Gallery */}
+      {gallery.length ? (
+        <section
+          id="gallery"
+          className="brand-section scroll-mt-40 border-t border-border"
+        >
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <SectionHeading
+              index={sectionIndex("gallery")}
+              kicker="Gallery"
+              title="In the space"
+            />
+            <div className="mt-12 grid gap-4 sm:grid-cols-2">
+              {gallery.map((src, index) => (
+                <div
+                  key={src}
+                  className={cn(
+                    "scroll-wipe-up-soft group aspect-[4/3] overflow-hidden rounded-sm bg-surface",
+                    gallery.length % 2 === 1 &&
+                      index === 0 &&
+                      "sm:col-span-2 sm:aspect-[21/9]",
+                  )}
+                  style={{ ["--i" as string]: index % 2 }}
+                >
+                  <div className="scroll-zoom size-full">
+                    <img
+                      src={src}
+                      alt={`${pick(product.name)} ${index + 1}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
       ) : null}
 
@@ -570,10 +673,7 @@ function ProductDetailPage() {
             <SectionHeading
               index={sectionIndex("series")}
               kicker="Series"
-              title={pick({
-                th: "เลือกรุ่นที่เหมาะกับงาน",
-                en: "Choose the right series",
-              })}
+              title="Choose the right series"
             />
             <ol className="mt-12 grid gap-px overflow-hidden rounded-sm border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
               {product.series.map((series, index) => (
@@ -606,7 +706,7 @@ function ProductDetailPage() {
             <SectionHeading
               index={sectionIndex("specs")}
               kicker="Specifications"
-              title={pick({ th: "ข้อมูลทางเทคนิค", en: "Technical details" })}
+              title="Technical details"
             />
             <div className="mt-12 grid gap-14 lg:grid-cols-2 lg:gap-20">
               {product.specs?.length ? (
@@ -629,10 +729,7 @@ function ProductDetailPage() {
               {product.colors?.length ? (
                 <div>
                   <h3 className="brand-kicker text-muted-foreground">
-                    {pick({
-                      th: "สีและผิวที่เลือกได้",
-                      en: "Colours & finishes",
-                    })}
+                    Colours & finishes
                   </h3>
                   <div className="mt-6 space-y-8">
                     {product.colors.map((set) => (
@@ -688,7 +785,7 @@ function ProductDetailPage() {
             <SectionHeading
               index={sectionIndex("videos")}
               kicker="Videos"
-              title={pick({ th: "ดูการใช้งานจริง", en: "See it in action" })}
+              title="See it in action"
             />
             <div className="mt-12 grid gap-x-6 gap-y-10 md:grid-cols-2">
               {videos.map((video) => (
@@ -709,10 +806,7 @@ function ProductDetailPage() {
             <SectionHeading
               index={sectionIndex("downloads")}
               kicker="Downloads"
-              title={pick({
-                th: "แคตตาล็อกและเอกสาร",
-                en: "Catalogue & documents",
-              })}
+              title="Catalogue & documents"
               description={pick({
                 th: "แคตตาล็อกออนไลน์ ใบรับรอง และเอกสารทางเทคนิคของสินค้านี้",
                 en: "The online catalogue, certificates and technical documents for this product.",
@@ -776,7 +870,7 @@ function ProductDetailPage() {
             <SectionHeading
               index={sectionIndex("projects")}
               kicker="Seen in"
-              title={pick({ th: "ผลงานจริง", en: "Real installations" })}
+              title="Real installations"
             />
             <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
               {projects.map((project) => (
@@ -787,16 +881,45 @@ function ProductDetailPage() {
         </section>
       ) : null}
 
+      {/* FAQ */}
+      {faqs.length ? (
+        <section
+          id="faq"
+          className="brand-section scroll-mt-40 border-t border-border bg-surface"
+        >
+          <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:px-8">
+            <SectionHeading
+              index={sectionIndex("faq")}
+              kicker="FAQ"
+              title="Frequently asked questions"
+              description={pick({
+                th: "ไม่เจอคำตอบที่ต้องการ? ทัก LINE ได้เลย",
+                en: "Can't find your answer? Message us on LINE.",
+              })}
+            />
+            <Accordion type="multiple" className="border-t border-border">
+              {faqs.map((item) => (
+                <AccordionItem key={item.question.en} value={item.question.en}>
+                  <AccordionTrigger className="min-h-14 text-left text-base font-medium hover:no-underline">
+                    {pick(item.question)}
+                  </AccordionTrigger>
+                  <AccordionContent className="max-w-2xl text-base leading-7 text-muted-foreground">
+                    {pick(item.answer)}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </section>
+      ) : null}
+
       {/* Related */}
       {related.length ? (
         <section className="brand-section border-t border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <SectionHeading
               kicker={category.name.en}
-              title={pick({
-                th: "สินค้าในหมวดเดียวกัน",
-                en: "More in this category",
-              })}
+              title="More in this category"
               action={
                 <Link
                   to="/products"

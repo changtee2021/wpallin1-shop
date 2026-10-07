@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import {
   BrandChooseGuide,
@@ -11,9 +11,13 @@ import {
   BrandFactory,
   BrandStatement,
 } from "@/components/storefront/home/brand-story-sections";
+import { DEALER_ONLY_PURCHASE } from "@/lib/features";
 import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_store/")({
+  beforeLoad: () => {
+    if (DEALER_ONLY_PURCHASE) throw redirect({ to: "/shop", replace: true });
+  },
   head: () =>
     pageHead({
       title: "WP ALL — ม่าน มู่ลี่ และระบบมอเตอร์ ผลิตในไทย",

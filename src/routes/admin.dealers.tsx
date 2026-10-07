@@ -1,7 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { KeyRound, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import {
+  ApproveDealerDialog,
+  CreateDealerDialog,
+  DealerHandoffDialog,
+  type DealerHandoff,
+} from "@/components/admin/dealer-account-dialogs";
 import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +28,7 @@ import {
   approveDealerApp,
   fetchDealerApplications,
   rejectDealerApp,
+  resetDealerPasswordFn,
 } from "@/lib/api.functions";
 import {
   dealerApplicationStatusLabel,
@@ -36,6 +44,12 @@ export const Route = createFileRoute("/admin/dealers")({
 });
 
 type StatusFilter = "pending" | "approved" | "rejected" | "all";
+
+const SOURCE_LABELS: Record<DealerApplicationDto["source"], string> = {
+  web: "สมัครจากเว็บ",
+  line: "เปิดผ่าน LINE",
+  sales: "เซลเปิดให้",
+};
 
 const STATUS_TABS: { id: StatusFilter; label: string }[] = [
   { id: "pending", label: "รออนุมัติ" },
@@ -62,6 +76,11 @@ function AdminDealersPage() {
   const [rejectNote, setRejectNote] = useState("");
   const [rejecting, setRejecting] = useState(false);
   const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [approveTarget, setApproveTarget] =
+    useState<DealerApplicationDto | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [handoff, setHandoff] = useState<DealerHandoff | null>(null);
+  const [resettingId, setResettingId] = useState<string | null>(null);
 
   async function reload(status?: StatusFilter) {
     const active = status ?? filter;
@@ -77,19 +96,47 @@ function AdminDealersPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, filter]);
 
-  async function handleApprove(id: string) {
-    setApprovingId(id);
+  async function handleApprove(
+    app: DealerApplicationDto,
+    provinceCode: string,
+  ) {
+    setApprovingId(app.id);
     try {
-      await approveDealerApp({
-        data: { applicationId: id },
+      const result = await approveDealerApp({
+        data: { applicationId: app.id, provinceCode },
         ...authServerFnOptions(session),
       });
-      toast.success("อนุมัติแล้ว — ผู้สมัครได้ role ตัวแทน");
+      setApproveTarget(null);
+      setHandoff({
+        dealerCode: result.dealerCode,
+        companyName: app.companyName,
+        contactName: app.contactName,
+      });
       await reload();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "ไม่สำเร็จ");
     } finally {
       setApprovingId(null);
+    }
+  }
+
+  async function handleResetPassword(app: DealerApplicationDto) {
+    setResettingId(app.id);
+    try {
+      const result = await resetDealerPasswordFn({
+        data: { userId: app.userId },
+        ...authServerFnOptions(session),
+      });
+      setHandoff({
+        dealerCode: result.dealerCode,
+        tempPassword: result.tempPassword,
+        companyName: app.companyName,
+        contactName: app.contactName,
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "ไม่สำเร็จ");
+    } finally {
+      setResettingId(null);
     }
   }
 
@@ -119,7 +166,13 @@ function AdminDealersPage() {
     <div>
       <PageHeader
         title="ตัวแทนจำหน่าย"
-        description="อนุมัติใบสมัครตัวแทน — ระบบภายในร้าน WP ALL"
+        description="เปิดบัญชีให้ลูกค้าที่คุยทาง LINE หรืออนุมัติใบสมัครจากเว็บ ทุกบัญชีได้รหัสตัวแทน WPD"
+        actions={
+          <Button className="h-11" onClick={() => setCreateOpen(true)}>
+            <UserPlus className="mr-2 size-4" aria-hidden />
+            เปิดบัญชีตัวแทน
+          </Button>
+        }
       />
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -165,6 +218,14 @@ function AdminDealersPage() {
                       <Badge variant={statusBadgeVariant(app.status)}>
                         {dealerApplicationStatusLabel(app.status)}
                       </Badge>
+                      {app.dealerCode ? (
+                        <span className="rounded-md border px-2 py-0.5 font-mono text-xs">
+                          {app.dealerCode}
+                        </span>
+                      ) : null}
+                      <span className="text-xs text-muted-foreground">
+                        {SOURCE_LABELS[app.source]}
+                      </span>
                     </div>
                     <p className="mt-1 text-sm text-muted-foreground">
                       {app.contactName} · {app.contactPhone} ·{" "}
@@ -177,14 +238,27 @@ function AdminDealersPage() {
                         : ""}
                     </p>
                   </div>
+                  {app.status === "approved" && app.dealerCode ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={resettingId === app.id}
+                      onClick={() => void handleResetPassword(app)}
+                    >
+                      <KeyRound className="mr-1.5 size-3.5" aria-hidden />
+                      {resettingId === app.id
+                        ? "กำลังออกรหัส..."
+                        : "ออกรหัสผ่านใหม่"}
+                    </Button>
+                  ) : null}
                   {app.status === "pending" ? (
                     <div className="flex gap-2">
                       <Button
                         size="sm"
                         disabled={approvingId === app.id}
-                        onClick={() => void handleApprove(app.id)}
+                        onClick={() => setApproveTarget(app)}
                       >
-                        {approvingId === app.id ? "กำลังอนุมัติ..." : "อนุมัติ"}
+                        อนุมัติ
                       </Button>
                       <Button
                         size="sm"
@@ -243,6 +317,26 @@ function AdminDealersPage() {
           ใบสมัครใหม่จะแจ้งเตือนในระบบเมื่อลูกค้าส่งจากหน้า /dealer/register
         </p>
       ) : null}
+
+      <CreateDealerDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={(result) => {
+          setHandoff(result);
+          setFilter("approved");
+          void reload("approved");
+        }}
+      />
+      <ApproveDealerDialog
+        key={approveTarget?.id ?? "none"}
+        application={approveTarget}
+        saving={approvingId != null}
+        onCancel={() => setApproveTarget(null)}
+        onConfirm={(provinceCode) =>
+          approveTarget && void handleApprove(approveTarget, provinceCode)
+        }
+      />
+      <DealerHandoffDialog handoff={handoff} onClose={() => setHandoff(null)} />
 
       <Dialog
         open={rejectId != null}

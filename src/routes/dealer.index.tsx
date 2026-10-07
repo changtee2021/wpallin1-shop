@@ -3,6 +3,7 @@ import { Copy, Download, RotateCcw, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { DealerIdentityCard } from "@/components/dealer/dealer-identity-card";
 import { PageLoading } from "@/components/loading";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
@@ -138,6 +139,8 @@ function DealerDashboardPage() {
         description="ภาพรวมบัญชีตัวแทน"
         badge={stats.tier ?? "dealer"}
       />
+
+      <DealerIdentityCard />
 
       <div className="mb-6 grid gap-3 sm:grid-cols-3">
         <Button asChild size="lg" className="h-auto flex-col gap-2 py-4">

@@ -4,7 +4,6 @@ import { useState } from "react";
 
 import { SectionHeading } from "@/components/brand/section-heading";
 import { CountUpNumber } from "@/components/storefront/home/count-up-number";
-import { ABOUT_PROCESS } from "@/data/about-content";
 import { useBi, type Bi } from "@/lib/bi";
 import { cn } from "@/lib/utils";
 
@@ -93,17 +92,46 @@ export function BrandStatement() {
   );
 }
 
-/** One full-frame photo per production step, in the same order as ABOUT_PROCESS. */
-const STEP_PHOTOS = [
-  "/brand/process-prep.webp",
-  "/brand/process-cut.webp",
-  "/brand/process-drill.webp",
-  "/brand/process-assemble.webp",
-  "/brand/process-colors.webp",
-  "/brand/process-qc.webp",
-] as const;
+/**
+ * The home page tells the production story in four broad steps. The detailed six-step
+ * line (prep, cut, drill, assemble, colour storage, QC) stays on the About page.
+ */
+const HOME_STEPS: { title: Bi; body: Bi; photo: string }[] = [
+  {
+    title: { th: "เตรียม", en: "Prepare" },
+    body: {
+      th: "ตรวจรับและเตรียมวัสดุตามใบสั่งผลิต จัดเก็บแยกตามรหัสสี หยิบใช้ได้ถูกต้อง",
+      en: "Materials checked and staged against each work order, stored by colour code.",
+    },
+    photo: "/brand/process-prep.webp",
+  },
+  {
+    title: { th: "ประกอบ", en: "Assemble" },
+    body: {
+      th: "ตัด เจาะ และประกอบชุดกลไกกับตัวสินค้าในสายผลิตของเราเอง",
+      en: "Cut, drilled and assembled on our own line, mechanisms and all.",
+    },
+    photo: "/brand/process-assemble.webp",
+  },
+  {
+    title: { th: "ตรวจ", en: "Inspect" },
+    body: {
+      th: "ตรวจการทำงานและความเรียบร้อยก่อนแพ็กส่ง",
+      en: "Function and finish checked before packing.",
+    },
+    photo: "/brand/process-qc.webp",
+  },
+  {
+    title: { th: "ส่งมอบ", en: "Deliver" },
+    body: {
+      th: "แพ็กและส่งมอบถึงมือร้านค้าและลูกค้า",
+      en: "Packed and handed over to shops and customers.",
+    },
+    photo: "/about/ready-stock-containers.webp",
+  },
+];
 
-/** Chapter 5 — the factory, after the projects. One screen: photo + six steps that expand on tap or hover. */
+/** Chapter 5 — the factory, after the projects. One screen: photo + four steps that expand on tap or hover. */
 export function BrandFactory() {
   const pick = useBi();
   const [active, setActive] = useState(0);
@@ -147,16 +175,16 @@ export function BrandFactory() {
           tone="dark"
           index="05"
           kicker="Craftsmanship"
-          title="Six steps of care in every piece"
+          title="Four steps of care in every piece"
           description={pick({
-            th: "ความใส่ใจ 6 ขั้นตอน ในทุกชิ้นงาน",
+            th: "ความใส่ใจ 4 ขั้นตอน ในทุกชิ้นงาน",
             en: "",
           })}
         />
 
         <div className="mt-10 grid gap-8 lg:mt-14 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-stretch lg:gap-14">
           <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-black/20 lg:aspect-auto lg:min-h-[28rem]">
-            {STEP_PHOTOS.map((src, photo) => (
+            {HOME_STEPS.map(({ photo: src }, photo) => (
               <img
                 key={src}
                 src={src}
@@ -174,13 +202,13 @@ export function BrandFactory() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-5 lg:p-6">
               <p className="text-lg font-medium text-white lg:text-xl">
-                {pick(ABOUT_PROCESS[active].title)}
+                {pick(HOME_STEPS[active].title)}
               </p>
             </div>
           </div>
 
           <ol className="flex flex-col lg:justify-center">
-            {ABOUT_PROCESS.map((step, index) => {
+            {HOME_STEPS.map((step, index) => {
               const open = active === index;
               return (
                 <li

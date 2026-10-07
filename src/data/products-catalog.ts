@@ -337,7 +337,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Wooden blinds that pair natural material with a contemporary look. Selected timber and careful detailing — tone, grain and slat proportion — for homes, hotels, restaurants and offices.",
     ),
     image: "/products/wood-blinds.webp",
-    gallery: ["/products/wood-bedroom.webp"],
+    gallery: [
+      "/products/wood-bedroom.webp",
+      "/products/gallery/wood-blinds-study.webp",
+    ],
     highlights: [
       t(
         "ใบมู่ลี่กว้าง 50 มม. เลือกไม้แท้หรือไม้คอมโพสิต",
@@ -428,6 +431,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Aluminium blinds with 25 mm or 50 mm slats, small cord holes and an L-shaped slat profile for tighter closure. Easy to clean — ideal for offices and bathrooms.",
     ),
     image: "/products/aluminium-blinds.webp",
+    gallery: [
+      "/products/gallery/aluminium-blinds-living.webp",
+      "/products/gallery/aluminium-blinds-office.webp",
+    ],
     highlights: [
       t("ใบ 25 มม. และ 50 มม.", "25 mm and 50 mm slats"),
       t("ซีรีส์ L Shape และ C Shape", "L Shape and C Shape series"),
@@ -500,6 +507,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Roller blinds in fabric collections from blackout and sunscreen to translucent and natural woven, in standard, Zebra, Panel, Double Roll and Roman Shade types.",
     ),
     image: "/products/roller-blinds.webp",
+    gallery: [
+      "/products/gallery/roller-blinds-bedroom.webp",
+      "/products/gallery/roller-blinds-office.webp",
+    ],
     highlights: [
       t(
         "ผ้า Blackout, Fiberglass, Sunscreen (5% / 3% / 1%), Translucent, Nature Woven",
@@ -574,6 +585,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Vertical blinds with ultrasonic-cut vanes for clean edges and better light blocking than standard stitching. Works on straight, curved and sloped tracks.",
     ),
     image: "/products/vertical-blinds.webp",
+    gallery: [
+      "/products/gallery/vertical-blinds-living.webp",
+      "/products/gallery/vertical-blinds-office.webp",
+    ],
     highlights: [
       t(
         "ผ้า Blackout, Fiberglass, Sunscreen 1% / 3% / 5% และ Translucent",
@@ -612,6 +627,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Roller blinds for exterior installation. Hand-crank operation, upgradeable to a motor later.",
     ),
     image: "/products/outdoor-roller.webp",
+    gallery: [
+      "/products/gallery/outdoor-roller-terrace.webp",
+      "/products/gallery/outdoor-roller-cafe.webp",
+    ],
     highlights: [
       t("ระบบมือหมุน", "Hand-crank operation"),
       t("อัปเกรดเป็นมอเตอร์ได้", "Motor upgrade available"),
@@ -635,6 +654,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Exterior roller blinds with fabric edges running in full-height side channels. Motorized, with 50 mm, 63 mm and extra-large 63 mm profiles.",
     ),
     image: "/products/zip-blinds.webp",
+    gallery: [
+      "/products/gallery/zip-blinds-pergola.webp",
+      "/products/gallery/zip-blinds-detail.webp",
+    ],
     highlights: [
       t("โปรไฟล์ 50 มม. และ 63 มม.", "50 mm and 63 mm profiles"),
       t(
@@ -663,6 +686,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Motorized roller systems for glass roofs, pergolas and skylights, in three systems: FSS, FTS and FCS.",
     ),
     image: "/products/skylight.webp",
+    gallery: [
+      "/products/gallery/skylight-atrium.webp",
+      "/products/gallery/skylight-dining.webp",
+    ],
     highlights: [
       t("ระบบ FSS, FTS และ FCS", "FSS, FTS and FCS systems"),
       t("ระบบมอเตอร์", "Motorized"),
@@ -695,6 +722,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Folding partitions in grade-A PVC on an anodised, powder-coated 6063 aluminium track that can be bent to curves. A full-height magnetic strip closes the door tight.",
     ),
     image: "/products/pvc-folding-door.webp",
+    gallery: [
+      "/products/gallery/pvc-folding-door-living.webp",
+      "/products/gallery/pvc-folding-door-kitchen.webp",
+    ],
     highlights: [
       t(
         "4 สไตล์ Standard, Japanese, USA และ URO",
@@ -800,6 +831,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Track for wave curtains, with spacing tape that keeps every fold even. Two series: L – Luxury and S – Speed.",
     ),
     image: "/products/s-curve-track.webp",
+    gallery: [
+      "/products/gallery/s-curve-track-living.webp",
+      "/products/gallery/s-curve-track-detail.webp",
+    ],
     highlights: [
       t(
         "2 ซีรีส์ L - Luxury และ S - Speed",
@@ -830,6 +865,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Hook track for pleated curtains, in four series: Large, Strong, Lock and Save.",
     ),
     image: "/products/standard-track.webp",
+    gallery: [
+      "/products/gallery/standard-track-bedroom.webp",
+      "/products/gallery/standard-track-detail.webp",
+    ],
     highlights: [
       t(
         "4 ซีรีส์ Large, Strong, Lock, Save",
@@ -859,6 +898,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Roman shade track in 6063 T5 aluminium with a gear set rated to 10 kg, in white or black.",
     ),
     image: "/products/roman-track.webp",
+    gallery: [
+      "/products/gallery/roman-track-dining.webp",
+      "/products/gallery/roman-track-nook.webp",
+    ],
     highlights: [
       t("อลูมิเนียมเกรด 6063 T5", "6063 T5 aluminium"),
       t("หัวเกียร์รับน้ำหนักได้ถึง 10 กก.", "Gear set rated to 10 kg"),
@@ -895,6 +938,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Ceiling-mounted track for patient bays and exam rooms. Bends to the room layout and pairs with PVC folding doors.",
     ),
     image: "/products/hospital-track.webp",
+    gallery: [
+      "/products/gallery/hospital-track-ward.webp",
+      "/products/gallery/hospital-track-clinic.webp",
+    ],
     highlights: [
       t(
         "ติดเพดาน ดัดโค้งตามผังห้อง",
@@ -1015,7 +1062,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Dual curtain system with a main and secondary motor for two-layer curtains. Plug-in ready, as low as 20 dB, carrying up to 60 kg on a 6 m straight track.",
     ),
     image: "/products/n23.webp",
-    gallery: ["/products/motorized-track.webp"],
+    gallery: [
+      "/products/motorized-track.webp",
+      "/products/gallery/n23-living.webp",
+    ],
     highlights: [
       t(
         "มอเตอร์หลัก + มอเตอร์รอง สำหรับม่านคู่",
@@ -1087,6 +1137,10 @@ export const CATALOG_PRODUCTS: CatalogProduct[] = [
       "Finials, brackets and fittings for curtain rods and tracks — stocked for curtain shops and installers.",
     ),
     image: "/products/accessories.webp",
+    gallery: [
+      "/products/gallery/accessories-flatlay.webp",
+      "/products/gallery/accessories-detail.webp",
+    ],
     highlights: [
       t("หัวรางหลายแบบ", "Range of finials"),
       t("ขาจับและอุปกรณ์ประกอบ", "Brackets and fittings"),
