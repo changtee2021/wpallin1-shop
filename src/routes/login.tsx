@@ -238,7 +238,7 @@ function LoginPage() {
           </Link>
           <Link to="/" className="shrink-0">
             <img
-              src="/brand/logo-mono-dark.png"
+              src="/brand/logo-color.png"
               alt="WP ALL"
               className="h-9 w-auto object-contain"
             />

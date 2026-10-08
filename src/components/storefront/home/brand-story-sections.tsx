@@ -175,9 +175,9 @@ export function BrandFactory() {
           tone="dark"
           index="05"
           kicker="Craftsmanship"
-          title="Four steps of care in every piece"
+          title="Step of CREATION"
           description={pick({
-            th: "ความใส่ใจ 4 ขั้นตอน ในทุกชิ้นงาน",
+            th: "ขั้นตอนความใส่ใจของเรา",
             en: "",
           })}
         />

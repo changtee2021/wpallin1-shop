@@ -2,6 +2,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   createRootRouteWithContext,
+  redirect,
+  type ErrorComponentProps,
   useRouter,
   HeadContent,
   Scripts,
@@ -19,6 +21,8 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { CartProvider } from "@/hooks/use-cart";
 import { ChatUiProvider } from "@/hooks/use-chat-ui";
 import { I18nProvider } from "@/i18n";
+import { COMMERCE_ENABLED } from "@/lib/features";
+import { resolveLegacyRedirect } from "@/lib/legacy-redirects";
 import appCss from "@/styles.css?url";
 import { getDefaultOgImageUrl, getPublicUrl } from "@/lib/public-url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -27,7 +31,7 @@ function NotFoundComponent() {
   return <ErrorPageShell kind="404" />;
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   const router = useRouter();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
@@ -36,7 +40,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <ErrorPageShell
       kind="500"
-      errorMessage={error.message}
+      errorMessage={error instanceof Error ? error.message : undefined}
       onRetry={() => {
         router.invalidate();
         reset();
@@ -47,15 +51,25 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   {
+    beforeLoad: ({ location }) => {
+      // Old ReadyPlanet pages live on the brand site only; the dealer shop has its own paths.
+      const target = COMMERCE_ENABLED
+        ? null
+        : resolveLegacyRedirect(location.pathname);
+      if (target) throw redirect({ href: target, statusCode: 301 });
+      return {};
+    },
     head: () => ({
       meta: [
         { charSet: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        { title: "WP ALL — ม่าน มู่ลี่ และระบบมอเตอร์ ผลิตในไทย" },
+        {
+          title: "WP ALL | Perfect Fit Curtains, Blinds & Smart Motor Systems",
+        },
         {
           name: "description",
           content:
-            "WP ALL IN 1 แบรนด์ผ้าม่าน มู่ลี่ ม่านม้วน ฉากกั้นห้อง PVC รางม่าน และระบบมอเตอร์อัจฉริยะ สั่งทำตามขนาด สำหรับบ้าน โครงการ และตัวแทนจำหน่าย",
+            "ม่าน มู่ลี่ ที่ใส่ใจทุกรายละเอียด ให้ทุกหน้าต่างพอดี และทุกมุมห้องสวย ด้วยดีไซน์ ฟังก์ชัน และเทคโนโลยีมอเตอร์อัจฉริยะ",
         },
         { name: "theme-color", content: "#188F8B" },
         { property: "og:type", content: "website" },
@@ -90,7 +104,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         },
         { rel: "stylesheet", href: "https://use.typekit.net/kts4wjg.css" },
         { rel: "stylesheet", href: appCss },
-        { rel: "icon", href: "/brand/logo-mono-dark.png", type: "image/png" },
+        // Google needs a favicon in multiples of 48px at a stable URL; the .ico covers old browsers.
+        { rel: "icon", href: "/favicon.ico", sizes: "any" },
+        {
+          rel: "icon",
+          href: "/favicon-48.png",
+          type: "image/png",
+          sizes: "48x48",
+        },
+        {
+          rel: "icon",
+          href: "/favicon-96.png",
+          type: "image/png",
+          sizes: "96x96",
+        },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       ],
     }),
     shellComponent: RootShell,

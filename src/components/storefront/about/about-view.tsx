@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { SectionHeading } from "@/components/brand/section-heading";
 import {
   AboutCompanyProfile,
@@ -218,15 +220,17 @@ function AboutWhoWeAre() {
   );
 }
 
+/** Same layout as the home page factory chapter: photo on the left, steps that expand on tap or hover. */
 function AboutCraft() {
   const pick = useBi();
-  const [lead, ...rest] = ABOUT_IMAGES.factory;
+  const [active, setActive] = useState(0);
 
   return (
-    <section className="brand-section bg-background">
+    <section className="brand-section relative isolate bg-primary-deep text-white">
       <div className={container}>
         <SectionHeading
           hideKicker
+          tone="dark"
           kicker="Craftsmanship"
           title="From raw material to you, in six steps"
           description={pick({
@@ -234,106 +238,128 @@ function AboutCraft() {
             en: "",
           })}
         />
-        <div className={cn(tileFrame, "mt-12 sm:grid-cols-2 lg:grid-cols-12")}>
-          <CraftImage
-            src={lead}
-            index={0}
-            className="sm:col-span-2 lg:col-span-7 lg:row-span-2 lg:min-h-[32rem]"
-          />
-          {rest.map((src, index) => (
-            <CraftImage
-              key={src}
-              src={src}
-              index={index + 1}
-              className={cn(
-                "lg:col-span-5",
-                index === 2 && "sm:col-span-2 lg:col-span-12 lg:min-h-80",
-              )}
-            />
-          ))}
-        </div>
 
-        <div className="mt-16 grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-20">
-          <div className="lg:sticky lg:top-28 lg:self-start">
-            <p className="scroll-rise text-[clamp(5rem,14vw,11rem)] leading-none font-medium tracking-tighter text-accent">
-              06
-            </p>
-            <p className="scroll-rise mt-2 text-lg font-medium text-foreground">
-              {pick({ th: "ขั้นตอนในทุกชิ้นงาน", en: "steps in every piece" })}
-            </p>
-          </div>
-          <ol>
-            {ABOUT_PROCESS.map((step, index) => (
-              <li
-                key={step.title.en}
-                className="scroll-line-top group flex items-start gap-6 border-t border-border py-6 lg:gap-8 lg:py-8"
-              >
-                <span className="w-10 shrink-0 pt-1.5 text-sm font-medium text-muted-foreground tabular-nums">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <div className="scroll-rise min-w-0 flex-1">
-                  <h3 className="text-xl font-medium tracking-tight text-foreground lg:text-2xl">
-                    {pick(step.title)}
-                    <span className="ml-3 text-sm font-normal text-muted-foreground">
-                      {step.title.en}
-                    </span>
-                  </h3>
-                  <p className="mt-2 max-w-lg text-sm leading-7 text-muted-foreground lg:text-base">
-                    {pick(step.body)}
-                  </p>
-                </div>
-                {PROCESS_IMAGES[index] ? (
-                  <div className="scroll-scale-in hidden aspect-[4/3] w-28 shrink-0 overflow-hidden rounded-sm bg-surface sm:block lg:w-36">
-                    <img
-                      src={PROCESS_IMAGES[index]}
-                      alt=""
-                      aria-hidden
-                      loading="lazy"
-                      decoding="async"
-                      className="size-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                  </div>
-                ) : null}
-              </li>
+        <div className="mt-10 grid gap-8 lg:mt-14 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-stretch lg:gap-14">
+          <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-black/20 lg:aspect-auto lg:min-h-[32rem]">
+            {PROCESS_IMAGES.map((src, photo) => (
+              <img
+                key={src}
+                src={src}
+                alt=""
+                aria-hidden
+                loading="lazy"
+                className={cn(
+                  "absolute inset-0 size-full object-cover transition-[opacity,transform] duration-700 ease-out",
+                  active === photo
+                    ? "scale-100 opacity-100"
+                    : "scale-[1.05] opacity-0",
+                )}
+              />
             ))}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-5 lg:p-6">
+              <p className="text-lg font-medium text-white lg:text-xl">
+                {pick(ABOUT_PROCESS[active].title)}
+              </p>
+            </div>
+          </div>
+
+          <ol className="flex flex-col lg:justify-center">
+            {ABOUT_PROCESS.map((step, index) => {
+              const open = active === index;
+              return (
+                <li
+                  key={step.title.en}
+                  className="border-t border-white/15 last:border-b"
+                  onMouseEnter={() => setActive(index)}
+                >
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    onClick={() => setActive(index)}
+                    onFocus={() => setActive(index)}
+                    className="flex min-h-14 w-full items-center gap-5 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  >
+                    <span
+                      className={cn(
+                        "brand-index w-6 shrink-0 transition-colors",
+                        open ? "text-accent" : "text-white/40",
+                      )}
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span
+                      className={cn(
+                        "flex-1 text-lg font-medium tracking-tight transition-colors lg:text-xl",
+                        open ? "text-white" : "text-white/55",
+                      )}
+                    >
+                      {pick(step.title)}
+                    </span>
+                    <span
+                      aria-hidden
+                      className={cn(
+                        "h-px bg-accent transition-[width] duration-500",
+                        open ? "w-8" : "w-0",
+                      )}
+                    />
+                  </button>
+                  <div
+                    className={cn(
+                      "grid transition-[grid-template-rows] duration-500 ease-out",
+                      open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+                    )}
+                  >
+                    <p className="overflow-hidden pl-11 text-sm leading-6 text-white/70">
+                      <span className="block pb-4">{pick(step.body)}</span>
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
           </ol>
         </div>
+
+        <LabourStandard />
       </div>
     </section>
   );
 }
 
-function CraftImage({
-  src,
-  index,
-  className,
-}: {
-  src: string;
-  index: number;
-  className?: string;
-}) {
+function LabourStandard() {
   const pick = useBi();
   return (
-    <div
-      className={cn(
-        "scroll-scale-in group relative min-h-56 overflow-hidden rounded-sm bg-surface lg:min-h-64",
-        className,
-      )}
-      style={{ ["--i" as string]: index % 2 }}
-    >
-      <div className="scroll-zoom absolute inset-0">
+    <figure className="mt-12 grid gap-6 border-t border-white/15 pt-8 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-10">
+      <div className="flex w-44 items-center justify-center rounded-sm bg-white p-4 sm:w-52">
         <img
-          src={src}
+          src="/about/glp-logo.png"
           alt={pick({
-            th: `ขั้นตอนการผลิต WP ALL ${index + 1}`,
-            en: `WP ALL craftsmanship ${index + 1}`,
+            th: "โลโก้มาตรฐาน GLP (Good Labour Practices)",
+            en: "Good Labour Practices (GLP) logo",
           })}
+          width={600}
+          height={337}
           loading="lazy"
           decoding="async"
-          className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+          className="h-auto w-full"
         />
       </div>
-    </div>
+      <figcaption>
+        <p className="text-sm font-medium text-accent">Good Labour Practices</p>
+        <h3 className="mt-2 text-2xl font-medium tracking-tight text-balance lg:text-3xl">
+          {pick({
+            th: "ได้มาตรฐานแรงงาน GLP",
+            en: "Certified to GLP labour standards",
+          })}
+        </h3>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-white/70 text-pretty lg:text-base">
+          {pick({
+            th: "WP ALL ได้มาตรฐาน GLP (Good Labour Practices) จากสำนักพัฒนามาตรฐานแรงงาน ทุกชิ้นงานผลิตโดยทีมที่ทำงานภายใต้การดูแลที่เป็นธรรมและปลอดภัย",
+            en: "WP ALL meets Good Labour Practices (GLP), set by Thailand's Labour Standards Development Bureau. Every piece is made by a team working under fair and safe conditions.",
+          })}
+        </p>
+      </figcaption>
+    </figure>
   );
 }
 

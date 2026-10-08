@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
+import { BrandChannels } from "@/components/storefront/home/brand-channels-section";
 import {
   BrandChooseGuide,
   BrandHero,
@@ -13,6 +14,7 @@ import {
 } from "@/components/storefront/home/brand-story-sections";
 import { DEALER_ONLY_PURCHASE } from "@/lib/features";
 import { pageHead } from "@/lib/seo";
+import { buildOrganizationJsonLd } from "@/lib/seo-structured-data";
 
 export const Route = createFileRoute("/_store/")({
   beforeLoad: () => {
@@ -20,17 +22,18 @@ export const Route = createFileRoute("/_store/")({
   },
   head: () =>
     pageHead({
-      title: "WP ALL — ม่าน มู่ลี่ และระบบมอเตอร์ ผลิตในไทย",
+      title: "WP ALL | Perfect Fit Curtains, Blinds & Smart Motor Systems",
       description:
-        "WP ALL IN 1 แบรนด์ผ้าม่าน มู่ลี่ ม่านม้วน ฉากกั้นห้อง PVC รางม่าน และระบบมอเตอร์อัจฉริยะ สั่งทำตามขนาด สำหรับบ้าน โครงการ และตัวแทนจำหน่าย",
+        "ม่าน มู่ลี่ ที่ใส่ใจทุกรายละเอียด ให้ทุกหน้าต่างพอดี และทุกมุมห้องสวย ด้วยดีไซน์ ฟังก์ชัน และเทคโนโลยีมอเตอร์อัจฉริยะ",
       path: "/",
       image: "/home/hero-living-curtains.png",
+      jsonLd: buildOrganizationJsonLd(),
     }),
   component: HomePage,
 });
 
 /**
- * Story order: promise → range → projects → craftsmanship → partner steps (footer closes with the contact CTA).
+ * Story order: promise → range → projects → craftsmanship → partner steps → ordering website and app (footer closes with the contact CTA).
  * W-P-A-L-L values live on the About page only.
  * Chapter numbers 01–06 are printed in each section heading; backgrounds alternate white / cream / white / deep / surface.
  */
@@ -48,6 +51,7 @@ function HomePage() {
       <BrandProjectsBento />
       <BrandFactory />
       <BrandChooseGuide />
+      <BrandChannels />
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { ArrowUpRight, Menu, Phone, ShoppingCart } from "lucide-react";
+import { Menu, Phone, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { AccountMenuButton } from "@/components/account/account-menu-button";
@@ -18,12 +18,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
 import { useLocaleControl, useT } from "@/i18n";
 import type { Locale, TranslationKey } from "@/i18n/types";
-import { useBi, type Bi } from "@/lib/bi";
-import { COMMERCE_ENABLED, SHOP_URL, shopHref } from "@/lib/features";
+import { COMMERCE_ENABLED } from "@/lib/features";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
-
-const SHOP_LABEL: Bi = { th: "ร้านค้าตัวแทน", en: "Dealer shop" };
 
 type NavItem = {
   to: "/" | "/products" | "/projects" | "/smart-motor" | "/about" | "/catalogs";
@@ -160,7 +157,6 @@ function CommerceActions() {
 
 function MobileMenu() {
   const { t } = useT();
-  const pick = useBi();
   const [open, setOpen] = useState(false);
 
   return (
@@ -218,19 +214,6 @@ function MobileMenu() {
                 {t("nav.partners")}
               </Link>
             </li>
-            {SHOP_URL ? (
-              <li>
-                <a
-                  href={shopHref()}
-                  className="flex min-h-14 items-baseline gap-4 py-3 text-2xl font-semibold text-white/90 hover:text-white"
-                >
-                  <span className="brand-index text-white/40">
-                    {String(SITE_NAV.length + 2).padStart(2, "0")}
-                  </span>
-                  {pick(SHOP_LABEL)}
-                </a>
-              </li>
-            ) : null}
           </ol>
         </nav>
         <div className="space-y-3 border-t border-white/10 px-6 py-5">
@@ -261,7 +244,6 @@ function MobileMenu() {
 
 export function StorefrontHeader() {
   const { t } = useT();
-  const pick = useBi();
   const isHome = useLocation({
     select: (location) => location.pathname === "/",
   });
@@ -335,15 +317,6 @@ export function StorefrontHeader() {
                   )}
                 </Link>
               ))}
-              {SHOP_URL ? (
-                <a
-                  href={shopHref()}
-                  className="inline-flex min-h-11 items-center gap-1 px-3.5 text-[15px] text-white/80 transition-colors hover:text-white"
-                >
-                  {pick(SHOP_LABEL)}
-                  <ArrowUpRight className="size-3.5" aria-hidden />
-                </a>
-              ) : null}
             </nav>
 
             <div className="ml-auto flex items-center gap-1.5 lg:ml-0">

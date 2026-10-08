@@ -12,7 +12,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 import { SectionHeading } from "@/components/brand/section-heading";
-import { Button } from "@/components/ui/button";
 import { CATALOG_PRODUCTS, type CatalogProduct } from "@/data/products-catalog";
 import { PROJECT_KIND_LABELS, PROJECTS, type Project } from "@/data/projects";
 import { SMART_MOTOR_TYPES, smartMotorImage } from "@/data/smart-motor";
@@ -88,8 +87,8 @@ export function BrandHero() {
       >
         <h1 className="max-w-4xl text-4xl leading-[1.2] font-medium tracking-tight text-balance sm:text-5xl lg:text-6xl">
           {pick({
-            th: "พอดีทุกหน้าต่าง สวยทุกมุมห้อง",
-            en: "Made to fit every window. Made to be lived with.",
+            th: "PERFECT fit for every window",
+            en: "PERFECT fit for every window",
           })
             .split(" ")
             .map((phrase, index) => (
@@ -443,7 +442,7 @@ type PartnerStep = {
 const PARTNER_STEPS: PartnerStep[] = [
   {
     icon: MessageCircle,
-    title: { th: "ติดต่อทีมงาน", en: "Get in touch" },
+    title: { th: "Get in touch", en: "Get in touch" },
     text: {
       th: "ติดต่อเราผ่านช่องทางที่สะดวก ทั้ง LINE โทรศัพท์ หรือแบบฟอร์มบนเว็บไซต์",
       en: "Reach us through LINE, phone or the online form, whichever suits you.",
@@ -456,7 +455,7 @@ const PARTNER_STEPS: PartnerStep[] = [
   },
   {
     icon: BadgeCheck,
-    title: { th: "ลงทะเบียนเป็นพาร์ทเนอร์", en: "Register as a partner" },
+    title: { th: "Register as a partner", en: "Register as a partner" },
     text: {
       th: "เปิดบัญชีผู้จำหน่าย (Vendor) เพื่อรับสิทธิ์และเงื่อนไขสำหรับพาร์ทเนอร์",
       en: "Open your vendor account to unlock partner terms and benefits.",
@@ -468,7 +467,7 @@ const PARTNER_STEPS: PartnerStep[] = [
   },
   {
     icon: Headset,
-    title: { th: "ทีมขายดูแลประจำ", en: "Dedicated sales support" },
+    title: { th: "Dedicated sales support", en: "Dedicated sales support" },
     text: {
       th: "มีเจ้าหน้าที่ขายดูแลบัญชีของคุณโดยเฉพาะ ให้คำปรึกษาตลอดการทำงาน",
       en: "A sales representative is assigned to your account and advises you throughout.",
@@ -481,7 +480,7 @@ const PARTNER_STEPS: PartnerStep[] = [
   {
     icon: BookOpen,
     title: {
-      th: "รับแคตตาล็อกและข้อมูลสินค้า",
+      th: "Receive catalogues and product information",
       en: "Receive catalogues and product information",
     },
     text: {
@@ -495,7 +494,7 @@ const PARTNER_STEPS: PartnerStep[] = [
   },
   {
     icon: PackageCheck,
-    title: { th: "สั่งซื้ออย่างสะดวก", en: "Order with ease" },
+    title: { th: "Order with ease", en: "Order with ease" },
     text: {
       th: "สั่งซื้อผ่านทีมขายของเรา และผ่านเว็บไซต์เมื่อระบบพร้อมให้บริการ",
       en: "Place orders through your sales representative, and on our website once the system is ready.",
@@ -509,7 +508,8 @@ const PARTNER_STEPS: PartnerStep[] = [
 
 /**
  * Chapter 7 — how a shop becomes a partner. A pinned stage on the left changes scene
- * as each step on the right scrolls through the middle of the screen.
+ * as each step on the right scrolls through the middle of the screen. The last step's
+ * line runs on into BrandChannels' monitor, so the grid columns must stay in step with it.
  */
 export function BrandChooseGuide() {
   const pick = useBi();
@@ -656,7 +656,14 @@ export function BrandChooseGuide() {
                           )}
                         />
                       </span>
-                    ) : null}
+                    ) : (
+                      <span
+                        aria-hidden
+                        className="channel-link-track absolute top-14 bottom-[calc(-1*clamp(4rem,9vw,7.5rem))] left-[1.625rem] hidden w-px bg-border lg:block"
+                      >
+                        <span className="channel-link-from block size-full origin-top bg-accent" />
+                      </span>
+                    )}
 
                     <span
                       className={cn(
@@ -702,32 +709,6 @@ export function BrandChooseGuide() {
                 );
               })}
             </ol>
-
-            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 lg:pl-[5rem]">
-              <Button
-                size="lg"
-                className="h-12 rounded-full bg-accent px-6 text-white hover:bg-accent/90"
-                asChild
-              >
-                <Link to="/contact" search={{ topic: "dealer" }}>
-                  {pick({ th: "สมัครเป็นพาร์ทเนอร์", en: "Become a partner" })}
-                  <ArrowRight className="ml-1 size-4" aria-hidden />
-                </Link>
-              </Button>
-              <Link
-                to="/partners"
-                className="group inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary"
-              >
-                {pick({
-                  th: "ดูโปรแกรมตัวแทน",
-                  en: "See the dealer programme",
-                })}
-                <ArrowRight
-                  className="size-4 transition-transform group-hover:translate-x-1"
-                  aria-hidden
-                />
-              </Link>
-            </div>
           </div>
         </div>
       </div>

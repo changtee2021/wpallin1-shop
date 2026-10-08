@@ -3,7 +3,7 @@ export function getPublicUrl(): string {
 }
 
 export function getDefaultOgImageUrl(): string {
-  return `${getPublicUrl()}/brand/logo-mono-dark.png`;
+  return `${getPublicUrl()}/home/hero-living-curtains.png`;
 }
 
 export function absoluteUrl(path: string): string {

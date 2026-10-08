@@ -715,6 +715,159 @@
 }
 
 /*
+ * Home "order online" devices. The section names a view timeline so the devices,
+ * their scrolling screens and the cart badge all key off the same scroll position
+ * (an element's own transform would not move its own view timeline).
+ */
+@keyframes channel-monitor-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-3rem, 5rem, 0) scale(0.92);
+  }
+}
+
+@keyframes channel-phone-in {
+  from {
+    opacity: 0;
+    transform: translate3d(3rem, 9rem, 0) rotate(9deg);
+  }
+}
+
+@keyframes channel-screen-scroll {
+  to {
+    transform: translateY(-42%);
+  }
+}
+
+@keyframes channel-pop {
+  0%,
+  55% {
+    transform: scale(0);
+  }
+  75% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes channel-added {
+  0%,
+  45% {
+    background-color: var(--primary);
+  }
+  60% {
+    transform: scale(1.25);
+  }
+  100% {
+    background-color: var(--accent);
+    transform: scale(1);
+  }
+}
+
+@keyframes channel-link {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes channel-link-node {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.8);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes channel-cart-bar {
+  0%,
+  50% {
+    opacity: 0;
+    transform: translateY(120%);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Lets the partner-steps section above read the --channels timeline too. */
+    :root {
+      timeline-scope: --channels;
+    }
+
+    .channels-timeline {
+      view-timeline: --channels block;
+    }
+
+    .channel-link-from,
+    .channel-link-to,
+    .channel-link-node,
+    .channel-monitor-in,
+    .channel-phone-in,
+    .channel-screen-scroll,
+    .channel-pop,
+    .channel-added,
+    .channel-cart-bar {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --channels;
+    }
+
+    /* Step 05's line draws down out of the partner section, then into the monitor. */
+    .channel-link-from {
+      animation-name: channel-link;
+      animation-range: entry 0% entry 35%;
+    }
+
+    .channel-link-to {
+      animation-name: channel-link;
+      animation-range: entry 35% entry 70%;
+    }
+
+    .channel-link-node {
+      animation-name: channel-link-node;
+      animation-range: entry 66% entry 85%;
+    }
+
+    .channel-monitor-in {
+      animation-name: channel-monitor-in;
+      animation-range: entry 15% entry 70%;
+    }
+
+    .channel-phone-in {
+      animation-name: channel-phone-in;
+      animation-range: entry 50% cover 50%;
+    }
+
+    .channel-screen-scroll {
+      animation-name: channel-screen-scroll;
+      animation-range: cover 35% cover 80%;
+    }
+
+    .channel-pop {
+      animation-name: channel-pop;
+      animation-range: cover 30% cover 60%;
+    }
+
+    .channel-added {
+      animation-name: channel-added;
+      animation-range: cover 30% cover 60%;
+    }
+
+    .channel-cart-bar {
+      animation-name: channel-cart-bar;
+      animation-range: cover 30% cover 62%;
+    }
+  }
+}
+
+/*
  * Home product marquee: each track holds the row twice and slides by half its width,
  * so the loop is seamless. Pointer or keyboard focus pauses it so a card can be clicked.
  * With reduced motion the row becomes a normal swipe row instead.

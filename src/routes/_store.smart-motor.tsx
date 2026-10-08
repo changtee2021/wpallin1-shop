@@ -14,7 +14,7 @@ import { pageHead } from "@/lib/seo";
 export const Route = createFileRoute("/_store/smart-motor")({
   head: () =>
     pageHead({
-      title: "Smart Motor | WP ALL",
+      title: "ม่านมอเตอร์ไฟฟ้า Smart Motor | WP ALL",
       description:
         "ระบบมอเตอร์อัจฉริยะสำหรับม่านม้วน มู่ลี่ไม้ มู่ลี่อลูมิเนียม ผ้าม่านจีบ และม่านลอน ควบคุมผ่านรีโมท สวิตช์ติดผนัง และมือถือ",
       path: "/smart-motor",
