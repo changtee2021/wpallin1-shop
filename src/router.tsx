@@ -2,6 +2,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { RoutePendingFallback } from "@/components/loading";
+import { createLocaleRewrite } from "@/i18n/locales";
 
 export const getRouter = () => {
   const queryClient = new QueryClient();
@@ -14,6 +15,7 @@ export const getRouter = () => {
     defaultPendingComponent: RoutePendingFallback,
     defaultPendingMs: 0,
     defaultPendingMinMs: 0,
+    rewrite: createLocaleRewrite(),
   });
 
   return router;

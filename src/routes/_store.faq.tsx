@@ -10,8 +10,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useT } from "@/i18n";
-import { useBi, type Bi } from "@/lib/bi";
+import { bi, useBi, type Bi } from "@/lib/bi";
 import { pageHead } from "@/lib/seo";
+import { PAGE_META } from "@/lib/page-meta";
 import { siteConfig } from "@/lib/site-config";
 
 type FaqLinkTarget =
@@ -169,11 +170,11 @@ const FAQ_GROUPS: FaqGroup[] = [
 ];
 
 export const Route = createFileRoute("/_store/faq")({
-  head: () =>
+  head: ({ match }) =>
     pageHead({
-      title: "คำถามที่พบบ่อย | WP ALL",
-      description:
-        "คำตอบเรื่องราคา การวัดขนาดหน้าต่าง ตัวอย่างสี ม่านมอเตอร์ งานพิมพ์ผ้า การสมัครตัวแทน และการนัดเยี่ยมชม WP ALL",
+      locale: match.context.locale,
+      title: bi(match.context.locale ?? "th", PAGE_META.faq.title),
+      description: bi(match.context.locale ?? "th", PAGE_META.faq.description),
       path: "/faq",
       jsonLd: {
         "@context": "https://schema.org",

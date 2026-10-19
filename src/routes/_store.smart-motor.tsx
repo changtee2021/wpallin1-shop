@@ -10,13 +10,18 @@ import {
   SmartMotorTypes,
 } from "@/components/storefront/smart-motor/smart-motor-sections";
 import { pageHead } from "@/lib/seo";
+import { bi } from "@/lib/bi";
+import { PAGE_META } from "@/lib/page-meta";
 
 export const Route = createFileRoute("/_store/smart-motor")({
-  head: () =>
+  head: ({ match }) =>
     pageHead({
-      title: "ม่านมอเตอร์ไฟฟ้า Smart Motor | WP ALL",
-      description:
-        "ระบบมอเตอร์อัจฉริยะสำหรับม่านม้วน มู่ลี่ไม้ มู่ลี่อลูมิเนียม ผ้าม่านจีบ และม่านลอน ควบคุมผ่านรีโมท สวิตช์ติดผนัง และมือถือ",
+      locale: match.context.locale,
+      title: bi(match.context.locale ?? "th", PAGE_META.smartMotor.title),
+      description: bi(
+        match.context.locale ?? "th",
+        PAGE_META.smartMotor.description,
+      ),
       path: "/smart-motor",
       image: "/products/motorized-track.webp",
     }),

@@ -1,4 +1,5 @@
 import type { Locale } from "@/i18n/types";
+import { bi } from "@/lib/bi";
 
 export const CONTACT_TOPICS = [
   "project",
@@ -31,7 +32,7 @@ export type VisitSiteId = (typeof VISIT_SITE_IDS)[number];
 type Copy = { th: string; en: string };
 
 function pick(copy: Copy, locale: Locale): string {
-  return locale === "en" ? copy.en : copy.th;
+  return bi(locale, copy);
 }
 
 const TOPIC_LABELS: Record<ContactTopic, Copy> = {
@@ -177,11 +178,11 @@ export function purposeLabel(id: string, locale: Locale): string {
 
 export function sessionLabel(session: VisitSession, locale: Locale): string {
   if (session === "morning") {
-    return locale === "en"
+    return locale !== "th"
       ? "Morning (09:00–12:00)"
       : "รอบเช้า (09:00–12:00 น.)";
   }
-  return locale === "en"
+  return locale !== "th"
     ? "Afternoon (13:00–16:00)"
     : "รอบเย็น (13:00–16:00 น.)";
 }
@@ -201,7 +202,7 @@ export function formatVisitSites(
   const selected = VISIT_SITES.filter((site) => ids?.includes(site.id));
   if (selected.length === 0) return "";
   if (selected.length === VISIT_SITES.length) {
-    return locale === "en" ? "All 3 production lines" : "ไปทั้ง 3 สายผลิต";
+    return locale !== "th" ? "All 3 production lines" : "ไปทั้ง 3 สายผลิต";
   }
   return selected
     .map((site) => `${site.no} ${pick(site.title, locale)}`)

@@ -1,3 +1,4 @@
+import type { Locale } from "@/i18n/locales";
 import { LINE_OA_URL } from "@/lib/catalog-config";
 
 const MAPS_QUERY =
@@ -6,6 +7,55 @@ const MAPS_QUERY =
 function envUrl(name: string): string | undefined {
   const value = import.meta.env[name];
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+export type ContactChannel = {
+  label: string;
+  href: string;
+};
+
+/**
+ * Extra messaging channels per locale. Links only appear when the env var is set
+ * (company must confirm accounts exist). Phone + LINE always available.
+ */
+export function channelsByLocale(locale: Locale): ContactChannel[] {
+  const channels: ContactChannel[] = [];
+  switch (locale) {
+    case "my": {
+      const viber = envUrl("VITE_VIBER_URL");
+      const messenger = envUrl("VITE_MESSENGER_URL");
+      if (viber) channels.push({ label: "Viber", href: viber });
+      if (messenger) channels.push({ label: "Messenger", href: messenger });
+      break;
+    }
+    case "lo": {
+      channels.push({
+        label: "WhatsApp",
+        href: envUrl("VITE_WHATSAPP_URL") ?? "https://wa.me/66982806288",
+      });
+      channels.push({ label: "LINE", href: LINE_OA_URL });
+      break;
+    }
+    case "km": {
+      const telegram = envUrl("VITE_TELEGRAM_URL");
+      if (telegram) channels.push({ label: "Telegram", href: telegram });
+      break;
+    }
+    case "zh-hans":
+    case "zh-hant": {
+      const wechat = envUrl("VITE_WECHAT_ID");
+      if (wechat) {
+        channels.push({
+          label: "WeChat",
+          href: envUrl("VITE_WECHAT_URL") ?? `#wechat-${wechat}`,
+        });
+      }
+      break;
+    }
+    default:
+      break;
+  }
+  return channels;
 }
 
 export const siteConfig = {
@@ -48,6 +98,7 @@ export const siteConfig = {
   websiteUrl: envUrl("VITE_PUBLIC_WEBSITE_URL") ?? "https://www.wpallin1.com",
   websiteDisplay: "www.wpallin1.com",
   lineQrSrc: "/about/line-oa-qr.webp",
+  wechatQrSrc: envUrl("VITE_WECHAT_QR_SRC") ?? "/about/wechat-qr.webp",
   address: {
     line1: "117 ซอยเจริญพัฒนา 11",
     line2: "แขวงบางชัน เขตคลองสามวา",

@@ -2,7 +2,7 @@ import { ArrowUpRight, MessageCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useT } from "@/i18n";
-import { useBi, type Bi } from "@/lib/bi";
+import { useBi, useEnText, type Bi } from "@/lib/bi";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
@@ -67,12 +67,13 @@ export function ContactCtaBand({
   },
 }: ContactCtaBandProps) {
   const pick = useBi();
+  const en = useEnText();
 
   return (
     <section className="bg-foreground text-background">
       <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-20 sm:px-6 lg:flex-row lg:items-end lg:justify-between lg:px-8 lg:py-28">
         <div className="max-w-2xl">
-          <p className="brand-kicker text-accent">{kicker}</p>
+          <p className="brand-kicker text-accent">{en(kicker)}</p>
           <h2 className="brand-heading mt-4 text-white">{pick(title)}</h2>
           <p className="mt-4 text-base leading-7 text-white/65 text-pretty">
             {pick(description)}

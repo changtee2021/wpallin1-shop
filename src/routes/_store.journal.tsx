@@ -2,18 +2,22 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { SectionHeading } from "@/components/brand/section-heading";
 import { JOURNAL_POSTS } from "@/data/journal";
-import { useBi } from "@/lib/bi";
+import { bi, useBi } from "@/lib/bi";
 import { pageHead } from "@/lib/seo";
+import { PAGE_META } from "@/lib/page-meta";
 
 export const Route = createFileRoute("/_store/journal")({
   beforeLoad: () => {
     if (JOURNAL_POSTS.length === 0) throw redirect({ to: "/", replace: true });
   },
-  head: () =>
+  head: ({ match }) =>
     pageHead({
-      title: "บทความ | WP ALL",
-      description:
-        "ไอเดียแต่งบ้าน วิธีเลือกม่านและมู่ลี่ และเรื่องราวจาก WP ALL",
+      locale: match.context.locale,
+      title: bi(match.context.locale ?? "th", PAGE_META.journal.title),
+      description: bi(
+        match.context.locale ?? "th",
+        PAGE_META.journal.description,
+      ),
       path: "/journal",
     }),
   component: JournalPage,

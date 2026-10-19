@@ -2,13 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { AboutView } from "@/components/storefront/about/about-view";
 import { pageHead } from "@/lib/seo";
+import { bi } from "@/lib/bi";
+import { PAGE_META } from "@/lib/page-meta";
 
 export const Route = createFileRoute("/_store/about")({
-  head: () =>
+  head: ({ match }) =>
     pageHead({
-      title: "เกี่ยวกับ WP ALL | ผู้ผลิตม่าน มู่ลี่ และระบบมอเตอร์",
-      description:
-        "WP ALL แบรนด์ผ้าม่าน มู่ลี่ ราง และระบบมอเตอร์ สำหรับบ้านและงานโครงการ ปรัชญา C-P-C และความใส่ใจ 6 ขั้นตอนในทุกชิ้นงาน",
+      locale: match.context.locale,
+      title: bi(match.context.locale ?? "th", PAGE_META.about.title),
+      description: bi(
+        match.context.locale ?? "th",
+        PAGE_META.about.description,
+      ),
       path: "/about",
       image: "/brand/factory-1.webp",
     }),

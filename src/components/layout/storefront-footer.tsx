@@ -7,6 +7,7 @@ import { SocialLinks } from "@/components/layout/social-links";
 import { Button } from "@/components/ui/button";
 import { PRODUCT_CATEGORIES } from "@/data/products-catalog";
 import { useT } from "@/i18n";
+import { localizeEnglish } from "@/i18n/content/sea";
 import { useBi } from "@/lib/bi";
 import { siteConfig } from "@/lib/site-config";
 
@@ -25,8 +26,8 @@ export function StorefrontFooter() {
   const pick = useBi();
   const year = new Date().getFullYear();
   const legalName =
-    locale === "en" ? siteConfig.legalNameEn : siteConfig.legalName;
-  const address = locale === "en" ? siteConfig.addressEn : siteConfig.address;
+    locale !== "th" ? siteConfig.legalNameEn : siteConfig.legalName;
+  const address = locale !== "th" ? siteConfig.addressEn : siteConfig.address;
 
   return (
     <footer className="mt-auto bg-primary-deep text-white">
@@ -160,8 +161,8 @@ export function StorefrontFooter() {
           <FooterHeading>{t("footer.contact")}</FooterHeading>
           <div className="pt-1">
             <p className="text-white/50">
-              {locale === "en"
-                ? siteConfig.officeLabelEn
+              {locale !== "th"
+                ? localizeEnglish(locale, siteConfig.officeLabelEn)
                 : siteConfig.officeLabel}
             </p>
             <a
@@ -221,7 +222,7 @@ export function StorefrontFooter() {
             >
               {t("footer.cookieSettings")}
             </button>
-            <LocaleToggle />
+            <LocaleToggle side="top" />
           </nav>
         </div>
       </div>

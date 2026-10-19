@@ -1,3 +1,6 @@
+import { localizeEnglish } from "@/i18n/content/sea";
+import type { Locale } from "@/i18n/locales";
+
 export type DealerApplicationStatus =
   "pending" | "approved" | "rejected" | "suspended";
 
@@ -50,10 +53,12 @@ export function dealerApplicationStatusLabel(status: string): string {
 
 export function dealerBusinessTypeLabel(
   value: string | null | undefined,
-  locale: "th" | "en" = "th",
+  locale: string = "th",
 ): string {
   if (!value) return "—";
   const row = DEALER_BUSINESS_TYPES.find((t) => t.value === value);
   if (!row) return value;
-  return locale === "en" ? row.labelEn : row.label;
+  return locale !== "th"
+    ? localizeEnglish(locale as Locale, row.labelEn)
+    : row.label;
 }

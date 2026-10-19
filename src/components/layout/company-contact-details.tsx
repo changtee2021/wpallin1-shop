@@ -1,4 +1,5 @@
 import { useT } from "@/i18n";
+import { localizeEnglish } from "@/i18n/content/sea";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
@@ -30,11 +31,15 @@ export function CompanyContactDetails({
 }: CompanyContactDetailsProps) {
   const { t, locale } = useT();
   const officeLabel =
-    locale === "en" ? siteConfig.officeLabelEn : siteConfig.officeLabel;
+    locale !== "th"
+      ? localizeEnglish(locale, siteConfig.officeLabelEn)
+      : siteConfig.officeLabel;
   const salesLabel =
-    locale === "en" ? siteConfig.salesLabelEn : siteConfig.salesLabel;
+    locale !== "th"
+      ? localizeEnglish(locale, siteConfig.salesLabelEn)
+      : siteConfig.salesLabel;
   const itemLink = compact ? compactLinkClass : linkClass;
-  const address = locale === "en" ? siteConfig.addressEn : siteConfig.address;
+  const address = locale !== "th" ? siteConfig.addressEn : siteConfig.address;
 
   return (
     <div
@@ -173,7 +178,7 @@ export function CompanyContactDetails({
               {address.line2}
               <br />
               {address.city}
-              {locale === "en" ? (
+              {locale !== "th" ? (
                 <>
                   <br />
                   {address.country}

@@ -14,6 +14,9 @@ export const Route = createFileRoute("/dealer")({
   // With commerce off the guard must run on the server so the redirect happens before hydration.
   ssr: !COMMERCE_ENABLED,
   beforeLoad: requireCommerce,
+  head: () => ({
+    meta: [{ name: "robots", content: "noindex, nofollow" }],
+  }),
   component: DealerLayout,
 });
 

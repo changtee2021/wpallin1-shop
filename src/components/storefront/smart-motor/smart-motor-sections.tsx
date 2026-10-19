@@ -16,7 +16,7 @@ import {
   smartMotorImage,
   type SmartMotorType,
 } from "@/data/smart-motor";
-import { useBi } from "@/lib/bi";
+import { useBi, useEnText } from "@/lib/bi";
 import { cn } from "@/lib/utils";
 
 const container = "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8";
@@ -32,6 +32,7 @@ const CONTROL_ICONS: Record<string, LucideIcon> = {
 
 export function SmartMotorHero() {
   const pick = useBi();
+  const en = useEnText();
 
   return (
     <section className="bg-background">
@@ -70,7 +71,7 @@ export function SmartMotorHero() {
                 key={control.id}
                 className="rounded-full border border-border px-4 py-2 text-sm text-foreground/80"
               >
-                {control.title}
+                {en(control.title)}
               </li>
             ))}
           </ul>
@@ -271,6 +272,7 @@ export function SmartMotorFeatures() {
 
 export function SmartMotorControl() {
   const pick = useBi();
+  const en = useEnText();
 
   return (
     <section className="brand-section bg-foreground text-white">
@@ -299,7 +301,7 @@ export function SmartMotorControl() {
                 </div>
                 <div>
                   <h3 className="text-3xl font-medium tracking-tight lg:text-4xl">
-                    {control.title}
+                    {en(control.title)}
                   </h3>
                   <p className="mt-3 text-sm leading-6 text-white/65 lg:text-base">
                     {pick(control.body)}
@@ -316,6 +318,7 @@ export function SmartMotorControl() {
 
 function ModelPanel({ slug, flip }: { slug: string; flip?: boolean }) {
   const pick = useBi();
+  const en = useEnText();
   const product = getCatalogProduct(slug);
   if (!product) return null;
 
@@ -337,7 +340,7 @@ function ModelPanel({ slug, flip }: { slug: string; flip?: boolean }) {
           />
         </div>
         <span className="absolute top-4 left-4 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-foreground">
-          {product.code}
+          {en(product.code)}
         </span>
       </div>
 
@@ -412,6 +415,7 @@ export function SmartMotorModels() {
 
 function TypeTile({ type, index }: { type: SmartMotorType; index: number }) {
   const pick = useBi();
+  const en = useEnText();
   const image = smartMotorImage(type);
   const motors = type.motorSlugs
     .map((slug) => getCatalogProduct(slug))
@@ -441,7 +445,7 @@ function TypeTile({ type, index }: { type: SmartMotorType; index: number }) {
         </span>
       </div>
       <div className="flex flex-1 flex-col p-5 lg:p-6">
-        <h3 className="text-xl font-medium tracking-tight">{type.title}</h3>
+        <h3 className="text-xl font-medium tracking-tight">{en(type.title)}</h3>
         <p className="mt-2 text-sm leading-6 text-white/65">
           {pick(type.description)}
         </p>

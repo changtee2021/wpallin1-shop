@@ -3,6 +3,10 @@ import type { Translations } from "./types";
 export const th: Translations = {
   "app.name": "WP ALL",
   "app.tagline": "ศูนย์กลางผ้าม่าน — ครบวงจร",
+  "site.meta.title":
+    "WP ALL | Perfect Fit Curtains, Blinds & Smart Motor Systems",
+  "site.meta.description":
+    "ม่าน มู่ลี่ ที่ใส่ใจทุกรายละเอียด ให้ทุกหน้าต่างพอดี และทุกมุมห้องสวย ด้วยดีไซน์ ฟังก์ชัน และเทคโนโลยีมอเตอร์อัจฉริยะ",
   "nav.home": "หน้าแรก",
   "nav.homeMenu": "Home",
   "nav.order": "สั่งเลย",

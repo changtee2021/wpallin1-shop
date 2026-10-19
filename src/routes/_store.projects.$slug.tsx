@@ -11,7 +11,7 @@ import {
 } from "@/data/products-catalog";
 import { PROJECT_KIND_LABELS, PROJECTS, getProject } from "@/data/projects";
 import { useT } from "@/i18n";
-import { useBi } from "@/lib/bi";
+import { bi, useBi, useEnText } from "@/lib/bi";
 import { absoluteUrl } from "@/lib/public-url";
 import { pageHead } from "@/lib/seo";
 
@@ -21,12 +21,13 @@ export const Route = createFileRoute("/_store/projects/$slug")({
     if (!project) throw redirect({ to: "/projects", replace: true });
     return { project };
   },
-  head: ({ loaderData }) => {
+  head: ({ loaderData, match }) => {
     if (!loaderData?.project) return {};
     const { project } = loaderData;
     return pageHead({
-      title: `${project.title.th} | ผลงาน WP ALL`,
-      description: project.summary.th,
+      locale: match.context.locale,
+      title: `${bi(match.context.locale ?? "th", project.title)} | WP ALL`,
+      description: bi(match.context.locale ?? "th", project.summary),
       path: `/projects/${project.slug}`,
       image: project.cover,
       type: "article",
@@ -51,6 +52,7 @@ export const Route = createFileRoute("/_store/projects/$slug")({
 function ProjectDetailPage() {
   const { t } = useT();
   const pick = useBi();
+  const en = useEnText();
   const { project } = Route.useLoaderData();
 
   const products = project.productSlugs
@@ -93,7 +95,7 @@ function ProjectDetailPage() {
 
       <header className="mx-auto max-w-7xl px-4 pt-6 pb-10 sm:px-6 lg:px-8">
         <p className="brand-kicker text-primary">
-          {PROJECT_KIND_LABELS[project.kind].en}
+          {en(PROJECT_KIND_LABELS[project.kind].en)}
         </p>
         <h1 className="brand-display mt-4 max-w-4xl text-foreground text-balance">
           {pick(project.title)}
@@ -170,7 +172,12 @@ function ProjectDetailPage() {
             <SectionHeading
               kicker="Products used"
               title="In this project"
-              description={pick({ th: "สินค้าในงานนี้", en: "" })}
+              description={pick({
+                th: "สินค้าในงานนี้",
+                en: "",
+                "zh-hans": "本项目使用的产品",
+                "zh-hant": "本專案使用的產品",
+              })}
             />
             <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
               {products.map((product) => (

@@ -38,7 +38,7 @@ import {
   authServerFnOptions,
   useAuthServerFnOptions,
 } from "@/lib/server-fn-auth";
-import { useT, useLocaleControl } from "@/i18n";
+import { isLocale, useT, useLocaleControl, type Locale } from "@/i18n";
 import type {
   AccountProfileDto,
   AddressDto,
@@ -108,7 +108,7 @@ function AccountPage() {
 
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [locale, setLocale] = useState<"th" | "en">("th");
+  const [locale, setLocale] = useState<Locale>("th");
   const [customerType, setCustomerType] = useState<"individual" | "juristic">(
     "individual",
   );
@@ -152,7 +152,7 @@ function AccountPage() {
     setProfile(data);
     setFullName(data.fullName ?? "");
     setPhone(data.phone ?? "");
-    setLocale(data.locale === "en" ? "en" : "th");
+    setLocale(isLocale(data.locale) ? data.locale : "th");
     setCustomerType(data.customerType);
     setNationalId(data.nationalId ?? "");
     setCompanyTaxId(data.companyTaxId ?? "");

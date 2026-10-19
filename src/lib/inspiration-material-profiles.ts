@@ -2,6 +2,8 @@ import type {
   InspirationMaterialDto,
   InspirationRoomDto,
 } from "@/types/api/inspiration";
+import type { Locale } from "@/i18n/locales";
+import { bi } from "@/lib/bi";
 
 export type FabricPublicDto = {
   id: string;
@@ -659,9 +661,6 @@ export function resolveMaterialProfile(
   };
 }
 
-export function pickLocalized(
-  text: LocalizedText,
-  locale: "th" | "en",
-): string {
-  return locale === "en" ? text.en : text.th;
+export function pickLocalized(text: LocalizedText, locale: string): string {
+  return bi(locale as Locale, text);
 }

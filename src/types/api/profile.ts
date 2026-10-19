@@ -73,7 +73,7 @@ export type TaxInvoiceProfileDto = {
 export type UpdateAccountProfileInput = {
   fullName: string;
   phone?: string;
-  locale?: "th" | "en";
+  locale?: "th" | "en" | "my" | "lo" | "km" | "zh-hans" | "zh-hant";
   customerType?: "individual" | "juristic";
   nationalId?: string;
   companyTaxId?: string;

@@ -1,6 +1,6 @@
 import { Monitor, Plus, Search, ShoppingCart, Smartphone } from "lucide-react";
 
-import { useBi, type Bi } from "@/lib/bi";
+import { useBi, useEnText, type Bi } from "@/lib/bi";
 import { cn } from "@/lib/utils";
 
 const container = "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8";
@@ -29,47 +29,92 @@ type MockProduct = { src: string; name: Bi; size: string };
 const PRODUCTS: MockProduct[] = [
   {
     src: "/products/wood-blinds.webp",
-    name: { th: "มู่ลี่ไม้", en: "Wood blinds" },
+    name: {
+      th: "มู่ลี่ไม้",
+      en: "Wood blinds",
+      "zh-hans": "木百叶",
+      "zh-hant": "木百葉",
+    },
     size: "120 × 180",
   },
   {
     src: "/products/roller-blinds.webp",
-    name: { th: "ม่านม้วน", en: "Roller blinds" },
+    name: {
+      th: "ม่านม้วน",
+      en: "Roller blinds",
+      "zh-hans": "卷帘",
+      "zh-hant": "捲簾",
+    },
     size: "150 × 200",
   },
   {
     src: "/products/aluminium-blinds.webp",
-    name: { th: "มู่ลี่อลูมิเนียม", en: "Aluminium" },
+    name: {
+      th: "มู่ลี่อลูมิเนียม",
+      en: "Aluminium",
+      "zh-hans": "铝百叶",
+      "zh-hant": "鋁百葉",
+    },
     size: "90 × 160",
   },
   {
     src: "/products/vertical-blinds.webp",
-    name: { th: "ม่านปรับแสง", en: "Vertical blinds" },
+    name: {
+      th: "ม่านปรับแสง",
+      en: "Vertical blinds",
+      "zh-hans": "竖百叶",
+      "zh-hant": "直式百葉",
+    },
     size: "200 × 220",
   },
   {
     src: "/products/zip-blinds.webp",
-    name: { th: "ม่านซิป", en: "Zip blinds" },
+    name: {
+      th: "ม่านซิป",
+      en: "Zip blinds",
+      "zh-hans": "拉链帘",
+      "zh-hant": "拉鍊簾",
+    },
     size: "250 × 240",
   },
   {
     src: "/products/motorized-track.webp",
-    name: { th: "รางมอเตอร์", en: "Motor track" },
+    name: {
+      th: "รางมอเตอร์",
+      en: "Motor track",
+      "zh-hans": "电动轨道",
+      "zh-hant": "電動軌道",
+    },
     size: "300 cm",
   },
   {
     src: "/products/pvc-folding-door.webp",
-    name: { th: "ฉากกั้นห้อง PVC", en: "PVC partition" },
+    name: {
+      th: "ฉากกั้นห้อง PVC",
+      en: "PVC partition",
+      "zh-hans": "PVC 隔断",
+      "zh-hant": "PVC 隔間",
+    },
     size: "180 × 220",
   },
   {
     src: "/products/curtain-rod.webp",
-    name: { th: "ราวม่าน", en: "Curtain rod" },
+    name: {
+      th: "ราวม่าน",
+      en: "Curtain rod",
+      "zh-hans": "窗帘杆",
+      "zh-hant": "窗簾桿",
+    },
     size: "200 cm",
   },
   {
     src: "/products/standard-track.webp",
-    name: { th: "รางม่าน", en: "Curtain track" },
+    name: {
+      th: "รางม่าน",
+      en: "Curtain track",
+      "zh-hans": "窗帘轨",
+      "zh-hant": "窗簾軌",
+    },
     size: "250 cm",
   },
 ];
@@ -91,6 +136,7 @@ type Pick = (value: Bi) => string;
  */
 export function BrandChannels() {
   const pick = useBi();
+  const en = useEnText();
 
   return (
     <section className="channels-timeline brand-section overflow-hidden border-t border-border bg-background">
@@ -100,13 +146,13 @@ export function BrandChannels() {
           <div className="max-w-xl">
             <p className="scroll-rise brand-kicker flex items-center gap-3 text-primary">
               <span className="inline-flex h-7 items-center rounded-full bg-accent px-3 text-[0.6875rem] tracking-[0.16em] text-white">
-                Soon
+                {en("Soon")}
               </span>
               <span aria-hidden className="h-px w-8 bg-border" />
-              How to order
+              {en("How to order")}
             </p>
             <h2 className="scroll-rise brand-heading mt-4 text-foreground">
-              Order online, on web and app
+              {en("Order online, on web and app")}
             </h2>
             <p className="scroll-rise mt-4 max-w-lg text-base leading-7 text-pretty text-muted-foreground">
               {pick({

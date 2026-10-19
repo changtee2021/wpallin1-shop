@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { SectionHeading } from "@/components/brand/section-heading";
 import { CountUpNumber } from "@/components/storefront/home/count-up-number";
-import { useBi, type Bi } from "@/lib/bi";
+import { useBi, useEnText, type Bi } from "@/lib/bi";
 import { cn } from "@/lib/utils";
 
 const container = "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8";
@@ -48,6 +48,7 @@ const USP_ITEMS: { title: Bi; text: Bi }[] = [
 /** Chapter 1 — the promise. Words light up one by one as the sentence scrolls into view. */
 export function BrandStatement() {
   const pick = useBi();
+  const en = useEnText();
   const words = pick(STATEMENT).split(" ");
 
   return (
@@ -78,7 +79,7 @@ export function BrandStatement() {
               </span>
               <div>
                 <h2 className="text-base font-medium tracking-tight text-foreground lg:text-lg">
-                  {item.title.en}
+                  {en(item.title.en)}
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
                   {pick(item.text)}
@@ -134,6 +135,7 @@ const HOME_STEPS: { title: Bi; body: Bi; photo: string }[] = [
 /** Chapter 5 — the factory, after the projects. One screen: photo + four steps that expand on tap or hover. */
 export function BrandFactory() {
   const pick = useBi();
+  const en = useEnText();
   const [active, setActive] = useState(0);
 
   const stats: { title: string; detail: Bi }[] = [
@@ -179,6 +181,8 @@ export function BrandFactory() {
           description={pick({
             th: "ขั้นตอนความใส่ใจของเรา",
             en: "",
+            "zh-hans": "我们用心的每个步骤",
+            "zh-hant": "我們用心的每個步驟",
           })}
         />
 
@@ -268,7 +272,7 @@ export function BrandFactory() {
             {stats.map((stat) => (
               <div key={stat.title}>
                 <dd className="text-xl font-medium tracking-tight text-balance text-white sm:text-2xl">
-                  <CountUpNumber value={stat.title} />
+                  <CountUpNumber value={en(stat.title)} />
                 </dd>
                 <dt className="mt-1 text-sm leading-5 text-white/60">
                   {pick(stat.detail)}

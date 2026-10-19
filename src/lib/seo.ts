@@ -1,15 +1,43 @@
+import {
+  DEFAULT_LOCALE,
+  HREFLANG,
+  LOCALES,
+  OG_LOCALE,
+  shouldIgnorePath,
+  withLocalePrefix,
+  type Locale,
+} from "@/i18n/locales";
 import { absoluteUrl } from "@/lib/public-url";
 
 type PageHeadInput = {
   title: string;
   description: string;
+  /** Logical path without locale prefix, e.g. `/products` or `/`. */
   path: string;
   image?: string;
   type?: "website" | "article" | "product";
   jsonLd?: Record<string, unknown>;
+  locale?: Locale;
+  /** Skip hreflang / index for private areas (account, dealer). */
+  noIndex?: boolean;
 };
 
-/** Per-page title, description, canonical and Open Graph tags for brand pages. */
+function hreflangLinks(path: string) {
+  const bare = path.startsWith("/") ? path : `/${path}`;
+  const links = LOCALES.map((locale) => ({
+    rel: "alternate" as const,
+    hrefLang: HREFLANG[locale],
+    href: absoluteUrl(withLocalePrefix(bare, locale)),
+  }));
+  links.push({
+    rel: "alternate",
+    hrefLang: "x-default",
+    href: absoluteUrl(withLocalePrefix(bare, DEFAULT_LOCALE)),
+  });
+  return links;
+}
+
+/** Per-page title, description, canonical, hreflang and Open Graph tags. */
 export function pageHead({
   title,
   description,
@@ -17,18 +45,25 @@ export function pageHead({
   image,
   type = "website",
   jsonLd,
+  locale = DEFAULT_LOCALE,
+  noIndex = false,
 }: PageHeadInput) {
-  const url = absoluteUrl(path);
+  const localizedPath = shouldIgnorePath(path)
+    ? path
+    : withLocalePrefix(path, locale);
+  const url = absoluteUrl(localizedPath);
   const imageUrl = image ? absoluteUrl(image) : undefined;
 
   return {
     meta: [
       { title },
       { name: "description", content: description },
+      ...(noIndex ? [{ name: "robots", content: "noindex, nofollow" }] : []),
       { property: "og:type", content: type },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
       { property: "og:url", content: url },
+      { property: "og:locale", content: OG_LOCALE[locale] },
       ...(imageUrl
         ? [
             { property: "og:image", content: imageUrl },
@@ -36,7 +71,10 @@ export function pageHead({
           ]
         : []),
     ],
-    links: [{ rel: "canonical", href: url }],
+    links: [
+      { rel: "canonical", href: url },
+      ...(noIndex ? [] : hreflangLinks(path)),
+    ],
     scripts: jsonLd
       ? [{ type: "application/ld+json", children: JSON.stringify(jsonLd) }]
       : [],

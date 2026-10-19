@@ -7,16 +7,20 @@ import { BusinessContactForm } from "@/components/storefront/business-contact-fo
 import { RevealOnScroll } from "@/components/storefront/reveal-on-scroll";
 import { PRODUCT_CATEGORIES } from "@/data/products-catalog";
 import { PROJECTS } from "@/data/projects";
-import { useBi, type Bi } from "@/lib/bi";
+import { bi, useBi, type Bi } from "@/lib/bi";
 import { pageHead } from "@/lib/seo";
+import { PAGE_META } from "@/lib/page-meta";
 import { siteConfig } from "@/lib/site-config";
 
 export const Route = createFileRoute("/_store/partners")({
-  head: () =>
+  head: ({ match }) =>
     pageHead({
-      title: "ตัวแทนจำหน่าย / OEM / ODM | WP ALL",
-      description:
-        "ร่วมเป็นตัวแทนจำหน่ายม่าน มู่ลี่ ราง และมอเตอร์ WP ALL หรือสั่งผลิตแบบ OEM / ODM ภายใต้แบรนด์ของคุณ ผลิตตามออเดอร์และจัดส่งถึงร้านคุณ",
+      locale: match.context.locale,
+      title: bi(match.context.locale ?? "th", PAGE_META.partners.title),
+      description: bi(
+        match.context.locale ?? "th",
+        PAGE_META.partners.description,
+      ),
       path: "/partners",
       image: "/brand/factory-2.webp",
     }),

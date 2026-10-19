@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useT } from "@/i18n";
+import { useT, type Locale } from "@/i18n";
 import { tierLabel, showCreditPanel } from "@/lib/member-tier";
 import { formatDate, formatPrice } from "@/lib/format";
 import type {
@@ -117,8 +117,8 @@ export type AccountSettingsSectionsProps = {
   onDeleteTax: (id: string) => void;
   onEditTax: (tax: TaxInvoiceProfileDto) => void;
   onCancelTaxEdit: () => void;
-  locale: "th" | "en";
-  setLocale: (v: "th" | "en") => void;
+  locale: Locale;
+  setLocale: (v: Locale) => void;
   onSaveSettings: () => void;
   onSignOut: () => void;
 };

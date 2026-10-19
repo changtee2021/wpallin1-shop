@@ -5,6 +5,10 @@ import { th } from "./th";
 export const en: Translations = {
   ...th,
   "app.tagline": "WP all in one – Home Decoration",
+  "site.meta.title":
+    "WP ALL | Perfect Fit Curtains, Blinds & Smart Motor Systems",
+  "site.meta.description":
+    "Curtains and blinds crafted to fit every window — design, function, and smart motor technology for a beautiful home.",
   "nav.home": "Home",
   "nav.homeMenu": "Home",
   "nav.order": "Order now",
@@ -77,6 +81,12 @@ export const en: Translations = {
   "account.section.mine": "My stuff",
   "account.section.about": "About",
   "account.section.support": "Support",
+  "dealer.dashboard": "Dealer dashboard",
+  "dealer.catalog": "Wholesale price catalogue",
+  "dealer.wallet": "Wallet / credit",
+  "admin.overview": "Overview",
+  "admin.products": "Products",
+  "admin.settings": "Settings",
   "common.loading": "Loading...",
   "common.comingSoon": "Coming soon",
   "common.search": "Search products",

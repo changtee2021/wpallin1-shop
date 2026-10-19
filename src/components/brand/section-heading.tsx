@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { useEnText } from "@/lib/bi";
 import { cn } from "@/lib/utils";
 
 type SectionHeadingProps = {
@@ -31,6 +32,7 @@ export function SectionHeading({
   className,
   as: Heading = "h2",
 }: SectionHeadingProps) {
+  const en = useEnText();
   const dark = tone === "dark";
   const masthead = Heading === "h1";
 
@@ -57,7 +59,7 @@ export function SectionHeading({
           />
         </>
       ) : null}
-      {kicker}
+      {en(kicker)}
     </p>
   );
 
@@ -71,7 +73,7 @@ export function SectionHeading({
         dark ? "text-white" : "text-foreground",
       )}
     >
-      {title}
+      {typeof title === "string" ? en(title) : title}
     </Heading>
   );
 

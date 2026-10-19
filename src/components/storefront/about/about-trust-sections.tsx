@@ -66,7 +66,12 @@ export function AboutNumbers() {
           hideKicker
           kicker="In numbers"
           title="WP ALL in numbers"
-          description={pick({ th: "ความพร้อมของเราในตัวเลข", en: "" })}
+          description={pick({
+            th: "ความพร้อมของเราในตัวเลข",
+            en: "",
+            "zh-hans": "用数字看我们的实力",
+            "zh-hant": "用數字看我們的實力",
+          })}
         />
         <dl className={cn(tileFrame, "mt-12 sm:grid-cols-2 lg:grid-cols-12")}>
           <div className="scroll-scale-in relative min-h-72 overflow-hidden rounded-sm bg-surface sm:col-span-2 lg:col-span-7 lg:min-h-[26rem]">
@@ -181,7 +186,12 @@ export function AboutTimeline() {
           hideKicker
           kicker="Our story"
           title="Our story so far"
-          description={pick({ th: "เส้นทางของ WP ALL", en: "" })}
+          description={pick({
+            th: "เส้นทางของ WP ALL",
+            en: "",
+            "zh-hans": "WP ALL 的发展历程",
+            "zh-hant": "WP ALL 的發展歷程",
+          })}
         />
         <ol className="mt-12 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-5">
           {milestones.map((milestone, index) => (
@@ -257,6 +267,8 @@ export function AboutProof() {
           description={pick({
             th: "ผลงานจริงที่ใช้สินค้าของเรา",
             en: "",
+            "zh-hans": "使用我们产品的真实案例",
+            "zh-hant": "使用我們產品的真實案例",
           })}
           action={
             <Link
@@ -371,6 +383,8 @@ export function AboutCompanyProfile() {
             description={pick({
               th: "ข้อมูลบริษัทสำหรับคู่ค้าและงานโครงการ",
               en: "",
+              "zh-hans": "供合作伙伴与工程项目参考的公司资料",
+              "zh-hant": "供合作夥伴與工程專案參考的公司資料",
             })}
           />
           <div className="scroll-rise mt-10 flex flex-wrap gap-3">

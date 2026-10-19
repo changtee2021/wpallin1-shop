@@ -10,7 +10,8 @@ import { Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useT } from "@/i18n";
+import { HTML_LANG, useT, type Locale } from "@/i18n";
+import { useCatalogDbText } from "@/i18n/content/catalog-db";
 import { cn } from "@/lib/utils";
 import type { MarketingCatalogDto } from "@/types/api/marketing-catalogs";
 
@@ -25,8 +26,10 @@ function isNewCatalog(updatedAt: string): boolean {
   return Date.now() - updated < thirtyDays;
 }
 
-function formatUpdatedDate(iso: string, locale: string): string {
-  return new Date(iso).toLocaleDateString(locale === "en" ? "en-GB" : "th-TH", {
+function formatUpdatedDate(iso: string, locale: Locale): string {
+  const tag =
+    locale === "th" ? "th-TH" : locale === "en" ? "en-GB" : HTML_LANG[locale];
+  return new Date(iso).toLocaleDateString(tag, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -35,6 +38,7 @@ function formatUpdatedDate(iso: string, locale: string): string {
 
 export function MarketingCatalogGrid({ catalogs, compact = false }: Props) {
   const { t, locale } = useT();
+  const dbText = useCatalogDbText();
 
   if (!catalogs.length) {
     return (
@@ -65,7 +69,7 @@ export function MarketingCatalogGrid({ catalogs, compact = false }: Props) {
             {catalog.coverImageUrl ? (
               <img
                 src={catalog.coverImageUrl}
-                alt={catalog.title}
+                alt={dbText(catalog.title)}
                 className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                 loading="lazy"
               />
@@ -103,10 +107,12 @@ export function MarketingCatalogGrid({ catalogs, compact = false }: Props) {
           </div>
           <CardContent className="space-y-3 p-4">
             <div>
-              <h3 className="font-semibold leading-snug">{catalog.title}</h3>
+              <h3 className="font-semibold leading-snug">
+                {dbText(catalog.title)}
+              </h3>
               {catalog.categoryName ? (
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {catalog.categoryName}
+                  {dbText(catalog.categoryName)}
                 </p>
               ) : null}
             </div>
@@ -123,14 +129,14 @@ export function MarketingCatalogGrid({ catalogs, compact = false }: Props) {
             </div>
             {catalog.description && !compact ? (
               <p className="line-clamp-2 text-sm text-muted-foreground">
-                {catalog.description}
+                {dbText(catalog.description)}
               </p>
             ) : null}
             {catalog.tags.length > 0 && !compact ? (
               <div className="flex flex-wrap gap-1">
                 {catalog.tags.slice(0, 4).map((tag) => (
                   <Badge key={tag} variant="secondary" className="text-[10px]">
-                    {tag}
+                    {dbText(tag)}
                   </Badge>
                 ))}
               </div>

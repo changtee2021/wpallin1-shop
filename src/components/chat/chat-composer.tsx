@@ -57,7 +57,7 @@ export function ChatComposer({
   const [uploading, setUploading] = useState(false);
   const imageRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const quickReplies = locale === "en" ? QUICK_REPLIES_EN : QUICK_REPLIES_TH;
+  const quickReplies = locale !== "th" ? QUICK_REPLIES_EN : QUICK_REPLIES_TH;
 
   async function submit() {
     const trimmed = text.trim();

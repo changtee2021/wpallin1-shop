@@ -1,6 +1,13 @@
-import { Link, useLocation } from "@tanstack/react-router";
-import { Menu, Phone, ShoppingCart } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Link, useLocation, useRouterState } from "@tanstack/react-router";
+import {
+  Check,
+  ChevronDown,
+  Globe,
+  Menu,
+  Phone,
+  ShoppingCart,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 import { AccountMenuButton } from "@/components/account/account-menu-button";
 import { ArrowFillLink } from "@/components/brand/arrow-fill-link";
@@ -16,8 +23,14 @@ import {
 } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
-import { useLocaleControl, useT } from "@/i18n";
-import type { Locale, TranslationKey } from "@/i18n/types";
+import {
+  HREFLANG,
+  LOCALE_OPTIONS,
+  switchLocalePath,
+  useLocaleControl,
+  useT,
+} from "@/i18n";
+import type { TranslationKey } from "@/i18n/types";
 import { COMMERCE_ENABLED } from "@/lib/features";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
@@ -39,67 +52,110 @@ export const SITE_NAV: NavItem[] = [
 const headerIconClass =
   "size-11 rounded-full text-white hover:bg-white/10 hover:text-white";
 
-const LOCALE_OPTIONS: { value: Locale; label: string; name: string }[] = [
-  { value: "th", label: "TH", name: "ไทย" },
-  { value: "en", label: "EN", name: "English" },
-];
-
-/** Plain-text language switch: "TH | EN". The active language is bold, the other is one tap away. */
+/**
+ * Language dropdown. Native <details> + real links, so it opens and switches
+ * even before hydration; once hydrated, clicks switch client-side.
+ */
 export function LocaleToggle({
   className,
   tone = "light",
+  side = "bottom",
 }: {
   className?: string;
   tone?: "light" | "dark";
+  side?: "bottom" | "top";
 }) {
   const { t } = useT();
   const { locale, setLocale } = useLocaleControl();
+  const publicHref = useRouterState({
+    select: (s) => s.location.publicHref ?? s.location.href,
+  });
+  const ref = useRef<HTMLDetailsElement>(null);
   const light = tone === "light";
+  const current =
+    LOCALE_OPTIONS.find((option) => option.value === locale) ??
+    LOCALE_OPTIONS[0];
+  const url = new URL(publicHref, "http://local");
+
+  useEffect(() => {
+    const close = (event: Event) => {
+      const details = ref.current;
+      if (!details?.open) return;
+      if (event instanceof KeyboardEvent) {
+        if (event.key !== "Escape") return;
+        details.open = false;
+        details.querySelector("summary")?.focus();
+        return;
+      }
+      if (!details.contains(event.target as Node)) details.open = false;
+    };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, []);
 
   return (
-    <div
-      role="group"
-      aria-label={t("site.lang.label")}
-      className={cn(
-        "inline-flex items-center text-sm",
-        light ? "text-white" : "text-foreground",
-        className,
-      )}
-    >
-      {LOCALE_OPTIONS.map((option, index) => {
-        const active = locale === option.value;
-        return (
-          <span key={option.value} className="inline-flex items-center">
-            {index > 0 ? (
-              <span
-                aria-hidden
+    <details ref={ref} className={cn("group relative", className)}>
+      <summary
+        aria-label={`${t("site.lang.label")}: ${current.name}`}
+        className={cn(
+          "inline-flex min-h-11 cursor-pointer list-none items-center gap-1.5 rounded-full px-3 text-sm font-medium transition-colors select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent [&::-webkit-details-marker]:hidden",
+          light
+            ? "text-white hover:bg-white/10"
+            : "text-foreground hover:bg-muted",
+        )}
+      >
+        <Globe className="size-4" aria-hidden />
+        <span lang={current.value}>{current.label}</span>
+        <ChevronDown
+          className="size-3.5 opacity-70 transition-transform group-open:rotate-180"
+          aria-hidden
+        />
+      </summary>
+      <ul
+        aria-label={t("site.lang.label")}
+        className={cn(
+          "absolute right-0 z-50 min-w-48 overflow-hidden rounded-xl bg-background py-1.5 text-foreground shadow-[0_18px_40px_-16px_rgb(0_0_0/0.45)] ring-1 ring-border",
+          side === "top" ? "bottom-full mb-2" : "top-full mt-2",
+        )}
+      >
+        {LOCALE_OPTIONS.map((option) => {
+          const active = option.value === locale;
+          return (
+            <li key={option.value}>
+              <a
+                href={`${switchLocalePath(url.pathname, option.value)}${url.search}${url.hash}`}
+                hrefLang={HREFLANG[option.value]}
+                lang={option.value}
+                aria-current={active ? "true" : undefined}
+                onClick={(event) => {
+                  if (event.metaKey || event.ctrlKey || event.shiftKey) return;
+                  event.preventDefault();
+                  if (ref.current) ref.current.open = false;
+                  setLocale(option.value);
+                }}
                 className={cn(
-                  "h-3.5 w-px",
-                  light ? "bg-white/30" : "bg-border",
+                  "flex min-h-11 items-center justify-between gap-4 px-4 text-sm transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
+                  active && "font-semibold",
                 )}
-              />
-            ) : null}
-            <button
-              type="button"
-              lang={option.value}
-              title={option.name}
-              aria-pressed={active}
-              onClick={() => setLocale(option.value)}
-              className={cn(
-                "inline-flex min-h-11 min-w-11 items-center justify-center px-2 tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
-                active
-                  ? "font-semibold"
-                  : light
-                    ? "text-white/55 hover:text-white"
-                    : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {option.label}
-            </button>
-          </span>
-        );
-      })}
-    </div>
+              >
+                <span>{option.name}</span>
+                {active ? (
+                  <Check className="size-4 text-accent" aria-hidden />
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    {option.label}
+                  </span>
+                )}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </details>
   );
 }
 
@@ -234,7 +290,7 @@ function MobileMenu() {
               <Phone className="size-4" aria-hidden />
               {siteConfig.phoneDisplay}
             </a>
-            <LocaleToggle />
+            <LocaleToggle side="top" />
           </div>
         </div>
       </SheetContent>

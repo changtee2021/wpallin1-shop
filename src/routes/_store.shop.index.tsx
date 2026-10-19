@@ -30,6 +30,8 @@ import {
   fetchShopFilterFacets,
 } from "@/lib/api.functions";
 import { pageHead } from "@/lib/seo";
+import { bi } from "@/lib/bi";
+import { PAGE_META } from "@/lib/page-meta";
 import {
   buildShopListOptions,
   clearAllFilters,
@@ -90,11 +92,11 @@ export const Route = createFileRoute("/_store/shop/")({
     ]);
     return { products, categories, facets };
   },
-  head: () =>
+  head: ({ match }) =>
     pageHead({
-      title: "WP ALL Shop — สั่งซื้อสินค้าสำหรับตัวแทนจำหน่าย",
-      description:
-        "ร้านค้าออนไลน์ WP ALL ผ้าม่าน ม่านม้วน รางม่าน และอุปกรณ์ ราคาโรงงานสำหรับตัวแทนจำหน่าย สั่งซ้ำง่าย ติดตามออเดอร์ได้",
+      locale: match.context.locale,
+      title: bi(match.context.locale ?? "th", PAGE_META.shop.title),
+      description: bi(match.context.locale ?? "th", PAGE_META.shop.description),
       path: "/shop",
     }),
   pendingComponent: ShopGridSkeleton,

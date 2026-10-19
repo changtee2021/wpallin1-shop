@@ -8,8 +8,9 @@ import {
   type Project,
   type ProjectKind,
 } from "@/data/projects";
-import { useBi } from "@/lib/bi";
+import { bi, useBi } from "@/lib/bi";
 import { pageHead } from "@/lib/seo";
+import { PAGE_META } from "@/lib/page-meta";
 import { cn } from "@/lib/utils";
 
 const PROJECT_KINDS = [
@@ -26,11 +27,14 @@ const FIRST_ROW = 4;
 
 export const Route = createFileRoute("/_store/projects/")({
   validateSearch: (search) => projectsSearchSchema.parse(search),
-  head: () =>
+  head: ({ match }) =>
     pageHead({
-      title: "ผลงาน | WP ALL",
-      description:
-        "ผลงานม่านพิมพ์ลาย งานนิทรรศการ และงานติดตั้งจากตัวแทนจำหน่าย WP ALL ทั่วประเทศ เช่น Colors of Buriram 2025 และ Bangkok Design Week 2025",
+      locale: match.context.locale,
+      title: bi(match.context.locale ?? "th", PAGE_META.projects.title),
+      description: bi(
+        match.context.locale ?? "th",
+        PAGE_META.projects.description,
+      ),
       path: "/projects",
     }),
   component: ProjectsPage,
@@ -80,6 +84,10 @@ function ProjectsPage() {
             {pick({
               th: "งานจริงที่ใช้สินค้าของเรา ตั้งแต่ผ้าม่านพิมพ์ลายในงานนิทรรศการ ไปจนถึงงานติดตั้งของตัวแทนทั่วประเทศ",
               en: "",
+              "zh-hans":
+                "使用我们产品的真实案例，从展览中的印花窗帘到全国经销商的安装工程",
+              "zh-hant":
+                "使用我們產品的真實案例，從展覽中的印花窗簾到全國經銷商的安裝工程",
             })}
           </p>
         </div>

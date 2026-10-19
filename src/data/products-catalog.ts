@@ -127,24 +127,41 @@ export type CatalogProduct = {
   featured?: boolean;
 };
 
-const t = (th: string, en: string): Bi => ({ th, en });
+const t = (
+  th: string,
+  en: string,
+  extra?: Partial<Omit<Bi, "th" | "en">>,
+): Bi => ({ th, en, ...extra });
 const same = (value: string): Bi => ({ th: value, en: value });
 
 export const PRODUCT_CATEGORIES: ProductCategory[] = [
   {
     id: "blinds",
     index: "01",
-    name: t("มู่ลี่และม่านภายใน", "Interior Blinds"),
+    name: t("มู่ลี่และม่านภายใน", "Interior Blinds", {
+      "zh-hans": "室内百叶与窗帘",
+      "zh-hant": "室內百葉與窗簾",
+      my: "အတွင်းဘလိုင့်နှင့် ကန့်လန့်ကာ",
+      lo: "ມູລີ ແລະ ມ່ານພາຍໃນ",
+      km: "វាំងននខាងក្នុង",
+    }),
     description: t(
       "มู่ลี่ไม้ มู่ลี่อลูมิเนียม ม่านม้วน และม่านปรับแสง ผลิตตามขนาดหน้างาน",
       "Wood and aluminium blinds, roller and vertical blinds — all made to measure.",
+      {
+        "zh-hans": "木百叶、铝百叶、卷帘与竖百叶 — 按现场尺寸定制。",
+        "zh-hant": "木百葉、鋁百葉、捲簾與直式百葉 — 依現場尺寸訂製。",
+      },
     ),
     image: "/products/wood-blinds.webp",
   },
   {
     id: "outdoor",
     index: "02",
-    name: t("ระบบกันแดดภายนอก", "Outdoor Shading"),
+    name: t("ระบบกันแดดภายนอก", "Outdoor Shading", {
+      "zh-hans": "户外遮阳系统",
+      "zh-hant": "戶外遮陽系統",
+    }),
     description: t(
       "ม่านม้วนภายนอก ซิปบลาย และสกายไลท์ สำหรับระเบียง เพอร์โกล่า และหลังคากระจก",
       "Exterior rollers, zip blinds and skylight systems for terraces, pergolas and glass roofs.",
@@ -154,17 +171,32 @@ export const PRODUCT_CATEGORIES: ProductCategory[] = [
   {
     id: "partitions",
     index: "03",
-    name: t("ฉากกั้นห้อง PVC", "PVC Folding Doors"),
+    name: t("ฉากกั้นห้อง PVC", "PVC Folding Doors", {
+      "zh-hans": "PVC 折叠隔断",
+      "zh-hant": "PVC 折疊隔間",
+      my: "PVC အခန်းကန့်",
+      lo: "ສະກັ້ນຫ້ອງ PVC",
+      km: "ភាគថាស PVC",
+    }),
     description: t(
       "ฉากกั้นห้องพับได้ 4 สไตล์ Standard, Japanese, USA และ URO สูงได้ถึง 3.60 เมตร",
       "Folding partitions in Standard, Japanese, USA and URO styles, up to 3.60 m high.",
+      {
+        "zh-hans":
+          "四种风格折叠隔断：Standard、Japanese、USA、URO，最高 3.60 米。",
+        "zh-hant":
+          "四種風格折疊隔間：Standard、Japanese、USA、URO，最高 3.60 公尺。",
+      },
     ),
     image: "/products/pvc-folding-door.webp",
   },
   {
     id: "tracks",
     index: "04",
-    name: t("รางม่าน", "Curtain Tracks"),
+    name: t("รางม่าน", "Curtain Tracks", {
+      "zh-hans": "窗帘轨",
+      "zh-hant": "窗簾軌",
+    }),
     description: t(
       "รางเทปลอน รางตะขอ รางม่านพับ รางโค้งดัดมือ และรางโรงพยาบาล",
       "S-curve, hook, roman, hand-bent and hospital tracks.",
@@ -174,7 +206,10 @@ export const PRODUCT_CATEGORIES: ProductCategory[] = [
   {
     id: "motorization",
     index: "05",
-    name: t("รางม่านมอเตอร์", "Motorized Curtain Tracks"),
+    name: t("รางม่านมอเตอร์", "Motorized Curtain Tracks", {
+      "zh-hans": "电动窗帘轨",
+      "zh-hant": "電動窗簾軌",
+    }),
     description: t(
       "มอเตอร์ม่านไร้แปรงถ่าน เสียงเงียบ ควบคุมด้วยรีโมท สวิตช์ หรือมือถือ",
       "Quiet brushless curtain motors, run by remote, wall switch or phone.",
@@ -184,7 +219,10 @@ export const PRODUCT_CATEGORIES: ProductCategory[] = [
   {
     id: "rods",
     index: "06",
-    name: t("รางโชว์และอุปกรณ์", "Curtain Rods & Accessories"),
+    name: t("รางโชว์และอุปกรณ์", "Curtain Rods & Accessories", {
+      "zh-hans": "装饰杆与配件",
+      "zh-hant": "裝飾桿與配件",
+    }),
     description: t(
       "รางโชว์หลายสีและหลายผิว พร้อมหัวราง ขาจับ และอุปกรณ์ตกแต่ง",
       "Decorative rods in many finishes, with finials, brackets and hardware.",
@@ -194,7 +232,10 @@ export const PRODUCT_CATEGORIES: ProductCategory[] = [
   {
     id: "custom-print",
     index: "07",
-    name: t("งานพิมพ์ลายสั่งทำ", "Custom Print"),
+    name: t("งานพิมพ์ลายสั่งทำ", "Custom Print", {
+      "zh-hans": "定制印花",
+      "zh-hant": "訂製印花",
+    }),
     description: t(
       "พิมพ์ลายลงผ้า ม่านญี่ปุ่น และม่านม้วน จากไฟล์งานหรือภาพของลูกค้า",
       "Printed fabric, noren and roller blinds made from your artwork or photo.",
@@ -204,12 +245,29 @@ export const PRODUCT_CATEGORIES: ProductCategory[] = [
 ];
 
 export const PRODUCT_SUBCATEGORIES: ProductSubcategory[] = [
-  { id: "venetian", category: "blinds", name: t("มู่ลี่", "Venetian blinds") },
-  { id: "roller", category: "blinds", name: t("ม่านม้วน", "Roller shades") },
+  {
+    id: "venetian",
+    category: "blinds",
+    name: t("มู่ลี่", "Venetian blinds", {
+      "zh-hans": "百叶",
+      "zh-hant": "百葉",
+    }),
+  },
+  {
+    id: "roller",
+    category: "blinds",
+    name: t("ม่านม้วน", "Roller shades", {
+      "zh-hans": "卷帘",
+      "zh-hant": "捲簾",
+    }),
+  },
   {
     id: "vertical",
     category: "blinds",
-    name: t("ม่านปรับแสง", "Vertical blinds"),
+    name: t("ม่านปรับแสง", "Vertical blinds", {
+      "zh-hans": "竖百叶",
+      "zh-hant": "直式百葉",
+    }),
   },
   {
     id: "outdoor-roller",

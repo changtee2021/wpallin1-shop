@@ -25,7 +25,8 @@ import {
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { isUuid } from "@/lib/catalog-slug";
 import { absoluteUrl, getDefaultOgImageUrl } from "@/lib/public-url";
-import { useT } from "@/i18n";
+import { DEFAULT_LOCALE, useT, withLocalePrefix } from "@/i18n";
+import { catalogDbText, useCatalogDbText } from "@/i18n/content/catalog-db";
 import type { ProductPublicDto } from "@/types/api/products";
 import type {
   MarketingCatalogAccessDto,
@@ -38,28 +39,6 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/_store/catalogs/$id")({
   validateSearch: searchSchema,
-  head: ({ loaderData }) => {
-    if (!loaderData?.access) return {};
-    const { catalog } = loaderData.access;
-    const canonical = absoluteUrl(`/catalogs/${catalog.slug}`);
-    const description =
-      catalog.description?.slice(0, 160) ??
-      `${catalog.title} — WP ALL product catalog`;
-    const ogImage = catalog.coverImageUrl ?? getDefaultOgImageUrl();
-
-    return {
-      meta: [
-        { title: `${catalog.title} | WP ALL Catalog` },
-        { name: "description", content: description },
-        { property: "og:type", content: "article" },
-        { property: "og:title", content: catalog.title },
-        { property: "og:description", content: description },
-        { property: "og:url", content: canonical },
-        { property: "og:image", content: ogImage },
-      ],
-      links: [{ rel: "canonical", href: canonical }],
-    };
-  },
   loader: async ({ params }) => {
     const access = await fetchMarketingCatalogAccess({
       data: { ref: params.id },
@@ -90,11 +69,39 @@ export const Route = createFileRoute("/_store/catalogs/$id")({
 
     return { access, related, categoryProducts };
   },
+  head: ({ loaderData, match }) => {
+    if (!loaderData?.access) return {};
+    const { catalog } = loaderData.access;
+    const locale = match.context.locale ?? DEFAULT_LOCALE;
+    const canonical = absoluteUrl(
+      withLocalePrefix(`/catalogs/${catalog.slug}`, locale),
+    );
+    const title = catalogDbText(locale, catalog.title);
+    const description =
+      (catalog.description
+        ? catalogDbText(locale, catalog.description).slice(0, 160)
+        : undefined) ?? `${title} — WP ALL product catalog`;
+    const ogImage = catalog.coverImageUrl ?? getDefaultOgImageUrl();
+
+    return {
+      meta: [
+        { title: `${title} | WP ALL Catalog` },
+        { name: "description", content: description },
+        { property: "og:type", content: "article" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: canonical },
+        { property: "og:image", content: ogImage },
+      ],
+      links: [{ rel: "canonical", href: canonical }],
+    };
+  },
   component: CatalogViewerPage,
 });
 
 function CatalogViewerPage() {
   const { t } = useT();
+  const dbText = useCatalogDbText();
   const { session } = useAuth();
   const authOpts = authServerFnOptions(session);
   const loaderData = Route.useLoaderData();
@@ -172,10 +179,12 @@ function CatalogViewerPage() {
 
       <header className="mb-4 space-y-1.5 sm:mb-6 sm:space-y-2">
         <h1 className="text-lg font-bold leading-tight sm:text-2xl">
-          {catalog.title}
+          {dbText(catalog.title)}
         </h1>
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground sm:text-sm">
-          {catalog.categoryName ? <span>{catalog.categoryName}</span> : null}
+          {catalog.categoryName ? (
+            <span>{dbText(catalog.categoryName)}</span>
+          ) : null}
           {catalog.version ? (
             <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] sm:text-xs">
               {catalog.version}
@@ -189,7 +198,7 @@ function CatalogViewerPage() {
         </div>
         {catalog.description ? (
           <p className="line-clamp-2 text-xs text-muted-foreground sm:line-clamp-none sm:text-sm">
-            {catalog.description}
+            {dbText(catalog.description)}
           </p>
         ) : null}
       </header>
@@ -200,7 +209,7 @@ function CatalogViewerPage() {
         <>
           <CatalogViewer
             pdfUrl={catalog.pdfUrl}
-            title={catalog.title}
+            title={dbText(catalog.title)}
             slug={catalog.slug}
             catalogId={catalog.id}
             allowDownload={catalog.allowDownload}
@@ -218,7 +227,9 @@ function CatalogViewerPage() {
         <section className="mt-10 sm:mt-12">
           <CatalogCategoryProducts
             products={categoryProducts}
-            categoryName={catalog.categoryName}
+            categoryName={
+              catalog.categoryName ? dbText(catalog.categoryName) : null
+            }
             shopCategorySlug={shopCategorySlug}
             memberPrices={memberPrices}
           />

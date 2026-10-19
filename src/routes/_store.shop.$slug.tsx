@@ -101,10 +101,11 @@ export const Route = createFileRoute("/_store/shop/$slug")({
       : [];
     return { product, related: related.slice(0, 8) };
   },
-  head: ({ loaderData }) => {
+  head: ({ loaderData, match }) => {
     if (!loaderData?.product) return {};
     const { product } = loaderData;
     const head = pageHead({
+      locale: match.context.locale,
       title: `${product.name} (${product.sku}) | WP ALL Shop`,
       description:
         product.description?.slice(0, 160) ??

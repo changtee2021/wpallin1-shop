@@ -5,6 +5,12 @@ import {
   PRODUCT_CATEGORY_IDS,
 } from "@/data/products-catalog";
 import { PROJECTS } from "@/data/projects";
+import {
+  DEFAULT_LOCALE,
+  HREFLANG,
+  LOCALES,
+  withLocalePrefix,
+} from "@/i18n/locales";
 import { getPublicUrl } from "@/lib/public-url";
 import { getAdminClient } from "@/lib/server-fns/_shared";
 import { listPublicMarketingCatalogs } from "@/services/marketing-catalog.service";
@@ -29,11 +35,30 @@ function escapeXml(value: string): string {
 }
 
 function renderUrl(base: string, entry: SitemapEntry): string {
-  const loc = escapeXml(`${base}${entry.path}`);
-  const lastmod = entry.lastmod
-    ? `\n    <lastmod>${entry.lastmod}</lastmod>`
-    : "";
-  return `  <url><loc>${loc}</loc>${lastmod}\n    <changefreq>${entry.changefreq ?? "weekly"}</changefreq>\n  </url>`;
+  const bare = entry.path;
+  const alternates = LOCALES.map((locale) => {
+    const href = escapeXml(`${base}${withLocalePrefix(bare || "/", locale)}`);
+    return `    <xhtml:link rel="alternate" hreflang="${HREFLANG[locale]}" href="${href}" />`;
+  });
+  const xDefault = escapeXml(
+    `${base}${withLocalePrefix(bare || "/", DEFAULT_LOCALE)}`,
+  );
+  alternates.push(
+    `    <xhtml:link rel="alternate" hreflang="x-default" href="${xDefault}" />`,
+  );
+
+  // Emit one <url> per locale so crawlers discover every language URL.
+  return LOCALES.map((locale) => {
+    const loc = escapeXml(`${base}${withLocalePrefix(bare || "/", locale)}`);
+    const lastmod = entry.lastmod
+      ? `\n    <lastmod>${entry.lastmod}</lastmod>`
+      : "";
+    return `  <url>
+    <loc>${loc}</loc>${lastmod}
+    <changefreq>${entry.changefreq ?? "weekly"}</changefreq>
+${alternates.join("\n")}
+  </url>`;
+  }).join("\n");
 }
 
 export const Route = createFileRoute("/sitemap.xml")({
@@ -97,7 +122,8 @@ export const Route = createFileRoute("/sitemap.xml")({
         ];
 
         const body = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls.map((entry) => renderUrl(base, entry)).join("\n")}
 </urlset>`;
 

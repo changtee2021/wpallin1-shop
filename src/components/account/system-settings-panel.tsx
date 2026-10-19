@@ -17,12 +17,12 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
-import type { useT } from "@/i18n";
+import { LOCALE_OPTIONS, type Locale, type useT } from "@/i18n";
 
 type SystemSettingsPanelProps = {
   email: string | null;
-  locale: "th" | "en";
-  setLocale: (v: "th" | "en") => void;
+  locale: Locale;
+  setLocale: (v: Locale) => void;
   savingProfile: boolean;
   onSaveSettings: () => void;
   onSignOut: () => void;
@@ -82,14 +82,17 @@ export function SystemSettingsPanel({
             <Label>ภาษา / Language</Label>
             <Select
               value={locale}
-              onValueChange={(v) => setLocale(v as "th" | "en")}
+              onValueChange={(v) => setLocale(v as Locale)}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="th">ไทย</SelectItem>
-                <SelectItem value="en">English</SelectItem>
+                {LOCALE_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

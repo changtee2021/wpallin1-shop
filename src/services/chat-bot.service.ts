@@ -163,7 +163,7 @@ export async function generateBotReply(
   if (!input.aiAccess.canUseLlm) {
     if (faqHit) {
       const answer =
-        input.locale === "en" && faqHit.answerEn
+        input.locale && input.locale !== "th" && faqHit.answerEn
           ? faqHit.answerEn
           : faqHit.answerTh;
       return {

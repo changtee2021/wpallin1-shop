@@ -2,17 +2,65 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
-  useState,
   type ReactNode,
 } from "react";
+import { useRouter, useRouterState } from "@tanstack/react-router";
 
-import { readStoredLocale, writeStoredLocale } from "@/lib/locale-preference";
 import { en } from "./en";
+import { km } from "./km";
+import {
+  DEFAULT_LOCALE,
+  HTML_LANG,
+  localeFromHref,
+  setActiveLocale,
+  switchLocalePath,
+  type Locale,
+} from "./locales";
+import { lo } from "./lo";
+import { my } from "./my";
 import { th } from "./th";
-import type { Locale, TranslationKey, Translations } from "./types";
+import type {
+  PartialTranslations,
+  TranslationKey,
+  Translations,
+} from "./types";
+import { ZH_DICT_EXTRA } from "./zh-dict-extra";
+import { zhHans } from "./zh-hans";
+import { zhHant } from "./zh-hant";
 
-const dictionaries: Record<Locale, Translations> = { th, en };
+const zhExtra = (index: 0 | 1): PartialTranslations =>
+  Object.fromEntries(
+    Object.entries(ZH_DICT_EXTRA).map(([key, pair]) => [key, pair?.[index]]),
+  );
+
+const dictionaries: Record<Locale, PartialTranslations | Translations> = {
+  th,
+  en,
+  my,
+  lo,
+  km,
+  "zh-hans": { ...zhExtra(0), ...zhHans },
+  "zh-hant": { ...zhExtra(1), ...zhHant },
+};
+
+const THAI_SCRIPT = /[\u0E00-\u0E7F]/;
+
+/**
+ * Resolve a key: active locale, then English, then Thai, then the key itself.
+ * Keys the Thai site already shows in English stay English on every locale.
+ */
+export function translate(locale: Locale, key: TranslationKey): string {
+  const own = dictionaries[locale][key];
+  // Thai copy that is already English (About Us, FAQ, brand names) stays
+  // English — unless this locale has its own wording for that key.
+  if (locale !== "th" && th[key] && !THAI_SCRIPT.test(th[key])) {
+    if (own && own !== th[key]) return own;
+    return en[key] || th[key];
+  }
+  return own || (locale !== "en" && en[key]) || th[key] || key;
+}
 
 type I18nContextValue = {
   locale: Locale;
@@ -21,28 +69,39 @@ type I18nContextValue = {
 };
 
 const I18nContext = createContext<I18nContextValue>({
-  locale: "th",
+  locale: DEFAULT_LOCALE,
   setLocale: () => {},
   t: (key) => th[key],
 });
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(() => readStoredLocale());
+  const router = useRouter();
+  const publicHref = useRouterState({
+    select: (s) => s.location.publicHref ?? s.location.href,
+  });
+  const locale = localeFromHref(publicHref);
 
-  const setLocale = useCallback((next: Locale) => {
-    writeStoredLocale(next);
-    setLocaleState(next);
-    if (typeof document !== "undefined") {
-      document.documentElement.lang = next;
-    }
-  }, []);
+  useEffect(() => {
+    setActiveLocale(locale);
+    document.documentElement.lang = HTML_LANG[locale];
+  }, [locale]);
+
+  const setLocale = useCallback(
+    (next: Locale) => {
+      if (next === locale) return;
+      setActiveLocale(next);
+      const url = new URL(publicHref, window.location.origin);
+      // router.navigate() would compare the de-localized href, see the same
+      // page, and skip the history update — push the public URL directly.
+      router.history.push(
+        `${switchLocalePath(url.pathname, next)}${url.search}${url.hash}`,
+      );
+    },
+    [locale, publicHref, router],
+  );
 
   const value = useMemo<I18nContextValue>(
-    () => ({
-      locale,
-      setLocale,
-      t: (key) => dictionaries[locale][key] ?? dictionaries.th[key] ?? key,
-    }),
+    () => ({ locale, setLocale, t: (key) => translate(locale, key) }),
     [locale, setLocale],
   );
 
@@ -59,6 +118,22 @@ export function useLocaleControl() {
   return { locale, setLocale };
 }
 
-export function translate(locale: Locale, key: TranslationKey): string {
-  return dictionaries[locale][key] ?? dictionaries.th[key] ?? key;
-}
+export type { Locale, TranslationKey, Translations, PartialTranslations };
+export {
+  DEFAULT_LOCALE,
+  HREFLANG,
+  HTML_LANG,
+  LOCALES,
+  LOCALE_OPTIONS,
+  OG_LOCALE,
+  fontStylesheetForLocale,
+  getActiveLocale,
+  isLocale,
+  localeFromHref,
+  localeFromPath,
+  setActiveLocale,
+  stripLocalePrefix,
+  switchLocalePath,
+  withLocalePrefix,
+  shouldIgnorePath,
+} from "./locales";

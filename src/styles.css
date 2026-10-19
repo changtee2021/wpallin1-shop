@@ -72,6 +72,30 @@
   --font-document: "Sarabun", "TH Sarabun New", "Noto Sans Thai", sans-serif;
 }
 
+/* Per-locale font stacks — only loaded when that language is active (see __root.tsx). */
+:lang(my) {
+  --font-sans: "Noto Sans Myanmar", "IBM Plex Sans Thai", ui-sans-serif, system-ui,
+    sans-serif;
+  line-height: 1.65;
+}
+:lang(lo) {
+  --font-sans: "Noto Sans Lao", "IBM Plex Sans Thai", ui-sans-serif, system-ui,
+    sans-serif;
+}
+:lang(km) {
+  --font-sans: "Kantumruy Pro", "Noto Sans Khmer", "IBM Plex Sans Thai",
+    ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.7;
+}
+:lang(zh-Hans) {
+  --font-sans: "Noto Sans SC", "IBM Plex Sans Thai", ui-sans-serif, system-ui,
+    sans-serif;
+}
+:lang(zh-Hant) {
+  --font-sans: "Noto Sans TC", "IBM Plex Sans Thai", ui-sans-serif, system-ui,
+    sans-serif;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

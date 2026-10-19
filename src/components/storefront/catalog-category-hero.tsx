@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Blinds, BookOpen, Layers, Sun } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { useCatalogDbText } from "@/i18n/content/catalog-db";
 import { cn } from "@/lib/utils";
 
 const categoryIcons: Record<string, LucideIcon> = {
@@ -30,6 +31,7 @@ export function CatalogCategoryHero({
   onSelect,
   title,
 }: Props) {
+  const dbText = useCatalogDbText();
   if (!categories.length) return null;
 
   return (
@@ -59,12 +61,12 @@ export function CatalogCategoryHero({
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold text-foreground">
-                    {category.name}
+                    {dbText(category.name)}
                   </h3>
                   <ArrowRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {count} แคตตาล็อก
+                  {count} {dbText("แคตตาล็อก")}
                 </p>
               </div>
             </button>

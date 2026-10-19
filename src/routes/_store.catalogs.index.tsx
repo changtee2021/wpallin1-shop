@@ -15,8 +15,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fetchPublicMarketingCatalogs } from "@/lib/api.functions";
 import { useT } from "@/i18n";
-import { useBi } from "@/lib/bi";
+import { useCatalogDbText } from "@/i18n/content/catalog-db";
+import { bi, useBi } from "@/lib/bi";
 import { pageHead } from "@/lib/seo";
+import { PAGE_META } from "@/lib/page-meta";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_store/catalogs/")({
@@ -31,11 +33,14 @@ export const Route = createFileRoute("/_store/catalogs/")({
     ).map(([id, name]) => ({ id, name }));
     return { catalogs, categories };
   },
-  head: () =>
+  head: ({ match }) =>
     pageHead({
-      title: "แคตตาล็อกสินค้า | WP ALL",
-      description:
-        "อ่านและดาวน์โหลดแคตตาล็อกม่าน มู่ลี่ ราง และระบบมอเตอร์ WP ALL ออนไลน์",
+      locale: match.context.locale,
+      title: bi(match.context.locale ?? "th", PAGE_META.catalogs.title),
+      description: bi(
+        match.context.locale ?? "th",
+        PAGE_META.catalogs.description,
+      ),
       path: "/catalogs",
     }),
   pendingComponent: () => (
@@ -50,6 +55,7 @@ export const Route = createFileRoute("/_store/catalogs/")({
 function CatalogsPage() {
   const { t } = useT();
   const pick = useBi();
+  const dbText = useCatalogDbText();
   const { catalogs, categories } = Route.useLoaderData();
   const [activeCategory, setActiveCategory] = useState<string | "all">("all");
   const [search, setSearch] = useState("");
@@ -64,11 +70,14 @@ function CatalogsPage() {
     return list.filter(
       (item) =>
         item.title.toLowerCase().includes(q) ||
+        dbText(item.title).toLowerCase().includes(q) ||
         item.categoryName?.toLowerCase().includes(q) ||
+        (item.categoryName &&
+          dbText(item.categoryName).toLowerCase().includes(q)) ||
         item.version?.toLowerCase().includes(q) ||
         item.tags.some((tag) => tag.toLowerCase().includes(q)),
     );
-  }, [activeCategory, catalogs, search]);
+  }, [activeCategory, catalogs, dbText, search]);
 
   const featured = useMemo(
     () => filtered.filter((item) => item.isFeatured),
@@ -112,6 +121,8 @@ function CatalogsPage() {
             {pick({
               th: "ขอรับแคตตาล็อกเล่มจริงจากทีมขาย หรืออ่านแบบออนไลน์ได้ทันที",
               en: "",
+              "zh-hans": "向销售团队索取印刷版目录，或立即在线阅读",
+              "zh-hant": "向業務團隊索取印刷版型錄，或立即線上閱讀",
             })}
           </p>
         </div>
@@ -127,6 +138,10 @@ function CatalogsPage() {
             description={pick({
               th: "แคตตาล็อกเล่มจริงแยกตามหมวดสินค้า กด “ขอตัวอย่าง” แล้วทีมขายจะติดต่อกลับ",
               en: "",
+              "zh-hans":
+                "按产品分类的印刷版目录，点击「索取样本」后销售团队会与您联系",
+              "zh-hant":
+                "依產品分類的印刷版型錄，點選「索取樣本」後業務團隊會與您聯絡",
             })}
           />
           <div className="mt-14">
@@ -145,6 +160,8 @@ function CatalogsPage() {
             description={pick({
               th: "อ่านแคตตาล็อกฉบับเต็มบนเว็บแบบ E-book ได้ทุกอุปกรณ์",
               en: "",
+              "zh-hans": "在网页上以电子书形式阅读完整目录，任何设备皆可",
+              "zh-hant": "在網頁上以電子書形式閱讀完整型錄，任何裝置皆可",
             })}
           />
           <div className="scroll-rise relative mt-8 mb-10 max-w-xl">
@@ -187,7 +204,7 @@ function CatalogsPage() {
                   active={activeCategory === category.id}
                   onClick={() => setActiveCategory(category.id)}
                 >
-                  {category.name} ({count})
+                  {dbText(category.name)} ({count})
                 </CategoryPill>
               );
             })}

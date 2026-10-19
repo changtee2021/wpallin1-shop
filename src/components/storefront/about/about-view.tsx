@@ -16,7 +16,7 @@ import {
   WPALL_TAGLINE,
 } from "@/data/about-content";
 import { WpallValuesPinned } from "@/components/storefront/wpall-values";
-import { useBi } from "@/lib/bi";
+import { useBi, useEnText } from "@/lib/bi";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
@@ -75,6 +75,8 @@ export function AboutView() {
             description={pick({
               th: "สต๊อกพร้อมส่ง และเวทีการค้าระดับนานาชาติ",
               en: "",
+              "zh-hans": "现货随时发货，并走向国际贸易舞台",
+              "zh-hant": "現貨隨時出貨，並走向國際貿易舞台",
             })}
           />
           <StockPanel />
@@ -90,7 +92,12 @@ export function AboutView() {
             hideKicker
             kicker="Specialist"
             title="Specialist lines"
-            description={pick({ th: "งานเฉพาะทางจากสายผลิตของเรา", en: "" })}
+            description={pick({
+              th: "งานเฉพาะทางจากสายผลิตของเรา",
+              en: "",
+              "zh-hans": "来自自有产线的专业产品",
+              "zh-hant": "來自自有產線的專業產品",
+            })}
           />
           <div className={cn(tileFrame, "mt-12 md:grid-cols-2")}>
             <Feature
@@ -176,6 +183,7 @@ function AboutHero() {
 
 function AboutWhoWeAre() {
   const pick = useBi();
+  const en = useEnText();
 
   return (
     <section className="brand-section bg-cream">
@@ -206,7 +214,7 @@ function AboutWhoWeAre() {
               </span>
               <div className="scroll-rise">
                 <h3 className="text-xl font-medium tracking-tight text-foreground lg:text-3xl">
-                  {value.title.en}
+                  {en(value.title.en)}
                 </h3>
                 <p className="mt-3 max-w-lg text-sm leading-7 text-muted-foreground lg:text-base">
                   {pick(value.body)}
@@ -236,6 +244,8 @@ function AboutCraft() {
           description={pick({
             th: "ทุกออเดอร์ผ่านขั้นตอนเดียวกัน ด้วยมาตรฐานเดียวกัน",
             en: "",
+            "zh-hans": "每张订单都经过相同流程、相同标准",
+            "zh-hant": "每張訂單都經過相同流程、相同標準",
           })}
         />
 
@@ -328,6 +338,7 @@ function AboutCraft() {
 
 function LabourStandard() {
   const pick = useBi();
+  const en = useEnText();
   return (
     <figure className="mt-12 grid gap-6 border-t border-white/15 pt-8 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-10">
       <div className="flex w-44 items-center justify-center rounded-sm bg-white p-4 sm:w-52">
@@ -345,7 +356,9 @@ function LabourStandard() {
         />
       </div>
       <figcaption>
-        <p className="text-sm font-medium text-accent">Good Labour Practices</p>
+        <p className="text-sm font-medium text-accent">
+          {en("Good Labour Practices")}
+        </p>
         <h3 className="mt-2 text-2xl font-medium tracking-tight text-balance lg:text-3xl">
           {pick({
             th: "ได้มาตรฐานแรงงาน GLP",
@@ -365,6 +378,7 @@ function LabourStandard() {
 
 function StockPanel() {
   const pick = useBi();
+  const en = useEnText();
   return (
     <article className={cn(tileFrame, "lg:grid-cols-12")}>
       <div className="scroll-scale-in relative min-h-72 overflow-hidden rounded-sm bg-surface lg:col-span-7 lg:min-h-[28rem]">
@@ -381,12 +395,12 @@ function StockPanel() {
           />
         </div>
         <span className="absolute top-4 left-4 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-foreground">
-          Ready to supply
+          {en("Ready to supply")}
         </span>
       </div>
       <div className="scroll-scale-in flex flex-col justify-end rounded-sm bg-neutral-900 p-6 text-white lg:col-span-5 lg:p-10">
         <h3 className="text-3xl font-medium tracking-tight text-balance lg:text-4xl">
-          Stock ready to sell, ready to ship
+          {en("Stock ready to sell, ready to ship")}
         </h3>
         <p className="mt-4 text-sm leading-7 text-white/70 text-pretty lg:text-base">
           {pick({
@@ -401,12 +415,13 @@ function StockPanel() {
 
 function TradePanel() {
   const pick = useBi();
+  const en = useEnText();
   return (
     <article className={cn(tileFrame, "lg:grid-cols-12")}>
       <div className="scroll-scale-in flex flex-col justify-end rounded-sm bg-primary-deep p-6 text-white lg:order-2 lg:col-span-7 lg:min-h-[24rem] lg:p-10">
         <p className="text-sm font-medium text-accent">WP ALL x HD Expo 2026</p>
         <h3 className="mt-3 text-3xl font-medium tracking-tight text-balance lg:text-4xl">
-          From a Thai workshop to the trade-show floor
+          {en("From a Thai workshop to the trade-show floor")}
         </h3>
         <p className="mt-4 max-w-xl text-sm leading-7 text-white/75 text-pretty lg:text-base">
           {pick({
@@ -452,6 +467,7 @@ function Feature({
   title: string;
   body: string;
 }) {
+  const en = useEnText();
   return (
     <article
       className="scroll-scale-in group flex flex-col overflow-hidden rounded-sm bg-neutral-900 text-white"
@@ -469,9 +485,9 @@ function Feature({
         </div>
       </div>
       <div className="p-6 sm:p-8">
-        <p className="brand-kicker text-accent">{kicker}</p>
+        <p className="brand-kicker text-accent">{en(kicker)}</p>
         <h3 className="mt-3 text-2xl font-medium tracking-tight lg:text-3xl">
-          {title}
+          {en(title)}
         </h3>
         <p className="mt-3 max-w-md text-sm leading-7 text-white/70 lg:text-base">
           {body}

@@ -41,7 +41,7 @@ import {
 import { getProductFaqs } from "@/data/product-faqs";
 import { PROJECTS } from "@/data/projects";
 import { useT } from "@/i18n";
-import { useBi, type Bi } from "@/lib/bi";
+import { bi, useBi, useEnText, type Bi } from "@/lib/bi";
 import { shopHref } from "@/lib/features";
 import { absoluteUrl } from "@/lib/public-url";
 import { pageHead } from "@/lib/seo";
@@ -54,7 +54,7 @@ export const Route = createFileRoute("/_store/products/$slug")({
     if (!product) throw redirect({ to: "/products", replace: true });
     return { product };
   },
-  head: ({ loaderData }) => {
+  head: ({ loaderData, match }) => {
     if (!loaderData?.product) return {};
     const { product } = loaderData;
     const faqs = getProductFaqs(product.slug);
@@ -71,8 +71,9 @@ export const Route = createFileRoute("/_store/products/$slug")({
       manufacturer: { "@type": "Organization", name: siteConfig.legalNameEn },
     };
     return pageHead({
-      title: `${product.name.th} (${product.code}) | WP ALL`,
-      description: product.summary.th,
+      locale: match.context.locale,
+      title: `${bi(match.context.locale ?? "th", product.name)} (${en(product.code)}) | WP ALL`,
+      description: bi(match.context.locale ?? "th", product.summary),
       path: `/products/${product.slug}`,
       image: product.image,
       type: "product",
@@ -213,6 +214,7 @@ function scrollToSection(event: MouseEvent<HTMLAnchorElement>) {
 function ProductDetailPage() {
   const { t } = useT();
   const pick = useBi();
+  const en = useEnText();
   const { product } = Route.useLoaderData();
   const category = getProductCategory(product.category);
   const subcategory = getProductSubcategory(product.subcategory);
@@ -368,13 +370,13 @@ function ProductDetailPage() {
       <section className="mx-auto grid max-w-7xl gap-10 px-4 pt-6 pb-16 sm:px-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16 lg:px-8 lg:pb-24">
         <div className="order-2 flex flex-col lg:order-1 lg:pt-6">
           <p className="brand-kicker text-muted-foreground">
-            {category.index} — {category.name.en}
+            {category.index} — {en(category.name.en)}
           </p>
           <h1 className="mt-5 text-[clamp(2.5rem,5vw,4.25rem)] leading-[1.08] font-medium tracking-tight text-foreground text-balance">
             {pick(product.name)}
           </h1>
           <p className="mt-3 text-sm tracking-[0.14em] text-muted-foreground uppercase">
-            {product.code}
+            {en(product.code)}
           </p>
           <p className="mt-8 max-w-md text-lg leading-8 text-foreground/85 text-pretty">
             {pick(product.tagline)}
@@ -490,7 +492,7 @@ function ProductDetailPage() {
                     onClick={scrollToSection}
                     className="inline-flex min-h-12 items-center px-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    {section.label.en}
+                    {en(section.label.en)}
                   </a>
                 </li>
               ))}
@@ -542,7 +544,7 @@ function ProductDetailPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8 lg:pb-16">
-            <p className="brand-kicker text-white/70">{product.code}</p>
+            <p className="brand-kicker text-white/70">{en(product.code)}</p>
             <p className="mt-3 max-w-2xl text-[clamp(1.75rem,3.6vw,3rem)] leading-tight font-medium text-white text-balance">
               {pick(product.tagline)}
             </p>
@@ -612,7 +614,7 @@ function ProductDetailPage() {
               <div className="max-w-md">
                 <p className="brand-kicker text-muted-foreground">Craft</p>
                 <h2 className="mt-4 text-2xl font-medium tracking-tight lg:text-3xl">
-                  {block.title.en}
+                  {en(block.title.en)}
                 </h2>
                 <p className="mt-5 text-base leading-8 text-muted-foreground text-pretty">
                   {pick(block.body)}

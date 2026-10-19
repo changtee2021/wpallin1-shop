@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useLocaleControl, useT } from "@/i18n";
+import { useLocaleControl, useT, type Locale } from "@/i18n";
 import {
   ACCOUNT_HELP_TOPICS,
   pickLocalized,
@@ -34,7 +34,7 @@ function HelpFlowStrip({
   locale,
 }: {
   topic: HelpTopic;
-  locale: "th" | "en";
+  locale: Locale;
 }) {
   return (
     <div className="relative -mx-1">
@@ -89,7 +89,7 @@ function HelpTopicView({
   onClose,
 }: {
   topic: HelpTopic;
-  locale: "th" | "en";
+  locale: Locale;
   onBack: () => void;
   onClose: () => void;
 }) {
@@ -189,7 +189,7 @@ function HelpHomeView({
   locale,
   onSelectTopic,
 }: {
-  locale: "th" | "en";
+  locale: Locale;
   onSelectTopic: (id: string) => void;
 }) {
   const { t } = useT();

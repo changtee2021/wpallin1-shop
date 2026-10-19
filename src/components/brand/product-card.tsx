@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 
 import { type CatalogProduct } from "@/data/products-catalog";
-import { useBi } from "@/lib/bi";
+import { useBi, useEnText } from "@/lib/bi";
 import { cn } from "@/lib/utils";
 
 type ProductCardProps = {
@@ -21,6 +21,8 @@ export function ProductCard({
   eager = false,
 }: ProductCardProps) {
   const pick = useBi();
+  const en = useEnText();
+  const displayName = en(product.name.en);
   const hoverImage = product.gallery?.[0];
   const badges = [
     product.videos?.length ? { th: "วิดีโอ", en: "Video" } : null,
@@ -84,11 +86,13 @@ export function ProductCard({
         ) : null}
         <div className="min-w-0">
           <h3 className="text-xl leading-snug font-semibold tracking-tight text-foreground transition-colors group-hover:text-primary">
-            {product.name.en}
+            {displayName}
           </h3>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            {product.name.th}
-          </p>
+          {pick(product.name) !== displayName ? (
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              {pick(product.name)}
+            </p>
+          ) : null}
           <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
             {pick(product.tagline)}
           </p>

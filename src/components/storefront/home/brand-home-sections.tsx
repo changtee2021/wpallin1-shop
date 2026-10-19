@@ -16,7 +16,7 @@ import { CATALOG_PRODUCTS, type CatalogProduct } from "@/data/products-catalog";
 import { PROJECT_KIND_LABELS, PROJECTS, type Project } from "@/data/projects";
 import { SMART_MOTOR_TYPES, smartMotorImage } from "@/data/smart-motor";
 import { useT } from "@/i18n";
-import { useBi, type Bi } from "@/lib/bi";
+import { useBi, useEnText, type Bi } from "@/lib/bi";
 import { cn } from "@/lib/utils";
 
 const container = "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8";
@@ -208,6 +208,8 @@ export function BrandProductRail() {
             description={pick({
               th: "ครบทุกอย่างสำหรับหน้าต่าง ในที่เดียว",
               en: "",
+              "zh-hans": "窗户所需的一切，尽在一处",
+              "zh-hant": "窗戶所需的一切，盡在一處",
             })}
             action={
               <Link
@@ -262,6 +264,7 @@ export function BrandProductRail() {
 /** Chapter 3 — Smart Motor, ahead of the projects: every curtain and blind can be motorised. */
 export function BrandSmartMotor() {
   const pick = useBi();
+  const en = useEnText();
 
   return (
     <section className="brand-section relative isolate bg-primary-deep text-white">
@@ -275,6 +278,8 @@ export function BrandSmartMotor() {
           description={pick({
             th: "ม่านและมู่ลี่ทุกแบบ ติดมอเตอร์ได้",
             en: "",
+            "zh-hans": "各式窗帘与百叶都能加装电机",
+            "zh-hant": "各式窗簾與百葉都能加裝馬達",
           })}
           action={
             <Link
@@ -322,7 +327,7 @@ export function BrandSmartMotor() {
                       : pick({ th: "มู่ลี่", en: "Blind" })}
                   </p>
                   <h3 className="mt-1 text-lg font-medium tracking-tight text-balance">
-                    {type.title}
+                    {en(type.title)}
                   </h3>
                 </Link>
               </li>
@@ -363,6 +368,8 @@ export function BrandProjectsBento() {
           description={pick({
             th: "ผลงานจากพาร์ทเนอร์ของเรา",
             en: "",
+            "zh-hans": "来自合作伙伴的作品",
+            "zh-hant": "來自合作夥伴的作品",
           })}
           action={
             <Link
@@ -548,6 +555,8 @@ export function BrandChooseGuide() {
           description={pick({
             th: "ขั้นตอนที่ชัดเจน ตั้งแต่การติดต่อครั้งแรก จนถึงการสั่งซื้อและการดูแลต่อเนื่อง",
             en: "",
+            "zh-hans": "流程清晰，从首次联系到下单与后续服务",
+            "zh-hant": "流程清晰，從首次聯絡到下單與後續服務",
           })}
         />
 

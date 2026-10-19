@@ -1,8 +1,10 @@
-export type Locale = "th" | "en";
+export type { Locale } from "./locales";
 
 export type TranslationKey =
   | "app.name"
   | "app.tagline"
+  | "site.meta.title"
+  | "site.meta.description"
   | "nav.home"
   | "nav.homeMenu"
   | "nav.order"
@@ -541,3 +543,4 @@ export type TranslationKey =
   | "chat.quotationValidUntil";
 
 export type Translations = Record<TranslationKey, string>;
+export type PartialTranslations = Partial<Translations>;

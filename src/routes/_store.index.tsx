@@ -12,6 +12,7 @@ import {
   BrandFactory,
   BrandStatement,
 } from "@/components/storefront/home/brand-story-sections";
+import { DEFAULT_LOCALE, translate } from "@/i18n";
 import { DEALER_ONLY_PURCHASE } from "@/lib/features";
 import { pageHead } from "@/lib/seo";
 import { buildOrganizationJsonLd } from "@/lib/seo-structured-data";
@@ -20,15 +21,17 @@ export const Route = createFileRoute("/_store/")({
   beforeLoad: () => {
     if (DEALER_ONLY_PURCHASE) throw redirect({ to: "/shop", replace: true });
   },
-  head: () =>
-    pageHead({
-      title: "WP ALL | Perfect Fit Curtains, Blinds & Smart Motor Systems",
-      description:
-        "ม่าน มู่ลี่ ที่ใส่ใจทุกรายละเอียด ให้ทุกหน้าต่างพอดี และทุกมุมห้องสวย ด้วยดีไซน์ ฟังก์ชัน และเทคโนโลยีมอเตอร์อัจฉริยะ",
+  head: ({ match }) => {
+    const locale = match.context.locale ?? DEFAULT_LOCALE;
+    return pageHead({
+      title: translate(locale, "site.meta.title"),
+      description: translate(locale, "site.meta.description"),
       path: "/",
       image: "/home/hero-living-curtains.png",
+      locale,
       jsonLd: buildOrganizationJsonLd(),
-    }),
+    });
+  },
   component: HomePage,
 });
 

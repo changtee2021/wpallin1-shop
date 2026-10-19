@@ -27,8 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { useChatUiSafe } from "@/hooks/use-chat-ui";
-import { useLocaleControl, useT } from "@/i18n";
-import type { Locale } from "@/i18n/types";
+import { LOCALE_OPTIONS, useLocaleControl, useT } from "@/i18n";
 import { fetchAccountProfileCached } from "@/lib/account-profile-cache";
 import { cn } from "@/lib/utils";
 import type { AccountProfileDto } from "@/types/api/profile";
@@ -38,11 +37,6 @@ type AccountMenuButtonProps = {
   variant?: "header" | "menu";
   onNavigate?: () => void;
 };
-
-const localeOptions: { value: Locale; label: string }[] = [
-  { value: "th", label: "ไทย" },
-  { value: "en", label: "English" },
-];
 
 export function AccountMenuButton({
   className,
@@ -116,7 +110,7 @@ export function AccountMenuButton({
     return (
       <Link
         to="/account"
-        search={{ tab: "dashboard" }}
+        search={{ tab: "dashboard", section: "personal" }}
         className={cn(
           "flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-muted",
           className,
@@ -186,10 +180,10 @@ export function AccountMenuButton({
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <Languages />
-            {locale === "th" ? "เปลี่ยนภาษา" : "Language"}
+            {t("site.lang.label")}
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            {localeOptions.map((option) => (
+          <DropdownMenuSubContent className="max-h-72 overflow-y-auto">
+            {LOCALE_OPTIONS.map((option) => (
               <DropdownMenuItem
                 key={option.value}
                 onClick={() => setLocale(option.value)}
@@ -197,7 +191,7 @@ export function AccountMenuButton({
                   locale === option.value ? "font-semibold" : undefined
                 }
               >
-                {option.label}
+                {option.name}
                 {locale === option.value ? " ✓" : null}
               </DropdownMenuItem>
             ))}

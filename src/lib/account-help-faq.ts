@@ -8,6 +8,9 @@ import {
   Wallet,
 } from "lucide-react";
 
+import type { Locale } from "@/i18n/locales";
+import { bi } from "@/lib/bi";
+
 type LocalizedText = { th: string; en: string };
 
 export type HelpFlowStep = {
@@ -408,9 +411,6 @@ export const ACCOUNT_HELP_TOPICS: HelpTopic[] = [
   },
 ];
 
-export function pickLocalized(
-  locale: "th" | "en",
-  text: LocalizedText,
-): string {
-  return locale === "en" ? text.en : text.th;
+export function pickLocalized(locale: string, text: LocalizedText): string {
+  return bi(locale as Locale, text);
 }

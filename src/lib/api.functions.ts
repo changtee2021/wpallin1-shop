@@ -291,7 +291,10 @@ export const updateAccountProfileFn = createServerFn({ method: "POST" })
       .object({
         fullName: z.string().min(1),
         phone: z.string().optional(),
-        locale: z.enum(["th", "en"]).optional(),
+        locale: z
+          .enum(["th", "en", "my", "lo", "km", "zh-hans", "zh-hant"])
+          .optional(),
+
         customerType: z.enum(["individual", "juristic"]).optional(),
         nationalId: z.string().optional(),
         companyTaxId: z.string().optional(),

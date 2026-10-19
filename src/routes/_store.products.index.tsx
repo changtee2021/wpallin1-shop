@@ -27,8 +27,8 @@ import {
   type ProductCategoryId,
   type ProductSubcategoryId,
 } from "@/data/products-catalog";
-import { useT } from "@/i18n";
-import { useBi, type Bi } from "@/lib/bi";
+import { DEFAULT_LOCALE, translate, useT } from "@/i18n";
+import { bi, useBi, useEnText, type Bi } from "@/lib/bi";
 import { pageHead } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
@@ -42,18 +42,20 @@ type ProductsSearch = z.infer<typeof productsSearchSchema>;
 export const Route = createFileRoute("/_store/products/")({
   validateSearch: (search) => productsSearchSchema.parse(search),
   head: ({ match }) => {
+    const locale = match.context.locale ?? DEFAULT_LOCALE;
     const category = match.search.category
       ? getProductCategory(match.search.category)
       : null;
     return pageHead({
       title: category
-        ? `${category.name.th} | WP ALL`
-        : "สินค้าทั้งหมด | WP ALL",
+        ? `${bi(locale, category.name)} | WP ALL`
+        : `${translate(locale, "nav.products")} | WP ALL`,
       description: category
-        ? category.description.th
-        : "มู่ลี่ ม่านม้วน ระบบกันแดดภายนอก ฉากกั้นห้อง PVC รางม่าน ระบบมอเตอร์ รางโชว์ และงานพิมพ์ลายสั่งทำ จาก WP ALL",
+        ? bi(locale, category.description)
+        : translate(locale, "site.meta.description"),
       path: category ? `/products?category=${category.id}` : "/products",
       image: category?.image ?? "/products/wood-blinds.webp",
+      locale,
     });
   },
   pendingComponent: () => (
@@ -172,8 +174,17 @@ const PRODUCT_GROUPS: ProductGroup[] = PRODUCT_CATEGORIES.flatMap(
 );
 
 function ProductsPage() {
-  const { t } = useT();
+  const { t, locale } = useT();
   const pick = useBi();
+  const en = useEnText();
+  const displayName = (name: Bi) =>
+    locale === "th" || locale === "en" ? name.en : pick(name);
+  // Thai page pairs the English heading with Thai; other locales pair it with their own name.
+  const secondaryName = (name: Bi) => {
+    if (locale === "th") return name.th;
+    if (locale === "en") return "";
+    return displayName(name) === name.en ? "" : name.en;
+  };
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const setSearch = (patch: Partial<ProductsSearch>) => {
@@ -228,7 +239,7 @@ function ProductsPage() {
             <span aria-hidden className="h-px w-8 bg-accent" />
             {activeCategory
               ? `${activeCategory.index} — ${pick({ th: "หมวดสินค้า", en: "Category" })}`
-              : "Made to measure"}
+              : en("Made to measure")}
           </p>
           <h1
             className={cn(
@@ -238,7 +249,10 @@ function ProductsPage() {
                 : "text-[clamp(3.5rem,12vw,9.5rem)] leading-[0.92]",
             )}
           >
-            {(activeCategory ? activeCategory.name.en : "Products")
+            {(activeCategory
+              ? displayName(activeCategory.name)
+              : en("Products")
+            )
               .split(" ")
               .map((word, index) => (
                 <span
@@ -255,7 +269,7 @@ function ProductsPage() {
               className="hero-blur-in mt-2 text-lg text-muted-foreground"
               style={{ ["--delay" as string]: "350ms" }}
             >
-              {activeCategory.name.th}
+              {secondaryName(activeCategory.name)}
             </p>
           ) : null}
           <p
@@ -367,10 +381,10 @@ function ProductsPage() {
                         id={`group-${group.id}`}
                         className="text-3xl leading-tight font-medium tracking-tight text-balance"
                       >
-                        {group.name.en}
+                        {displayName(group.name)}
                       </h2>
                       <p className="mt-1 text-base text-muted-foreground">
-                        {group.name.th}
+                        {secondaryName(group.name)}
                       </p>
                       <p className="mt-4 text-sm leading-7 text-muted-foreground text-pretty">
                         {pick(GROUP_CONCEPTS[group.id] ?? group.description)}

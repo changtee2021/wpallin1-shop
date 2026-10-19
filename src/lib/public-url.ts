@@ -1,5 +1,13 @@
+// Server and browser must agree, or head tags (canonical, hreflang) duplicate
+// on hydration — process.env is server-only, import.meta.env is inlined for both.
 export function getPublicUrl(): string {
-  return process.env.VITE_APP_PUBLIC_URL ?? "https://wpallin1-shop.vercel.app";
+  return (
+    import.meta.env.VITE_APP_PUBLIC_URL ||
+    (typeof process !== "undefined"
+      ? process.env.VITE_APP_PUBLIC_URL
+      : undefined) ||
+    "https://wpallin1-shop.vercel.app"
+  );
 }
 
 export function getDefaultOgImageUrl(): string {

@@ -20,7 +20,7 @@ const PLACEHOLDERS = {
 
 export const legalPages: Record<
   "terms" | "privacy" | "cookies",
-  Record<Locale, LegalPageContent>
+  Record<"th" | "en", LegalPageContent>
 > = {
   terms: {
     th: {
@@ -56,7 +56,7 @@ export const legalPages: Record<
         {
           title: "5. ทรัพย์สินทางปัญญา",
           paragraphs: [
-            "เนื้อหา รูปภาพ โลโก้ และซอฟตware บนเว็บไซต์เป็นทรัพย์สินของเราหรือผู้ให้อนุญาต ห้ามคัดลอกหรือใช้เพื่อการค้าโดยไม่ได้รับอนุญาต",
+            "เนื้อหา รูปภาพ โลโก้ และซอฟต์แวร์บนเว็บไซต์เป็นทรัพย์สินของเราหรือผู้ให้อนุญาต ห้ามคัดลอกหรือใช้เพื่อการค้าโดยไม่ได้รับอนุญาต",
           ],
         },
         {
@@ -320,5 +320,6 @@ export function getLegalPage(
   page: keyof typeof legalPages,
   locale: Locale,
 ): LegalPageContent {
-  return legalPages[page][locale] ?? legalPages[page].th;
+  const key = locale === "th" ? "th" : "en";
+  return legalPages[page][key];
 }

@@ -7,8 +7,9 @@ import { BusinessContactForm } from "@/components/storefront/business-contact-fo
 import { ErrorFeedbackForm } from "@/components/errors/error-feedback-form";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
-import { useT } from "@/i18n";
-import { useBi } from "@/lib/bi";
+import { DEFAULT_LOCALE, translate, useT } from "@/i18n";
+import { localizeEnglish } from "@/i18n/content/sea";
+import { enText, useBi } from "@/lib/bi";
 import { isContactFormTopic } from "@/lib/contact-inquiry";
 import {
   defaultFeedbackSubject,
@@ -16,7 +17,7 @@ import {
   type ErrorPageKind,
 } from "@/lib/error-feedback";
 import { pageHead } from "@/lib/seo";
-import { siteConfig } from "@/lib/site-config";
+import { channelsByLocale, siteConfig } from "@/lib/site-config";
 
 const contactSearchSchema = z.object({
   type: z.enum(["feedback"]).optional(),
@@ -34,20 +35,23 @@ const contactSearchSchema = z.object({
 
 export const Route = createFileRoute("/_store/contact")({
   validateSearch: (search) => contactSearchSchema.parse(search),
-  head: () =>
-    pageHead({
-      title: "ติดต่อเรา / ขอใบเสนอราคา | WP ALL",
-      description:
-        "ขอใบเสนอราคา ปรึกษางานโครงการ สมัครตัวแทน หรือนัดเยี่ยมชม WP ALL ที่คลองสามวา กรุงเทพฯ โทร 02-334-0235 LINE @wpfordealer",
+  head: ({ match }) => {
+    const locale = match.context.locale ?? DEFAULT_LOCALE;
+    return pageHead({
+      title: `${translate(locale, "site.cta.contact")} | WP ALL`,
+      description: translate(locale, "site.meta.description"),
       path: "/contact",
-    }),
+      locale,
+    });
+  },
   component: ContactPage,
 });
 
 function ContactPage() {
   const { t, locale } = useT();
   const pick = useBi();
-  const address = locale === "en" ? siteConfig.addressEn : siteConfig.address;
+  const address = locale === "th" ? siteConfig.address : siteConfig.addressEn;
+  const localeChannels = channelsByLocale(locale);
   const search = Route.useSearch();
   const isFeedback = search.type === "feedback";
   const kind: ErrorPageKind =
@@ -127,7 +131,9 @@ function ContactPage() {
 
         <aside className="space-y-8 lg:sticky lg:top-28">
           <div>
-            <p className="brand-kicker text-muted-foreground">Talk to us now</p>
+            <p className="brand-kicker text-muted-foreground">
+              {enText(locale, "Talk to us now")}
+            </p>
             <div className="mt-4 grid gap-2">
               <a
                 href={siteConfig.lineUrl}
@@ -150,11 +156,23 @@ function ContactPage() {
                   {siteConfig.phoneDisplay}
                 </span>
                 <span className="text-xs font-normal text-muted-foreground">
-                  {locale === "en"
-                    ? siteConfig.officeLabelEn
-                    : siteConfig.officeLabel}
+                  {locale === "th"
+                    ? siteConfig.officeLabel
+                    : localizeEnglish(locale, siteConfig.officeLabelEn)}
                 </span>
               </a>
+              {localeChannels.map((channel) => (
+                <a
+                  key={channel.label}
+                  href={channel.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex min-h-12 items-center justify-between gap-2 rounded-full border border-border px-5 text-sm font-semibold hover:border-primary hover:text-primary"
+                >
+                  <span>{channel.label}</span>
+                  <ArrowUpRight className="size-4" aria-hidden />
+                </a>
+              ))}
             </div>
           </div>
 
@@ -199,7 +217,7 @@ function ContactPage() {
           <div className="border-t border-border pt-8">
             <p className="brand-kicker text-muted-foreground">Head office</p>
             <address className="mt-3 text-sm leading-6 not-italic">
-              {locale === "en" ? siteConfig.legalNameEn : siteConfig.legalName}
+              {locale === "th" ? siteConfig.legalName : siteConfig.legalNameEn}
               <br />
               {address.line1} {address.line2}
               <br />
