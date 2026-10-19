@@ -21,6 +21,7 @@ import {
 import { lo } from "./lo";
 import { my } from "./my";
 import { th } from "./th";
+import { vi } from "./vi";
 import type {
   PartialTranslations,
   TranslationKey,
@@ -41,6 +42,7 @@ const dictionaries: Record<Locale, PartialTranslations | Translations> = {
   my,
   lo,
   km,
+  vi,
   "zh-hans": { ...zhExtra(0), ...zhHans },
   "zh-hant": { ...zhExtra(1), ...zhHant },
 };

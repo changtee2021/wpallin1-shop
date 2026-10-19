@@ -3,12 +3,14 @@ import type { Locale } from "@/i18n/locales";
 import { SEA_KM } from "./sea-km";
 import { SEA_LO } from "./sea-lo";
 import { SEA_MY } from "./sea-my";
+import { SEA_VI } from "./sea-vi";
 import { zhFromEnglish } from "./zh";
 
 const SEA_CONTENT: Partial<Record<Locale, Record<string, string>>> = {
   my: SEA_MY,
   lo: SEA_LO,
   km: SEA_KM,
+  vi: SEA_VI,
 };
 
 /** Translation of static English source copy for locales that are not shipped inline. */

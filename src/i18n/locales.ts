@@ -5,6 +5,7 @@ export const LOCALES = [
   "my",
   "lo",
   "km",
+  "vi",
   "zh-hans",
   "zh-hant",
 ] as const;
@@ -25,6 +26,7 @@ export const HREFLANG: Record<Locale, string> = {
   my: "my",
   lo: "lo",
   km: "km",
+  vi: "vi",
   "zh-hans": "zh-Hans",
   "zh-hant": "zh-Hant",
 };
@@ -36,6 +38,7 @@ export const HTML_LANG: Record<Locale, string> = {
   my: "my",
   lo: "lo",
   km: "km",
+  vi: "vi",
   "zh-hans": "zh-Hans",
   "zh-hant": "zh-Hant",
 };
@@ -47,6 +50,7 @@ export const OG_LOCALE: Record<Locale, string> = {
   my: "my_MM",
   lo: "lo_LA",
   km: "km_KH",
+  vi: "vi_VN",
   "zh-hans": "zh_CN",
   "zh-hant": "zh_TW",
 };
@@ -65,6 +69,7 @@ export const LOCALE_OPTIONS: LocaleOption[] = [
   { value: "my", label: "MY", name: "မြန်မာ" },
   { value: "lo", label: "LO", name: "ລາວ" },
   { value: "km", label: "KM", name: "ខ្មែរ" },
+  { value: "vi", label: "VI", name: "Tiếng Việt" },
   { value: "zh-hans", label: "简", name: "简体中文" },
   { value: "zh-hant", label: "繁", name: "繁體中文" },
 ];
@@ -209,6 +214,8 @@ export function fontStylesheetForLocale(locale: Locale): string | null {
       return "https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600&display=swap";
     case "km":
       return "https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600&family=Noto+Sans+Khmer:wght@400;500;600&display=swap";
+    case "vi":
+      return "https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&display=swap";
     case "zh-hans":
       return "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&display=swap";
     case "zh-hant":

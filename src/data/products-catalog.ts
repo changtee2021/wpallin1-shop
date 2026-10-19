@@ -144,6 +144,7 @@ export const PRODUCT_CATEGORIES: ProductCategory[] = [
       my: "အတွင်းဘလိုင့်နှင့် ကန့်လန့်ကာ",
       lo: "ມູລີ ແລະ ມ່ານພາຍໃນ",
       km: "វាំងននខាងក្នុង",
+      vi: "Rèm sáo và rèm nội thất",
     }),
     description: t(
       "มู่ลี่ไม้ มู่ลี่อลูมิเนียม ม่านม้วน และม่านปรับแสง ผลิตตามขนาดหน้างาน",
@@ -177,6 +178,7 @@ export const PRODUCT_CATEGORIES: ProductCategory[] = [
       my: "PVC အခန်းကန့်",
       lo: "ສະກັ້ນຫ້ອງ PVC",
       km: "ភាគថាស PVC",
+      vi: "Vách ngăn PVC",
     }),
     description: t(
       "ฉากกั้นห้องพับได้ 4 สไตล์ Standard, Japanese, USA และ URO สูงได้ถึง 3.60 เมตร",

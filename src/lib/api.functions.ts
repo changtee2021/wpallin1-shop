@@ -292,7 +292,7 @@ export const updateAccountProfileFn = createServerFn({ method: "POST" })
         fullName: z.string().min(1),
         phone: z.string().optional(),
         locale: z
-          .enum(["th", "en", "my", "lo", "km", "zh-hans", "zh-hant"])
+          .enum(["th", "en", "my", "lo", "km", "vi", "zh-hans", "zh-hant"])
           .optional(),
 
         customerType: z.enum(["individual", "juristic"]).optional(),

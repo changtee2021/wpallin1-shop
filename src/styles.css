@@ -87,6 +87,9 @@
     ui-sans-serif, system-ui, sans-serif;
   line-height: 1.7;
 }
+:lang(vi) {
+  --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+}
 :lang(zh-Hans) {
   --font-sans: "Noto Sans SC", "IBM Plex Sans Thai", ui-sans-serif, system-ui,
     sans-serif;
