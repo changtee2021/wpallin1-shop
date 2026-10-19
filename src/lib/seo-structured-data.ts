@@ -33,7 +33,7 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
           {
             "@type": "ContactPoint",
             contactType: "sales",
-            telephone: "+66-2-334-0235",
+            telephone: "+66-91-772-7967",
             availableLanguage: ["th", "en"],
           },
         ],

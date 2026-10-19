@@ -82,8 +82,8 @@ export const siteConfig = {
   ],
   emailTo:
     envUrl("VITE_CONTACT_EMAIL") ?? "wp.trading.intergroup2021@gmail.com",
-  phoneTel: envUrl("VITE_PHONE_TEL") ?? "023340235",
-  phoneDisplay: envUrl("VITE_PHONE_DISPLAY") ?? "02-334-0235",
+  phoneTel: envUrl("VITE_PHONE_TEL") ?? "0917727967",
+  phoneDisplay: envUrl("VITE_PHONE_DISPLAY") ?? "091-772-7967",
   officeLabel: "สำนักงาน",
   officeLabelEn: "Office",
   salesLabel: "ฝ่ายขาย",
