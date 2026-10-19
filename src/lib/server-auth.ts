@@ -65,7 +65,7 @@ export async function requireAdmin(userId: string) {
   }
 }
 
-export async function requireStaff(userId: string) {
+export async function isStaff(userId: string): Promise<boolean> {
   const { supabaseAdmin } =
     await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
@@ -74,11 +74,13 @@ export async function requireStaff(userId: string) {
     .eq("user_id", userId);
   if (error) throw new Error(error.message);
   const roles = (data ?? []).map((r) => r.role);
-  if (
-    !roles.some(
-      (r) => r === "admin" || r === "super_admin" || r === "sales_staff",
-    )
-  ) {
+  return roles.some(
+    (r) => r === "admin" || r === "super_admin" || r === "sales_staff",
+  );
+}
+
+export async function requireStaff(userId: string) {
+  if (!(await isStaff(userId))) {
     throw new Error("Forbidden: staff role required");
   }
 }

@@ -301,13 +301,17 @@ export async function addConfigurationToCart(
   const { getCart, resolveCartForContext } =
     await import("@/services/cart.service");
 
-  const { data: config } = await supabase
+  const { data: config, error: configErr } = await supabase
     .from("custom_configurations")
-    .select("id, product_id, config_json, computed_price")
+    .select("id, user_id, product_id, config_json, computed_price")
     .eq("id", configurationId)
     .maybeSingle();
 
+  if (configErr) throw new Error(configErr.message);
   if (!config) throw new Error("ไม่พบการกำหนดค่า");
+  if (config.user_id && config.user_id !== ctx.userId) {
+    throw new Error("ไม่พบการกำหนดค่า");
+  }
 
   const cart = await resolveCartForContext(supabase, ctx);
   const draft = config.config_json as ConfiguratorDraft;

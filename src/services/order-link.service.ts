@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { calcLineTotal } from "@/domain/pricing";
 import { getCart, recalcCartTotals } from "@/services/cart.service";
+import { resolveProductUnitPrice } from "@/services/pricing-resolver";
 import type { CartDto } from "@/types/api/cart";
 import type {
   CreateOrderLinkInput,
@@ -63,6 +64,36 @@ export async function createOrderLink(
   input: CreateOrderLinkInput,
 ): Promise<{ token: string; url: string }> {
   if (!input.items.length) throw new Error("ไม่มีรายการสินค้า");
+  if (input.items.length > 100) throw new Error("รายการมากเกินไป");
+
+  const productIds = [...new Set(input.items.map((item) => item.productId))];
+  const { data: products, error: productErr } = await supabase
+    .from("products")
+    .select("id, name, sku, is_active")
+    .in("id", productIds);
+  if (productErr) throw new Error(productErr.message);
+  const byId = new Map((products ?? []).map((row) => [row.id, row]));
+
+  const pricedItems = [];
+  for (const item of input.items) {
+    const product = byId.get(item.productId);
+    if (!product?.is_active || !product.sku || !product.name) {
+      throw new Error("สินค้าไม่พร้อมขาย");
+    }
+    const unitPrice = await resolveProductUnitPrice(
+      supabase,
+      userId,
+      item.productId,
+      item.qty,
+    );
+    pricedItems.push({
+      productId: product.id,
+      sku: product.sku,
+      productName: product.name,
+      qty: item.qty,
+      unitPrice,
+    });
+  }
 
   const token = randomToken();
   const days = input.expiresInDays ?? 7;
@@ -84,7 +115,7 @@ export async function createOrderLink(
   if (linkErr) throw new Error(linkErr.message);
 
   const { error: itemsErr } = await supabase.from("order_link_items").insert(
-    input.items.map((item, index) => ({
+    pricedItems.map((item, index) => ({
       order_link_id: link.id,
       product_id: item.productId,
       sku: item.sku,
@@ -210,7 +241,13 @@ export async function acceptOrderLinkToCart(
 
   for (const item of link.items) {
     if (!item.productId) continue;
-    const lineTotal = calcLineTotal(item.qty, item.unitPrice);
+    const unitPrice = await resolveProductUnitPrice(
+      supabase,
+      ctx.userId,
+      item.productId,
+      item.qty,
+    );
+    const lineTotal = calcLineTotal(item.qty, unitPrice);
     const { data: existing } = await supabase
       .from("cart_items")
       .select("id, qty")
@@ -220,38 +257,41 @@ export async function acceptOrderLinkToCart(
 
     if (existing) {
       const newQty = Number(existing.qty) + item.qty;
-      const newLineTotal = calcLineTotal(newQty, item.unitPrice);
-      await supabase
+      const newLineTotal = calcLineTotal(newQty, unitPrice);
+      const { error: updateErr } = await supabase
         .from("cart_items")
         .update({
           qty: newQty,
-          unit_price: item.unitPrice,
+          unit_price: unitPrice,
           line_total: newLineTotal,
         })
         .eq("id", existing.id);
+      if (updateErr) throw new Error(updateErr.message);
     } else {
-      await supabase.from("cart_items").insert({
+      const { error: insertErr } = await supabase.from("cart_items").insert({
         cart_id: cartId,
         product_id: item.productId,
         product_name: item.productName,
         sku: item.sku,
         qty: item.qty,
-        unit_price: item.unitPrice,
+        unit_price: unitPrice,
         line_total: lineTotal,
         config_snapshot: { source: "order_link", token },
       });
+      if (insertErr) throw new Error(insertErr.message);
     }
   }
 
   await recalcCartTotals(supabase, cartId);
 
-  await supabase
+  const { error: linkErr } = await supabase
     .from("order_links")
     .update({
       status: "ordered",
       ordered_at: new Date().toISOString(),
     })
     .eq("token", token);
+  if (linkErr) throw new Error(linkErr.message);
 
   return getCart(supabase, ctx);
 }

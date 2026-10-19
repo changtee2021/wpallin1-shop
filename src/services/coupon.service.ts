@@ -87,14 +87,19 @@ export async function incrementCouponUsage(
   supabase: SupabaseClient,
   code: string,
 ): Promise<void> {
-  const { data } = await supabase
-    .from("coupons")
-    .select("used_count")
-    .eq("code", code)
-    .maybeSingle();
-  if (!data) return;
-  await supabase
-    .from("coupons")
-    .update({ used_count: Number(data.used_count) + 1 })
-    .eq("code", code);
+  const { error } = await supabase.rpc("coupon_redeem", { p_code: code });
+  if (error) {
+    if (error.message.includes("coupon_exhausted")) {
+      throw new Error("คูปองหมดสิทธิ์แล้ว");
+    }
+    throw new Error("ใช้คูปองไม่สำเร็จ");
+  }
+}
+
+export async function releaseCouponUsage(
+  supabase: SupabaseClient,
+  code: string,
+): Promise<void> {
+  const { error } = await supabase.rpc("coupon_release", { p_code: code });
+  if (error) throw new Error("คืนสิทธิ์คูปองไม่สำเร็จ");
 }

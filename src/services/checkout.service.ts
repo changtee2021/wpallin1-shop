@@ -11,7 +11,10 @@ import {
   resolveCartForContext,
 } from "@/services/cart.service";
 import { getProductById } from "@/services/catalog.service";
-import { incrementCouponUsage } from "@/services/coupon.service";
+import {
+  incrementCouponUsage,
+  releaseCouponUsage,
+} from "@/services/coupon.service";
 import { assertCanPurchase } from "@/services/purchase-access.service";
 import { decrementStockForPaidOrder } from "@/services/inventory.service";
 import {
@@ -31,6 +34,43 @@ async function getBankAccounts(supabase: SupabaseClient) {
   if (Array.isArray(accounts))
     return accounts as CheckoutResult["bankAccounts"];
   return [];
+}
+
+async function cancelUnpaidOrder(
+  supabase: SupabaseClient,
+  orderId: string,
+  paymentId: string,
+) {
+  const { error: orderErr } = await supabase
+    .from("orders")
+    .update({ status: "cancelled", payment_status: "unpaid" })
+    .eq("id", orderId);
+  if (orderErr) throw new Error(orderErr.message);
+
+  const { error: payErr } = await supabase
+    .from("payments")
+    .update({ status: "failed" })
+    .eq("id", paymentId);
+  if (payErr) throw new Error(payErr.message);
+}
+
+async function markOrderPaid(
+  supabase: SupabaseClient,
+  orderId: string,
+  paymentId: string,
+) {
+  const paidAt = new Date().toISOString();
+  const { error: orderErr } = await supabase
+    .from("orders")
+    .update({ status: "paid", payment_status: "paid" })
+    .eq("id", orderId);
+  if (orderErr) throw new Error(orderErr.message);
+
+  const { error: payErr } = await supabase
+    .from("payments")
+    .update({ status: "paid", paid_at: paidAt })
+    .eq("id", paymentId);
+  if (payErr) throw new Error(payErr.message);
 }
 
 async function getDefaultShippingFee(supabase: SupabaseClient) {
@@ -144,7 +184,14 @@ export async function placeOrder(
   }
 
   const isWalletPaid = paymentMethod === "wallet";
-  const isCreditPending = paymentMethod === "credit";
+
+  const { data: cartFull, error: cartCouponErr } = await supabase
+    .from("carts")
+    .select("coupon_code")
+    .eq("id", cartRow.id)
+    .maybeSingle();
+  if (cartCouponErr) throw new Error(cartCouponErr.message);
+  const couponCode = cartFull?.coupon_code ?? null;
 
   const { data: order, error: orderErr } = await supabase
     .from("orders")
@@ -161,12 +208,8 @@ export async function placeOrder(
       grand_total: totals.grandTotal,
       note: input.note?.trim() || null,
       metadata: orderMetadata,
-      status: isWalletPaid
-        ? "paid"
-        : isCreditPending
-          ? "pending_payment"
-          : "pending_payment",
-      payment_status: isWalletPaid ? "paid" : "unpaid",
+      status: "pending_payment",
+      payment_status: "unpaid",
     })
     .select("id, order_number, grand_total")
     .single();
@@ -184,30 +227,43 @@ export async function placeOrder(
       user_id: userId,
       order_id: order.id,
       method: paymentMethod,
-      status: isWalletPaid ? "paid" : "awaiting_verification",
+      status: "awaiting_verification",
       amount: totals.grandTotal,
-      paid_at: isWalletPaid ? new Date().toISOString() : null,
+      paid_at: null,
     })
     .select("id")
     .single();
   if (payErr) throw new Error(payErr.message);
 
+  if (couponCode) {
+    try {
+      await incrementCouponUsage(supabase, couponCode);
+    } catch (err) {
+      await cancelUnpaidOrder(supabase, order.id, payment.id);
+      throw err;
+    }
+  }
+
   if (isWalletPaid) {
-    await debitWalletForOrder(supabase, userId, order.id, totals.grandTotal);
+    try {
+      await debitWalletForOrder(supabase, userId, order.id, totals.grandTotal);
+    } catch (err) {
+      if (couponCode) {
+        try {
+          await releaseCouponUsage(supabase, couponCode);
+        } catch {
+          // Still cancel the unpaid order if the coupon return fails.
+        }
+      }
+      await cancelUnpaidOrder(supabase, order.id, payment.id);
+      throw err;
+    }
+    await markOrderPaid(supabase, order.id, payment.id);
     await recordPaidOrderStats(supabase, userId, totals.grandTotal);
     await decrementStockForPaidOrder(supabase, order.id);
     const { createProductionJob } =
       await import("@/services/admin-order.service");
     await createProductionJob(supabase, order.id);
-  }
-
-  const { data: cartFull } = await supabase
-    .from("carts")
-    .select("coupon_code")
-    .eq("id", cartRow.id)
-    .maybeSingle();
-  if (cartFull?.coupon_code) {
-    await incrementCouponUsage(supabase, cartFull.coupon_code);
   }
 
   if (input.affiliateCode) {
@@ -219,15 +275,16 @@ export async function placeOrder(
     );
   }
 
+  if (couponCode) {
+    const { error: clearCouponErr } = await supabase
+      .from("carts")
+      .update({ discount: 0, coupon_code: null })
+      .eq("id", cartRow.id);
+    if (clearCouponErr) throw new Error(clearCouponErr.message);
+  }
+
   if (selectedItemIds) {
     await removeCartItems(supabase, cartRow.id, input.itemIds!);
-    const remainingCount = (cartItems?.length ?? 0) - checkoutItems.length;
-    if (remainingCount <= 0) {
-      await supabase
-        .from("carts")
-        .update({ discount: 0, coupon_code: null })
-        .eq("id", cartRow.id);
-    }
   } else {
     await clearCart(supabase, cartRow.id);
   }
@@ -344,17 +401,18 @@ export async function placeOrderOnBehalf(
       note: input.note?.trim() || null,
       internal_note: input.internalNote?.trim() || null,
       metadata,
-      status: isPaid ? "paid" : "pending_payment",
-      payment_status: isPaid ? "paid" : "unpaid",
+      status: "pending_payment",
+      payment_status: "unpaid",
     })
     .select("id, order_number, grand_total")
     .single();
 
   if (orderErr) throw new Error(orderErr.message);
 
-  await supabase
+  const { error: itemsErr } = await supabase
     .from("order_items")
     .insert(orderItems.map((item) => ({ ...item, order_id: order.id })));
+  if (itemsErr) throw new Error(itemsErr.message);
 
   const { data: payment, error: payErr } = await supabase
     .from("payments")
@@ -362,21 +420,27 @@ export async function placeOrderOnBehalf(
       user_id: input.customerUserId,
       order_id: order.id,
       method: paymentMethod,
-      status: isPaid ? "paid" : "awaiting_verification",
+      status: "awaiting_verification",
       amount: totals.grandTotal,
-      paid_at: isPaid ? new Date().toISOString() : null,
+      paid_at: null,
     })
     .select("id")
     .single();
   if (payErr) throw new Error(payErr.message);
 
   if (isPaid) {
-    await debitWalletForOrder(
-      supabase,
-      input.customerUserId,
-      order.id,
-      totals.grandTotal,
-    );
+    try {
+      await debitWalletForOrder(
+        supabase,
+        input.customerUserId,
+        order.id,
+        totals.grandTotal,
+      );
+    } catch (err) {
+      await cancelUnpaidOrder(supabase, order.id, payment.id);
+      throw err;
+    }
+    await markOrderPaid(supabase, order.id, payment.id);
     await recordPaidOrderStats(
       supabase,
       input.customerUserId,

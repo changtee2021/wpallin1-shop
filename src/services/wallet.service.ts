@@ -67,41 +67,41 @@ export async function listWalletTransactions(
   }));
 }
 
+function throwWalletRpcError(error: { message: string }): never {
+  const msg = error.message;
+  if (msg.includes("insufficient_balance")) {
+    throw new Error("ยอดเงินในกระเป๋าไม่พอ");
+  }
+  if (msg.includes("wallet_not_found")) {
+    throw new Error("ไม่พบกระเป๋าเงิน");
+  }
+  if (msg.includes("already_processed")) {
+    throw new Error("คำขอนี้ดำเนินการแล้ว");
+  }
+  if (msg.includes("self_approval")) {
+    throw new Error("อนุมัติคำขอของตัวเองไม่ได้");
+  }
+  if (msg.includes("invalid_amount")) {
+    throw new Error("จำนวนเงินไม่ถูกต้อง");
+  }
+  if (msg.includes("not_found")) {
+    throw new Error("ไม่พบคำขอเติมเงิน");
+  }
+  throw new Error("ทำรายการกระเป๋าเงินไม่สำเร็จ");
+}
+
 export async function debitWalletForOrder(
   supabase: SupabaseClient,
   userId: string,
   orderId: string,
   amount: number,
 ): Promise<void> {
-  const { data: account, error: accErr } = await supabase
-    .from("wallet_accounts")
-    .select("id, available_balance")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (accErr) throw new Error(accErr.message);
-  if (!account) throw new Error("ไม่พบกระเป๋าเงิน");
-
-  const balance = Number(account.available_balance);
-  if (balance < amount) throw new Error("ยอดเงินในกระเป๋าไม่พอ");
-
-  const newBalance = balance - amount;
-  await supabase
-    .from("wallet_accounts")
-    .update({ available_balance: newBalance })
-    .eq("id", account.id);
-
-  await supabase.from("wallet_transactions").insert({
-    wallet_account_id: account.id,
-    tx_type: "debit",
-    direction: "debit",
-    amount,
-    status: "used",
-    balance_after: newBalance,
-    description: "ชำระออเดอร์",
-    reference_type: "order",
-    reference_id: orderId,
+  const { error } = await supabase.rpc("wallet_debit_for_order", {
+    p_user_id: userId,
+    p_order_id: orderId,
+    p_amount: amount,
   });
+  if (error) throwWalletRpcError(error);
 }
 
 export async function payWithWallet(
@@ -113,7 +113,7 @@ export async function payWithWallet(
 ): Promise<void> {
   await debitWalletForOrder(supabase, userId, orderId, amount);
 
-  await supabase
+  const { error: payErr } = await supabase
     .from("payments")
     .update({
       method: "wallet",
@@ -121,11 +121,13 @@ export async function payWithWallet(
       paid_at: new Date().toISOString(),
     })
     .eq("id", paymentId);
+  if (payErr) throw new Error(payErr.message);
 
-  await supabase
+  const { error: orderErr } = await supabase
     .from("orders")
     .update({ status: "paid", payment_status: "paid" })
     .eq("id", orderId);
+  if (orderErr) throw new Error(orderErr.message);
 }
 
 export type WalletTopupRequestDto = {
@@ -358,64 +360,17 @@ export async function approveTopupRequest(
   adminUserId: string,
   requestId: string,
 ): Promise<void> {
-  const { data: req, error: reqErr } = await supabase
-    .from("wallet_topup_requests")
-    .select("id, wallet_account_id, amount, status, user_id")
-    .eq("id", requestId)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("wallet_approve_topup", {
+    p_request_id: requestId,
+    p_admin_id: adminUserId,
+  });
+  if (error) throwWalletRpcError(error);
 
-  if (reqErr) throw new Error(reqErr.message);
-  if (!req) throw new Error("ไม่พบคำขอเติมเงิน");
-  if (req.status !== "pending") throw new Error("คำขอนี้ดำเนินการแล้ว");
-
-  const { data: account, error: accErr } = await supabase
-    .from("wallet_accounts")
-    .select("id, available_balance")
-    .eq("id", req.wallet_account_id)
-    .maybeSingle();
-
-  if (accErr || !account) throw new Error("ไม่พบกระเป๋าเงิน");
-
-  const amount = Number(req.amount);
-  const newBalance = Number(account.available_balance) + amount;
-
-  const { data: tx, error: txErr } = await supabase
-    .from("wallet_transactions")
-    .insert({
-      wallet_account_id: account.id,
-      tx_type: "credit",
-      direction: "credit",
-      amount,
-      status: "available",
-      balance_after: newBalance,
-      description: "เติมเงินกระเป๋า",
-      reference_type: "topup",
-      reference_id: requestId,
-    })
-    .select("id")
-    .single();
-
-  if (txErr) throw new Error(txErr.message);
-
-  await supabase
-    .from("wallet_accounts")
-    .update({ available_balance: newBalance })
-    .eq("id", account.id);
-
-  const now = new Date().toISOString();
-  await supabase
-    .from("wallet_topup_requests")
-    .update({
-      status: "approved",
-      reviewed_by: adminUserId,
-      reviewed_at: now,
-      wallet_transaction_id: tx.id,
-      updated_at: now,
-    })
-    .eq("id", requestId);
+  const userId = typeof data === "string" ? data : null;
+  if (!userId) return;
 
   const { notifyUserEvent } = await import("@/services/notification.service");
-  await notifyUserEvent(supabase, req.user_id, "wallet_topup_approved");
+  await notifyUserEvent(supabase, userId, "wallet_topup_approved");
 }
 
 export async function rejectTopupRequest(
@@ -461,36 +416,18 @@ export async function adminAdjustWallet(
 ): Promise<void> {
   if (amount <= 0) throw new Error("จำนวนเงินไม่ถูกต้อง");
 
-  const account = await ensureWalletAccount(supabase, userId);
-  const { data: acc, error: accErr } = await supabase
-    .from("wallet_accounts")
-    .select("available_balance")
-    .eq("id", account.id)
-    .single();
-
-  if (accErr) throw new Error(accErr.message);
-
-  let newBalance = Number(acc.available_balance);
-  if (direction === "credit") {
-    newBalance += amount;
-  } else {
-    if (newBalance < amount) throw new Error("ยอดเงินไม่พอสำหรับหัก");
-    newBalance -= amount;
-  }
-
-  await supabase.from("wallet_transactions").insert({
-    wallet_account_id: account.id,
-    tx_type: "adjustment",
-    direction,
-    amount,
-    status: "available",
-    balance_after: newBalance,
-    description: note?.trim() || "ปรับยอดโดยแอดมิน",
-    metadata: { adjusted_by: adminUserId },
+  await ensureWalletAccount(supabase, userId);
+  const { error } = await supabase.rpc("wallet_admin_adjust", {
+    p_user_id: userId,
+    p_admin_id: adminUserId,
+    p_amount: amount,
+    p_direction: direction,
+    p_note: note ?? "",
   });
-
-  await supabase
-    .from("wallet_accounts")
-    .update({ available_balance: newBalance })
-    .eq("id", account.id);
+  if (error) {
+    if (error.message.includes("insufficient_balance")) {
+      throw new Error("ยอดเงินไม่พอสำหรับหัก");
+    }
+    throwWalletRpcError(error);
+  }
 }

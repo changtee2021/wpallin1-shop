@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { enforceRateLimit, RateLimitError } from "@/lib/rate-limit";
-import { requireAdmin, requireStaff } from "@/lib/server-auth";
+import { isStaff, requireAdmin, requireStaff } from "@/lib/server-auth";
 import {
   cartCtxSchema,
   getAdminClient,
@@ -86,7 +86,12 @@ export const fetchQuotationDetail = createServerFn({ method: "GET" })
   )
   .handler(async ({ data, context }) => {
     const supabase = await getAdminClient();
-    return getQuotationDetail(supabase, data.quotationId);
+    const quote = await getQuotationDetail(supabase, data.quotationId);
+    if (!quote) throw new Error("ไม่พบใบเสนอราคา");
+    if (quote.userId !== context.userId && !(await isStaff(context.userId))) {
+      throw new Error("ไม่พบใบเสนอราคา");
+    }
+    return quote;
   });
 
 export const fetchPublicQuotation = createServerFn({ method: "GET" })

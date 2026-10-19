@@ -24,7 +24,7 @@ export const createShareableOrderLink = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z
       .object({
-        items: z.array(orderLinkItemSchema).min(1),
+        items: z.array(orderLinkItemSchema).min(1).max(100),
         customerNote: z.string().max(500).optional(),
         expiresInDays: z.number().int().min(1).max(30).optional(),
       })
