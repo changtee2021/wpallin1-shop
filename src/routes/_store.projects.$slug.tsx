@@ -10,10 +10,12 @@ import {
   type CatalogProduct,
 } from "@/data/products-catalog";
 import { PROJECT_KIND_LABELS, PROJECTS, getProject } from "@/data/projects";
-import { useT } from "@/i18n";
+import { DEFAULT_LOCALE, useT } from "@/i18n";
 import { bi, useBi, useEnText } from "@/lib/bi";
 import { absoluteUrl } from "@/lib/public-url";
 import { pageHead } from "@/lib/seo";
+import { buildBreadcrumbJsonLd } from "@/lib/seo-structured-data";
+import { siteConfig } from "@/lib/site-config";
 
 export const Route = createFileRoute("/_store/projects/$slug")({
   loader: ({ params }) => {
@@ -24,24 +26,36 @@ export const Route = createFileRoute("/_store/projects/$slug")({
   head: ({ loaderData, match }) => {
     if (!loaderData?.project) return {};
     const { project } = loaderData;
+    const locale = match.context.locale ?? DEFAULT_LOCALE;
+    const path = `/projects/${project.slug}`;
+    const title = bi(locale, project.title);
     return pageHead({
-      locale: match.context.locale,
-      title: `${bi(match.context.locale ?? "th", project.title)} | WP ALL`,
-      description: bi(match.context.locale ?? "th", project.summary),
-      path: `/projects/${project.slug}`,
+      locale,
+      title: `${title} | WP ALL`,
+      description: bi(locale, project.summary),
+      path,
       image: project.cover,
       type: "article",
       jsonLd: {
         "@context": "https://schema.org",
-        "@type": "CreativeWork",
-        name: project.title.th,
-        alternateName: project.title.en,
-        description: project.summary.th,
-        image: [project.cover, ...project.gallery].map((src) =>
-          absoluteUrl(src),
-        ),
-        ...(project.year ? { dateCreated: project.year } : {}),
-        creator: { "@type": "Organization", name: "WP ALL" },
+        "@graph": [
+          {
+            "@type": "CreativeWork",
+            name: title,
+            alternateName: project.title.en,
+            description: bi(locale, project.summary),
+            image: [project.cover, ...project.gallery].map((src) =>
+              absoluteUrl(src),
+            ),
+            ...(project.year ? { dateCreated: project.year } : {}),
+            creator: { "@type": "Organization", name: siteConfig.name },
+          },
+          buildBreadcrumbJsonLd(locale, [
+            { name: siteConfig.name, path: "/" },
+            { name: "Projects", path: "/projects" },
+            { name: title, path },
+          ]),
+        ],
       },
     });
   },

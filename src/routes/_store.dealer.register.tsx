@@ -43,11 +43,13 @@ import {
 import { submitDealerApplication } from "@/lib/api.functions";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { COMMERCE_ENABLED } from "@/lib/features";
+import { noIndexHead } from "@/lib/seo";
 import { formatDate } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyDealerApplication } from "@/services/dealer.service";
 
 export const Route = createFileRoute("/_store/dealer/register")({
+  head: noIndexHead,
   beforeLoad: () => {
     // Account-based applications need login; brand mode collects dealer leads on /partners.
     if (!COMMERCE_ENABLED) throw redirect({ to: "/partners", replace: true });

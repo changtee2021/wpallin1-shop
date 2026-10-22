@@ -13,9 +13,11 @@ import {
   fetchPublicQuotation,
   respondPublicQuotation,
 } from "@/lib/api.functions";
+import { noIndexHead } from "@/lib/seo";
 import type { QuotationDto } from "@/types/api/quotations";
 
 export const Route = createFileRoute("/quote/$token")({
+  head: noIndexHead,
   component: PublicQuotationPage,
 });
 

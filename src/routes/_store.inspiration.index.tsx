@@ -6,6 +6,9 @@ import { InspirationHubTabs } from "@/components/storefront/inspiration-hub-tabs
 import { InspirationMaterialMasonryGrid } from "@/components/storefront/inspiration-material-masonry-grid";
 import { InspirationMasonryGrid } from "@/components/storefront/inspiration-masonry-grid";
 import { resolveInspirationRooms } from "@/data/inspiration-fallback";
+import { bi } from "@/lib/bi";
+import { PAGE_META } from "@/lib/page-meta";
+import { pageHead } from "@/lib/seo";
 import {
   fetchCategories,
   fetchPublicInspirationMaterials,
@@ -19,6 +22,17 @@ const inspirationIndexSearchSchema = z.object({
 
 export const Route = createFileRoute("/_store/inspiration/")({
   validateSearch: (search) => inspirationIndexSearchSchema.parse(search),
+  head: ({ match }) =>
+    pageHead({
+      locale: match.context.locale,
+      title: bi(match.context.locale ?? "th", PAGE_META.inspiration.title),
+      description: bi(
+        match.context.locale ?? "th",
+        PAGE_META.inspiration.description,
+      ),
+      path: "/inspiration",
+      image: "/inspiration/inspiration-02-living-linen.png",
+    }),
   loader: async () => {
     const [rooms, categories, dbMaterials] = await Promise.all([
       resolveInspirationRooms(() => fetchPublicInspirationRooms()),

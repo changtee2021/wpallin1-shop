@@ -14,6 +14,7 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as DealerRouteImport } from './routes/dealer'
 import { Route as ErrorRouteImport } from './routes/error'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SignupRouteImport } from './routes/signup'
@@ -131,6 +132,11 @@ const DealerRoute = DealerRouteImport.update({
 const ErrorRoute = ErrorRouteImport.update({
   id: '/error',
   path: '/error',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -614,6 +620,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/dealer': typeof DealerRouteWithChildren
   '/error': typeof ErrorRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/signup': typeof SignupRoute
@@ -710,6 +717,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/error': typeof ErrorRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/signup': typeof SignupRoute
@@ -805,6 +813,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/dealer': typeof DealerRouteWithChildren
   '/error': typeof ErrorRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/signup': typeof SignupRoute
@@ -908,6 +917,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dealer'
     | '/error'
+    | '/llms.txt'
     | '/login'
     | '/robots.txt'
     | '/signup'
@@ -1004,6 +1014,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/error'
+    | '/llms.txt'
     | '/login'
     | '/robots.txt'
     | '/signup'
@@ -1098,6 +1109,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dealer'
     | '/error'
+    | '/llms.txt'
     | '/login'
     | '/robots.txt'
     | '/signup'
@@ -1200,6 +1212,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   DealerRoute: typeof DealerRouteWithChildren
   ErrorRoute: typeof ErrorRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   LoginRoute: typeof LoginRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SignupRoute: typeof SignupRoute
@@ -1257,6 +1270,13 @@ declare module '@tanstack/react-router' {
       path: '/error'
       fullPath: '/error'
       preLoaderRoute: typeof ErrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -2218,6 +2238,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   DealerRoute: DealerRouteWithChildren,
   ErrorRoute: ErrorRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   LoginRoute: LoginRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SignupRoute: SignupRoute,

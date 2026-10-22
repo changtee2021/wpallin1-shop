@@ -3,10 +3,12 @@ import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
 import { navigateAfterAuth } from "@/lib/auth-errors";
+import { noIndexHead } from "@/lib/seo";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth/callback")({
   ssr: false,
+  head: noIndexHead,
   component: AuthCallbackPage,
 });
 

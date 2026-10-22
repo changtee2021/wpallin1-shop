@@ -11,6 +11,8 @@ import {
 } from "@/lib/api.functions";
 import { enrichInspirationRoomProducts } from "@/lib/inspiration-enrich";
 import { findSimilarInspirationRooms } from "@/lib/inspiration-similar";
+import { absoluteUrl } from "@/lib/public-url";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_store/inspiration/$slug")({
   loader: async ({ params }) => {
@@ -33,6 +35,29 @@ export const Route = createFileRoute("/_store/inspiration/$slug")({
     const similarRooms = findSimilarInspirationRooms(enriched, allRooms);
 
     return { room: enriched, similarRooms };
+  },
+  head: ({ loaderData, match }) => {
+    if (!loaderData?.room) return {};
+    const { room } = loaderData;
+    const description = (room.description ?? room.title)
+      .replace(/\s+/g, " ")
+      .slice(0, 160);
+    return pageHead({
+      locale: match.context.locale,
+      title: `${room.title} | WP ALL`,
+      description: description || room.title,
+      path: `/inspiration/${room.slug}`,
+      image: room.imageUrl,
+      type: "article",
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: room.title,
+        description,
+        image: absoluteUrl(room.imageUrl),
+        author: { "@type": "Organization", name: "WP ALL" },
+      },
+    });
   },
   component: InspirationRoomPage,
 });

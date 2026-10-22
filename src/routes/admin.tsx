@@ -7,9 +7,11 @@ import { AppBottomNav } from "@/components/layout/app-bottom-nav";
 import { StorefrontHeader } from "@/components/layout/storefront-header";
 import { storeSectionClasses } from "@/components/layout/store-page";
 import { PageLoading } from "@/components/loading";
+import { noIndexHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
+  head: noIndexHead,
   component: AdminLayout,
 });
 

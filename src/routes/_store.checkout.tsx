@@ -39,6 +39,7 @@ import { PromptPayPanel } from "@/components/checkout/promptpay-panel";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { getAffiliateRef } from "@/lib/affiliate-cookie";
 import { requireCommerce } from "@/lib/commerce-guard";
+import { noIndexHead } from "@/lib/seo";
 import { formatPrice } from "@/lib/format";
 import type { BankAccountDto } from "@/types/api/orders";
 import type { AddressDto } from "@/types/api/profile";
@@ -53,6 +54,7 @@ const checkoutSearchSchema = z.object({
 export const Route = createFileRoute("/_store/checkout")({
   validateSearch: checkoutSearchSchema,
   beforeLoad: requireCommerce,
+  head: noIndexHead,
   component: CheckoutPage,
 });
 

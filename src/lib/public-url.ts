@@ -15,6 +15,7 @@ export function getDefaultOgImageUrl(): string {
 }
 
 export function absoluteUrl(path: string): string {
+  if (/^https?:\/\//i.test(path)) return path;
   const base = getPublicUrl().replace(/\/$/, "");
   const normalized = path.startsWith("/") ? path : `/${path}`;
   return `${base}${normalized}`;

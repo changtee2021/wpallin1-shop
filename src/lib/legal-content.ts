@@ -1,4 +1,6 @@
 import type { Locale } from "@/i18n/types";
+import { getPublicUrl } from "@/lib/public-url";
+import { siteConfig } from "@/lib/site-config";
 
 export type LegalSection = {
   title: string;
@@ -316,10 +318,48 @@ export const legalPages: Record<
   },
 };
 
+const LEGACY_PUBLIC_SITE = "https://wpallin1-shop.vercel.app";
+
+function applyLegalTokens(text: string, locale: "th" | "en"): string {
+  const address =
+    locale === "th"
+      ? `${siteConfig.address.line1} ${siteConfig.address.line2} ${siteConfig.address.city}`
+      : `${siteConfig.addressEn.line1}, ${siteConfig.addressEn.line2}, ${siteConfig.addressEn.city}, ${siteConfig.addressEn.country}`;
+  const company =
+    locale === "th" ? siteConfig.legalName : siteConfig.legalNameEn;
+  return text
+    .replaceAll(PLACEHOLDERS.company, company)
+    .replaceAll(PLACEHOLDERS.address, address)
+    .replaceAll(PLACEHOLDERS.dpo, siteConfig.emailTo)
+    .replaceAll(LEGACY_PUBLIC_SITE, getPublicUrl().replace(/\/$/, ""));
+}
+
 export function getLegalPage(
   page: keyof typeof legalPages,
   locale: Locale,
 ): LegalPageContent {
   const key = locale === "th" ? "th" : "en";
-  return legalPages[page][key];
+  const content = legalPages[page][key];
+  return {
+    title: applyLegalTokens(content.title, key),
+    lastUpdated: content.lastUpdated,
+    sections: content.sections.map((section) => ({
+      title: applyLegalTokens(section.title, key),
+      paragraphs: section.paragraphs.map((paragraph) =>
+        applyLegalTokens(paragraph, key),
+      ),
+    })),
+  };
+}
+
+export function legalPageMeta(
+  page: keyof typeof legalPages,
+  locale: Locale,
+): { title: string; description: string } {
+  const content = getLegalPage(page, locale);
+  const raw = content.sections[0]?.paragraphs[0] ?? content.title;
+  return {
+    title: `${content.title} | WP ALL`,
+    description: raw.replace(/\s+/g, " ").slice(0, 160),
+  };
 }

@@ -42,6 +42,11 @@ import { useMemberProductPrices } from "@/hooks/use-member-product-prices";
 import { fetchProductBySlug, fetchPublicProducts } from "@/lib/api.functions";
 import { lineOaMessageUrl } from "@/lib/dealer-onboarding";
 import { pageHead } from "@/lib/seo";
+import {
+  buildBreadcrumbJsonLd,
+  buildProductJsonLd,
+} from "@/lib/seo-structured-data";
+import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 import type { ApiListResponse } from "@/types/api/common";
 import type { ProductPublicDto } from "@/types/api/products";
@@ -104,22 +109,32 @@ export const Route = createFileRoute("/_store/shop/$slug")({
   head: ({ loaderData, match }) => {
     if (!loaderData?.product) return {};
     const { product } = loaderData;
-    const head = pageHead({
-      locale: match.context.locale,
+    const locale = match.context.locale ?? "th";
+    const path = `/shop/${product.slug}`;
+    return pageHead({
+      locale,
       title: `${product.name} (${product.sku}) | WP ALL Shop`,
       description:
         product.description?.slice(0, 160) ??
         `${product.name} — สั่งซื้อสำหรับตัวแทนจำหน่าย WP ALL`,
-      path: `/shop/${product.slug}`,
+      path,
       image: product.imageUrl ?? undefined,
       type: "product",
+      noIndex: product.isMock,
+      jsonLd: product.isMock
+        ? undefined
+        : {
+            "@context": "https://schema.org",
+            "@graph": [
+              buildProductJsonLd(product, undefined, locale),
+              buildBreadcrumbJsonLd(locale, [
+                { name: siteConfig.name, path: "/" },
+                { name: "Shop", path: "/shop" },
+                { name: product.name, path },
+              ]),
+            ],
+          },
     });
-    return product.isMock
-      ? {
-          ...head,
-          meta: [...head.meta, { name: "robots", content: "noindex, follow" }],
-        }
-      : head;
   },
   pendingComponent: DetailSkeleton,
   errorComponent: ({ reset }) => (

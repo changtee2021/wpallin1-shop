@@ -40,11 +40,12 @@ import {
 } from "@/data/products-catalog";
 import { getProductFaqs } from "@/data/product-faqs";
 import { PROJECTS } from "@/data/projects";
-import { useT } from "@/i18n";
+import { DEFAULT_LOCALE, useT, withLocalePrefix } from "@/i18n";
 import { bi, useBi, useEnText, type Bi } from "@/lib/bi";
 import { shopHref } from "@/lib/features";
 import { absoluteUrl } from "@/lib/public-url";
 import { pageHead } from "@/lib/seo";
+import { buildBreadcrumbJsonLd } from "@/lib/seo-structured-data";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
@@ -57,38 +58,55 @@ export const Route = createFileRoute("/_store/products/$slug")({
   head: ({ loaderData, match }) => {
     if (!loaderData?.product) return {};
     const { product } = loaderData;
+    const locale = match.context.locale ?? DEFAULT_LOCALE;
+    const category = getProductCategory(product.category);
     const faqs = getProductFaqs(product.slug);
+    const productPath = `/products/${product.slug}`;
     const productLd = {
       "@type": "Product",
-      name: product.name.th,
+      name: bi(locale, product.name),
       alternateName: product.name.en,
-      description: product.summary.th,
+      sku: product.code,
+      description: bi(locale, product.summary),
       image: [product.image, ...(product.gallery ?? [])].map((src) =>
         absoluteUrl(src),
       ),
-      category: getProductCategory(product.category).name.en,
-      brand: { "@type": "Brand", name: "WP ALL" },
+      category: bi(locale, category.name),
+      url: absoluteUrl(withLocalePrefix(productPath, locale)),
+      brand: { "@type": "Brand", name: siteConfig.name },
       manufacturer: { "@type": "Organization", name: siteConfig.legalNameEn },
     };
     return pageHead({
-      locale: match.context.locale,
-      title: `${bi(match.context.locale ?? "th", product.name)} (${en(product.code)}) | WP ALL`,
-      description: bi(match.context.locale ?? "th", product.summary),
-      path: `/products/${product.slug}`,
+      locale,
+      title: `${bi(locale, product.name)} (${product.code}) | WP ALL`,
+      description: bi(locale, product.summary),
+      path: productPath,
       image: product.image,
       type: "product",
       jsonLd: {
         "@context": "https://schema.org",
         "@graph": [
           productLd,
+          buildBreadcrumbJsonLd(locale, [
+            { name: siteConfig.name, path: "/" },
+            {
+              name: bi(locale, category.name),
+              path: `/products?category=${category.id}`,
+            },
+            { name: bi(locale, product.name), path: productPath },
+          ]),
           ...(faqs.length
             ? [
                 {
                   "@type": "FAQPage",
+                  inLanguage: locale,
                   mainEntity: faqs.map((item) => ({
                     "@type": "Question",
-                    name: item.question.th,
-                    acceptedAnswer: { "@type": "Answer", text: item.answer.th },
+                    name: bi(locale, item.question),
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: bi(locale, item.answer),
+                    },
                   })),
                 },
               ]

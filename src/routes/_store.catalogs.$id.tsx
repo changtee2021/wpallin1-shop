@@ -24,8 +24,8 @@ import {
 } from "@/lib/api.functions";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { isUuid } from "@/lib/catalog-slug";
-import { absoluteUrl, getDefaultOgImageUrl } from "@/lib/public-url";
-import { DEFAULT_LOCALE, useT, withLocalePrefix } from "@/i18n";
+import { pageHead } from "@/lib/seo";
+import { DEFAULT_LOCALE, useT } from "@/i18n";
 import { catalogDbText, useCatalogDbText } from "@/i18n/content/catalog-db";
 import type { ProductPublicDto } from "@/types/api/products";
 import type {
@@ -73,28 +73,21 @@ export const Route = createFileRoute("/_store/catalogs/$id")({
     if (!loaderData?.access) return {};
     const { catalog } = loaderData.access;
     const locale = match.context.locale ?? DEFAULT_LOCALE;
-    const canonical = absoluteUrl(
-      withLocalePrefix(`/catalogs/${catalog.slug}`, locale),
-    );
     const title = catalogDbText(locale, catalog.title);
     const description =
       (catalog.description
         ? catalogDbText(locale, catalog.description).slice(0, 160)
         : undefined) ?? `${title} — WP ALL product catalog`;
-    const ogImage = catalog.coverImageUrl ?? getDefaultOgImageUrl();
 
-    return {
-      meta: [
-        { title: `${title} | WP ALL Catalog` },
-        { name: "description", content: description },
-        { property: "og:type", content: "article" },
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
-        { property: "og:url", content: canonical },
-        { property: "og:image", content: ogImage },
-      ],
-      links: [{ rel: "canonical", href: canonical }],
-    };
+    return pageHead({
+      locale,
+      title: `${title} | WP ALL Catalog`,
+      description,
+      path: `/catalogs/${catalog.slug}`,
+      image: catalog.coverImageUrl ?? undefined,
+      type: "article",
+      noIndex: catalog.visibility !== "public",
+    });
   },
   component: CatalogViewerPage,
 });

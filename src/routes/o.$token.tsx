@@ -15,9 +15,11 @@ import {
 import { getOrCreateCartSessionId } from "@/lib/cart-session";
 import { formatDate, formatPrice } from "@/lib/format";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
+import { noIndexHead } from "@/lib/seo";
 import type { OrderLinkDto } from "@/types/api/order-links";
 
 export const Route = createFileRoute("/o/$token")({
+  head: noIndexHead,
   component: PublicOrderLinkPage,
 });
 

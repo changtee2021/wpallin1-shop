@@ -94,6 +94,7 @@ export const Route = createRootRouteWithContext<{
         { property: "og:image", content: getDefaultOgImageUrl() },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:image", content: getDefaultOgImageUrl() },
+        { name: "apple-mobile-web-app-title", content: "WP ALL" },
       ],
       links: [
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -132,6 +133,7 @@ export const Route = createRootRouteWithContext<{
           sizes: "96x96",
         },
         { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+        { rel: "manifest", href: "/site.webmanifest" },
       ],
     };
   },

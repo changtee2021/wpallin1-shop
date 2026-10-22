@@ -78,7 +78,7 @@ export const LOCALE_OPTIONS: LocaleOption[] = [
  * Paths that never get a locale prefix (admin, auth callbacks, tokens, SEO files).
  */
 const IGNORE_PATH_RE =
-  /^\/(?:admin(?:\/|$)|auth(?:\/|$)|api(?:\/|$)|o\/|quote\/|sitemap\.xml$|robots\.txt$)/;
+  /^\/(?:admin(?:\/|$)|auth(?:\/|$)|api(?:\/|$)|o\/|quote\/|sitemap\.xml$|robots\.txt$|llms\.txt$)/;
 
 export function shouldIgnorePath(pathname: string): boolean {
   return IGNORE_PATH_RE.test(pathname);

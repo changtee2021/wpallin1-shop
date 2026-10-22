@@ -13,6 +13,7 @@ import {
   findSimilarInspirationMaterials,
 } from "@/lib/inspiration-materials";
 import { getPublicFabricById } from "@/services/inspiration-material.service";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_store/inspiration/materials/$slug")({
   loader: async ({ params }) => {
@@ -34,6 +35,21 @@ export const Route = createFileRoute("/_store/inspiration/materials/$slug")({
       : null;
 
     return { material, rooms, similarMaterials, fabric };
+  },
+  head: ({ loaderData, match }) => {
+    if (!loaderData?.material) return {};
+    const { material } = loaderData;
+    const description = (material.caption ?? material.label)
+      .replace(/\s+/g, " ")
+      .slice(0, 160);
+    return pageHead({
+      locale: match.context.locale,
+      title: `${material.label} | WP ALL`,
+      description,
+      path: `/inspiration/materials/${material.slug}`,
+      image: material.imageUrl,
+      type: "article",
+    });
   },
   component: InspirationMaterialPage,
 });

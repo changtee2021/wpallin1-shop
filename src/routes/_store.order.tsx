@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { fetchMyOrders } from "@/lib/api.functions";
 import { orderLinesFromSearch, orderSearchSchema } from "@/lib/order-share";
 import { requireCommerce } from "@/lib/commerce-guard";
+import { noIndexHead } from "@/lib/seo";
 import { authServerFnOptions } from "@/lib/server-fn-auth";
 import { useT } from "@/i18n";
 import type { OrderSummaryDto } from "@/types/api/orders";
@@ -17,6 +18,7 @@ const RECENT_ORDER_LIMIT = 5;
 export const Route = createFileRoute("/_store/order")({
   validateSearch: (search) => orderSearchSchema.parse(search),
   beforeLoad: requireCommerce,
+  head: noIndexHead,
   component: OrderPage,
 });
 

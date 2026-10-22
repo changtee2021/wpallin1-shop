@@ -112,6 +112,22 @@ export const PAGE_META = {
         "WP ALL 全國經銷商的印花窗簾、展覽與安裝案例，包括 Colors of Buriram 2025 與 Bangkok Design Week 2025。",
     },
   },
+  inspiration: {
+    title: {
+      th: "แรงบันดาลใจแต่งบ้าน | WP ALL",
+      en: "Home Inspiration | WP ALL",
+      "zh-hans": "家居灵感 | WP ALL",
+      "zh-hant": "居家靈感 | WP ALL",
+    },
+    description: {
+      th: "ไอเดียห้องจริงจากผ้าม่าน มู่ลี่ และวัสดุ WP ALL เลือกบรรยากาศแล้วดูว่าใช้ผ้า ราง หรือมู่ลี่แบบไหน",
+      en: "Real-room ideas from WP ALL curtains, blinds and materials. Browse a look, then see the fabric, track or blind behind it.",
+      "zh-hans":
+        "来自 WP ALL 窗帘、百叶与材料的真实房间灵感。先看氛围，再看背后的布料、轨道或百叶。",
+      "zh-hant":
+        "來自 WP ALL 窗簾、百葉與材料的真實房間靈感。先看氛圍，再看背後的布料、軌道或百葉。",
+    },
+  },
   shop: {
     title: {
       th: "WP ALL Shop — สั่งซื้อสินค้าสำหรับตัวแทนจำหน่าย",

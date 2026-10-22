@@ -34,6 +34,7 @@ import {
   safeAuthRedirect,
 } from "@/lib/auth-errors";
 import { getSessionUser } from "@/lib/auth-session";
+import { noIndexHead } from "@/lib/seo";
 
 const loginSearchSchema = z.object({
   tab: z.enum(["login", "signup"]).optional().catch("login"),
@@ -44,6 +45,7 @@ type AuthView = "tabs" | "forgot" | "verify-email";
 
 export const Route = createFileRoute("/login")({
   ssr: false,
+  head: noIndexHead,
   validateSearch: (search) => loginSearchSchema.parse(search),
   pendingComponent: () => (
     <PageLoading variant="detail" className="min-h-screen" />

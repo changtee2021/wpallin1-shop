@@ -8,10 +8,12 @@ import { useCart } from "@/hooks/use-cart";
 import { useCompare } from "@/hooks/use-compare";
 import { formatPrice } from "@/lib/format";
 import { requireCommerce } from "@/lib/commerce-guard";
+import { noIndexHead } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_store/compare")({
   beforeLoad: requireCommerce,
+  head: noIndexHead,
   component: ComparePage,
 });
 

@@ -17,6 +17,7 @@ import {
   type ErrorPageKind,
 } from "@/lib/error-feedback";
 import { pageHead } from "@/lib/seo";
+import { buildLocalBusinessJsonLd } from "@/lib/seo-structured-data";
 import { channelsByLocale, siteConfig } from "@/lib/site-config";
 
 const contactSearchSchema = z.object({
@@ -37,11 +38,14 @@ export const Route = createFileRoute("/_store/contact")({
   validateSearch: (search) => contactSearchSchema.parse(search),
   head: ({ match }) => {
     const locale = match.context.locale ?? DEFAULT_LOCALE;
+    const isFeedback = match.search.type === "feedback";
     return pageHead({
       title: `${translate(locale, "site.cta.contact")} | WP ALL`,
       description: translate(locale, "site.meta.description"),
       path: "/contact",
       locale,
+      noIndex: isFeedback,
+      jsonLd: isFeedback ? undefined : buildLocalBusinessJsonLd(),
     });
   },
   component: ContactPage,

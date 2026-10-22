@@ -9,7 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useT } from "@/i18n";
+import { DEFAULT_LOCALE, useT } from "@/i18n";
 import { bi, useBi, type Bi } from "@/lib/bi";
 import { pageHead } from "@/lib/seo";
 import { PAGE_META } from "@/lib/page-meta";
@@ -170,24 +170,30 @@ const FAQ_GROUPS: FaqGroup[] = [
 ];
 
 export const Route = createFileRoute("/_store/faq")({
-  head: ({ match }) =>
-    pageHead({
-      locale: match.context.locale,
-      title: bi(match.context.locale ?? "th", PAGE_META.faq.title),
-      description: bi(match.context.locale ?? "th", PAGE_META.faq.description),
+  head: ({ match }) => {
+    const locale = match.context.locale ?? DEFAULT_LOCALE;
+    return pageHead({
+      locale,
+      title: bi(locale, PAGE_META.faq.title),
+      description: bi(locale, PAGE_META.faq.description),
       path: "/faq",
       jsonLd: {
         "@context": "https://schema.org",
         "@type": "FAQPage",
+        inLanguage: locale,
         mainEntity: FAQ_GROUPS.flatMap((group) =>
           group.items.map((item) => ({
             "@type": "Question",
-            name: item.question.th,
-            acceptedAnswer: { "@type": "Answer", text: item.answer.th },
+            name: bi(locale, item.question),
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: bi(locale, item.answer),
+            },
           })),
         ),
       },
-    }),
+    });
+  },
   component: FaqPage,
 });
 
